@@ -49,11 +49,9 @@ class _PopupState extends State<Popup> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: min(widget.column, widget.editingWindowSize.width - width),
-        top: widget.row,
-      ),
+    return Positioned(
+      left: min(widget.column, widget.editingWindowSize.width - width),
+      top: widget.row,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: height, maxWidth: width),
         child: Container(
@@ -103,7 +101,6 @@ class _PopupState extends State<Popup> {
           widget.controller.selectedIndex = index;
           widget.parentFocusNode.requestFocus();
           widget.controller.onCompletionSelected();
-
         },
         hoverColor: Colors.grey.withOpacity(0.1),
         splashColor: Colors.transparent,

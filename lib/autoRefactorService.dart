@@ -1,19 +1,12 @@
 import 'dart:math';
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:tuple/tuple.dart';
 
 import 'constants/constants.dart';
 
-late String refactorSettings;
 
-void loadRefactorSettings() async{
-  refactorSettings = await rootBundle.loadString('assets/settings/autoRefactoringSettings.json');
-}
-
-String autoRefactor(String text, String language){
-  loadRefactorSettings();
+String autoRefactor(String text, String language, String refactorSettings){
   String refactorText = "";
   Map<String, dynamic> settings = jsonDecode(refactorSettings);
   List<Tuple2<String, List<Tuple2<int, int>>>> indexes;
