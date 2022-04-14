@@ -207,6 +207,7 @@ class CodeFieldState extends State<CodeField> {
   //
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
+  bool isMultiline = false;
   String? lines;
   String longestLine = "";
   late Size windowSize;
@@ -235,6 +236,8 @@ class CodeFieldState extends State<CodeField> {
   }
 
   KeyEventResult _onKey(FocusNode node, RawKeyEvent event) {
+    this.isMultiline =
+        event.isAltPressed && event.isControlPressed ? true : false;
     return widget.controller.onKey(event);
   }
 
@@ -396,7 +399,9 @@ class CodeFieldState extends State<CodeField> {
       enabled: widget.enabled,
       onChanged: widget.onChanged,
       readOnly: widget.readOnly,
-    );
+      onTap: () {
+        widget.controller.handleTap(isMultiline);
+      });
 
     final editingField = Theme(
       data: Theme.of(context).copyWith(

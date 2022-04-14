@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:code_text_field/src/autocomplete/popup_controller.dart';
+import 'package:code_text_field/src/multiline_controller.dart';
 import 'package:code_text_field/src/autocomplete/suggestion.dart';
 import 'package:code_text_field/src/autocomplete/suggestion_generator.dart';
 import 'package:code_text_field/src/code_modifier.dart';
@@ -54,6 +55,7 @@ class CodeController extends TextEditingController {
   bool isPopupShown = false;
   RegExp? styleRegExp;
   late PopupController popupController;
+  late MultilineController? multilineController;
   SuggestionGenerator? suggestionGenerator;
 
   CodeController({
@@ -82,6 +84,7 @@ class CodeController extends TextEditingController {
     modifiers.forEach((el) {
       modifierMap[el.char] = el;
     });
+    this.multilineController = MultilineController();
     suggestionGenerator = SuggestionGenerator(
         'language_id'); // TODO: replace string with some generated value for current language id
     this.popupController = PopupController(onCompletionSelected: this.insertSelectedWord);
@@ -127,7 +130,26 @@ class CodeController extends TextEditingController {
       removeChar();
   }
 
+  void handleTap(bool isMulti) {
+    if (isMulti) {
+      this.multilineController!.isMutli = true;
+      this.multilineController!.isCaret = true;
+      value = this.multilineController!.insertCaret(value);
+    } else {
+      multilineController!.updateCurrentSelection(
+          multilineController!.currentSelection, value.selection.start);
+      value = multilineController!.clearCarets(value);
+    }
+  }
+
   KeyEventResult onKey(RawKeyEvent event) {
+    if (event.isKeyPressed(LogicalKeyboardKey.arrowDown) ||
+        event.isKeyPressed(LogicalKeyboardKey.arrowUp) ||
+        event.isKeyPressed(LogicalKeyboardKey.arrowRight) ||
+        event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+      value = this.multilineController!.clearCarets(value);
+    }
+
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
       text = text.replaceRange(selection.start, selection.end, "\t");
       return KeyEventResult.handled;
@@ -155,11 +177,13 @@ class CodeController extends TextEditingController {
     String selectedWord = popupController.getSelectedWord();
     int startPosition = selection.baseOffset -
         suggestionGenerator!.getCurrentWordPrefix().length;
-    text = text.replaceRange(startPosition, selection.baseOffset, selectedWord);
-    selection = previousSelection.copyWith(
-      baseOffset: startPosition + selectedWord.length,
-      extentOffset: startPosition + selectedWord.length,
-    );
+    value = value.copyWith(
+        text: text.replaceRange(
+            startPosition, selection.baseOffset, selectedWord),
+        selection: previousSelection.copyWith(
+          baseOffset: startPosition + selectedWord.length,
+          extentOffset: startPosition + selectedWord.length,
+        ));
     popupController.hide();
   }
 
@@ -201,7 +225,7 @@ class CodeController extends TextEditingController {
   @override
   set value(TextEditingValue newValue) {
     final loc = _insertedLoc(text, newValue.text);
-    if (loc != null) {
+    if (loc != null && !multilineController!.isMutli) {
       final char = newValue.text[loc];
       final modifier = modifierMap[char];
       final val = modifier?.updateString(rawText, selection, params);
@@ -215,8 +239,13 @@ class CodeController extends TextEditingController {
       }
     }
 
+    multilineController!.updateCurrentSelection(
+        newValue.selection.start, value.selection.start);
+        
     bool hasTextChanged = newValue.text != super.value.text;
     bool hasSelectionChanged = (newValue.selection != super.value.selection);
+
+    newValue = multilineController!.updateMultiline(value, newValue);
 
     //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
     // Now fix the textfield for web
