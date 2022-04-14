@@ -9,7 +9,7 @@ abstract class CodeModifier {
 
   // Helper to insert [str] in [text] between [start] and [end]
   TextEditingValue replace(String text, int start, int end, String str) {
-    final len = str.length;
+    final int len = str.length;
     return TextEditingValue(
       text: text.replaceRange(start, end, str),
       selection: TextSelection(
@@ -33,20 +33,30 @@ class IntendModifier extends CodeModifier {
   @override
   TextEditingValue? updateString(
       String text, TextSelection sel, EditorParams params) {
-    var spacesCount = 0;
-    var braceCount = 0;
-    for (var k = min(sel.start, text.length) - 1; k >= 0; k--) {
-      if (text[k] == "\n") break;
-      if (text[k] == " ")
+    int spacesCount = 0;
+    int braceCount = 0;
+    for (int k = min(sel.start, text.length) - 1; k >= 0; k--) {
+      if (text[k] == '\n') {
+        break;
+      }
+
+      if (text[k] == ' ') {
         spacesCount += 1;
-      else
+      } 
+      else {
         spacesCount = 0;
-      if (text[k] == "{")
+      }
+
+      if (text[k] == '{')
         braceCount += 1;
-      else if (text[k] == "}") braceCount -= 1;
+      else if (text[k] == '}') {
+        braceCount -= 1;
+      }
     }
-    if (braceCount > 0) spacesCount += params.tabSpaces;
-    final insert = "\n" + " " * spacesCount;
+    if (braceCount > 0) {
+      spacesCount += params.tabSpaces;
+    }
+    final String insert = '\n' + ' ' * spacesCount;
     return replace(text, sel.start, sel.end, insert);
   }
 }
@@ -58,16 +68,21 @@ class CloseBlockModifier extends CodeModifier {
   TextEditingValue? updateString(
       String text, TextSelection sel, EditorParams params) {
     int spaceCount = 0;
-    for (var k = min(sel.start, text.length) - 1; k >= 0; k--) {
-      if (text[k] == "\n") break;
-      if (text[k] != " ") {
+    for (int k = min(sel.start, text.length) - 1; k >= 0; k--) {
+      if (text[k] == '\n') {
+        break;
+      }
+
+      if (text[k] != ' ') {
         spaceCount = 0;
         break;
       }
       spaceCount += 1;
     }
-    if (spaceCount >= params.tabSpaces)
-      return replace(text, sel.start - params.tabSpaces, sel.end, "}");
+
+    if (spaceCount >= params.tabSpaces) {
+      return replace(text, sel.start - params.tabSpaces, sel.end, '}');
+    }
     return null;
   }
 }
@@ -78,7 +93,7 @@ class TabModifier extends CodeModifier {
   @override
   TextEditingValue? updateString(
       String text, TextSelection sel, EditorParams params) {
-    final tmp = replace(text, sel.start, sel.end, " " * params.tabSpaces);
+    final TextEditingValue tmp = replace(text, sel.start, sel.end, ' ' * params.tabSpaces);
     return tmp;
   }
 }

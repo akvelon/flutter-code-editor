@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:code_text_field/code_text_field.dart';
-import 'package:code_text_field/languages/all.dart';
-
 import 'package:code_text_field/autoRefactorService.dart';
+import 'package:code_text_field/code_text_field.dart';
 import 'package:code_text_field/constants/constants.dart';
 import 'package:code_text_field/constants/themes.dart';
+import 'package:code_text_field/languages/all.dart';
+import 'package:flutter/material.dart';
 
 class CustomCodeBox extends StatefulWidget {
   final String language;
@@ -39,12 +38,12 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
   ];
 
   List<String?> themeList  = <String>[
-    "monokai-sublime",
-    "a11y-dark",
-    "an-old-hope",
-    "vs2015",
-    "vs",
-    "atom-one-dark"
+    'monokai-sublime',
+    'a11y-dark',
+    'an-old-hope',
+    'vs2015',
+    'vs',
+    'atom-one-dark'
   ];
 
   Widget buildDropdown(Iterable<String?> choices, String value, IconData icon,
@@ -67,19 +66,22 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
 
   @override
   Widget build(BuildContext context) {
-    final codeDropdown =
-        buildDropdown(languageList, language!, Icons.code, (val) {
+
+    final Widget codeDropdown =
+        buildDropdown(languageList, language!, Icons.code, (String? val) {
       if (val == null) return;
       setState(() => language = val);
     });
-    final themeDropdown =
-        buildDropdown(themeList, theme!, Icons.color_lens, (val) {
+
+    final Widget themeDropdown =
+        buildDropdown(themeList, theme!, Icons.color_lens, (String? val) {
       if (val == null) return;
       setState(() => theme = val);
     });
-    final resetButton = TextButton.icon(
-      icon: Icon(Icons.delete, color: Colors.white), 
-      label: Text('Reset', style: TextStyle(color: Colors.white)),
+
+    final TextButton resetButton = TextButton.icon(
+      icon: const Icon(Icons.delete, color: Colors.white), 
+      label: const Text('Reset', style: TextStyle(color: Colors.white)),
       onPressed: () {
         setState(() {
           reset = (!reset!);
@@ -87,31 +89,35 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       }, 
     );
 
-    final buttons = Container (
+    final Container buttons = Container (
       height: MediaQuery.of(context).size.height/13,
       color: Colors.deepPurple[900],
       child: Row(
-        children: [
-        Spacer(flex: 2),
-        Text('Code editor', style: TextStyle(fontSize: 28, color: Colors.white)),
-        Spacer(flex: 35),
+        children: <Widget>[
+        const Spacer(flex: 2),
+        const Text('Code editor', style: TextStyle(fontSize: 28, color: Colors.white)),
+        const Spacer(flex: 35),
         codeDropdown,
-        Spacer(),
+        const Spacer(),
         themeDropdown,
-        Spacer(),
+        const Spacer(),
         resetButton
         ]
       )
     );
-    final codeField = InnerField(
-      key: ValueKey("$language - $theme - $reset"),
+
+    final InnerField codeField = InnerField(
+      key: ValueKey<String>('$language - $theme - $reset'),
       language: language!,
       theme: theme!,
     );
-    return Column(children: [
-      buttons,
-      codeField,
-    ]);
+    
+    return Column(
+      children: <Widget>[
+        buttons,
+        codeField,
+      ]
+    );
   }
 }
 
@@ -151,7 +157,7 @@ class _InnerFieldState extends State<InnerField> {
       color: _codeController!.theme!['root']!.backgroundColor,
       height: MediaQuery.of(context).size.height / 13 * 12,
       child: Stack(
-        children: [
+        children: <Widget>[
           SingleChildScrollView(
             child: CodeField(
               controller: _codeController!,
@@ -161,13 +167,13 @@ class _InnerFieldState extends State<InnerField> {
           Align(
             alignment: Alignment.topRight,
             child: FloatingActionButton(
-              child: const Icon(Icons.format_align_left_outlined),
               backgroundColor: Colors.indigo[800],
               onPressed: (){
                 setState(() {
                   _codeController!.text = autoRefactor( _codeController!.text, widget.language);
                 });
-              }
+              },
+              child: const Icon(Icons.format_align_left_outlined)
             )
           )
         ]

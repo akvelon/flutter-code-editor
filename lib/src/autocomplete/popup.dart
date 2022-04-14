@@ -57,15 +57,6 @@ class _PopupState extends State<Popup> {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: height, maxWidth: width),
         child: Container(
-          child: ScrollablePositionedList.builder(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              itemScrollController: widget.controller.itemScrollController,
-              itemPositionsListener: widget.controller.itemPositionsListener,
-              itemCount: widget.controller.suggestions.length,
-              itemBuilder: (context, index) {
-                return _buildListItem(index);
-              }),
           decoration: BoxDecoration(
             color: widget.backgroundColor,
             border: Border.all(
@@ -73,6 +64,15 @@ class _PopupState extends State<Popup> {
               width: 0.5,
             ),
           ),
+          child: ScrollablePositionedList.builder(
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              itemScrollController: widget.controller.itemScrollController,
+              itemPositionsListener: widget.controller.itemPositionsListener,
+              itemCount: widget.controller.suggestions.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildListItem(index);
+              }),
         ),
       ),
     );
@@ -82,19 +82,6 @@ class _PopupState extends State<Popup> {
     return Material(
       color: Colors.grey.withOpacity(0.1),
       child: InkWell(
-        child: Container(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
-            child: Text(
-              widget.controller.suggestions[index].word,
-              overflow: TextOverflow.ellipsis,
-              style: widget.style,
-            ),
-          ),
-          color: widget.controller.selectedIndex == index
-              ? Colors.blueAccent.withOpacity(0.5)
-              : Colors.transparent,
-        ),
         onTap: () {
           widget.controller.selectedIndex = index;
           widget.parentFocusNode.requestFocus();
@@ -108,6 +95,19 @@ class _PopupState extends State<Popup> {
         hoverColor: Colors.grey.withOpacity(0.1),
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
+        child: Container(
+          color: widget.controller.selectedIndex == index
+              ? Colors.blueAccent.withOpacity(0.5)
+              : Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
+            child: Text(
+              widget.controller.suggestions[index].word,
+              overflow: TextOverflow.ellipsis,
+              style: widget.style,
+            ),
+          ),
+        ),
       ),
     );
   }
