@@ -5,12 +5,12 @@ import 'package:code_text_field/src/autocomplete/suggestion.dart';
 import 'package:flutter/services.dart';
 
 class SuggestionGenerator {
-  RegExp identifierRegex = RegExp(r"^[_a-zA-Z0-9]+$");
-  RegExp splitRegex = RegExp(r"[^_a-zA-Z0-9]+");
+  RegExp identifierRegex = RegExp(r'^[_a-zA-Z0-9]+$');
+  RegExp splitRegex = RegExp(r'[^_a-zA-Z0-9]+');
   String? languageID;
-  final autoCompleteLanguage = AutoComplete(engine: SortEngine.entriesOnly());
-  final autoCompleteUser = AutoComplete(engine: SortEngine.entriesOnly());
-  final autoCompleteSnipplets = AutoComplete(engine: SortEngine.entriesOnly());
+  final AutoComplete autoCompleteLanguage = AutoComplete(engine: SortEngine.entriesOnly());
+  final AutoComplete autoCompleteUser = AutoComplete(engine: SortEngine.entriesOnly());
+  final AutoComplete autoCompleteSnipplets = AutoComplete(engine: SortEngine.entriesOnly());
   late int cursorPosition;
   late String text;
 
@@ -28,11 +28,11 @@ class SuggestionGenerator {
   }
 
   List<String> getKeywords(Map<String, dynamic> config) {
-    return config["keywords"].toString().split(" ");
+    return config['keywords'].toString().split(' ');
   }
 
   List<String> getSnipplets(Map<String, dynamic> config) {
-    return [...config["snipplets"]];
+    return <String>[...config['snipplets']];
   }
 
   /// Placeholder for dictionary initialization using json resource files for the given language
@@ -42,11 +42,11 @@ class SuggestionGenerator {
     List<String> keywords = getKeywords(jsonConfig);
     List<String> snipplets = getSnipplets(jsonConfig);
 
-    keywords.forEach((element) {
+    keywords.forEach((String element) {
       autoCompleteLanguage.enter(element);
     });
 
-    snipplets.forEach((element) {
+    snipplets.forEach((String element) {
       autoCompleteSnipplets.enter(element);
     });
   }
@@ -56,21 +56,21 @@ class SuggestionGenerator {
     this.text = text;
     String prefix = getCurrentWordPrefix();
     if (prefix.isEmpty) {
-      return [];
+      return <Suggestion>[];
     }
     _parseText();
-    List<Suggestion> suggestions = [];
+    List<Suggestion> suggestions = <Suggestion>[];
     suggestions += autoCompleteUser
         .suggest(prefix)
-        .map((word) => Suggestion(word, SuggestionType.local))
+        .map((String word) => Suggestion(word, SuggestionType.local))
         .toList();
     suggestions += autoCompleteLanguage
         .suggest(prefix)
-        .map((word) => Suggestion(word, SuggestionType.language))
+        .map((String word) => Suggestion(word, SuggestionType.language))
         .toList();
     suggestions += autoCompleteSnipplets
         .suggest(prefix)
-        .map((word) => Suggestion(word, SuggestionType.snippet))
+        .map((String word) => Suggestion(word, SuggestionType.snippet))
         .toList();
     return suggestions;
   }
@@ -102,7 +102,7 @@ class SuggestionGenerator {
   /// Parses text - gets user keywords and adds them into user trie
   void _parseText() {
     List<String> list = _getTextKeywords();
-    list.forEach((element) {
+    list.forEach((String element) {
       autoCompleteUser.enter(element);
     });
     _filterTextKeywords();
@@ -111,10 +111,10 @@ class SuggestionGenerator {
   /// Delete from trie keywords that are not currently in editor text
   void _filterTextKeywords() {
     List<String> keywords = _getTextKeywords();
-    final userKeyWords = autoCompleteUser.allEntries.toList();
-    final notInText =
-        userKeyWords.where((element) => !keywords.contains(element)).toList();
-    notInText.forEach((element) {
+    final List<String> userKeyWords = autoCompleteUser.allEntries.toList();
+    final List<String> notInText =
+        userKeyWords.where((String element) => !keywords.contains(element)).toList();
+    notInText.forEach((String element) {
       autoCompleteUser.delete(element);
     });
   }
@@ -123,11 +123,11 @@ class SuggestionGenerator {
   List<String> _getTextKeywords() {
     String processedText = _excludeCurrentWord();
     List<String> keywords = processedText.split(splitRegex);
-    keywords.removeWhere((el) => el.isEmpty == true);
+    keywords.removeWhere((String el) => el.isEmpty == true);
     keywords.removeWhere(
-        (el) => autoCompleteLanguage.allEntries.toList().contains(el));
+        (String el) => autoCompleteLanguage.allEntries.toList().contains(el));
     keywords
-        .removeWhere((element) => !element.startsWith(RegExp(r"[a-zA-Z_]")));
+        .removeWhere((String element) => !element.startsWith(RegExp(r'[a-zA-Z_]')));
     keywords = keywords.toSet().toList();
     return keywords;
   }
@@ -135,6 +135,6 @@ class SuggestionGenerator {
   /// Returns text without the word pointed to by the cursor
   String _excludeCurrentWord() {
     return text.replaceRange(cursorPosition - getCurrentWordPrefix().length,
-        cursorPosition + _getCurrentWordSuffix().length, "");
+        cursorPosition + _getCurrentWordSuffix().length, '');
   }
 }

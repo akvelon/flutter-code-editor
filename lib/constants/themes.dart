@@ -1,3 +1,4 @@
+import 'package:flutter/src/painting/text_style.dart';
 import 'package:flutter_highlight/themes/a11y-dark.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
 import 'package:flutter_highlight/themes/agate.dart';
@@ -89,7 +90,7 @@ import 'package:flutter_highlight/themes/xcode.dart';
 import 'package:flutter_highlight/themes/xt256.dart';
 import 'package:flutter_highlight/themes/zenburn.dart';
 
-const THEMES = {
+const Map<String, Map<String, TextStyle>> THEMES = <String, Map<String, TextStyle>>{
   'a11y-dark': a11yDarkTheme,
   'a11y-light': a11yLightTheme,
   'agate': agateTheme,

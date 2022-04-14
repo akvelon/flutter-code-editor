@@ -46,12 +46,12 @@ class PopupController extends ChangeNotifier {
     else
       selectedIndex = (selectedIndex + 1) % suggestions.length;
     List<int> visiblePositions = itemPositionsListener.itemPositions.value
-        .where((item) {
+        .where((ItemPosition item) {
           final bool isTopVisible = item.itemLeadingEdge >= 0;
           final bool isBottomVisible = item.itemTrailingEdge <= 1;
           return isTopVisible && isBottomVisible;
         })
-        .map((e) => e.index)
+        .map((ItemPosition e) => e.index)
         .toList();
     // List offset will be changed only if new selected item is not visible
     if (!visiblePositions.contains(selectedIndex)) {

@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:tuple/tuple.dart';
@@ -14,7 +14,7 @@ void loadRefactorSettings() async{
 
 String autoRefactor(String text, String language){
   loadRefactorSettings();
-  String refactorText = "";
+  String refactorText = '';
   Map<String, dynamic> settings = jsonDecode(refactorSettings);
   List<Tuple2<String, List<Tuple2<int, int>>>> indexes;
   Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> result = removeExtraSpacesAndLines(text, 
@@ -31,7 +31,7 @@ String autoRefactor(String text, String language){
     refactorText = addLineBreakAfterFunctionColon(refactorText, ''.padRight(int.parse(settings['intend'])), indexes);
   }
   refactorText = refactorText.trimRight();
-  if (settings['add_line_at_the_end'] == "true"){
+  if (settings['add_line_at_the_end'] == 'true'){
     refactorText += '\n ';
   }
   return refactorText;
@@ -40,17 +40,17 @@ String autoRefactor(String text, String language){
 Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAndLines(String text, String language, 
                                                                   int maxExtraLines){
   List<Tuple2<String, List<Tuple2<int, int>>>> indexes = [];
-  String refactorText = "";
+  String refactorText = '';
   text = text.trim();
   final List<String> textInLines = text.split('\n');
-  final pattern = RegExp('\\s\\s+');
+  final RegExp pattern = RegExp('\\s\\s+');
   bool multiline = false;
   String multilineQuotes = '';
   for (int i = 0; i < textInLines.length; i++) {
     if (textInLines[i] == '' || textInLines[i].trim() == '') {
       if (multiline) {
         refactorText += '\n';
-        indexes.add(Tuple2(multline, []));
+        indexes.add(const Tuple2<String, List<Tuple2<int, int>>>(multline, <Tuple2<int, int>>[]));
       }
       else {
         final List<String> reTextInLines = refactorText.split('\n');
@@ -58,24 +58,24 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           for (int j = 0; j < maxExtraLines; j++){
             if (reTextInLines[reTextInLines.length - 2 - j] != ''){
               refactorText += '\n';
-              indexes.add(Tuple2(simple, []));
+              indexes.add(const Tuple2(simple,  <Tuple2<int, int>>[]));
               break;
             }
           }
         }
         else {
           refactorText += '\n';
-          indexes.add(Tuple2(simple, []));
+          indexes.add(const Tuple2(simple,  <Tuple2<int, int>>[]));
         }
       }
     }
     else {
       String mutableString = textInLines[i];
-      List<Tuple2<int, int>> indexesOfline = [];
+      List<Tuple2<int, int>> indexesOfline = <Tuple2<int, int>>[];
       int beforeIndex = 0;
       while (mutableString.length > 0){
-        List<String> symbols = [];
-        List<int> firstIndexesOfSymbols = [];
+        List<String> symbols = <String>[];
+        List<int> firstIndexesOfSymbols = <int>[];
 
         if (language == go){
           int indexMultiLineGo = mutableString.indexOf('`');
@@ -85,8 +85,8 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
         else {
           int indexDoubMultiQuote = mutableString.indexOf('"""');
           int indexSingleMultiQuote = mutableString.indexOf('\'\'\'');
-          symbols.addAll(['"""', '\'\'\'']);
-          firstIndexesOfSymbols.addAll([indexDoubMultiQuote, indexSingleMultiQuote]);
+          symbols.addAll(<String>['"""', '\'\'\'']);
+          firstIndexesOfSymbols.addAll(<int>[indexDoubMultiQuote, indexSingleMultiQuote]);
         }
         
         if (language == python){
@@ -98,8 +98,8 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           int indexOfSlashes = mutableString.indexOf('//');
           int startIndex = mutableString.indexOf('/*');
           int endIndex = mutableString.indexOf('*/');
-          symbols.addAll(['//', '/*', '*/']);
-          firstIndexesOfSymbols.addAll([indexOfSlashes, startIndex, endIndex]);
+          symbols.addAll(<String>['//', '/*', '*/']);
+          firstIndexesOfSymbols.addAll(<int>[indexOfSlashes, startIndex, endIndex]);
         }
 
         RegExp singleQuoteRex1 = RegExp(r"[^\\]'");
@@ -115,14 +115,14 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
         int indexSingleQuote2 = mutableString.indexOf(singleQuoteRex2);
         int indexSingleQuote = indexSingleQuote2 == -1 ? (indexSingleQuote1 == -1 ? -1 : indexSingleQuote1 + 1) : indexSingleQuote2;
 
-        symbols.addAll(['\'', '"']);
-        firstIndexesOfSymbols.addAll([indexSingleQuote, indexDoubQuote]);
+        symbols.addAll(<String>['\'', '"']);
+        firstIndexesOfSymbols.addAll(<int>[indexSingleQuote, indexDoubQuote]);
 
         int minIndexOfSymbols = firstIndexesOfSymbols.reduce(max);
         if (minIndexOfSymbols == -1){
           if (multiline){
             refactorText += mutableString;
-            indexes.add(Tuple2(multline, []));
+            indexes.add(const Tuple2(multline, <Tuple2<int, int>>[]));
             mutableString = '';
           }
           else {
@@ -158,7 +158,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
             else {
               refactorText += mutableString;
               indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length - 1));
-              mutableString = "";
+              mutableString = '';
             }
           }
           else if (symbol == '"""' || symbol == "'''" || symbol == '`' || symbol == '/*' || symbol == '*/'){
@@ -176,7 +176,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
               if (secondIndex == -1){
                 refactorText += mutableString;
                 indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length - 1));
-                mutableString = "";
+                mutableString = '';
                 multilineQuotes = symbol == '/*' ? '*/' : symbol;
                 multiline = true;
               }
@@ -222,15 +222,15 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
 
 Tuple2<bool, int> symbolContains(String bracket, String text, Tuple2<String, List<Tuple2<int, int>>> indexesOfString){
   if (indexesOfString.item1 == multline){
-    return Tuple2(false, -1);
+    return const Tuple2<bool, int>(false, -1);
   }
   if (!text.contains(bracket)){
-    return Tuple2(false, -1);
+    return const Tuple2<bool, int>(false, -1);
   }
   if (indexesOfString.item1 == simple){
-    return Tuple2(true, text.indexOf(bracket));
+    return Tuple2<bool, int>(true, text.indexOf(bracket));
   }
-  List<int> indexesOfBracket= [];
+  List<int> indexesOfBracket= <int>[];
   int index = 0;
   while(index != -1){
     index = text.indexOf(bracket, index);
@@ -248,10 +248,10 @@ Tuple2<bool, int> symbolContains(String bracket, String text, Tuple2<String, Lis
       }
     }
     if (!insideString){
-      return Tuple2(true, indexesOfBracket[i]);
+      return Tuple2<bool, int>(true, indexesOfBracket[i]);
     }
   }
-  return Tuple2(false, -1);
+  return const Tuple2<bool, int>(false, -1);
 }
 
 Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBracket(List<String> textInLines, String intend, List<dynamic> brackets, String settings,
@@ -262,7 +262,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
   if (brackets.isEmpty) {
     return Tuple2(text, indexesOfStrings);
   }
-  List<int> indexes = [];
+  List<int> indexes = <int>[];
   for (int i = 0; i < brackets.length; i++){
     int firstIndex;
     int secondIndex;
@@ -302,7 +302,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
   }
   String bracket = brackets[indexOfmin];
 
-  String refactorText = "";
+  String refactorText = '';
   List<Tuple2<String, List<Tuple2<int, int>>>> newIndexesOfStrings = [];
   int i = 0;
 
@@ -318,7 +318,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
       List<String> linesWithAfterBracket = textInLines.sublist(i + 1);
       List<Tuple2<String, List<Tuple2<int, int>>>> indexesOfStringsWithAfterBracket = indexesOfStrings.sublist(i + 1);
       
-      List<Tuple2<int, int>> indexesForBeforeBracket = [];
+      List<Tuple2<int, int>> indexesForBeforeBracket = <Tuple2<int, int>>[];
       for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
         if (indexesOfStrings[i].item2[j].item2 < indexOfBracket){
           indexesForBeforeBracket.add(indexesOfStrings[i].item2[j]);
@@ -328,10 +328,10 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
 
       if (afterBracket.trim() != '') {
         linesWithAfterBracket.insert(0, afterBracket);
-        List<Tuple2<int, int>> indexesForAfterBracket = [];
+        List<Tuple2<int, int>> indexesForAfterBracket = <Tuple2<int, int>>[];
         for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
           if (indexesOfStrings[i].item2[j].item1 > indexOfBracket){
-            indexesForAfterBracket.add(Tuple2(indexesOfStrings[i].item2[j].item1 - indexOfBracket - 1, 
+            indexesForAfterBracket.add(Tuple2<int, int>(indexesOfStrings[i].item2[j].item1 - indexOfBracket - 1, 
                                                           indexesOfStrings[i].item2[j].item2 - indexOfBracket - 1));
           }
         }
@@ -353,7 +353,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
       List<String> linesWithAfterBracket = textInLines.sublist(i + 1);
       List<Tuple2<String, List<Tuple2<int, int>>>> indexesOfStringsWithAfterBracket = indexesOfStrings.sublist(i + 1);
 
-      List<Tuple2<int, int>> indexesForBeforeBracket = [];
+      List<Tuple2<int, int>> indexesForBeforeBracket = <Tuple2<int, int>>[];
       for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
         if (indexesOfStrings[i].item2[j].item2 < indexOfBracket){
           indexesForBeforeBracket.add(indexesOfStrings[i].item2[j]);
@@ -363,10 +363,10 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
 
       if (afterBracket.trim() != ''){
         linesWithAfterBracket.insert(0, afterBracket);
-        List<Tuple2<int, int>> indexesForAfterBracket = [];
+        List<Tuple2<int, int>> indexesForAfterBracket = <Tuple2<int, int>>[];
         for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
           if (indexesOfStrings[i].item2[j].item1 > indexOfBracket){
-            indexesForAfterBracket.add(Tuple2(indexesOfStrings[i].item2[j].item1 - indexOfBracket - 1, 
+            indexesForAfterBracket.add(Tuple2<int, int>(indexesOfStrings[i].item2[j].item1 - indexOfBracket - 1, 
                                                           indexesOfStrings[i].item2[j].item2 - indexOfBracket - 1));
           }
         }
@@ -390,9 +390,9 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
         if (indexesOfStrings[i].item2.length > 0){
           if (indexesOfStrings[i].item2[0].item1 != 0) {
             int lengthOfIntend = textInLines[i].length - textInLines[i].trimLeft().length;
-            List<Tuple2<int, int>> indexesForBeforeBracket = [];
+            List<Tuple2<int, int>> indexesForBeforeBracket = <Tuple2<int, int>>[];
             for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
-              indexesForBeforeBracket.add(Tuple2(indexesOfStrings[i].item2[j].item1 - lengthOfIntend + intend.length, 
+              indexesForBeforeBracket.add(Tuple2<int, int>(indexesOfStrings[i].item2[j].item1 - lengthOfIntend + intend.length, 
                                               indexesOfStrings[i].item2[j].item2 - lengthOfIntend + intend.length));
             }
             refactorText += intend + textInLines[i].trimLeft() + '\n';
@@ -405,7 +405,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
         }
         else {
           refactorText += intend + textInLines[i].trimLeft() + '\n';
-          newIndexesOfStrings.add(Tuple2(simple, []));
+          newIndexesOfStrings.add(const Tuple2(simple, <Tuple2<int, int>>[]));
         }
       }
       else {
@@ -419,7 +419,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
 }
 
 String addLineBreakAfterFunctionColon(String text, String intend, List<Tuple2<String, List<Tuple2<int, int>>>> indexesOfStrings){
-  String refactorText = "";
+  String refactorText = '';
   text = text.trimRight();
   final List<String> textInLines= text.split('\n');
   for (int i = 0; i < textInLines.length; i++){
@@ -430,10 +430,10 @@ String addLineBreakAfterFunctionColon(String text, String intend, List<Tuple2<St
       String afterColon = textInLines[i].substring(indexOfColon + 1);
       List<Tuple2<String, List<Tuple2<int, int>>>> indexesForAfterColonList = [];
       if (afterColon.trim() != ''){
-        List<Tuple2<int, int>> indexesForAfterColon = [];
+        List<Tuple2<int, int>> indexesForAfterColon = <Tuple2<int, int>>[];
         for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
           if (indexesOfStrings[i].item2[j].item1 > indexOfColon){
-            indexesForAfterColon.add(Tuple2(indexesOfStrings[i].item2[j].item1 - indexOfColon - 1, indexesOfStrings[i].item2[j].item2 - indexOfColon - 1));
+            indexesForAfterColon.add(Tuple2<int, int>(indexesOfStrings[i].item2[j].item1 - indexOfColon - 1, indexesOfStrings[i].item2[j].item2 - indexOfColon - 1));
           }
         }
         indexesForAfterColonList.add(Tuple2(indexesForAfterColon.isNotEmpty ? haveString : simple, indexesForAfterColon));

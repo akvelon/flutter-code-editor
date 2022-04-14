@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:code_text_field/languages/main_mode.dart';
 import 'package:code_text_field/src/autocomplete/popup_controller.dart';
 import 'package:code_text_field/src/autocomplete/suggestion.dart';
 import 'package:code_text_field/src/autocomplete/suggestion_generator.dart';
@@ -8,9 +9,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
-import 'package:code_text_field/languages/main_mode.dart';
 
-const _MIDDLE_DOT = '·';
+const String _MIDDLE_DOT = '·';
 
 class EditorParams {
   final int tabSpaces;
@@ -49,8 +49,8 @@ class CodeController extends TextEditingController {
 
   /* Computed members */
   final String languageId = _genId();
-  final styleList = <TextStyle>[];
-  final modifierMap = <String, CodeModifier>{};
+  final List<TextStyle> styleList = <TextStyle>[];
+  final Map<String, CodeModifier> modifierMap = <String, CodeModifier>{};
   bool isPopupShown = false;
   RegExp? styleRegExp;
   late PopupController popupController;
@@ -73,13 +73,13 @@ class CodeController extends TextEditingController {
   }) : super(text: text) {
     // PatternMap
     if (language != null && theme == null)
-      throw Exception("A theme must be provided for language parsing");
+      throw Exception('A theme must be provided for language parsing');
     // Register language
     if (language != null) {
       highlight.registerLanguage(languageId, language!);
     }
     // Create modifier map
-    modifiers.forEach((el) {
+    modifiers.forEach((CodeModifier el) {
       modifierMap[el.char] = el;
     });
     suggestionGenerator = SuggestionGenerator(
@@ -89,9 +89,9 @@ class CodeController extends TextEditingController {
 
   /// Replaces the current [selection] by [str]
   void insertStr(String str) {
-    final sel = selection;
+    final TextSelection sel = selection;
     text = text.replaceRange(selection.start, selection.end, str);
-    final len = str.length;
+    final int len = str.length;
     selection = sel.copyWith(
       baseOffset: sel.start + len,
       extentOffset: sel.start + len,
@@ -101,8 +101,8 @@ class CodeController extends TextEditingController {
   /// Remove the char just before the cursor or the selection
   void removeChar() {
     if (selection.start < 1) return;
-    final sel = selection;
-    text = text.replaceRange(selection.start - 1, selection.start, "");
+    final TextSelection sel = selection;
+    text = text.replaceRange(selection.start - 1, selection.start, '');
     selection = sel.copyWith(
       baseOffset: sel.start - 1,
       extentOffset: sel.start - 1,
@@ -111,8 +111,8 @@ class CodeController extends TextEditingController {
 
   /// Remove the selected text
   void removeSelection() {
-    final sel = selection;
-    text = text.replaceRange(selection.start, selection.end, "");
+    final TextSelection sel = selection;
+    text = text.replaceRange(selection.start, selection.end, '');
     selection = sel.copyWith(
       baseOffset: sel.start,
       extentOffset: sel.start,
@@ -129,7 +129,7 @@ class CodeController extends TextEditingController {
 
   KeyEventResult onKey(RawKeyEvent event) {
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
-      text = text.replaceRange(selection.start, selection.end, "\t");
+      text = text.replaceRange(selection.start, selection.end, '\t');
       return KeyEventResult.handled;
     }
     if (popupController.isPopupShown) {
@@ -151,7 +151,7 @@ class CodeController extends TextEditingController {
 
   /// Inserts the word selected from the list of completions
   void insertSelectedWord() {
-    final previousSelection = selection;
+    final TextSelection previousSelection = selection;
     String selectedWord = popupController.getSelectedWord();
     int startPosition = selection.baseOffset -
         suggestionGenerator!.getCurrentWordPrefix().length;
@@ -165,12 +165,12 @@ class CodeController extends TextEditingController {
 
   /// See webSpaceFix
   static String _spacesToMiddleDots(String str) {
-    return str.replaceAll(" ", _MIDDLE_DOT);
+    return str.replaceAll(' ', _MIDDLE_DOT);
   }
 
   /// See webSpaceFix
   static String _middleDotsToSpaces(String str) {
-    return str.replaceAll(_MIDDLE_DOT, " ");
+    return str.replaceAll(_MIDDLE_DOT, ' ');
   }
 
   /// Get untransformed text
@@ -184,27 +184,27 @@ class CodeController extends TextEditingController {
   bool get _webSpaceFix => kIsWeb && webSpaceFix;
 
   static String _genId() {
-    const _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
-    final _rnd = Random();
+    const String _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+    final Random _rnd = Random();
     return String.fromCharCodes(
-      Iterable.generate(
+      Iterable<int>.generate(
           10, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))),
     );
   }
 
   int? _insertedLoc(String a, String b) {
-    final sel = selection;
+    final TextSelection sel = selection;
     if (a.length + 1 != b.length || sel.start != sel.end) return null;
     return sel.start;
   }
 
   @override
   set value(TextEditingValue newValue) {
-    final loc = _insertedLoc(text, newValue.text);
+    final int? loc = _insertedLoc(text, newValue.text);
     if (loc != null) {
-      final char = newValue.text[loc];
-      final modifier = modifierMap[char];
-      final val = modifier?.updateString(rawText, selection, params);
+      final String char = newValue.text[loc];
+      final CodeModifier? modifier = modifierMap[char];
+      final TextEditingValue? val = modifier?.updateString(rawText, selection, params);
 
       if (val != null) {
         // Update newValue
@@ -234,7 +234,7 @@ class CodeController extends TextEditingController {
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
-    final children = <TextSpan>[];
+    final List<TextSpan> children = <TextSpan>[];
     text.splitMapJoin(
       styleRegExp!,
       onMatch: (Match m) {
@@ -260,33 +260,33 @@ class CodeController extends TextEditingController {
   }
 
   TextSpan _processLanguage(String text, TextStyle? style) {
-    final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
-    final result = highlight.parse(rawText, language: languageId);
+    final String rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
+    final Result result = highlight.parse(rawText, language: languageId);
 
-    final nodes = result.nodes;
+    final List<Node>? nodes = result.nodes;
 
-    final children = <TextSpan>[];
-    var currentSpans = children;
-    final stack = <List<TextSpan>>[];
+    final List<TextSpan> children = <TextSpan>[];
+    List<TextSpan> currentSpans = children;
+    final List<List<TextSpan>> stack = <List<TextSpan>>[];
 
     void _traverse(Node node) {
-      var val = node.value;
-      final nodeChildren = node.children;
+      String? val = node.value;
+      final List<Node>? nodeChildren = node.children;
       if (val != null) {
         if (_webSpaceFix) val = _spacesToMiddleDots(val);
-        var child = TextSpan(text: val, style: theme?[node.className]);
+        TextSpan child = TextSpan(text: val, style: theme?[node.className]);
         if (styleRegExp != null)
           child = _processPatterns(val, theme?[node.className]);
         currentSpans.add(child);
       } else if (nodeChildren != null) {
-        List<TextSpan> tmp = [];
+        List<TextSpan> tmp = <TextSpan>[];
         currentSpans.add(TextSpan(
           children: tmp,
           style: theme?[node.className],
         ));
         stack.add(currentSpans);
         currentSpans = tmp;
-        nodeChildren.forEach((n) {
+        nodeChildren.forEach((Node n) {
           _traverse(n);
           if (n == nodeChildren.last) {
             currentSpans = stack.isEmpty ? children : stack.removeLast();
@@ -295,7 +295,7 @@ class CodeController extends TextEditingController {
       }
     }
 
-    if (nodes != null) for (var node in nodes) _traverse(node);
+    if (nodes != null) for (Node node in nodes) _traverse(node);
     return TextSpan(style: style, children: children);
   }
 
@@ -312,17 +312,17 @@ class CodeController extends TextEditingController {
   TextSpan buildTextSpan(
       {required BuildContext context, TextStyle? style, bool? withComposing}) {
     // Retrieve pattern regexp
-    final patternList = <String>[];
+    final List<String> patternList = <String>[];
     if (_webSpaceFix) {
-      patternList.add("(" + _MIDDLE_DOT + ")");
-      styleList.add(TextStyle(color: Colors.transparent));
+      patternList.add('(' + _MIDDLE_DOT + ')');
+      styleList.add(const TextStyle(color: Colors.transparent));
     }
     if (stringMap != null) {
-      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
+      patternList.addAll(stringMap!.keys.map((String e) => r'(\b' + e + r'\b)'));
       styleList.addAll(stringMap!.values);
     }
     if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => "(" + e + ")"));
+      patternList.addAll(patternMap!.keys.map((String e) => '(' + e + ')'));
       styleList.addAll(patternMap!.values);
     }
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
