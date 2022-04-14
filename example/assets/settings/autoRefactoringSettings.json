@@ -1,0 +1,6 @@
+{
+    "intend": "10",
+    "max_extra_lines": "4",
+    "linebreak_after_this_brackets": ["{}"],
+    "add_line_at_the_end" : "true"
+}

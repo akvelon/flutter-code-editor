@@ -1,0 +1,17 @@
+{
+  "keywords" : "False True def class None and as assert async await break class continue def del elif else except finally for from global if import in rs lambda nonlocal not or pass raise return try while with yeild"
+    ,
+  "packages" : [
+    {
+      "material" : {
+        "keywords" :[]
+      },
+      "package" : {
+        "keywords" :[]
+      }
+    }
+  ],
+  "snipplets" : ["def function(value):\n  print(value)\n",
+    "class Class:\n  def __init__(self, value1, value2):\n    self.x = value1\n    self.y = value2\n",
+    "for value in value:\n  print(value)\n"]
+}

@@ -1,0 +1,17 @@
+{
+  "keywords" : "abstract as assert async await break case catch class const continue  covariant default deferred do dynamic else enum export extends extension external  factory false final finally for Function get  hide if implements import in inferface is library  mixin new null on operator part rethrow return set  show static super switch sync this throw true try typedef var void while with yield async Future await  async String double int yeild typedef Iterable main List Object Stream assert Map print forEach this @override enum"
+  ,
+  "packages" : [
+    {
+      "material" : {
+        "keywords" :[]
+      },
+      "package" : {
+        "keywords" :[]
+      }
+    }
+  ],
+  "snipplets" : ["void function(Object value){\n  //do something \n  return;\n}","function(Object value){\n  //do something \n  return;\n}",
+    "class Class{\n  Object value;\n  Class(Object value){\n    this.value = value;\n}",
+    "for (var value in values)\n  print(value);\n}"]
+}

@@ -1,0 +1,21 @@
+analyzer:
+  exclude:
+    - "*/pubspec.yaml"
+    - "**/*.g.dart"
+
+linter:
+  rules:
+    - always_declare_return_types
+    - cancel_subscriptions
+    - close_sinks
+    - comment_references
+    - directives_ordering
+    - one_member_abstracts
+    - only_throw_errors
+    - package_api_docs
+    - prefer_single_quotes
+    - sort_child_properties_last
+    - prefer_const_constructors
+    - annotate_overrides
+    - always_specify_types
+    - avoid_relative_lib_imports

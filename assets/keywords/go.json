@@ -1,0 +1,17 @@
+{
+    "keywords" : "const var func type import package chan interface map struct break case continue default else fallthrough for goto if range return select switch defer go" 
+    ,
+    "packages" : [
+      {
+        "material" : {
+          "keywords" :[]
+        },
+        "package" : {
+          "keywords" :[]
+        }
+      }
+    ],
+    "snipplets" : ["func function(value int){\n //do something \n  return}\n",
+      "type Struct struct{\n  field1 int\n  field2 int\n}\n",
+      "for i := 1;  i<=5; i++ {\n  fmt.Print(i)\n}\n"]
+  }
