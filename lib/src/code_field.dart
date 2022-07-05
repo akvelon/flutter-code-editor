@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import 'code_controller.dart';
+import 'theme.dart';
 
 import '/language_syntax/brackets_counting.dart';
 import '/language_syntax/java_dart_syntax.dart';
@@ -191,7 +192,7 @@ class CodeField extends StatefulWidget {
 }
 
 class CodeFieldState extends State<CodeField> {
-// Add a controller
+  // Add a controller
   LinkedScrollControllerGroup? _controllers;
   ScrollController? _numberScroll;
   ScrollController? _codeScroll;
@@ -321,21 +322,20 @@ class CodeFieldState extends State<CodeField> {
     final defaultBg = Colors.grey.shade900;
     final defaultText = Colors.grey.shade200;
 
-    final theme = widget.controller.theme;
+    final styles = CodeTheme.of(context)?.styles;
     Color? backgroundCol =
-        widget.background ?? theme?[ROOT_KEY]?.backgroundColor ?? defaultBg;
+        widget.background ?? styles?[ROOT_KEY]?.backgroundColor ?? defaultBg;
     if (widget.decoration != null) {
       backgroundCol = null;
     }
     TextStyle textStyle = widget.textStyle ?? TextStyle();
     textStyle = textStyle.copyWith(
-      color: textStyle.color ?? theme?[ROOT_KEY]?.color ?? defaultText,
+      color: textStyle.color ?? styles?[ROOT_KEY]?.color ?? defaultText,
       fontSize: textStyle.fontSize ?? this.widget.defaultFontSize,
     );
     this.widget.textStyle = textStyle;
     TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
-    final numberColor =
-        (theme?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
+    final numberColor = (styles?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
     // Copy important attributes
     numberTextStyle = numberTextStyle.copyWith(
       color: numberTextStyle.color ?? numberColor,
@@ -343,7 +343,7 @@ class CodeFieldState extends State<CodeField> {
       fontFamily: textStyle.fontFamily,
     );
     final cursorColor =
-        widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
+        widget.cursorColor ?? styles?[ROOT_KEY]?.color ?? defaultText;
 
     final lineNumberCol = TextField(
       scrollPadding: widget.padding,
@@ -381,8 +381,8 @@ class CodeFieldState extends State<CodeField> {
       controller: widget.controller,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
-      scrollController: _codeScroll,
       expands: widget.expands,
+      scrollController: _codeScroll,
       decoration: InputDecoration(
         isCollapsed: true,
         contentPadding: EdgeInsets.symmetric(vertical: 16.0),

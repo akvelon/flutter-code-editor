@@ -1,14 +1,16 @@
 import 'dart:math';
 
+import 'package:code_text_field/languages/main_mode.dart';
 import 'package:code_text_field/src/autocomplete/popup_controller.dart';
 import 'package:code_text_field/src/autocomplete/suggestion.dart';
 import 'package:code_text_field/src/autocomplete/suggestion_generator.dart';
-import 'package:code_text_field/src/code_modifier.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
-import 'package:code_text_field/languages/main_mode.dart';
+
+import 'code_modifier.dart';
+import 'theme.dart';
 
 const _MIDDLE_DOT = '·';
 
@@ -19,11 +21,40 @@ class EditorParams {
 }
 
 class CodeController extends TextEditingController {
-  /// A highligh language to parse the text with
-  final MainMode? language;
+  MainMode? _language;
+
+  /// A highlight language to parse the text with
+  MainMode? get language => _language;
+
+  set language(MainMode? language) {
+    if (language == _language) {
+      return;
+    }
+
+    if (language != null) {
+      _languageId = _genId();
+      highlight.registerLanguage(_languageId, language);
+    }
+
+    _language = language;
+    notifyListeners();
+  }
+
+  Map<String, TextStyle>? _theme;
 
   /// The theme to apply to the [language] parsing result
-  final Map<String, TextStyle>? theme;
+  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
+  Map<String, TextStyle>? get theme => _theme;
+
+  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
+  set theme(Map<String, TextStyle>? theme) {
+    if (theme == _theme) {
+      return;
+    }
+
+    _theme = theme;
+    notifyListeners();
+  }
 
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
@@ -48,7 +79,10 @@ class CodeController extends TextEditingController {
   final void Function(String)? onChange;
 
   /* Computed members */
-  final String languageId = _genId();
+  String _languageId = _genId();
+
+  String get languageId => _languageId;
+
   final styleList = <TextStyle>[];
   final modifierMap = <String, CodeModifier>{};
   bool isPopupShown = false;
@@ -58,8 +92,8 @@ class CodeController extends TextEditingController {
 
   CodeController({
     String? text,
-    this.language,
-    this.theme,
+    MainMode? language,
+    Map<String, TextStyle>? theme,
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -70,14 +104,10 @@ class CodeController extends TextEditingController {
     ],
     this.webSpaceFix = true,
     this.onChange,
-  }) : super(text: text) {
-    // PatternMap
-    if (language != null && theme == null)
-      throw Exception("A theme must be provided for language parsing");
-    // Register language
-    if (language != null) {
-      highlight.registerLanguage(languageId, language!);
-    }
+  })  : _theme = theme,
+        super(text: text) {
+    this.language = language;
+
     // Create modifier map
     modifiers.forEach((el) {
       modifierMap[el.char] = el;
@@ -85,6 +115,11 @@ class CodeController extends TextEditingController {
     suggestionGenerator = SuggestionGenerator(
         'language_id'); // TODO: replace string with some generated value for current language id
     this.popupController = PopupController(onCompletionSelected: this.insertSelectedWord);
+  }
+
+  /// Sets a specific cursor position in the text
+  void setCursor(int offset) {
+    selection = TextSelection.collapsed(offset: offset);
   }
 
   /// Replaces the current [selection] by [str]
@@ -259,9 +294,9 @@ class CodeController extends TextEditingController {
     return TextSpan(style: style, children: children);
   }
 
-  TextSpan _processLanguage(String text, TextStyle? style) {
+  TextSpan _processLanguage(String text, CodeThemeData? widgetTheme, TextStyle? style) {
     final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
-    final result = highlight.parse(rawText, language: languageId);
+    final result = highlight.parse(rawText, language: _languageId);
 
     final nodes = result.nodes;
 
@@ -272,17 +307,18 @@ class CodeController extends TextEditingController {
     void _traverse(Node node) {
       var val = node.value;
       final nodeChildren = node.children;
+      final nodeStyle = widgetTheme?.styles[node.className] ?? _theme?[node.className];
+
       if (val != null) {
         if (_webSpaceFix) val = _spacesToMiddleDots(val);
-        var child = TextSpan(text: val, style: theme?[node.className]);
-        if (styleRegExp != null)
-          child = _processPatterns(val, theme?[node.className]);
+        var child = TextSpan(text: val, style: nodeStyle);
+        if (styleRegExp != null) child = _processPatterns(val, nodeStyle);
         currentSpans.add(child);
       } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
         currentSpans.add(TextSpan(
           children: tmp,
-          style: theme?[node.className],
+          style: nodeStyle,
         ));
         stack.add(currentSpans);
         currentSpans = tmp;
@@ -328,11 +364,14 @@ class CodeController extends TextEditingController {
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     // Return parsing
-    if (language != null)
-      return _processLanguage(text, style);
-    else if (styleRegExp != null)
+    if (_language != null) {
+      return _processLanguage(text, CodeTheme.of(context), style);
+    }
+
+    if (styleRegExp != null) {
       return _processPatterns(text, style);
-    else
-      return TextSpan(text: text, style: style);
+    }
+
+    return TextSpan(text: text, style: style);
   }
 }
