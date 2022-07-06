@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:highlight/languages/scala.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:code_text_field/src/wip/languages/all.dart';
 
 import 'package:code_text_field/src/wip/autoRefactorService.dart';
-import 'package:code_text_field/src/wip/constants/constants.dart';
-import 'package:code_text_field/src/wip/constants/themes.dart';
+
+import 'themes.dart';
+
+final builtinLanguages = {
+  'go': go,
+  'java': java,
+  'python': python,
+  'scala': scala,
+  'dart': dart,
+};
+final allLanguages = {...builtinLanguages};
 
 class CustomCodeBox extends StatefulWidget {
   final String language;
   final String theme;
 
-  const CustomCodeBox({Key? key, required this.language, required this.theme})
-      : super(key: key);
+  const CustomCodeBox({
+    Key? key,
+    required this.language,
+    required this.theme,
+  }) : super(key: key);
 
   @override
   _CustomCodeBoxState createState() => _CustomCodeBoxState();
@@ -31,20 +47,20 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
   }
 
   List<String?> languageList = <String>[
-    java,
-    go,
-    python,
-    scala,
-    dart
+    'java',
+    'go',
+    'python',
+    'scala',
+    'dart',
   ];
 
-  List<String?> themeList  = <String>[
+  List<String?> themeList = <String>[
     "monokai-sublime",
     "a11y-dark",
     "an-old-hope",
     "vs2015",
     "vs",
-    "atom-one-dark"
+    "atom-one-dark",
   ];
 
   Widget buildDropdown(Iterable<String?> choices, String value, IconData icon,
@@ -78,30 +94,33 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       setState(() => theme = val);
     });
     final resetButton = TextButton.icon(
-      icon: Icon(Icons.delete, color: Colors.white), 
+      icon: Icon(Icons.delete, color: Colors.white),
       label: Text('Reset', style: TextStyle(color: Colors.white)),
       onPressed: () {
         setState(() {
           reset = (!reset!);
         });
-      }, 
+      },
     );
 
-    final buttons = Container (
-      height: MediaQuery.of(context).size.height/13,
+    final buttons = Container(
+      height: MediaQuery.of(context).size.height / 13,
       color: Colors.deepPurple[900],
       child: Row(
         children: [
-        Spacer(flex: 2),
-        Text('Code editor', style: TextStyle(fontSize: 28, color: Colors.white)),
-        Spacer(flex: 35),
-        codeDropdown,
-        Spacer(),
-        themeDropdown,
-        Spacer(),
-        resetButton
-        ]
-      )
+          Spacer(flex: 2),
+          Text(
+            'Code editor',
+            style: TextStyle(fontSize: 28, color: Colors.white),
+          ),
+          Spacer(flex: 35),
+          codeDropdown,
+          Spacer(),
+          themeDropdown,
+          Spacer(),
+          resetButton,
+        ],
+      ),
     );
     final codeField = InnerField(
       key: ValueKey("$language - $theme - $reset"),
@@ -119,8 +138,11 @@ class InnerField extends StatefulWidget {
   final String language;
   final String theme;
 
-  const InnerField({Key? key, required this.language, required this.theme})
-      : super(key: key);
+  const InnerField({
+    Key? key,
+    required this.language,
+    required this.theme,
+  }) : super(key: key);
 
   @override
   _InnerFieldState createState() => _InnerFieldState();
@@ -146,7 +168,6 @@ class _InnerFieldState extends State<InnerField> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Container(
       color: _codeController!.theme!['root']!.backgroundColor,
       height: MediaQuery.of(context).size.height / 13 * 12,
@@ -156,22 +177,23 @@ class _InnerFieldState extends State<InnerField> {
             child: CodeField(
               controller: _codeController!,
               textStyle: const TextStyle(fontFamily: 'SourceCode'),
-            )
+            ),
           ),
           Align(
             alignment: Alignment.topRight,
             child: FloatingActionButton(
               child: const Icon(Icons.format_align_left_outlined),
               backgroundColor: Colors.indigo[800],
-              onPressed: (){
+              onPressed: () {
                 setState(() {
-                  _codeController!.text = autoRefactor( _codeController!.text, widget.language);
+                  _codeController!.text =
+                      autoRefactor(_codeController!.text, widget.language);
                 });
-              }
-            )
-          )
-        ]
-      )
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,7 +1,6 @@
 //File only for testing. Later file will be deleted.
 import 'package:flutter/material.dart';
 
-import 'package:code_text_field/src/wip/constants/constants.dart';
 import 'custom_code_box.dart';
 
 void main() {
@@ -17,10 +16,10 @@ class CodeEditor extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: CustomCodeBox(
-            language: dart,
-            theme: 'monokai-sublime',
-          ),
-      ) 
+          language: 'dart',
+          theme: 'monokai-sublime',
+        ),
+      ),
     );
   }
 }
