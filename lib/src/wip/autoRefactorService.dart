@@ -4,7 +4,11 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:tuple/tuple.dart';
 
-import 'constants/constants.dart';
+const String _go = 'go';
+const String _haveString = 'have string';
+const String _multline = 'multline';
+const String _python = 'python';
+const String _simple = 'simple';
 
 late String refactorSettings;
 
@@ -27,7 +31,7 @@ String autoRefactor(String text, String language){
                                                                       ''.padRight(int.parse(settings['intend']), ' '), indexes);
   refactorText = result.item1;
   indexes = result.item2;                                                                    
-  if (language == python) { 
+  if (language == _python) {
     refactorText = addLineBreakAfterFunctionColon(refactorText, ''.padRight(int.parse(settings['intend'])), indexes);
   }
   refactorText = refactorText.trimRight();
@@ -50,7 +54,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
     if (textInLines[i] == '' || textInLines[i].trim() == '') {
       if (multiline) {
         refactorText += '\n';
-        indexes.add(Tuple2(multline, []));
+        indexes.add(Tuple2(_multline, []));
       }
       else {
         final List<String> reTextInLines = refactorText.split('\n');
@@ -58,14 +62,14 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           for (int j = 0; j < maxExtraLines; j++){
             if (reTextInLines[reTextInLines.length - 2 - j] != ''){
               refactorText += '\n';
-              indexes.add(Tuple2(simple, []));
+              indexes.add(Tuple2(_simple, []));
               break;
             }
           }
         }
         else {
           refactorText += '\n';
-          indexes.add(Tuple2(simple, []));
+          indexes.add(Tuple2(_simple, []));
         }
       }
     }
@@ -77,7 +81,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
         List<String> symbols = [];
         List<int> firstIndexesOfSymbols = [];
 
-        if (language == go){
+        if (language == _go){
           int indexMultiLineGo = mutableString.indexOf('`');
           symbols.add('`');
           firstIndexesOfSymbols.add(indexMultiLineGo);
@@ -89,7 +93,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           firstIndexesOfSymbols.addAll([indexDoubMultiQuote, indexSingleMultiQuote]);
         }
         
-        if (language == python){
+        if (language == _python){
           int indexOfHash = mutableString.indexOf('#');
           symbols.add('#');
           firstIndexesOfSymbols.add(indexOfHash);
@@ -122,7 +126,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
         if (minIndexOfSymbols == -1){
           if (multiline){
             refactorText += mutableString;
-            indexes.add(Tuple2(multline, []));
+            indexes.add(Tuple2(_multline, []));
             mutableString = '';
           }
           else {
@@ -213,7 +217,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
       }
       refactorText += '\n';
       if (indexes.length - 1 != i){
-        indexes.add(Tuple2(haveString, indexesOfline));
+        indexes.add(Tuple2(_haveString, indexesOfline));
       }
     }
   }
@@ -221,13 +225,13 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
 }
 
 Tuple2<bool, int> symbolContains(String bracket, String text, Tuple2<String, List<Tuple2<int, int>>> indexesOfString){
-  if (indexesOfString.item1 == multline){
+  if (indexesOfString.item1 == _multline){
     return Tuple2(false, -1);
   }
   if (!text.contains(bracket)){
     return Tuple2(false, -1);
   }
-  if (indexesOfString.item1 == simple){
+  if (indexesOfString.item1 == _simple){
     return Tuple2(true, text.indexOf(bracket));
   }
   List<int> indexesOfBracket= [];
@@ -324,7 +328,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
           indexesForBeforeBracket.add(indexesOfStrings[i].item2[j]);
         }
       }
-      newIndexesOfStrings.add(Tuple2(indexesForBeforeBracket.isNotEmpty ? haveString : simple, indexesForBeforeBracket));
+      newIndexesOfStrings.add(Tuple2(indexesForBeforeBracket.isNotEmpty ? _haveString : _simple, indexesForBeforeBracket));
 
       if (afterBracket.trim() != '') {
         linesWithAfterBracket.insert(0, afterBracket);
@@ -336,7 +340,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
           }
         }
         indexesOfStringsWithAfterBracket.insert(0,Tuple2(indexesForAfterBracket.isNotEmpty ? 
-                                                          haveString : simple, indexesForAfterBracket));
+                                                          _haveString : _simple, indexesForAfterBracket));
       }
       Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> result = 
             addLineBreakAfterBracket(linesWithAfterBracket, intend + settings, brackets, settings, indexesOfStringsWithAfterBracket);
@@ -359,7 +363,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
           indexesForBeforeBracket.add(indexesOfStrings[i].item2[j]);
         }
       }
-      newIndexesOfStrings.add(Tuple2(indexesForBeforeBracket.isNotEmpty ? haveString : simple, indexesForBeforeBracket));
+      newIndexesOfStrings.add(Tuple2(indexesForBeforeBracket.isNotEmpty ? _haveString : _simple, indexesForBeforeBracket));
 
       if (afterBracket.trim() != ''){
         linesWithAfterBracket.insert(0, afterBracket);
@@ -371,7 +375,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
           }
         }
         indexesOfStringsWithAfterBracket.insert(0,Tuple2(indexesForAfterBracket.isNotEmpty ? 
-                                                          haveString : simple, indexesForAfterBracket));
+                                                          _haveString : _simple, indexesForAfterBracket));
       }
 
       Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> result = addLineBreakAfterBracket(linesWithAfterBracket, newIntend, brackets, settings, indexesOfStringsWithAfterBracket);
@@ -386,7 +390,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
       return Tuple2(refactorText, newIndexesOfStrings);
     }
     else {
-      if (indexesOfStrings[i].item1 != multline){
+      if (indexesOfStrings[i].item1 != _multline){
         if (indexesOfStrings[i].item2.length > 0){
           if (indexesOfStrings[i].item2[0].item1 != 0) {
             int lengthOfIntend = textInLines[i].length - textInLines[i].trimLeft().length;
@@ -396,7 +400,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
                                               indexesOfStrings[i].item2[j].item2 - lengthOfIntend + intend.length));
             }
             refactorText += intend + textInLines[i].trimLeft() + '\n';
-            newIndexesOfStrings.add(Tuple2(haveString, indexesForBeforeBracket));
+            newIndexesOfStrings.add(Tuple2(_haveString, indexesForBeforeBracket));
           }
           else {
             refactorText += textInLines[i] + '\n';
@@ -405,7 +409,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
         }
         else {
           refactorText += intend + textInLines[i].trimLeft() + '\n';
-          newIndexesOfStrings.add(Tuple2(simple, []));
+          newIndexesOfStrings.add(Tuple2(_simple, []));
         }
       }
       else {
@@ -436,7 +440,7 @@ String addLineBreakAfterFunctionColon(String text, String intend, List<Tuple2<St
             indexesForAfterColon.add(Tuple2(indexesOfStrings[i].item2[j].item1 - indexOfColon - 1, indexesOfStrings[i].item2[j].item2 - indexOfColon - 1));
           }
         }
-        indexesForAfterColonList.add(Tuple2(indexesForAfterColon.isNotEmpty ? haveString : simple, indexesForAfterColon));
+        indexesForAfterColonList.add(Tuple2(indexesForAfterColon.isNotEmpty ? _haveString : _simple, indexesForAfterColon));
         refactorText +=  beforeColon + '\n' + intend + addLineBreakAfterFunctionColon(afterColon, intend, indexesForAfterColonList);
       }
       else {
