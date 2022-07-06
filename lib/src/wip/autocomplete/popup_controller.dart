@@ -1,6 +1,7 @@
-import 'package:code_text_field/src/autocomplete/suggestion.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+import 'suggestion.dart';
 
 class PopupController extends ChangeNotifier {
   late List<Suggestion> suggestions;

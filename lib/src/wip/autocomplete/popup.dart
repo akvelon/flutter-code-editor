@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import 'package:code_text_field/src/autocomplete/popup_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+import 'popup_controller.dart';
 
 /// Popup window displaying the list of possible completions
 class Popup extends StatefulWidget {
