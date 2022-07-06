@@ -53,15 +53,17 @@ class PopupController extends ChangeNotifier {
         })
         .map((e) => e.index)
         .toList();
+
     // List offset will be changed only if new selected item is not visible
     if (!visiblePositions.contains(selectedIndex)) {
       // If previously selected item was at the bottom of the visible part of the list,
       // on 'down' arrow the new one will appear at the bottom as well
       bool isStepDown = (selectedIndex - previousSelectedIndex == 1);
-      if (isStepDown && selectedIndex < suggestions.length - 1)
+      if (isStepDown && selectedIndex < suggestions.length - 1) {
         itemScrollController.jumpTo(index: selectedIndex + 1, alignment: 1.0);
-      else
+      } else {
         itemScrollController.jumpTo(index: selectedIndex);
+      }
     }
     notifyListeners();
   }

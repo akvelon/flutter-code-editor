@@ -5,4 +5,8 @@ class Suggestion {
   Suggestion(this.word, this.type);
 }
 
-enum SuggestionType { local, language, snippet }
+enum SuggestionType {
+  local,
+  language,
+  snippet,
+}

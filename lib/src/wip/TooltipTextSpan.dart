@@ -20,8 +20,9 @@ class TooltipTextSpan extends WidgetSpan {
               ),
               padding: EdgeInsets.only(right: LINE_NUMBER_MARGIN),
               decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.all(Radius.circular(4))),
+                color: Colors.red,
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
               width: LINE_NUMBER_WIDTH,
             ),
           ),
