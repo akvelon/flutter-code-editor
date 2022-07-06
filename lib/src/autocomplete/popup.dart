@@ -14,16 +14,16 @@ class Popup extends StatefulWidget {
   final PopupController controller;
   final FocusNode parentFocusNode;
 
-  Popup(
-      {Key? key,
-      required this.row,
-      required this.column,
-      required this.controller,
-      required this.editingWindowSize,
-      required this.style,
-      required this.parentFocusNode,
-      this.backgroundColor})
-      : super(key: key);
+  Popup({
+    Key? key,
+    required this.row,
+    required this.column,
+    required this.controller,
+    required this.editingWindowSize,
+    required this.style,
+    required this.parentFocusNode,
+    this.backgroundColor,
+  }) : super(key: key);
 
   @override
   _PopupState createState() => _PopupState();
@@ -58,14 +58,15 @@ class _PopupState extends State<Popup> {
         constraints: BoxConstraints(maxHeight: height, maxWidth: width),
         child: Container(
           child: ScrollablePositionedList.builder(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              itemScrollController: widget.controller.itemScrollController,
-              itemPositionsListener: widget.controller.itemPositionsListener,
-              itemCount: widget.controller.suggestions.length,
-              itemBuilder: (context, index) {
-                return _buildListItem(index);
-              }),
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
+            itemScrollController: widget.controller.itemScrollController,
+            itemPositionsListener: widget.controller.itemPositionsListener,
+            itemCount: widget.controller.suggestions.length,
+            itemBuilder: (context, index) {
+              return _buildListItem(index);
+            },
+          ),
           decoration: BoxDecoration(
             color: widget.backgroundColor,
             border: Border.all(
@@ -103,7 +104,6 @@ class _PopupState extends State<Popup> {
           widget.controller.selectedIndex = index;
           widget.parentFocusNode.requestFocus();
           widget.controller.onCompletionSelected();
-
         },
         hoverColor: Colors.grey.withOpacity(0.1),
         splashColor: Colors.transparent,

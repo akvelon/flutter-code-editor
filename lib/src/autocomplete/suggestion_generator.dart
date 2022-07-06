@@ -55,11 +55,14 @@ class SuggestionGenerator {
     this.cursorPosition = cursorPosition;
     this.text = text;
     String prefix = getCurrentWordPrefix();
+
     if (prefix.isEmpty) {
       return [];
     }
+
     _parseText();
     List<Suggestion> suggestions = [];
+
     suggestions += autoCompleteUser
         .suggest(prefix)
         .map((word) => Suggestion(word, SuggestionType.local))
@@ -72,6 +75,7 @@ class SuggestionGenerator {
         .suggest(prefix)
         .map((word) => Suggestion(word, SuggestionType.snippet))
         .toList();
+
     return suggestions;
   }
 
@@ -79,11 +83,13 @@ class SuggestionGenerator {
   String getCurrentWordPrefix() {
     String prefix = '';
     int characterPosition = cursorPosition - 1;
+
     while (characterPosition >= 0 &&
         identifierRegex.hasMatch(text[characterPosition] + prefix)) {
       prefix = text[characterPosition] + prefix;
       characterPosition--;
     }
+
     return prefix;
   }
 
@@ -91,20 +97,24 @@ class SuggestionGenerator {
   String _getCurrentWordSuffix() {
     String suffix = '';
     int characterPosition = cursorPosition;
+
     while (characterPosition < text.length &&
         identifierRegex.hasMatch(suffix + text[characterPosition])) {
       suffix = suffix + text[characterPosition];
       characterPosition++;
     }
+
     return suffix;
   }
 
   /// Parses text - gets user keywords and adds them into user trie
   void _parseText() {
     List<String> list = _getTextKeywords();
+
     list.forEach((element) {
       autoCompleteUser.enter(element);
     });
+
     _filterTextKeywords();
   }
 
@@ -112,8 +122,10 @@ class SuggestionGenerator {
   void _filterTextKeywords() {
     List<String> keywords = _getTextKeywords();
     final userKeyWords = autoCompleteUser.allEntries.toList();
+
     final notInText =
         userKeyWords.where((element) => !keywords.contains(element)).toList();
+
     notInText.forEach((element) {
       autoCompleteUser.delete(element);
     });
@@ -125,16 +137,21 @@ class SuggestionGenerator {
     List<String> keywords = processedText.split(splitRegex);
     keywords.removeWhere((el) => el.isEmpty == true);
     keywords.removeWhere(
-        (el) => autoCompleteLanguage.allEntries.toList().contains(el));
-    keywords
-        .removeWhere((element) => !element.startsWith(RegExp(r"[a-zA-Z_]")));
+      (el) => autoCompleteLanguage.allEntries.toList().contains(el),
+    );
+    keywords.removeWhere(
+      (element) => !element.startsWith(RegExp(r"[a-zA-Z_]")),
+    );
     keywords = keywords.toSet().toList();
     return keywords;
   }
 
   /// Returns text without the word pointed to by the cursor
   String _excludeCurrentWord() {
-    return text.replaceRange(cursorPosition - getCurrentWordPrefix().length,
-        cursorPosition + _getCurrentWordSuffix().length, "");
+    return text.replaceRange(
+      cursorPosition - getCurrentWordPrefix().length,
+      cursorPosition + _getCurrentWordSuffix().length,
+      "",
+    );
   }
 }
