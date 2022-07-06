@@ -14,18 +14,17 @@ import '../code_theme/code_theme_data.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import '../wip/autocomplete/suggestion.dart';
 import '../wip/autocomplete/suggestion_generator.dart';
-import '../wip/languages/main_mode.dart';
 import 'editor_params.dart';
 
 const _MIDDLE_DOT = '·';
 
 class CodeController extends TextEditingController {
-  MainMode? _language;
+  Mode? _language;
 
   /// A highlight language to parse the text with
-  MainMode? get language => _language;
+  Mode? get language => _language;
 
-  set language(MainMode? language) {
+  set language(Mode? language) {
     if (language == _language) {
       return;
     }
@@ -91,7 +90,7 @@ class CodeController extends TextEditingController {
 
   CodeController({
     String? text,
-    MainMode? language,
+    Mode? language,
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,

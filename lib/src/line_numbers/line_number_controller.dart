@@ -1,11 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:highlight/highlight.dart';
 
 import '../wip/TooltipTextSpan.dart';
 import '../wip/getErrorsMap.dart';
 
 class LineNumberController extends TextEditingController {
   final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
-  String language;
+  Mode? language;
   String codeFieldText;
 
   LineNumberController(
@@ -34,14 +35,23 @@ class LineNumberController extends TextEditingController {
       }
 
       if (errors.containsKey(number)) {
-        children.add(TooltipTextSpan(
-            message: errors[number]!, number: el, style: style));
-      } else {
-        children.add(textSpan);
-        if (k < list.length - 1) children.add(TextSpan(text: "\n"));
+        children.add(
+          TooltipTextSpan(
+            message: errors[number]!,
+            number: el,
+            style: style,
+          ),
+        );
+        continue;
+      }
+
+      children.add(textSpan);
+      if (k < list.length - 1) {
+        children.add(TextSpan(text: "\n"));
       }
     }
     children.add(TextSpan(text: "\n "));
+
     return TextSpan(children: children, style: style);
   }
 }
