@@ -1,9 +1,5 @@
 import 'dart:math';
 
-import 'package:code_text_field/languages/main_mode.dart';
-import 'package:code_text_field/src/autocomplete/popup_controller.dart';
-import 'package:code_text_field/src/autocomplete/suggestion.dart';
-import 'package:code_text_field/src/autocomplete/suggestion_generator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +11,10 @@ import '../code_modifiers/indent_code_modifier.dart';
 import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
+import '../wip/autocomplete/popup_controller.dart';
+import '../wip/autocomplete/suggestion.dart';
+import '../wip/autocomplete/suggestion_generator.dart';
+import '../wip/languages/main_mode.dart';
 import 'editor_params.dart';
 
 const _MIDDLE_DOT = '·';
@@ -387,12 +387,16 @@ class CodeController extends TextEditingController {
   }
 
   void generateSuggestions() {
-    List<Suggestion> suggestions =
-        suggestionGenerator!.getSuggestions(text, selection.start);
-    if (suggestions.isNotEmpty)
+    List<Suggestion> suggestions = suggestionGenerator!.getSuggestions(
+      text,
+      selection.start,
+    );
+
+    if (suggestions.isNotEmpty) {
       popupController.show(suggestions);
-    else
+    } else {
       popupController.hide();
+    }
   }
 
   @override

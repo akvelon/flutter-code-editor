@@ -1,7 +1,7 @@
 //File only for testing. Later file will be deleted.
 import 'package:flutter/material.dart';
 
-import 'package:code_text_field/constants/constants.dart';
+import 'package:code_text_field/src/wip/constants/constants.dart';
 import 'custom_code_box.dart';
 
 void main() {

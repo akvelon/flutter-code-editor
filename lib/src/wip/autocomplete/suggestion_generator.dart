@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:autotrie/autotrie.dart';
-import 'package:code_text_field/src/autocomplete/suggestion.dart';
 import 'package:flutter/services.dart';
+
+import 'suggestion.dart';
 
 class SuggestionGenerator {
   RegExp identifierRegex = RegExp(r"^[_a-zA-Z0-9]+$");
