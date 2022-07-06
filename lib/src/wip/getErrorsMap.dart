@@ -1,28 +1,28 @@
-import 'constants/constants.dart';
+import 'package:highlight/highlight.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:highlight/languages/scala.dart';
+
 import 'language_syntax/brackets_counting.dart';
 import 'language_syntax/golang_syntax.dart';
 import 'language_syntax/java_dart_syntax.dart';
 import 'language_syntax/python_syntax.dart';
 import 'language_syntax/scala_syntax.dart';
 
-Map<int, String> getErrorsMap(String text, String language) {
+Map<int, String> getErrorsMap(String text, Mode? language) {
   Map<int, String> errors = {};
   errors.addAll(countingBrackets(text));
 
-  switch (language) {
-    case java:
-    case dart:
-      errors.addAll(findJavaDartErrors(text));
-      break;
-    case go:
-      errors.addAll(findGolangErrors(text));
-      break;
-    case python:
-      errors.addAll(findPythonErrorTabs(text));
-      break;
-    case scala:
-      errors.addAll(findScalaErrors(text));
-      break;
+  if (language == java || language == dart) {
+    errors.addAll(findJavaDartErrors(text));
+  } else if (language == go) {
+    errors.addAll(findGolangErrors(text));
+  } else if (language == python) {
+    errors.addAll(findPythonErrorTabs(text));
+  } else if (language == scala) {
+    errors.addAll(findScalaErrors(text));
   }
 
   return errors;

@@ -114,7 +114,7 @@ class CodeFieldState extends State<CodeField> {
     _codeScroll = _controllers?.addAndGet();
     _numberController = LineNumberController(
       widget.lineNumberBuilder,
-      widget.controller.language!.nameOfLanguage,
+      widget.controller.language,
       widget.controller.text,
     );
     widget.controller.addListener(_onTextChanged);
