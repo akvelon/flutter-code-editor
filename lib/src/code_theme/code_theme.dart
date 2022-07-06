@@ -1,21 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-class CodeThemeData {
-  final Map<String, TextStyle> styles;
-
-  CodeThemeData({
-    required this.styles,
-  });
-
-  @override
-  int get hashCode => styles.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is CodeThemeData && styles == other.styles;
-  }
-}
+import 'code_theme_data.dart';
 
 class CodeTheme extends InheritedWidget {
   const CodeTheme({
