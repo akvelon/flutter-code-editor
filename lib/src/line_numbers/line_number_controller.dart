@@ -22,7 +22,7 @@ class LineNumberController extends TextEditingController {
     bool? withComposing,
   }) {
     final children = <InlineSpan>[];
-    final list = text.split("\n");
+    final list = text.split('\n');
     Map<int, String> errors = getErrorsMap(codeFieldText, language);
 
     for (int k = 0; k < list.length; k++) {
@@ -47,10 +47,10 @@ class LineNumberController extends TextEditingController {
 
       children.add(textSpan);
       if (k < list.length - 1) {
-        children.add(TextSpan(text: "\n"));
+        children.add(const TextSpan(text: '\n'));
       }
     }
-    children.add(TextSpan(text: "\n "));
+    children.add(const TextSpan(text: '\n '));
 
     return TextSpan(children: children, style: style);
   }

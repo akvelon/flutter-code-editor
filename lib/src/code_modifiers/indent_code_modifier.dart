@@ -22,19 +22,19 @@ class IntendModifier extends CodeModifier {
     var braceCount = 0;
 
     for (var k = min(sel.start, text.length) - 1; k >= 0; k--) {
-      if (text[k] == "\n") {
+      if (text[k] == '\n') {
         break;
       }
 
-      if (text[k] == " ") {
+      if (text[k] == ' ') {
         spacesCount += 1;
       } else {
         spacesCount = 0;
       }
 
-      if (text[k] == "{") {
+      if (text[k] == '{') {
         braceCount += 1;
-      } else if (text[k] == "}") {
+      } else if (text[k] == '}') {
         braceCount -= 1;
       }
     }
@@ -43,7 +43,7 @@ class IntendModifier extends CodeModifier {
       spacesCount += params.tabSpaces;
     }
 
-    final insert = "\n" + " " * spacesCount;
+    final insert = '\n${' ' * spacesCount}';
     return replace(text, sel.start, sel.end, insert);
   }
 }
