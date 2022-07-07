@@ -10,9 +10,9 @@ import '../line_numbers/line_number_style.dart';
 import '../wip/autocomplete/popup.dart';
 import 'code_controller.dart';
 
-const double LINE_NUMBER_WIDTH = 42;
-const TextAlign LINE_NUMBER_ALIGN = TextAlign.right;
-const double LINE_NUMBER_MARGIN = 5;
+const double _lineNumberWidth = 42;
+const TextAlign _lineNumberAlign = TextAlign.right;
+const double _lineNumberMargin = 5;
 
 class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.minLines}
@@ -57,7 +57,7 @@ class CodeField extends StatefulWidget {
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
 
-  final double defaultFontSize = 16.0;
+  final double defaultFontSize = 16;
 
   CodeField({
     Key? key,
@@ -69,7 +69,7 @@ class CodeField extends StatefulWidget {
     this.background,
     this.decoration,
     this.textStyle,
-    this.padding = const EdgeInsets.symmetric(),
+    this.padding = EdgeInsets.zero,
     this.lineNumberStyle = const LineNumberStyle(),
     this.enabled,
     this.readOnly = false,
@@ -92,18 +92,18 @@ class CodeFieldState extends State<CodeField> {
   ScrollController? _codeScroll;
   ScrollController? _horizontalCodeScroll;
   LineNumberController? _numberController;
-  GlobalKey _codeFieldKey = GlobalKey();
+  final _codeFieldKey = GlobalKey();
 
-  double cursorX = 0.0;
-  double cursorY = 0.0;
-  double painterWidth = 0.0;
-  double painterHeight = 0.0;
+  double cursorX = 0;
+  double cursorY = 0;
+  double painterWidth = 0;
+  double painterHeight = 0;
 
   //
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
   String? lines;
-  String longestLine = "";
+  String longestLine = '';
   late Size windowSize;
 
   @override
@@ -121,13 +121,14 @@ class CodeFieldState extends State<CodeField> {
     widget.controller.addListener(() {
       _updateCursorOffset(widget.controller.text);
     });
-    _horizontalCodeScroll = ScrollController(initialScrollOffset: 0.0);
+    _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKey: _onKey);
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       double width = _codeFieldKey.currentContext!.size!.width;
       double height = _codeFieldKey.currentContext!.size!.height;
-      windowSize = Size(width - LINE_NUMBER_WIDTH, height);
+      windowSize = Size(width - _lineNumberWidth, height);
     });
     _onTextChanged();
   }
@@ -152,29 +153,29 @@ class CodeFieldState extends State<CodeField> {
 
   void rebuild() {
     setState(() {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         double width = _codeFieldKey.currentContext!.size!.width;
         double height = _codeFieldKey.currentContext!.size!.height;
-        windowSize = Size(width - LINE_NUMBER_WIDTH, height);
+        windowSize = Size(width - _lineNumberWidth, height);
       });
     });
   }
 
   void _onTextChanged() {
     // Rebuild line number
-    final str = widget.controller.text.split("\n");
+    final str = widget.controller.text.split('\n');
     final buf = <String>[];
 
     for (var k = 0; k < str.length; k++) {
       buf.add((k + 1).toString());
     }
 
-    _numberController?.text = buf.join("\n");
+    _numberController?.text = buf.join('\n');
     _numberController?.codeFieldText = widget.controller.text;
 
     // Find longest line
-    longestLine = "";
-    widget.controller.text.split("\n").forEach((line) {
+    longestLine = '';
+    widget.controller.text.split('\n').forEach((line) {
       if (line.length > longestLine.length) longestLine = line;
     });
 
@@ -187,7 +188,7 @@ class CodeFieldState extends State<CodeField> {
     TextStyle textStyle,
     double minWidth,
   ) {
-    final leftPad = LINE_NUMBER_MARGIN;
+    const leftPad = _lineNumberWidth;
     final intrinsic = IntrinsicWidth(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -195,12 +196,12 @@ class CodeFieldState extends State<CodeField> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: 0.0,
-              minWidth: max(minWidth - leftPad, 0.0),
+              maxHeight: 0,
+              minWidth: max(minWidth - leftPad, 0),
             ),
             child: Padding(
+              padding: const EdgeInsets.only(right: 16),
               child: Text(longestLine, style: textStyle),
-              padding: const EdgeInsets.only(right: 16.0),
             ), // Add extra padding
           ),
           widget.expands ? Expanded(child: codeField) : codeField,
@@ -222,28 +223,29 @@ class CodeFieldState extends State<CodeField> {
   @override
   Widget build(BuildContext context) {
     // Default color scheme
-    const ROOT_KEY = 'root';
+    const rootKey = 'root';
     final defaultBg = Colors.grey.shade900;
     final defaultText = Colors.grey.shade200;
 
     final styles = CodeTheme.of(context)?.styles;
     Color? backgroundCol =
-        widget.background ?? styles?[ROOT_KEY]?.backgroundColor ?? defaultBg;
+        widget.background ?? styles?[rootKey]?.backgroundColor ?? defaultBg;
 
     if (widget.decoration != null) {
       backgroundCol = null;
     }
 
-    TextStyle textStyle = widget.textStyle ?? TextStyle();
+    TextStyle textStyle = widget.textStyle ?? const TextStyle();
     textStyle = textStyle.copyWith(
-      color: textStyle.color ?? styles?[ROOT_KEY]?.color ?? defaultText,
-      fontSize: textStyle.fontSize ?? this.widget.defaultFontSize,
+      color: textStyle.color ?? styles?[rootKey]?.color ?? defaultText,
+      fontSize: textStyle.fontSize ?? widget.defaultFontSize,
     );
-    this.widget.textStyle = textStyle;
+    widget.textStyle = textStyle;
 
-    TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
+    TextStyle numberTextStyle =
+        widget.lineNumberStyle.textStyle ?? const TextStyle();
     final numberColor =
-        (styles?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
+        (styles?[rootKey]?.color ?? defaultText).withOpacity(0.7);
 
     // Copy important attributes
     numberTextStyle = numberTextStyle.copyWith(
@@ -253,7 +255,7 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final cursorColor =
-        widget.cursorColor ?? styles?[ROOT_KEY]?.color ?? defaultText;
+        widget.cursorColor ?? styles?[rootKey]?.color ?? defaultText;
 
     final lineNumberCol = TextField(
       scrollPadding: widget.padding,
@@ -266,19 +268,19 @@ class CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _numberScroll,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16.0),
+        contentPadding: EdgeInsets.symmetric(vertical: 16),
         disabledBorder: InputBorder.none,
       ),
-      textAlign: LINE_NUMBER_ALIGN,
+      textAlign: _lineNumberAlign,
     );
 
     final numberCol = Container(
-      width: LINE_NUMBER_WIDTH,
+      width: _lineNumberWidth,
       padding: EdgeInsets.only(
         left: widget.padding.left,
-        right: LINE_NUMBER_MARGIN,
+        right: _lineNumberMargin,
       ),
       color: widget.lineNumberStyle.background,
       child: lineNumberCol,
@@ -293,9 +295,9 @@ class CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _codeScroll,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16.0),
+        contentPadding: EdgeInsets.symmetric(vertical: 16),
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
@@ -355,10 +357,9 @@ class CodeFieldState extends State<CodeField> {
     TextPainter painter = TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(text: text, style: widget.textStyle),
-    );
-    painter.layout();
+    )..layout();
     TextPosition cursorTextPosition = widget.controller.selection.base;
-    Rect caretPrototype = Rect.fromLTWH(0.0, 0.0, 0.0, 0.0);
+    Rect caretPrototype = Rect.zero;
     Offset caretOffset =
         painter.getOffsetForCaret(cursorTextPosition, caretPrototype);
     double caretHeight = (widget.controller.selection.base.offset > 0)
@@ -369,7 +370,7 @@ class CodeFieldState extends State<CodeField> {
       cursorX = max(
           caretOffset.dx +
               widget.padding.left +
-              LINE_NUMBER_MARGIN / 2 -
+              _lineNumberMargin / 2 -
               _horizontalCodeScroll!.offset,
           0);
       cursorY = max(

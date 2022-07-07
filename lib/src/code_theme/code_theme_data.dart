@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+@immutable
 class CodeThemeData {
   final Map<String, TextStyle> styles;
 

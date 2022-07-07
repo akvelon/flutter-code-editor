@@ -17,11 +17,11 @@ class CloseBlockModifier extends CodeModifier {
     int spaceCount = 0;
 
     for (var k = min(sel.start, text.length) - 1; k >= 0; k--) {
-      if (text[k] == "\n") {
+      if (text[k] == '\n') {
         break;
       }
 
-      if (text[k] != " ") {
+      if (text[k] != ' ') {
         spaceCount = 0;
         break;
       }
@@ -30,7 +30,7 @@ class CloseBlockModifier extends CodeModifier {
     }
 
     if (spaceCount >= params.tabSpaces) {
-      return replace(text, sel.start - params.tabSpaces, sel.end, "}");
+      return replace(text, sel.start - params.tabSpaces, sel.end, '}');
     }
 
     return null;

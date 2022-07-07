@@ -16,7 +16,7 @@ import '../wip/autocomplete/suggestion.dart';
 import '../wip/autocomplete/suggestion_generator.dart';
 import 'editor_params.dart';
 
-const _MIDDLE_DOT = '·';
+const _middleDot = '·';
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -96,10 +96,10 @@ class CodeController extends TextEditingController {
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
-    this.modifiers = const <CodeModifier>[
-      const IntendModifier(),
-      const CloseBlockModifier(),
-      const TabModifier(),
+    this.modifiers = const [
+      IntendModifier(),
+      CloseBlockModifier(),
+      TabModifier(),
     ],
     this.webSpaceFix = true,
     this.onChange,
@@ -108,13 +108,13 @@ class CodeController extends TextEditingController {
     this.language = language;
 
     // Create modifier map
-    modifiers.forEach((el) {
+    for (final el in modifiers) {
       modifierMap[el.char] = el;
-    });
+    }
+
     suggestionGenerator = SuggestionGenerator(
         'language_id'); // TODO: replace string with some generated value for current language id
-    this.popupController =
-        PopupController(onCompletionSelected: this.insertSelectedWord);
+    popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
 
   /// Sets a specific cursor position in the text
@@ -141,7 +141,7 @@ class CodeController extends TextEditingController {
     }
 
     final sel = selection;
-    text = text.replaceRange(selection.start - 1, selection.start, "");
+    text = text.replaceRange(selection.start - 1, selection.start, '');
 
     selection = sel.copyWith(
       baseOffset: sel.start - 1,
@@ -152,7 +152,7 @@ class CodeController extends TextEditingController {
   /// Remove the selected text
   void removeSelection() {
     final sel = selection;
-    text = text.replaceRange(selection.start, selection.end, "");
+    text = text.replaceRange(selection.start, selection.end, '');
 
     selection = sel.copyWith(
       baseOffset: sel.start,
@@ -171,7 +171,7 @@ class CodeController extends TextEditingController {
 
   KeyEventResult onKey(RawKeyEvent event) {
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
-      text = text.replaceRange(selection.start, selection.end, "\t");
+      text = text.replaceRange(selection.start, selection.end, '\t');
       return KeyEventResult.handled;
     }
 
@@ -208,12 +208,12 @@ class CodeController extends TextEditingController {
 
   /// See webSpaceFix
   static String _spacesToMiddleDots(String str) {
-    return str.replaceAll(" ", _MIDDLE_DOT);
+    return str.replaceAll(' ', _middleDot);
   }
 
   /// See webSpaceFix
   static String _middleDotsToSpaces(String str) {
-    return str.replaceAll(_MIDDLE_DOT, " ");
+    return str.replaceAll(_middleDot, ' ');
   }
 
   /// Get untransformed text
@@ -230,13 +230,13 @@ class CodeController extends TextEditingController {
   bool get _webSpaceFix => kIsWeb && webSpaceFix;
 
   static String _genId() {
-    const _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
-    final _rnd = Random();
+    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+    final rnd = Random();
 
     return String.fromCharCodes(
       Iterable.generate(
         10,
-        (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length)),
+        (_) => chars.codeUnitAt(rnd.nextInt(chars.length)),
       ),
     );
   }
@@ -270,7 +270,7 @@ class CodeController extends TextEditingController {
     }
 
     bool hasTextChanged = newValue.text != super.value.text;
-    bool hasSelectionChanged = (newValue.selection != super.value.selection);
+    bool hasSelectionChanged = newValue.selection != super.value.selection;
 
     //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
     // Now fix the textfield for web
@@ -278,11 +278,9 @@ class CodeController extends TextEditingController {
     //   newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
     // }
 
-    if (onChange != null) {
-      onChange!(
-        _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text,
-      );
-    }
+    onChange?.call(
+      _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text,
+    );
 
     super.value = newValue;
     if (hasTextChanged) {
@@ -367,20 +365,16 @@ class CodeController extends TextEditingController {
         stack.add(currentSpans);
         currentSpans = tmp;
 
-        nodeChildren.forEach((n) {
+        for (final n in nodeChildren) {
           _traverse(n);
           if (n == nodeChildren.last) {
             currentSpans = stack.isEmpty ? children : stack.removeLast();
           }
-        });
+        }
       }
     }
 
-    if (nodes != null) {
-      for (var node in nodes) {
-        _traverse(node);
-      }
-    }
+    nodes?.forEach(_traverse);
 
     return TextSpan(style: style, children: children);
   }
@@ -408,8 +402,8 @@ class CodeController extends TextEditingController {
     final patternList = <String>[];
 
     if (_webSpaceFix) {
-      patternList.add("(" + _MIDDLE_DOT + ")");
-      styleList.add(TextStyle(color: Colors.transparent));
+      patternList.add('($_middleDot)');
+      styleList.add(const TextStyle(color: Colors.transparent));
     }
 
     if (stringMap != null) {
@@ -418,7 +412,7 @@ class CodeController extends TextEditingController {
     }
 
     if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => "(" + e + ")"));
+      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
       styleList.addAll(patternMap!.values);
     }
 
