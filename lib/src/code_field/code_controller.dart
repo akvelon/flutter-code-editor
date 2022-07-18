@@ -15,6 +15,7 @@ import '../wip/autocomplete/popup_controller.dart';
 import '../wip/autocomplete/suggestion.dart';
 import '../wip/autocomplete/suggestion_generator.dart';
 import 'editor_params.dart';
+import 'models/code_model.dart';
 
 const _middleDot = '·';
 
@@ -174,6 +175,29 @@ class CodeController extends TextEditingController {
       text = text.replaceRange(selection.start, selection.end, '\t');
       return KeyEventResult.handled;
     }
+    if (event.isKeyPressed(LogicalKeyboardKey.delete)) {
+      CodeModel codeModel = CodeModel(code: text);
+      var sel = selection.copyWith(
+        baseOffset: selection.baseOffset + 1,
+        extentOffset: selection.extentOffset + 1,
+      );
+      if (codeModel.isSelectionHitReadOnlyLines(
+          text, sel, codeModel.readOnlyLines)) {
+        return KeyEventResult.handled;
+      }
+    }
+
+    if (event.isKeyPressed(LogicalKeyboardKey.backspace)) {
+      CodeModel codeModel = CodeModel(code: text);
+      var sel = selection.copyWith(
+        baseOffset: selection.baseOffset,
+        extentOffset: selection.extentOffset - 1,
+      );
+      if (codeModel.isSelectionHitReadOnlyLines(
+          text, sel, codeModel.readOnlyLines)) {
+        return KeyEventResult.handled;
+      }
+    }
 
     if (popupController.isPopupShown) {
       if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
@@ -254,6 +278,15 @@ class CodeController extends TextEditingController {
   @override
   set value(TextEditingValue newValue) {
     final loc = _insertedLoc(text, newValue.text);
+
+    CodeModel codeModel = CodeModel(code: text);
+    if (text.isNotEmpty &&
+        codeModel.isSelectionHitReadOnlyLines(
+            text, selection, codeModel.readOnlyLines)) {
+      if (text != newValue.text) {
+        return;
+      }
+    }
 
     if (loc != null) {
       final char = newValue.text[loc];
