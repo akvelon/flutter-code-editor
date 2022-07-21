@@ -37,7 +37,7 @@ class CodeField extends StatefulWidget {
   final Color? cursorColor;
 
   /// {@macro flutter.widgets.textField.textStyle}
-  late TextStyle? textStyle;
+  final TextStyle? textStyle;
 
   /// A way to replace specific line numbers by a custom TextSpan
   final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
@@ -59,7 +59,7 @@ class CodeField extends StatefulWidget {
 
   final double defaultFontSize = 16;
 
-  CodeField({
+  const CodeField({
     Key? key,
     required this.controller,
     this.minLines,
@@ -105,6 +105,7 @@ class CodeFieldState extends State<CodeField> {
   String? lines;
   String longestLine = '';
   late Size windowSize;
+  late TextStyle textStyle;
 
   @override
   void initState() {
@@ -235,12 +236,11 @@ class CodeFieldState extends State<CodeField> {
       backgroundCol = null;
     }
 
-    TextStyle textStyle = widget.textStyle ?? const TextStyle();
+    textStyle = widget.textStyle ?? const TextStyle();
     textStyle = textStyle.copyWith(
       color: textStyle.color ?? styles?[rootKey]?.color ?? defaultText,
       fontSize: textStyle.fontSize ?? widget.defaultFontSize,
     );
-    widget.textStyle = textStyle;
 
     TextStyle numberTextStyle =
         widget.lineNumberStyle.textStyle ?? const TextStyle();
@@ -356,7 +356,7 @@ class CodeFieldState extends State<CodeField> {
   void _updateCursorOffset(String text) {
     TextPainter painter = TextPainter(
       textDirection: TextDirection.ltr,
-      text: TextSpan(text: text, style: widget.textStyle),
+      text: TextSpan(text: text, style: textStyle),
     )..layout();
     TextPosition cursorTextPosition = widget.controller.selection.base;
     Rect caretPrototype = Rect.zero;
