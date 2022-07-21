@@ -56,6 +56,7 @@ class CodeField extends StatefulWidget {
   final Decoration? decoration;
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
+  final bool lineNumbers;
 
   final double defaultFontSize = 16;
 
@@ -78,6 +79,7 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
+    this.lineNumbers = true,
   }) : super(key: key);
 
   @override
@@ -257,34 +259,39 @@ class CodeFieldState extends State<CodeField> {
     final cursorColor =
         widget.cursorColor ?? styles?[rootKey]?.color ?? defaultText;
 
-    final lineNumberCol = TextField(
-      scrollPadding: widget.padding,
-      style: numberTextStyle,
-      controller: _numberController,
-      readOnly: true,
-      enableInteractiveSelection: false,
-      mouseCursor: SystemMouseCursors.basic,
-      minLines: widget.minLines,
-      maxLines: widget.maxLines,
-      expands: widget.expands,
-      scrollController: _numberScroll,
-      decoration: const InputDecoration(
-        isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16),
-        disabledBorder: InputBorder.none,
-      ),
-      textAlign: _lineNumberAlign,
-    );
+    TextField? lineNumberCol;
+    Container? numberCol;
 
-    final numberCol = Container(
-      width: _lineNumberWidth,
-      padding: EdgeInsets.only(
-        left: widget.padding.left,
-        right: _lineNumberMargin,
-      ),
-      color: widget.lineNumberStyle.background,
-      child: lineNumberCol,
-    );
+    if (widget.lineNumbers) {
+      lineNumberCol = TextField(
+        scrollPadding: widget.padding,
+        style: numberTextStyle,
+        controller: _numberController,
+        readOnly: true,
+        enableInteractiveSelection: false,
+        mouseCursor: SystemMouseCursors.basic,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
+        expands: widget.expands,
+        scrollController: _numberScroll,
+        decoration: const InputDecoration(
+          isCollapsed: true,
+          contentPadding: EdgeInsets.symmetric(vertical: 16),
+          disabledBorder: InputBorder.none,
+        ),
+        textAlign: _lineNumberAlign,
+      );
+
+      numberCol = Container(
+        width: _lineNumberWidth,
+        padding: EdgeInsets.only(
+          left: widget.padding.left,
+          right: _lineNumberMargin,
+        ),
+        color: widget.lineNumberStyle.background,
+        child: lineNumberCol,
+      );
+    }
 
     final codeField = TextField(
       focusNode: _focusNode,
@@ -326,10 +333,11 @@ class CodeFieldState extends State<CodeField> {
       decoration: widget.decoration,
       color: backgroundCol,
       key: _codeFieldKey,
+      padding: !widget.lineNumbers ? const EdgeInsets.only(left: 8) : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          numberCol,
+          if (widget.lineNumbers && numberCol != null) numberCol,
           Expanded(
             child: Stack(
               children: [
