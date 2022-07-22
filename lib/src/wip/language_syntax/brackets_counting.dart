@@ -16,9 +16,9 @@ Map<int, String> countingBrackets(String text) {
     if (char == "\n") {
       lineNumber++;
       continue;
-    } else if (char == "/" &&
+    } else if ((char == "*" || char == "/" &&
         i < text.length - 1 &&
-        text[i + 1] == char &&
+        text[i + 1] == char) &&
         !isCharInString) {
       while (char != "\n" && i < text.length - 1) {
         i++;
