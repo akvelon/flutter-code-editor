@@ -16,10 +16,12 @@ Map<int, String> countingBrackets(String text) {
     if (char == "\n") {
       lineNumber++;
       continue;
+      // TODO: discern multiplication & other uses of "*" from comments
     } else if ((char == "*" || char == "/" &&
         i < text.length - 1 &&
         text[i + 1] == char) &&
         !isCharInString) {
+      // skip comments
       while (char != "\n" && i < text.length - 1) {
         i++;
         char = text[i];
