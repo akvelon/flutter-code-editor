@@ -4,16 +4,18 @@ version: 1.0.2
 homepage: https://github.com/BertrandBev/code_field
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=1.26.0"
+  sdk: ">=2.17.0 <3.0.0"
+  flutter: ">=3.0.0"
 
 dependencies:
+  autotrie: ^2.0.0
+  collection: ^1.16.0
   flutter:
     sdk: flutter
-  linked_scroll_controller: ^0.2.0-nullsafety.0
-  highlight: ^0.7.0
   flutter_highlight: ^0.7.0
-  autotrie: ^2.0.0
+  highlight: ^0.7.0
+  linked_scroll_controller: ^0.2.0-nullsafety.0
+  meta: ^1.7.0
   scrollable_positioned_list: ^0.2.3
   tuple: ^2.0.0
 
