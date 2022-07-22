@@ -138,7 +138,7 @@ void main() {
       }
     });
 
-    test('characterIndexToLineIndex on signe line', () {
+    test('characterIndexToLineIndex on a single line', () {
       const texts = ['', 'no-newline'];
       for (final text in texts) {
         final code = Code(text: text, singleLineComments: singleLineComments);
