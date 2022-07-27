@@ -13,8 +13,8 @@ import 'language_syntax/scala_syntax.dart';
 Map<int, String> getErrorsMap(String text, Mode? language) {
   Map<int, String> errors = {};
 
-  /// This check is temporarily disabled because unclosed ' and "
-  /// characters in comments cause false positive errors
+  // This check is temporarily disabled because unclosed ' and "
+  // characters in comments cause false positive errors
   // errors.addAll(countingBrackets(text));
 
   if (language == java || language == dart) {
