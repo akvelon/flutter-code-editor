@@ -4,9 +4,11 @@ import 'package:code_text_field/src/code/code.dart';
 import 'package:code_text_field/src/code/code_line.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/highlight.dart';
+import 'package:highlight/languages/java.dart';
 
-const singleLineComments = ['//', '#'];
-
+// TODO(nausharipov): test every language if the current solution is correct
+final Mode language = java;
 const text = '''
 1 Lorem ipsum dolor sit amet,
 2 consectetur adipiscing elit,
@@ -30,7 +32,7 @@ void main() {
       const texts = ['', 'no-newline'];
 
       for (final text in texts) {
-        final code = Code(text: text, singleLineComments: singleLineComments);
+        final code = Code(text: text, language: language);
 
         expect(
           const ListEquality().equals(
@@ -49,7 +51,7 @@ void main() {
     });
 
     test('parses lines', () {
-      final code = Code(text: text, singleLineComments: singleLineComments);
+      final code = Code(text: text, language: language);
 
       expect(
         const ListEquality().equals(
@@ -83,7 +85,7 @@ void main() {
         final textWithTail = text + tail;
         final code = Code(
           text: textWithTail,
-          singleLineComments: singleLineComments,
+          language: language,
         );
 
         final map = {
@@ -141,7 +143,7 @@ void main() {
     test('characterIndexToLineIndex on a single line', () {
       const texts = ['', 'no-newline'];
       for (final text in texts) {
-        final code = Code(text: text, singleLineComments: singleLineComments);
+        final code = Code(text: text, language: language);
 
         for (int i = 0; i <= texts.length; i++) {
           expect(code.characterIndexToLineIndex(i), 0, reason: '"$text" at $i');
@@ -163,8 +165,8 @@ void main() {
             readonly
             readonly //readonly
             readonly // a readonly b'''
-            '\n\n'
-            '''
+              '\n\n'
+              '''
             The above line is empty but not last, so does not inherit readonly
             ''',
           'readonly': [false, true, true, false, false, false],
@@ -181,7 +183,7 @@ void main() {
       for (final data in dataSets) {
         final code = Code(
           text: data['text']! as String,
-          singleLineComments: singleLineComments,
+          language: language,
         );
 
         final readonly = data['readonly']! as List<bool>;

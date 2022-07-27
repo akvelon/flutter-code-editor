@@ -1,9 +1,17 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:highlight/highlight.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:highlight/languages/scala.dart';
 
 import 'code_line.dart';
 import 'text_range.dart';
 import 'tokens.dart';
+
+final List<Mode> slashCommentSignLanguages = [java, dart, go, scala];
 
 class Code {
   final String text;
@@ -11,10 +19,14 @@ class Code {
 
   factory Code({
     required String text,
-    required List<String> singleLineComments,
+    required Mode? language,
   }) {
-    final lines = _textToCodeLines(text, singleLineComments);
-    return Code._(text: text, lines: lines);
+    final singleLineComment = _getCommentSignByLanguage(language);
+    final lines = _textToCodeLines(text, singleLineComment);
+    return Code._(
+      text: text,
+      lines: lines,
+    );
   }
 
   const Code._({
@@ -26,7 +38,7 @@ class Code {
 
   static List<CodeLine> _textToCodeLines(
     String text,
-    List<String> singleLineComments,
+    String? singleLineComment,
   ) {
     final result = <CodeLine>[];
     final lines = text.split('\n');
@@ -34,7 +46,7 @@ class Code {
     int charIndex = 0;
 
     for (String line in lines) {
-      final words = _getCommentWords(line, singleLineComments);
+      final words = _getCommentWords(line, singleLineComment);
 
       String lineText = '$line\n';
       bool isReadOnly = words.contains(Tokens.readonly);
@@ -63,23 +75,26 @@ class Code {
     return result;
   }
 
-  static List<String> _getCommentWords(
-    String str,
-    List<String> singleLineComments,
-  ) {
-    for (final singleLineComment in singleLineComments) {
-      final commentIndex = str.indexOf(singleLineComment);
+  static String? _getCommentSignByLanguage(Mode? language) {
+    String? commentSign;
+    if (slashCommentSignLanguages.contains(language)) {
+      commentSign = '//';
+    } else if (language == python) {
+      commentSign = '#';
+    }
+    return commentSign;
+  }
 
-      if (commentIndex == -1) {
-        continue;
-      }
+  static List<String> _getCommentWords(String str, String? singleLineComment) {
+    if (singleLineComment != null && str.contains(singleLineComment)) {
+      final commentIndex = str.indexOf(singleLineComment);
 
       return str
           .substring(commentIndex + singleLineComment.length)
-          .split(RegExp(r'\s+')); // Split by any whitespaces.
+          .split(RegExp(r'\s+'));
+    } else {
+      return [];
     }
-
-    return [];
   }
 
   /// Returns the 0-based line number of the character at [characterIndex].
