@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../code/code.dart';
+import '../code/text_range.dart';
 import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
 import '../code_modifiers/indent_code_modifier.dart';
@@ -17,6 +19,9 @@ import '../wip/autocomplete/suggestion_generator.dart';
 import 'editor_params.dart';
 
 const _middleDot = '·';
+
+// TODO(alexeyinkin): Derive comments from language https://github.com/akvelon/flutter-code-editor/issues/34
+const _singleLineComments = ['//', '#'];
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -81,6 +86,8 @@ class CodeController extends TextEditingController {
 
   String get languageId => _languageId;
 
+  Code _lastCode;
+
   final styleList = <TextStyle>[];
   final modifierMap = <String, CodeModifier>{};
   bool isPopupShown = false;
@@ -103,7 +110,12 @@ class CodeController extends TextEditingController {
     ],
     this.webSpaceFix = true,
     this.onChange,
-  })  : _theme = theme,
+  })
+      : _theme = theme,
+        _lastCode = Code(
+          text: text ?? '',
+          singleLineComments: _singleLineComments,
+        ),
         super(text: text) {
     this.language = language;
 
@@ -169,27 +181,74 @@ class CodeController extends TextEditingController {
     }
   }
 
-  KeyEventResult onKey(RawKeyEvent event) {
-    if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
+  KeyEventResult onKey(KeyEvent event) {
+    if (event is KeyDownEvent || event is KeyRepeatEvent) {
+      return _onKeyDownRepeat(event);
+    }
+
+    return KeyEventResult.ignored; // The framework will handle.
+  }
+
+  KeyEventResult _onKeyDownRepeat(KeyEvent event) {
+    if (!_shouldAllowKeyDownRepeat(event)) {
+      return KeyEventResult.handled; // Prevent the framework from handling.
+    }
+
+    // TODO(alexeyinkin): Use a shortcut, https://github.com/akvelon/flutter-code-editor/issues/21
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
       text = text.replaceRange(selection.start, selection.end, '\t');
       return KeyEventResult.handled;
     }
 
     if (popupController.isPopupShown) {
-      if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         popupController.scrollByArrow(ScrollDirection.up);
         return KeyEventResult.handled;
       }
-      if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
         popupController.scrollByArrow(ScrollDirection.down);
         return KeyEventResult.handled;
       }
-      if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+      if (event.logicalKey == LogicalKeyboardKey.enter) {
         insertSelectedWord();
         return KeyEventResult.handled;
       }
     }
-    return KeyEventResult.ignored;
+
+    return KeyEventResult.ignored; // The framework will handle.
+  }
+
+  bool _shouldAllowKeyDownRepeat(KeyEvent event) {
+    if (event.logicalKey == LogicalKeyboardKey.backspace) {
+      return _shouldAllowBackspace();
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.delete) {
+      return _shouldAllowDelete();
+    }
+
+    return true;
+  }
+
+  bool _shouldAllowBackspace() {
+    final start = super.value.selection.normalized.start - 1;
+    if (start < 0) {
+      return false;
+    }
+
+    final line = _lastCode.characterIndexToLineIndex(start);
+    return !_lastCode.lines[line].isReadOnly;
+  }
+
+  bool _shouldAllowDelete() {
+    // If we are at the end of the line, see after the \n.
+    final end = value.selection.normalized.end + 1;
+    if (end >= value.text.length) {
+      return false;
+    }
+
+    final line = _lastCode.characterIndexToLineIndex(end);
+    return !_lastCode.lines[line].isReadOnly;
   }
 
   /// Inserts the word selected from the list of completions
@@ -253,6 +312,17 @@ class CodeController extends TextEditingController {
 
   @override
   set value(TextEditingValue newValue) {
+    if (newValue.text != super.value.text) {
+      if (_lastCode.isReadOnlySelected(super.value.selection)) {
+        return;
+      }
+
+      _lastCode = Code(
+        text: newValue.text,
+        singleLineComments: _singleLineComments,
+      );
+    }
+
     final loc = _insertedLoc(text, newValue.text);
 
     if (loc != null) {

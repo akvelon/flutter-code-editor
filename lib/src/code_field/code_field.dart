@@ -126,7 +126,7 @@ class CodeFieldState extends State<CodeField> {
     });
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
-    _focusNode!.attach(context, onKey: _onKey);
+    _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       double width = _codeFieldKey.currentContext!.size!.width;
@@ -136,7 +136,7 @@ class CodeFieldState extends State<CodeField> {
     _onTextChanged();
   }
 
-  KeyEventResult _onKey(FocusNode node, RawKeyEvent event) {
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
     return widget.controller.onKey(event);
   }
 
@@ -157,9 +157,14 @@ class CodeFieldState extends State<CodeField> {
   void rebuild() {
     setState(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        double width = _codeFieldKey.currentContext!.size!.width;
-        double height = _codeFieldKey.currentContext!.size!.height;
-        windowSize = Size(width - _lineNumberWidth, height);
+        // For some reason _codeFieldKey.currentContext is null in tests
+        // so check first.
+        final context = _codeFieldKey.currentContext;
+        if (context != null) {
+          double width = context.size!.width;
+          double height = context.size!.height;
+          windowSize = Size(width - _lineNumberWidth, height);
+        }
       });
     });
   }
