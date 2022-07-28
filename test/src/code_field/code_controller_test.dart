@@ -2,6 +2,7 @@ import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/languages/java.dart';
 
 const _editableBeginningEnd = '''
 abc
@@ -16,12 +17,17 @@ abc
 ro//readonly
 ''';
 
+final _language = java;
+
 void main() {
   group('CodeController Read-only', () {
     testWidgets(
       'Can edit at editable beginning of the document',
       (WidgetTester wt) async {
-        final controller = CodeController(text: _editableBeginningEnd);
+        final controller = CodeController(
+          text: _editableBeginningEnd,
+          language: _language,
+        );
         final focusNode = FocusNode();
 
         await wt.pumpWidget(_createApp(controller, focusNode));
@@ -74,7 +80,10 @@ void main() {
     testWidgets(
       'Can edit at editable end of the document',
       (WidgetTester wt) async {
-        final controller = CodeController(text: _editableBeginningEnd);
+        final controller = CodeController(
+          text: _editableBeginningEnd,
+          language: _language,
+        );
         final focusNode = FocusNode();
 
         await wt.pumpWidget(_createApp(controller, focusNode));
@@ -130,7 +139,10 @@ void main() {
     testWidgets(
       'Junction of editable and read-only',
       (WidgetTester wt) async {
-        final controller = CodeController(text: _editableBeginningEnd);
+        final controller = CodeController(
+          text: _editableBeginningEnd,
+          language: _language,
+        );
         final focusNode = FocusNode();
 
         await wt.pumpWidget(_createApp(controller, focusNode));
@@ -205,7 +217,10 @@ void main() {
     testWidgets(
       'Junction of and read-only and editable',
       (WidgetTester wt) async {
-        final controller = CodeController(text: _editableBeginningEnd);
+        final controller = CodeController(
+          text: _editableBeginningEnd,
+          language: _language,
+        );
         final focusNode = FocusNode();
 
         await wt.pumpWidget(_createApp(controller, focusNode));
@@ -263,7 +278,10 @@ void main() {
     testWidgets(
       'Read-only beginning of the document',
       (WidgetTester wt) async {
-        final controller = CodeController(text: _editableBetween);
+        final controller = CodeController(
+          text: _editableBetween,
+          language: _language,
+        );
         final focusNode = FocusNode();
 
         await wt.pumpWidget(_createApp(controller, focusNode));
@@ -294,8 +312,11 @@ void main() {
 
     testWidgets(
       'Read-only end of the document',
-        (WidgetTester wt) async {
-        final controller = CodeController(text: _editableBetween);
+      (WidgetTester wt) async {
+        final controller = CodeController(
+          text: _editableBetween,
+          language: _language,
+        );
         final focusNode = FocusNode();
 
         await wt.pumpWidget(_createApp(controller, focusNode));

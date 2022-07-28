@@ -1,9 +1,26 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:highlight/highlight.dart';
+import 'package:highlight/languages/dart.dart';
+import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:highlight/languages/scala.dart';
 
 import 'code_line.dart';
 import 'text_range.dart';
 import 'tokens.dart';
+
+const _slashes = '//';
+const _hash = '#';
+
+final _singleLineLanguageComments = <Mode, List<String>>{
+  java: [_slashes],
+  dart: [_slashes],
+  go: [_slashes],
+  scala: [_slashes],
+  python: [_hash],
+};
 
 class Code {
   final String text;
@@ -11,8 +28,9 @@ class Code {
 
   factory Code({
     required String text,
-    required List<String> singleLineComments,
+    Mode? language,
   }) {
+    final singleLineComments = _getCommentsByLanguage(language);
     final lines = _textToCodeLines(text, singleLineComments);
     return Code._(text: text, lines: lines);
   }
@@ -61,6 +79,11 @@ class Code {
     }
 
     return result;
+  }
+
+  static List<String> _getCommentsByLanguage(Mode? language) {
+    List<String>? singleLineComments = _singleLineLanguageComments[language];
+    return singleLineComments ?? [];
   }
 
   static List<String> _getCommentWords(

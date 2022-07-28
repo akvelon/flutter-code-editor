@@ -20,9 +20,6 @@ import 'editor_params.dart';
 
 const _middleDot = '·';
 
-// TODO(alexeyinkin): Derive comments from language https://github.com/akvelon/flutter-code-editor/issues/34
-const _singleLineComments = ['//', '#'];
-
 class CodeController extends TextEditingController {
   Mode? _language;
 
@@ -114,7 +111,7 @@ class CodeController extends TextEditingController {
       : _theme = theme,
         _lastCode = Code(
           text: text ?? '',
-          singleLineComments: _singleLineComments,
+          language: language,
         ),
         super(text: text) {
     this.language = language;
@@ -319,7 +316,7 @@ class CodeController extends TextEditingController {
 
       _lastCode = Code(
         text: newValue.text,
-        singleLineComments: _singleLineComments,
+        language: language,
       );
     }
 
