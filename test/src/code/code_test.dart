@@ -5,9 +5,9 @@ import 'package:code_text_field/src/code/code_line.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight.dart';
+import 'package:highlight/languages/css.dart';
 import 'package:highlight/languages/java.dart';
 
-// TODO(nausharipov): test every language if the current solution is correct
 final Mode language = java;
 const text = '''
 1 Lorem ipsum dolor sit amet,
@@ -192,5 +192,13 @@ void main() {
         }
       }
     });
+    test(
+      'does not parse an unsupported language',
+      () {
+        String textWithReadonly = 'end of line // readonly';
+        final code = Code(text: textWithReadonly, language: css);
+        expect(code.lines.first.isReadOnly, false);
+      },
+    );
   });
 }
