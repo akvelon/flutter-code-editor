@@ -17,7 +17,7 @@ ro//readonly
 abc
 ro//readonly
 ''';
-// TODO(nausharipov): test every language if the current solution is correct
+
 final Mode language = java;
 
 void main() {
