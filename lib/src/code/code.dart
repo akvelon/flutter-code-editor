@@ -91,7 +91,7 @@ class Code {
 
       return str
           .substring(commentIndex + singleLineComment.length)
-          .split(RegExp(r'\s+'));
+          .split(RegExp(r'\s+')); // Split by any whitespaces.
     } else {
       return [];
     }
