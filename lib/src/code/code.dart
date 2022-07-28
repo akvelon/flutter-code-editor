@@ -14,7 +14,7 @@ import 'tokens.dart';
 const _slashes = '//';
 const _hash = '#';
 
-final _singleLineComments = <Mode, List<String>>{
+final _singleLineLanguageComments = <Mode, List<String>>{
   java: [_slashes],
   dart: [_slashes],
   go: [_slashes],
@@ -82,8 +82,8 @@ class Code {
   }
 
   static List<String> _getCommentsByLanguage(Mode? language) {
-    List<String>? singleLineComment = _singleLineComments[language];
-    return singleLineComment ?? [];
+    List<String>? singleLineComments = _singleLineLanguageComments[language];
+    return singleLineComments ?? [];
   }
 
   static List<String> _getCommentWords(
