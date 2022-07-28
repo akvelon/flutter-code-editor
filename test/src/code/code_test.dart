@@ -5,7 +5,7 @@ import 'package:code_text_field/src/code/code_line.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight.dart';
-import 'package:highlight/languages/css.dart';
+import 'package:highlight/languages/angelscript.dart';
 import 'package:highlight/languages/java.dart';
 
 final Mode language = java;
@@ -196,7 +196,7 @@ void main() {
       'does not parse an unsupported language',
       () {
         String textWithReadonly = 'end of line // readonly';
-        final code = Code(text: textWithReadonly, language: css);
+        final code = Code(text: textWithReadonly, language: angelscript);
         expect(code.lines.first.isReadOnly, false);
       },
     );
