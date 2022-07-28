@@ -2,7 +2,6 @@ import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/highlight.dart';
 import 'package:highlight/languages/java.dart';
 
 const _editableBeginningEnd = '''
@@ -18,7 +17,7 @@ abc
 ro//readonly
 ''';
 
-final Mode language = java;
+final _language = java;
 
 void main() {
   group('CodeController Read-only', () {
@@ -27,7 +26,7 @@ void main() {
       (WidgetTester wt) async {
         final controller = CodeController(
           text: _editableBeginningEnd,
-          language: language,
+          language: _language,
         );
         final focusNode = FocusNode();
 
@@ -83,7 +82,7 @@ void main() {
       (WidgetTester wt) async {
         final controller = CodeController(
           text: _editableBeginningEnd,
-          language: language,
+          language: _language,
         );
         final focusNode = FocusNode();
 
@@ -142,7 +141,7 @@ void main() {
       (WidgetTester wt) async {
         final controller = CodeController(
           text: _editableBeginningEnd,
-          language: language,
+          language: _language,
         );
         final focusNode = FocusNode();
 
@@ -220,7 +219,7 @@ void main() {
       (WidgetTester wt) async {
         final controller = CodeController(
           text: _editableBeginningEnd,
-          language: language,
+          language: _language,
         );
         final focusNode = FocusNode();
 
@@ -281,7 +280,7 @@ void main() {
       (WidgetTester wt) async {
         final controller = CodeController(
           text: _editableBetween,
-          language: language,
+          language: _language,
         );
         final focusNode = FocusNode();
 
@@ -316,7 +315,7 @@ void main() {
       (WidgetTester wt) async {
         final controller = CodeController(
           text: _editableBetween,
-          language: language,
+          language: _language,
         );
         final focusNode = FocusNode();
 

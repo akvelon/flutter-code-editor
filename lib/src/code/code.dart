@@ -11,7 +11,16 @@ import 'code_line.dart';
 import 'text_range.dart';
 import 'tokens.dart';
 
-final List<Mode> slashCommentSignLanguages = [java, dart, go, scala];
+const _slashes = '//';
+const _hash = '#';
+
+final _singleLineComments = <Mode, List<String>>{
+  java: [_slashes],
+  dart: [_slashes],
+  go: [_slashes],
+  scala: [_slashes],
+  python: [_hash],
+};
 
 class Code {
   final String text;
@@ -19,14 +28,11 @@ class Code {
 
   factory Code({
     required String text,
-    required Mode? language,
+    Mode? language,
   }) {
-    final singleLineComment = _getCommentSignByLanguage(language);
-    final lines = _textToCodeLines(text, singleLineComment);
-    return Code._(
-      text: text,
-      lines: lines,
-    );
+    final singleLineComments = _getCommentByLanguage(language);
+    final lines = _textToCodeLines(text, singleLineComments);
+    return Code._(text: text, lines: lines);
   }
 
   const Code._({
@@ -38,7 +44,7 @@ class Code {
 
   static List<CodeLine> _textToCodeLines(
     String text,
-    String? singleLineComment,
+    List<String> singleLineComments,
   ) {
     final result = <CodeLine>[];
     final lines = text.split('\n');
@@ -46,7 +52,7 @@ class Code {
     int charIndex = 0;
 
     for (String line in lines) {
-      final words = _getCommentWords(line, singleLineComment);
+      final words = _getCommentWords(line, singleLineComments);
 
       String lineText = '$line\n';
       bool isReadOnly = words.contains(Tokens.readonly);
@@ -75,26 +81,28 @@ class Code {
     return result;
   }
 
-  static String? _getCommentSignByLanguage(Mode? language) {
-    String? commentSign;
-    if (slashCommentSignLanguages.contains(language)) {
-      commentSign = '//';
-    } else if (language == python) {
-      commentSign = '#';
-    }
-    return commentSign;
+  static List<String> _getCommentByLanguage(Mode? language) {
+    List<String>? singleLineComment = _singleLineComments[language];
+    return singleLineComment ?? [];
   }
 
-  static List<String> _getCommentWords(String str, String? singleLineComment) {
-    if (singleLineComment != null && str.contains(singleLineComment)) {
+  static List<String> _getCommentWords(
+    String str,
+    List<String> singleLineComments,
+  ) {
+    for (final singleLineComment in singleLineComments) {
       final commentIndex = str.indexOf(singleLineComment);
+
+      if (commentIndex == -1) {
+        continue;
+      }
 
       return str
           .substring(commentIndex + singleLineComment.length)
           .split(RegExp(r'\s+')); // Split by any whitespaces.
-    } else {
-      return [];
     }
+
+      return [];
   }
 
   /// Returns the 0-based line number of the character at [characterIndex].

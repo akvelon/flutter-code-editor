@@ -94,7 +94,7 @@ class CodeController extends TextEditingController {
 
   CodeController({
     String? text,
-    required Mode? language,
+    Mode? language,
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,
@@ -313,7 +313,10 @@ class CodeController extends TextEditingController {
         return;
       }
 
-      _lastCode = Code(text: newValue.text, language: language);
+      _lastCode = Code(
+        text: newValue.text,
+        language: language,
+      );
     }
 
     final loc = _insertedLoc(text, newValue.text);
