@@ -102,7 +102,7 @@ class Code {
           .split(RegExp(r'\s+')); // Split by any whitespaces.
     }
 
-      return [];
+    return [];
   }
 
   /// Returns the 0-based line number of the character at [characterIndex].

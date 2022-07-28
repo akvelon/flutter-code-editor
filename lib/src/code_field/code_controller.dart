@@ -107,7 +107,8 @@ class CodeController extends TextEditingController {
     ],
     this.webSpaceFix = true,
     this.onChange,
-  })  : _theme = theme,
+  })  
+      : _theme = theme,
         _lastCode = Code(
           text: text ?? '',
           language: language,
