@@ -30,7 +30,7 @@ class Code {
     required String text,
     Mode? language,
   }) {
-    final singleLineComments = _getCommentsByLanguage(language);
+    final singleLineComments = _singleLineLanguageComments[language] ?? [];
     final lines = _textToCodeLines(text, singleLineComments);
     return Code._(text: text, lines: lines);
   }
@@ -79,11 +79,6 @@ class Code {
     }
 
     return result;
-  }
-
-  static List<String> _getCommentsByLanguage(Mode? language) {
-    List<String>? singleLineComments = _singleLineLanguageComments[language];
-    return singleLineComments ?? [];
   }
 
   static List<String> _getCommentWords(
