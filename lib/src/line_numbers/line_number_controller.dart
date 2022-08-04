@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 
 import '../wip/TooltipTextSpan.dart';
 import '../wip/getErrorsMap.dart';

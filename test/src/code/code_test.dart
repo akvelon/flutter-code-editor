@@ -26,8 +26,8 @@ const _text = '''
 15 sunt in culpa qui officia deserunt mollit anim id est laborum.''';
 
 void main() {
-  group('Code', () {
-    test('parses single line', () {
+  group('Code. Lines.', () {
+    test('Parses single line', () {
       const texts = ['', 'no-newline'];
 
       for (final text in texts) {
@@ -49,7 +49,7 @@ void main() {
       }
     });
 
-    test('parses lines', () {
+    test('Parses lines', () {
       final code = Code(text: _text, language: _language);
 
       expect(
@@ -149,7 +149,9 @@ void main() {
         }
       }
     });
+  });
 
+  group('Code. Read-only.', () {
     test('parse read-only lines by end comments', () {
       const dataSets = [
         {
@@ -195,7 +197,7 @@ void main() {
     test(
       'does not parse an unsupported language',
       () {
-        String textWithReadonly = 'end of line // readonly';
+        const textWithReadonly = 'end of line // readonly';
         final code = Code(text: textWithReadonly, language: angelscript);
         expect(code.lines.first.isReadOnly, false);
       },
