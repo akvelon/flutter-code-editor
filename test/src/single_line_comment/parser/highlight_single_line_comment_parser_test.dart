@@ -15,7 +15,7 @@ void main() {
       //                Java
       // ==================================
 
-      _Data(
+      _Example(
         language: java,
         name: 'Java. Parses unquoted sequences',
         text: '''
@@ -40,7 +40,7 @@ public class MyClass {
         ],
       ),
 
-      _Data(
+      _Example(
         language: java,
         name: 'Java. Ignores quoted sequences',
         text: '''
@@ -61,7 +61,7 @@ public class MyClass { // comment
         ],
       ),
 
-      _Data(
+      _Example(
         language: java,
         name: 'Java. Breaks on single-quote multiline strings',
         text: '''
@@ -74,7 +74,7 @@ public class MyClass { // comment
         isLanguageLost: true,
       ),
 
-      _Data(
+      _Example(
         language: java,
         name: 'Java. Breaks on double-quote multiline strings',
         text: '''
@@ -87,7 +87,7 @@ public class MyClass { // comment
         isLanguageLost: true,
       ),
 
-      _Data(
+      _Example(
         language: java,
         name: 'Java. Breaks on number sign',
         // https://github.com/git-touch/highlight.dart/issues/36
@@ -104,7 +104,7 @@ text # not a comment
       //                Go
       // ==================================
 
-      _Data(
+      _Example(
         language: go,
         name: 'Go. Parses unquoted sequences',
         text: '''
@@ -129,7 +129,7 @@ public class MyClass {
         ],
       ),
 
-      _Data(
+      _Example(
         language: go,
         name: 'Go. Ignores quoted sequences',
         text: '''
@@ -158,7 +158,7 @@ public class MyClass { // comment
       //                Python
       // ==================================
 
-      _Data(
+      _Example(
         language: python,
         name: 'Python. Parses unquoted sequences',
         text: '''
@@ -180,7 +180,7 @@ def fn():
         ],
       ),
 
-      _Data(
+      _Example(
         language: python,
         name: 'Python. Ignores quoted sequences',
         text: '''
@@ -203,7 +203,7 @@ def fn(): # comment
         ],
       ),
 
-      _Data(
+      _Example(
         language: python,
         name: 'Python. Breaks on missing colon',
         text: '''
@@ -216,7 +216,7 @@ def fn() # comment
       //                Scala
       // ==================================
 
-      _Data(
+      _Example(
         language: scala,
         name: 'Scala. Parses unquoted sequences',
         text: '''
@@ -241,7 +241,7 @@ public class MyClass {
         ],
       ),
 
-      _Data(
+      _Example(
         language: scala,
         name: 'Scala. Ignores quoted sequences',
         text: '''
@@ -261,7 +261,7 @@ public class MyClass { // comment
         ],
       ),
 
-      _Data(
+      _Example(
         language: scala,
         name: 'Scala. Breaks on multiline strings',
         text: '''
@@ -294,14 +294,14 @@ val str4 = """
   });
 }
 
-class _Data {
+class _Example {
   final String name;
   final String text;
   final Mode language;
   final List<SingleLineComment> comments;
   final bool isLanguageLost;
 
-  _Data({
+  _Example({
     required this.name,
     required this.text,
     required this.language,

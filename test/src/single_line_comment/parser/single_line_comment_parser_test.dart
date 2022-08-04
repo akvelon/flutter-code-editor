@@ -26,7 +26,7 @@ public class MyClass {
 
     test('when type highlight fails, falls back to text', () {
       final examples = [
-        _Data(
+        _Example(
           language: java,
           name: 'Java. Highlight',
           parserType: HighlightSingleLineCommentParser,
@@ -42,7 +42,7 @@ public class MyClass {
 
         // If the number sign bug gets fixed, find another example
         // that breaks highlighting.
-        _Data(
+        _Example(
           language: java,
           name: 'Java. Text with number sign',
           parserType: TextSingleLineCommentParser,
@@ -72,13 +72,13 @@ text # not a comment
   });
 }
 
-class _Data {
+class _Example {
   final Mode language;
   final String name;
   final String text;
   final Type parserType;
 
-  _Data({
+  _Example({
     required this.language,
     required this.name,
     required this.text,
