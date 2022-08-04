@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 
 import '../single_line_comments/parser/single_line_comment_parser.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
