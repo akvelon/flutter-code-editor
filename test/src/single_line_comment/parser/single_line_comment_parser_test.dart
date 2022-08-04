@@ -25,7 +25,7 @@ public class MyClass {
     });
 
     test('when type highlight fails, falls back to text', () {
-      final data = [
+      final examples = [
         _Data(
           language: java,
           name: 'Java. Highlight',
@@ -55,18 +55,18 @@ text # not a comment
         ),
       ];
 
-      for (final one in data) {
-        highlight.registerLanguage('language', one.language);
-        final highlighted = highlight.parse(one.text, language: 'language');
+      for (final example in examples) {
+        highlight.registerLanguage('language', example.language);
+        final highlighted = highlight.parse(example.text, language: 'language');
 
         final result = SingleLineCommentParser.parseHighlighted(
-          text: one.text,
+          text: example.text,
           highlighted: highlighted,
           singleLineCommentSequences:
-              SingleLineComments.byMode[one.language] ?? [],
+              SingleLineComments.byMode[example.language] ?? [],
         );
 
-        expect(result.runtimeType, one.parserType);
+        expect(result.runtimeType, example.parserType);
       }
     });
   });

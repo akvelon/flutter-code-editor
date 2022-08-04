@@ -10,7 +10,7 @@ import 'package:highlight/languages/scala.dart';
 
 void main() {
   test('HighlightSingleLineCommentParser', () {
-    final data = [
+    final examples = [
       // ==================================
       //                Java
       // ==================================
@@ -273,22 +273,22 @@ val str4 = """
       ),
     ];
 
-    for (final one in data) {
-      highlight.registerLanguage('language', one.language);
-      final highlighted = highlight.parse(one.text, language: 'language');
+    for (final example in examples) {
+      highlight.registerLanguage('language', example.language);
+      final highlighted = highlight.parse(example.text, language: 'language');
 
       final result = HighlightSingleLineCommentParser(
-        text: one.text,
+        text: example.text,
         highlighted: highlighted,
         singleLineCommentSequences:
-            SingleLineComments.byMode[one.language] ?? [],
+            SingleLineComments.byMode[example.language] ?? [],
       );
 
-      expect(result.comments, one.comments, reason: one.name);
+      expect(result.comments, example.comments, reason: example.name);
       expect(
         highlighted.language,
-        one.isLanguageLost ? null : 'language',
-        reason: one.name,
+        example.isLanguageLost ? null : 'language',
+        reason: example.name,
       );
     }
   });
