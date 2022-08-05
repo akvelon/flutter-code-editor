@@ -14,7 +14,7 @@ class SingleLineComment {
   const SingleLineComment({
     required this.lineIndex,
     required this.innerContent,
-    required this.outerContent,
+    this.outerContent = '',
   });
 
   SingleLineComment.cut(
