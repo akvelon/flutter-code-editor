@@ -42,7 +42,7 @@ class CodeController extends TextEditingController {
   }
 
   final AbstractNamedSectionParser? namedSectionParser;
-  Set<String> readOnlySectionNames;
+  Set<String> _readOnlySectionNames;
 
   Map<String, TextStyle>? _theme;
 
@@ -100,7 +100,7 @@ class CodeController extends TextEditingController {
     String? text,
     Mode? language,
     this.namedSectionParser,
-    this.readOnlySectionNames = const {},
+    Set<String> readOnlySectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,
@@ -113,8 +113,8 @@ class CodeController extends TextEditingController {
     ],
     this.webSpaceFix = true,
     this.onChange,
-  })
-      : _theme = theme,
+  })  : _theme = theme,
+        _readOnlySectionNames = readOnlySectionNames,
         _lastCode = Code.empty,
         super(text: text) {
     this.language = language;
@@ -364,7 +364,7 @@ class CodeController extends TextEditingController {
       language: language,
       highlighted: highlight.parse(text, language: _languageId),
       namedSectionParser: namedSectionParser,
-      readOnlySectionNames: readOnlySectionNames,
+      readOnlySectionNames: _readOnlySectionNames,
     );
   }
 
