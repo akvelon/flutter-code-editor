@@ -23,6 +23,8 @@ import 'abstract.dart';
 ///
 /// The order of comments in the list does not matter.
 class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
+  const BracketsStartEndNamedSectionParser();
+
   static final _startRe = RegExp(r'\[(\s*)START(\s+)([_0-9a-zA-Z]+)(\s*)\]');
   static final _endRe = RegExp(r'\[(\s*)END(\s+)([_0-9a-zA-Z]+)(\s*)\]');
 

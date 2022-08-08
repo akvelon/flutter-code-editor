@@ -2,8 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../named_sections/named_section.dart';
+import '../named_sections/parsers/abstract.dart';
 import '../single_line_comments/parser/single_line_comment_parser.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
+import '../single_line_comments/single_line_comment.dart';
 import 'code_line.dart';
 import 'text_range.dart';
 import 'tokens.dart';
@@ -11,46 +14,72 @@ import 'tokens.dart';
 class Code {
   final String text;
   final List<CodeLine> lines;
+  final Map<String, NamedSection> namedSections;
 
   factory Code({
     required String text,
     Result? highlighted,
     Mode? language,
+    AbstractNamedSectionParser? namedSectionParser,
+    Set<String> readOnlySectionNames = const {},
   }) {
     final sequences = SingleLineComments.byMode[language] ?? [];
+
+    final commentParser = SingleLineCommentParser.parseHighlighted(
+      text: text,
+      highlighted: highlighted,
+      singleLineCommentSequences: sequences,
+    );
+
     final lines = _textToCodeLines(
       text: text,
       highlighted: highlighted,
       language: language,
-      singleLineCommentSequences: sequences,
+      commentsByLines: commentParser.getCommentsByLines(),
     );
-    return Code._(text: text, lines: lines);
+
+    final sections = namedSectionParser?.parse(
+          singleLineComments: commentParser.comments,
+          lineCount: lines.length,
+        ) ??
+        const [];
+    final sectionsMap = {for (final s in sections) s.name: s};
+
+    _applyNamedSectionsToLines(
+      lines: lines,
+      sections: sectionsMap,
+      readOnlySectionNames: readOnlySectionNames,
+    );
+
+    return Code._(
+      text: text,
+      lines: lines,
+      namedSections: sectionsMap,
+    );
   }
 
   const Code._({
     required this.text,
     required this.lines,
+    required this.namedSections,
   });
 
-  static const empty = Code._(text: '', lines: []);
+  static const empty = Code._(
+    text: '',
+    lines: [],
+    namedSections: {},
+  );
 
   static List<CodeLine> _textToCodeLines({
     required String text,
     required Result? highlighted,
     required Mode? language,
-    required List<String> singleLineCommentSequences,
+    required Map<int, SingleLineComment> commentsByLines,
   }) {
     final result = <CodeLine>[];
     final lines = text.split('\n');
     int charIndex = 0;
 
-    final commentParser = SingleLineCommentParser.parseHighlighted(
-      text: text,
-      highlighted: highlighted,
-      singleLineCommentSequences: singleLineCommentSequences,
-    );
-
-    final commentsByLines = commentParser.getCommentsByLines();
     int lineIndex = 0;
     final lastLineIndex = lines.length - 1;
 
@@ -92,6 +121,24 @@ class Code {
   ) {
     // Split by any whitespaces.
     return comment?.split(RegExp(r'\s+')) ?? const <String>[];
+  }
+
+  static void _applyNamedSectionsToLines({
+    required List<CodeLine> lines,
+    required Map<String, NamedSection> sections,
+    required Set<String> readOnlySectionNames,
+  }) {
+    for (final name in readOnlySectionNames) {
+      final section = sections[name];
+
+      if (section == null) {
+        continue;
+      }
+
+      for (int i = section.startLine; i <= section.endLine; i++) {
+        lines[i] = lines[i].copyWith(isReadOnly: true);
+      }
+    }
   }
 
   /// Returns the 0-based line number of the character at [characterIndex].

@@ -92,7 +92,7 @@ void main() {
       NamedSection(startLine: 84, endLine: last, name: '_'),
     ];
 
-    final parser = BracketsStartEndNamedSectionParser();
+    const parser = BracketsStartEndNamedSectionParser();
     final parsed = parser.parse(
       singleLineComments: comments,
       lineCount: lineCount,
