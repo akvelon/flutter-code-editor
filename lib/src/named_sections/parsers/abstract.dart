@@ -15,6 +15,8 @@ import '../named_section.dart';
 ///    - The end line is before the start line.
 /// 2. Sorts by the start lines.
 abstract class AbstractNamedSectionParser {
+  const AbstractNamedSectionParser();
+
   List<NamedSection> parse({
     required List<SingleLineComment> singleLineComments,
     required int lineCount,

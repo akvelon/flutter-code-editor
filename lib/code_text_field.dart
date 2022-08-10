@@ -18,3 +18,7 @@ export 'src/code_theme/code_theme_data.dart';
 
 export 'src/line_numbers/line_number_controller.dart';
 export 'src/line_numbers/line_number_style.dart';
+
+export 'src/named_sections/named_section.dart';
+export 'src/named_sections/parsers/abstract.dart';
+export 'src/named_sections/parsers/brackets_start_end.dart';

@@ -25,6 +25,14 @@ class CodeLine {
   String toString() =>
       'CodeLine(ro: $isReadOnly, textRange: $textRange, text: "$text")';
 
+  CodeLine copyWith({bool? isReadOnly}) {
+    return CodeLine(
+      text: text,
+      textRange: textRange,
+      isReadOnly: isReadOnly ?? this.isReadOnly,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     return other is CodeLine &&

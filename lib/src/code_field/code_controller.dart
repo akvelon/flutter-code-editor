@@ -13,6 +13,7 @@ import '../code_modifiers/indent_code_modifier.dart';
 import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
+import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import '../wip/autocomplete/suggestion.dart';
 import '../wip/autocomplete/suggestion_generator.dart';
@@ -39,6 +40,9 @@ class CodeController extends TextEditingController {
     _language = language;
     notifyListeners();
   }
+
+  final AbstractNamedSectionParser? namedSectionParser;
+  Set<String> _readOnlySectionNames;
 
   Map<String, TextStyle>? _theme;
 
@@ -95,6 +99,8 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
+    this.namedSectionParser,
+    Set<String> readOnlySectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,
@@ -107,14 +113,12 @@ class CodeController extends TextEditingController {
     ],
     this.webSpaceFix = true,
     this.onChange,
-  })
-      : _theme = theme,
-        _lastCode = Code(
-          text: text ?? '',
-          language: language,
-        ),
+  })  : _theme = theme,
+        _readOnlySectionNames = readOnlySectionNames,
+        _lastCode = Code.empty,
         super(text: text) {
     this.language = language;
+    _updateLastCode(text ?? '');
 
     // Create modifier map
     for (final el in modifiers) {
@@ -314,10 +318,7 @@ class CodeController extends TextEditingController {
         return;
       }
 
-      _lastCode = Code(
-        text: newValue.text,
-        language: language,
-      );
+      _updateLastCode(newValue.text);
     }
 
     final loc = _insertedLoc(text, newValue.text);
@@ -355,6 +356,16 @@ class CodeController extends TextEditingController {
     } else if (hasSelectionChanged) {
       popupController.hide();
     }
+  }
+
+  void _updateLastCode(String text) {
+    _lastCode = Code(
+      text: text,
+      language: language,
+      highlighted: highlight.parse(text, language: _languageId),
+      namedSectionParser: namedSectionParser,
+      readOnlySectionNames: _readOnlySectionNames,
+    );
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
