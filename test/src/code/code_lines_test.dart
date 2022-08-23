@@ -2,29 +2,13 @@ import 'dart:ui';
 
 import 'package:code_text_field/src/code/code.dart';
 import 'package:code_text_field/src/code/code_line.dart';
-import 'package:code_text_field/src/named_sections/parsers/brackets_start_end.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/languages/angelscript.dart';
 import 'package:highlight/languages/java.dart';
 
-final _language = java;
-const _text = '''
-1 Lorem ipsum dolor sit amet,
-2 consectetur adipiscing elit,
-3 sed do eiusmod tempor incididunt ut labore et dolore magna
-4 aliqua. Ut enim ad minim veniam,
-5 quis nostrud exercitation ullamco laboris nisi
-6 ut aliquip
-7 ex
+import '../common/loren_ipsum.dart';
 
-9 ea commodo consequat.
-10 Duis aute irure dolor in
-11 reprehenderit in voluptate velit esse cillum dolore
-12 eu fugiat nulla pariatur.
-13 Excepteur sint occaecat cupidatat
-14 non proident,
-15 sunt in culpa qui officia deserunt mollit anim id est laborum.''';
+final _language = java;
 
 void main() {
   group('Code. Lines.', () {
@@ -51,7 +35,7 @@ void main() {
     });
 
     test('Parses lines', () {
-      final code = Code(text: _text, language: _language);
+      final code = Code(text: lorenIpsum, language: _language);
 
       expect(
         code.lines,
@@ -153,7 +137,7 @@ void main() {
     test('characterIndexToLineIndex', () {
       const tails = ['', '\n'];
       for (final tail in tails) {
-        final textWithTail = _text + tail;
+        final textWithTail = lorenIpsum + tail;
         final code = Code(
           text: textWithTail,
           language: _language,
@@ -220,97 +204,6 @@ void main() {
           expect(code.characterIndexToLineIndex(i), 0, reason: '"$text" at $i');
         }
       }
-    });
-  });
-
-  group('Code. Read-only.', () {
-    test('Parse read-only lines by end comments', () {
-      const dataSets = [
-        {
-          'text': '''
-            readonly
-            editable// readonly
-''', //                                        Empty line inherits readonly
-          'readonly': [false, true, true],
-        },
-        {
-          'text': '''
-            readonly
-            readonly //readonly
-            readonly // a readonly b'''
-              '\n\n'
-              '''
-            The above line is empty but not last, so does not inherit readonly
-            ''',
-          'readonly': [false, true, true, false, false, false],
-        },
-        {
-          'text': '''
-            readonly
-            editable// readonly
-            ''', // Last after read only, but not empty, so editable.
-          'readonly': [false, true, false],
-        },
-      ];
-
-      for (final data in dataSets) {
-        final code = Code(
-          text: data['text']! as String,
-          language: _language,
-        );
-
-        final readonly = data['readonly']! as List<bool>;
-        for (int i = code.lines.length; --i >= 0;) {
-          expect(code.lines[i].isReadOnly, readonly[i], reason: 'Line #$i');
-        }
-      }
-    });
-
-    test(
-      'Does not parse an unsupported language',
-      () {
-        const textWithReadonly = 'end of line // readonly';
-        final code = Code(text: textWithReadonly, language: angelscript);
-        expect(code.lines.first.isReadOnly, false);
-      },
-    );
-
-    test('Lines in read-only sections are read-only', () {
-      const text = '''
-public class MyClass {
-  public void main() { // [START section1]
-  }
-  // [END section1]
-  // [START section2]
-  void method() {
-  }
-  // [END section2]
-}
-''';
-      const expected = [
-        false,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-      ];
-
-      final code = Code(
-        text: text,
-        namedSectionParser: const BracketsStartEndNamedSectionParser(),
-        readOnlySectionNames: {'section1', 'nonexistent'},
-        language: java,
-      );
-
-      expect(
-        code.lines.map((line) => line.isReadOnly),
-        expected,
-      );
     });
   });
 }

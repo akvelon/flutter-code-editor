@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 import '../../single_line_comments/single_line_comment.dart';
 import '../named_section.dart';
 
@@ -19,28 +17,22 @@ abstract class AbstractNamedSectionParser {
 
   List<NamedSection> parse({
     required List<SingleLineComment> singleLineComments,
-    required int lineCount,
   }) {
     final unsorted = parseUnsorted(
       singleLineComments: singleLineComments,
-      lineCount: lineCount,
     );
 
-    return unsorted
-        .where((section) => _isValid(section, lineCount))
-        .toList(growable: false)
+    return unsorted.where(_isValid).toList(growable: false)
       ..sort((a, b) => a.startLine - b.startLine);
   }
 
-  @protected
   List<NamedSection> parseUnsorted({
     required List<SingleLineComment> singleLineComments,
-    required int lineCount,
   });
 
-  bool _isValid(NamedSection section, int lineCount) {
+  bool _isValid(NamedSection section) {
+    final endLine = section.endLine;
     return section.startLine >= 0 &&
-        section.endLine < lineCount &&
-        section.startLine <= section.endLine;
+        (endLine == null || section.startLine <= endLine);
   }
 }

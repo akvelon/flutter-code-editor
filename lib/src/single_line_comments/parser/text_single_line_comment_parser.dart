@@ -20,6 +20,7 @@ class TextSingleLineCommentParser extends AbstractSingleLineCommentParser {
   void _parse() {
     final lines = text.split('\n');
     int lineIndex = 0;
+    int characterIndex = 0;
 
     for (final line in lines) {
       final column = _getCommentColumn(line);
@@ -29,12 +30,14 @@ class TextSingleLineCommentParser extends AbstractSingleLineCommentParser {
           SingleLineComment.cut(
             line.substring(column),
             lineIndex: lineIndex,
+            characterIndex: characterIndex + column,
             sequences: singleLineCommentSequences,
           ),
         );
       }
 
       lineIndex++;
+      characterIndex += line.length + 1;
     }
   }
 

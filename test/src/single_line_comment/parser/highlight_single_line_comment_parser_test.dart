@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'package:code_text_field/src/single_line_comments/parser/highlight_single_line_comment_parser.dart';
 import 'package:code_text_field/src/single_line_comments/parser/single_line_comments.dart';
 import 'package:code_text_field/src/single_line_comments/single_line_comment.dart';
@@ -29,11 +31,13 @@ public class MyClass {
         comments: const [
           SingleLineComment(
             lineIndex: 0,
+            characterIndex: 0,
             innerContent: ' slashed comment1 ',
             outerContent: '// slashed comment1 ', // note the trailing space.
           ),
           SingleLineComment(
             lineIndex: 4,
+            characterIndex: 68,
             innerContent: ' slashed comment2 // still comment2',
             outerContent: '// slashed comment2 // still comment2',
           ),
@@ -55,6 +59,7 @@ public class MyClass { // comment
         comments: const [
           SingleLineComment(
             lineIndex: 3,
+            characterIndex: 49,
             innerContent: ' comment',
             outerContent: '// comment',
           ),
@@ -118,11 +123,13 @@ public class MyClass {
         comments: const [
           SingleLineComment(
             lineIndex: 0,
+            characterIndex: 0,
             innerContent: ' slashed comment1 ',
             outerContent: '// slashed comment1 ', // note the trailing space.
           ),
           SingleLineComment(
             lineIndex: 4,
+            characterIndex: 68,
             innerContent: ' slashed comment2 // still comment2',
             outerContent: '// slashed comment2 // still comment2',
           ),
@@ -148,6 +155,7 @@ public class MyClass { // comment
         comments: const [
           SingleLineComment(
             lineIndex: 3,
+            characterIndex: 49,
             innerContent: ' comment',
             outerContent: '// comment',
           ),
@@ -169,11 +177,13 @@ def fn():
         comments: const [
           SingleLineComment(
             lineIndex: 0,
+            characterIndex: 0,
             innerContent: ' hash comment1 ',
             outerContent: '# hash comment1 ', // note the trailing space.
           ),
           SingleLineComment(
             lineIndex: 2,
+            characterIndex: 34,
             innerContent: ' hash comment2 # still comment2',
             outerContent: '# hash comment2 # still comment2',
           ),
@@ -197,6 +207,7 @@ def fn(): # comment
         comments: const [
           SingleLineComment(
             lineIndex: 0,
+            characterIndex: 10,
             innerContent: ' comment',
             outerContent: '# comment',
           ),
@@ -230,11 +241,13 @@ public class MyClass {
         comments: const [
           SingleLineComment(
             lineIndex: 0,
+            characterIndex: 0,
             innerContent: ' slashed comment1 ',
             outerContent: '// slashed comment1 ', // note the trailing space.
           ),
           SingleLineComment(
             lineIndex: 4,
+            characterIndex: 68,
             innerContent: ' slashed comment2 // still comment2',
             outerContent: '// slashed comment2 // still comment2',
           ),
@@ -255,6 +268,7 @@ public class MyClass { // comment
         comments: const [
           SingleLineComment(
             lineIndex: 3,
+            characterIndex: 49,
             innerContent: ' comment',
             outerContent: '// comment',
           ),
