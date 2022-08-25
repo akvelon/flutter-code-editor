@@ -8,77 +8,77 @@ void main() {
     const examples = [
       //
       _Example(
-        name: 'Empty vs empty',
+        'Empty vs empty',
         str1: '',
         str2: '',
         expectedSingle: TextRange.empty,
       ),
 
       _Example(
-        name: 'Same',
+        'Same',
         str1: 'abc',
         str2: 'abc',
         expectedSingle: TextRange.empty,
       ),
 
       _Example(
-        name: 'Adding: Empty vs non-empty',
+        'Adding: Empty vs non-empty',
         str1: '',
         str2: 'abc',
         expectedSingle: TextRange(start: 0, end: 3),
       ),
 
       _Example(
-        name: 'Adding: Common prefix',
+        'Adding: Common prefix',
         str1: 'abc',
         str2: 'abc123',
         expectedSingle: TextRange(start: 3, end: 6),
       ),
 
       _Example(
-        name: 'Adding: Common suffix',
+        'Adding: Common suffix',
         str1: 'abc',
         str2: '123abc',
         expectedSingle: TextRange(start: 0, end: 3),
       ),
 
       _Example(
-        name: 'Adding duplicate',
+        'Adding duplicate',
         str1: 'abc',
         str2: 'abc1abc',
         expected: [TextRange(start: 0, end: 4), TextRange(start: 3, end: 7)],
       ),
 
       _Example(
-        name: 'Removing: Non-empty vs empty',
+        'Removing: Non-empty vs empty',
         str1: 'abc',
         str2: '',
         expectedSingle: TextRange(start: 0, end: 0),
       ),
 
       _Example(
-        name: 'Removing: Common prefix',
+        'Removing: Common prefix',
         str1: 'abc123',
         str2: 'abc',
         expectedSingle: TextRange(start: 3, end: 3),
       ),
 
       _Example(
-        name: 'Removing a duplicate on a side',
+        'Removing a duplicate on a side',
         str1: 'abc1abc',
         str2: 'abc',
         expected: [TextRange(start: 0, end: 0), TextRange(start: 3, end: 3)],
       ),
 
       _Example(
-        name: 'Replacing',
+        'Replacing',
         str1: 'abc123def',
         str2: 'abc3210def',
         expectedSingle: TextRange(start: 3, end: 7),
       ),
 
       _Example(
-        name: 'Removed a duplicate in the middle',
+        'Removed a duplicate in the middle',
         str1: 'abccde',
         str2: 'abcde',
         expected: [TextRange(start: 2, end: 2), TextRange(start: 3, end: 3)],
@@ -122,8 +122,8 @@ class _Example {
   final List<TextRange>? expected;
   final TextRange? expectedSingle;
 
-  const _Example({
-    required this.name,
+  const _Example(
+    this.name, {
     required this.str1,
     required this.str2,
     this.expected,

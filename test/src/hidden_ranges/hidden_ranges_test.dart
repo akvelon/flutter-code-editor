@@ -89,45 +89,44 @@ void main() {
     test('cutString', () {
       final examples = [
         _CutStringExample(
-          name: 'Empty changes nothing (shortcut return)',
+          'Empty changes nothing (shortcut return)',
           hiddenTexts: HiddenRanges.empty,
           text: _text,
           start: 123,
           result: _text,
         ),
         _CutStringExample(
-          name: 'Cuts full string '
-              '(break with "rangeIndex < ranges.length" == false)',
+          'Cuts full string (break with "rangeIndex < ranges.length" == false)',
           hiddenTexts: _hiddenRanges,
           text: _text,
           start: 0,
           result: _cut,
         ),
         _CutStringExample(
-          name: 'Cuts a substring starting before and ending in a hidden range',
+          'Cuts a substring starting before and ending in a hidden range',
           hiddenTexts: _hiddenRanges,
           text: 'la',
           start: 8,
           result: 'l',
         ),
         _CutStringExample(
-          name: 'Cuts a substring starting in and ending after a hidden range',
+          'Cuts a substring starting in and ending after a hidden range',
           hiddenTexts: _hiddenRanges,
           text: 'ss',
           start: 10,
           result: 's',
         ),
         _CutStringExample(
-          name: 'Cuts a substring not starting or ending in hidden range '
-              '(break with "substringStart < end" == false',
+          'Cuts a substring not starting or ending in hidden range '
+          '(break with "substringStart < end" == false',
           hiddenTexts: _hiddenRanges,
           text: 'class MyClass {',
           start: 7,
           result: 'cls MyClass {',
         ),
         _CutStringExample(
-          name: 'Cuts a substring starting and ending in 2 hidden ranges '
-              '(break with "substringStart < end" == false',
+          'Cuts a substring starting and ending in 2 hidden ranges '
+          '(break with "substringStart < end" == false',
           hiddenTexts: _hiddenRanges,
           text: 'ss MyClass {\n  public void main() { // com',
           start: 10,
@@ -169,8 +168,8 @@ class _CutStringExample {
   final int start;
   final String result;
 
-  _CutStringExample({
-    required this.name,
+  _CutStringExample(
+    this.name, {
     required this.hiddenTexts,
     required this.text,
     required this.start,

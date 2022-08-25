@@ -18,8 +18,8 @@ void main() {
       // ==================================
 
       _Example(
+        'Java. Parses unquoted sequences',
         language: java,
-        name: 'Java. Parses unquoted sequences',
         text: '''
 // slashed comment1 
 /* multi
@@ -45,8 +45,8 @@ public class MyClass {
       ),
 
       _Example(
+        'Java. Ignores quoted sequences',
         language: java,
-        name: 'Java. Ignores quoted sequences',
         text: '''
 /*
  // not a comment
@@ -67,8 +67,8 @@ public class MyClass { // comment
       ),
 
       _Example(
+        'Java. Breaks on single-quote multiline strings',
         language: java,
-        name: 'Java. Breaks on single-quote multiline strings',
         text: '''
 public class MyClass { // comment
   private string str2 = \'''
@@ -80,8 +80,8 @@ public class MyClass { // comment
       ),
 
       _Example(
+        'Java. Breaks on double-quote multiline strings',
         language: java,
-        name: 'Java. Breaks on double-quote multiline strings',
         text: '''
 public class MyClass { // comment
   private string str4 = """
@@ -93,8 +93,8 @@ public class MyClass { // comment
       ),
 
       _Example(
+        'Java. Breaks on number sign',
         language: java,
-        name: 'Java. Breaks on number sign',
         // https://github.com/git-touch/highlight.dart/issues/36
         text: '''
 // slashed comment1
@@ -110,8 +110,8 @@ text # not a comment
       // ==================================
 
       _Example(
+        'Go. Parses unquoted sequences',
         language: go,
-        name: 'Go. Parses unquoted sequences',
         text: '''
 // slashed comment1 
 /* multi
@@ -137,8 +137,8 @@ public class MyClass {
       ),
 
       _Example(
+        'Go. Ignores quoted sequences',
         language: go,
-        name: 'Go. Ignores quoted sequences',
         text: '''
 /*
  // not a comment
@@ -167,8 +167,8 @@ public class MyClass { // comment
       // ==================================
 
       _Example(
+        'Python. Parses unquoted sequences',
         language: python,
-        name: 'Python. Parses unquoted sequences',
         text: '''
 # hash comment1 
 def fn():
@@ -191,8 +191,8 @@ def fn():
       ),
 
       _Example(
+        'Python. Ignores quoted sequences',
         language: python,
-        name: 'Python. Ignores quoted sequences',
         text: '''
 def fn(): # comment
   str1 = '# not a comment';
@@ -215,8 +215,8 @@ def fn(): # comment
       ),
 
       _Example(
+        'Python. Breaks on missing colon',
         language: python,
-        name: 'Python. Breaks on missing colon',
         text: '''
 def fn() # comment
 ''',
@@ -228,8 +228,8 @@ def fn() # comment
       // ==================================
 
       _Example(
+        'Scala. Parses unquoted sequences',
         language: scala,
-        name: 'Scala. Parses unquoted sequences',
         text: '''
 // slashed comment1 
 /* multi
@@ -255,8 +255,8 @@ public class MyClass {
       ),
 
       _Example(
+        'Scala. Ignores quoted sequences',
         language: scala,
-        name: 'Scala. Ignores quoted sequences',
         text: '''
 /*
  // not a comment
@@ -276,8 +276,8 @@ public class MyClass { // comment
       ),
 
       _Example(
+        'Scala. Breaks on multiline strings',
         language: scala,
-        name: 'Scala. Breaks on multiline strings',
         text: '''
 val str4 = """
            // not a comment
@@ -315,8 +315,8 @@ class _Example {
   final List<SingleLineComment> comments;
   final bool isLanguageLost;
 
-  _Example({
-    required this.name,
+  _Example(
+    this.name, {
     required this.text,
     required this.language,
     this.comments = const [],

@@ -27,7 +27,7 @@ void main() {
       final examples = [
         //
         _Example(
-          name: 'Ordinary comments are visible',
+          'Ordinary comments are visible',
           text: '''
 public class MyClass {
   public void main() { // comment
@@ -97,7 +97,7 @@ public class MyClass {
         ),
 
         _Example(
-          name: 'Service comments are hidden',
+          'Service comments are hidden',
           text: '''
 public class MyClass {
   public void main() { // readonly
@@ -201,8 +201,8 @@ class _Example {
   final Mode? mode;
   final TextSpan expected;
 
-  _Example({
-    required this.name,
+  _Example(
+    this.name, {
     required this.text,
     required this.mode,
     required this.expected,
