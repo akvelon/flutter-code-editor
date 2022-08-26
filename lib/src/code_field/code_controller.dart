@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../code/code.dart';
-import '../code/text_range.dart';
+import '../code/code_edit_result.dart';
+import '../code_field/text_editing_value.dart';
 import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
 import '../code_modifiers/indent_code_modifier.dart';
@@ -18,6 +19,7 @@ import '../wip/autocomplete/popup_controller.dart';
 import '../wip/autocomplete/suggestion.dart';
 import '../wip/autocomplete/suggestion_generator.dart';
 import 'editor_params.dart';
+import 'span_builder.dart';
 
 const _middleDot = '·';
 
@@ -115,10 +117,10 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
-        _lastCode = Code.empty,
-        super(text: text) {
+        _lastCode = Code.empty {
     this.language = language;
     _updateLastCode(text ?? '');
+    fullText = text ?? '';
 
     // Create modifier map
     for (final el in modifiers) {
@@ -191,10 +193,6 @@ class CodeController extends TextEditingController {
   }
 
   KeyEventResult _onKeyDownRepeat(KeyEvent event) {
-    if (!_shouldAllowKeyDownRepeat(event)) {
-      return KeyEventResult.handled; // Prevent the framework from handling.
-    }
-
     // TODO(alexeyinkin): Use a shortcut, https://github.com/akvelon/flutter-code-editor/issues/21
     if (event.logicalKey == LogicalKeyboardKey.tab) {
       text = text.replaceRange(selection.start, selection.end, '\t');
@@ -217,39 +215,6 @@ class CodeController extends TextEditingController {
     }
 
     return KeyEventResult.ignored; // The framework will handle.
-  }
-
-  bool _shouldAllowKeyDownRepeat(KeyEvent event) {
-    if (event.logicalKey == LogicalKeyboardKey.backspace) {
-      return _shouldAllowBackspace();
-    }
-
-    if (event.logicalKey == LogicalKeyboardKey.delete) {
-      return _shouldAllowDelete();
-    }
-
-    return true;
-  }
-
-  bool _shouldAllowBackspace() {
-    final start = super.value.selection.normalized.start - 1;
-    if (start < 0) {
-      return false;
-    }
-
-    final line = _lastCode.characterIndexToLineIndex(start);
-    return !_lastCode.lines[line].isReadOnly;
-  }
-
-  bool _shouldAllowDelete() {
-    // If we are at the end of the line, see after the \n.
-    final end = value.selection.normalized.end + 1;
-    if (end >= value.text.length) {
-      return false;
-    }
-
-    final line = _lastCode.characterIndexToLineIndex(end);
-    return !_lastCode.lines[line].isReadOnly;
   }
 
   /// Inserts the word selected from the list of completions
@@ -286,6 +251,13 @@ class CodeController extends TextEditingController {
     return _middleDotsToSpaces(super.text);
   }
 
+  String get fullText => _lastCode.text;
+
+  set fullText(String fullText) {
+    _updateLastCodeIfChanged(fullText);
+    super.value = TextEditingValue(text: _lastCode.visibleText);
+  }
+
   // Private methods
   bool get _webSpaceFix => kIsWeb && webSpaceFix;
 
@@ -314,11 +286,22 @@ class CodeController extends TextEditingController {
   @override
   set value(TextEditingValue newValue) {
     if (newValue.text != super.value.text) {
-      if (_lastCode.isReadOnlySelected(super.value.selection)) {
+      final editResult = _getEditResultNotBreakingReadOnly(newValue);
+
+      if (editResult == null) {
         return;
       }
 
-      _updateLastCode(newValue.text);
+      _updateLastCodeIfChanged(editResult.fullTextAfter);
+
+      if (newValue.text != _lastCode.text) {
+        // Manually typed in a text that has become a hidden range.
+        newValue = newValue.replacedText(_lastCode.visibleText);
+      }
+
+      // Uncomment this to see the hidden text in the console
+      // as you change the visible text.
+      //print('\n\n${_lastCode.text');
     }
 
     final loc = _insertedLoc(text, newValue.text);
@@ -358,11 +341,28 @@ class CodeController extends TextEditingController {
     }
   }
 
+  CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
+    final editResult = _lastCode.getEditResult(newValue);
+    if (!_lastCode.isReadOnlyInLineRange(editResult.linesChanged)) {
+      return editResult;
+    }
+
+    return null;
+  }
+
+  void _updateLastCodeIfChanged(String text) {
+    if (text != _lastCode.text) {
+      _updateLastCode(text);
+    }
+  }
+
   void _updateLastCode(String text) {
+    final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
+
     _lastCode = Code(
-      text: text,
+      text: rawText,
       language: language,
-      highlighted: highlight.parse(text, language: _languageId),
+      highlighted: highlight.parse(rawText, language: _languageId),
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
     );
@@ -498,7 +498,12 @@ class CodeController extends TextEditingController {
 
     // Return parsing
     if (_language != null) {
-      return _processLanguage(text, CodeTheme.of(context), style);
+      return const SpanBuilder().build(
+        code: _lastCode,
+        theme: _getTheme(context),
+        textStyle: style,
+      );
+      //return _processLanguage(text, CodeTheme.of(context), style);
     }
 
     if (styleRegExp != null) {
@@ -506,5 +511,9 @@ class CodeController extends TextEditingController {
     }
 
     return TextSpan(text: text, style: style);
+  }
+
+  CodeThemeData _getTheme(BuildContext context) {
+    return CodeTheme.of(context) ?? CodeThemeData(styles: _theme ?? {});
   }
 }

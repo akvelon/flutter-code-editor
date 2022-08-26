@@ -4,7 +4,7 @@ import 'package:code_text_field/src/single_line_comments/single_line_comment.dar
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('BracketsStartEndNamedSectionParser', () {
+  test('BracketsStartEndNamedSectionParser. Parses comments', () {
     const comments = [
       //
       SingleLineComment(lineIndex: 13, innerContent: ' no named section'),
@@ -65,16 +65,13 @@ void main() {
 
       SingleLineComment(lineIndex: -3, innerContent: '[START before0]'),
       SingleLineComment(lineIndex: -2, innerContent: '[END before0]'),
-      SingleLineComment(lineIndex: 98, innerContent: '[START after_eof]'),
-      SingleLineComment(lineIndex: 99, innerContent: '[END after_eof]'),
     ];
 
     const lineCount = 95;
-    const last = lineCount - 1;
 
     const expected = [
       NamedSection(startLine: 0, endLine: 14, name: 'never_started'),
-      NamedSection(startLine: 11, endLine: last, name: 'never_ending'),
+      NamedSection(startLine: 11, endLine: null, name: 'never_ending'),
       NamedSection(startLine: 16, endLine: 21, name: 'outer'),
       NamedSection(startLine: 18, endLine: 21, name: 'inner'),
       NamedSection(startLine: 24, endLine: 35, name: 'overlapping1'),
@@ -88,14 +85,13 @@ void main() {
       NamedSection(startLine: 80, endLine: 80, name: 'line'),
       NamedSection(startLine: 81, endLine: 81, name: 'swap'),
       NamedSection(startLine: 82, endLine: 82, name: 'split_line'),
-      NamedSection(startLine: 83, endLine: last, name: '2'),
-      NamedSection(startLine: 84, endLine: last, name: '_'),
+      NamedSection(startLine: 83, endLine: null, name: '2'),
+      NamedSection(startLine: 84, endLine: null, name: '_'),
     ];
 
     const parser = BracketsStartEndNamedSectionParser();
     final parsed = parser.parse(
       singleLineComments: comments,
-      lineCount: lineCount,
     );
 
     expect(parsed, expected);

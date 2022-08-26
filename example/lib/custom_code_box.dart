@@ -1,12 +1,13 @@
+// ignore_for_file: implementation_imports
+
+import 'package:code_text_field/code_text_field.dart';
+import 'package:code_text_field/src/wip/autoRefactorService.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/go.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
-import 'package:code_text_field/code_text_field.dart';
-
-import 'package:code_text_field/src/wip/autoRefactorService.dart';
 
 import 'themes.dart';
 
@@ -24,13 +25,13 @@ class CustomCodeBox extends StatefulWidget {
   final String theme;
 
   const CustomCodeBox({
-    Key? key,
+    super.key,
     required this.language,
     required this.theme,
-  }) : super(key: key);
+  });
 
   @override
-  _CustomCodeBoxState createState() => _CustomCodeBoxState();
+  State<CustomCodeBox> createState() => _CustomCodeBoxState();
 }
 
 class _CustomCodeBoxState extends State<CustomCodeBox> {
@@ -55,16 +56,20 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
   ];
 
   List<String?> themeList = <String>[
-    "monokai-sublime",
-    "a11y-dark",
-    "an-old-hope",
-    "vs2015",
-    "vs",
-    "atom-one-dark",
+    'monokai-sublime',
+    'a11y-dark',
+    'an-old-hope',
+    'vs2015',
+    'vs',
+    'atom-one-dark',
   ];
 
-  Widget buildDropdown(Iterable<String?> choices, String value, IconData icon,
-      Function(String?) onChanged) {
+  Widget buildDropdown(
+    Iterable<String?> choices,
+    String value,
+    IconData icon,
+    Function(String?) onChanged,
+  ) {
     return DropdownButton<String>(
       value: value,
       items: choices.map((String? value) {
@@ -94,11 +99,11 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       setState(() => theme = val);
     });
     final resetButton = TextButton.icon(
-      icon: Icon(Icons.delete, color: Colors.white),
-      label: Text('Reset', style: TextStyle(color: Colors.white)),
+      icon: const Icon(Icons.delete, color: Colors.white),
+      label: const Text('Reset', style: TextStyle(color: Colors.white)),
       onPressed: () {
         setState(() {
-          reset = (!reset!);
+          reset = !reset!;
         });
       },
     );
@@ -108,29 +113,33 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       color: Colors.deepPurple[900],
       child: Row(
         children: [
-          Spacer(flex: 2),
-          Text(
+          const Spacer(flex: 2),
+          const Text(
             'Code editor',
             style: TextStyle(fontSize: 28, color: Colors.white),
           ),
-          Spacer(flex: 35),
+          const Spacer(flex: 35),
           codeDropdown,
-          Spacer(),
+          const Spacer(),
           themeDropdown,
-          Spacer(),
+          const Spacer(),
           resetButton,
         ],
       ),
     );
+
     final codeField = InnerField(
-      key: ValueKey("$language - $theme - $reset"),
+      key: ValueKey('$language - $theme - $reset'),
       language: language!,
       theme: theme!,
     );
-    return Column(children: [
-      buttons,
-      codeField,
-    ]);
+
+    return Column(
+      children: [
+        buttons,
+        codeField,
+      ],
+    );
   }
 }
 
@@ -139,13 +148,13 @@ class InnerField extends StatefulWidget {
   final String theme;
 
   const InnerField({
-    Key? key,
+    super.key,
     required this.language,
     required this.theme,
-  }) : super(key: key);
+  });
 
   @override
-  _InnerFieldState createState() => _InnerFieldState();
+  State<InnerField> createState() => _InnerFieldState();
 }
 
 class _InnerFieldState extends State<InnerField> {
@@ -156,7 +165,17 @@ class _InnerFieldState extends State<InnerField> {
     super.initState();
     _codeController = CodeController(
       language: allLanguages[widget.language],
-      theme: THEMES[widget.theme],
+      text: '''
+class MyClass {
+  void readOnlyMethod() {// [START section1]
+  }// [END section1]
+  // [START section2]
+  void method() {
+  }// [END section2]
+}
+''',
+      namedSectionParser: const BracketsStartEndNamedSectionParser(),
+      readOnlySectionNames: {'section1', 'nonexistent'},
     );
   }
 
@@ -168,31 +187,36 @@ class _InnerFieldState extends State<InnerField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = themes[widget.theme];
+
     return Container(
-      color: _codeController!.theme!['root']!.backgroundColor,
+      color: theme?['root']?.backgroundColor,
       height: MediaQuery.of(context).size.height / 13 * 12,
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: CodeField(
-              controller: _codeController!,
-              textStyle: const TextStyle(fontFamily: 'SourceCode'),
+      child: CodeTheme(
+        data: CodeThemeData(styles: theme),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: CodeField(
+                controller: _codeController!,
+                textStyle: const TextStyle(fontFamily: 'SourceCode'),
+              ),
             ),
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: FloatingActionButton(
-              child: const Icon(Icons.format_align_left_outlined),
-              backgroundColor: Colors.indigo[800],
-              onPressed: () {
-                setState(() {
-                  _codeController!.text =
-                      autoRefactor(_codeController!.text, widget.language);
-                });
-              },
+            Align(
+              alignment: Alignment.topRight,
+              child: FloatingActionButton(
+                backgroundColor: Colors.indigo[800],
+                onPressed: () {
+                  setState(() {
+                    _codeController!.text =
+                        autoRefactor(_codeController!.text, widget.language);
+                  });
+                },
+                child: const Icon(Icons.format_align_left_outlined),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

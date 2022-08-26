@@ -16,7 +16,7 @@ import 'abstract.dart';
 /// different comments.
 ///
 /// If a section is never started, it starts at the line 0.
-/// If a section is never ended, it ends at the last line (count - 1).
+/// If a section is never ended, its `endLine` is `null`.
 ///
 /// If a section is started multiple times, the min line number takes effect.
 /// If a section is ended multiple times, the max line number takes effect.
@@ -31,7 +31,6 @@ class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
   @override
   List<NamedSection> parseUnsorted({
     required List<SingleLineComment> singleLineComments,
-    required int lineCount,
   }) {
     final starts = <String, int>{};
     final ends = <String, int>{};
@@ -39,7 +38,10 @@ class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
     for (final comment in singleLineComments) {
       for (final match in _startRe.allMatches(comment.innerContent)) {
         final name = match.group(3) ?? '';
-        starts[name] = min(comment.lineIndex, starts[name] ?? lineCount - 1);
+        final oldStart = starts[name];
+        starts[name] = oldStart == null
+            ? comment.lineIndex
+            : min(comment.lineIndex, oldStart);
       }
 
       for (final match in _endRe.allMatches(comment.innerContent)) {
@@ -48,13 +50,12 @@ class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
       }
     }
 
-    return _combineStartsAndEnds(starts, ends, lineCount);
+    return _combineStartsAndEnds(starts, ends);
   }
 
   List<NamedSection> _combineStartsAndEnds(
     Map<String, int> starts,
     Map<String, int> ends,
-    int lineCount,
   ) {
     final sections = <NamedSection>[];
 
@@ -80,7 +81,7 @@ class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
       sections.add(
         NamedSection(
           startLine: start,
-          endLine: ends[name] ?? lineCount - 1,
+          endLine: ends[name],
           name: name,
         ),
       );
