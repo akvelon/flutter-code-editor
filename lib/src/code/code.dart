@@ -284,7 +284,7 @@ class Code {
     );
   }
 
-  /// Returns weather any of the lines of this range is read-only.
+  /// Returns whether any of the lines of this range is read-only.
   bool isReadOnlyInLineRange(TextRange lineRange) {
     for (int line = lineRange.start; line <= lineRange.end; line++) {
       if (lines[line].isReadOnly) {
