@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 
 import '../code/reg_exp.dart';
+import '../code/string.dart';
 import '../code/text_range.dart';
 
-extension ReplacedSelection on TextEditingValue {
+extension MyTextEditingValue on TextEditingValue {
   /// The position where the word at the cursor starts.
   /// `null` for a non-collapsed selection.
   int? get wordAtCursorStart {
@@ -81,5 +82,21 @@ extension ReplacedSelection on TextEditingValue {
 
   TextEditingValue replacedSelection(String value) {
     return replaced(selection, value);
+  }
+
+  TextEditingValue replacedText(String newText) {
+    if (newText == text) {
+      return this;
+    }
+
+    final rangeAfter = newText.getChangedRange(
+      text,
+      attributeChangeTo: TextAffinity.upstream,
+    );
+
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: rangeAfter.start),
+    );
   }
 }

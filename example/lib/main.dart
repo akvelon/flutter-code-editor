@@ -1,4 +1,3 @@
-//File only for testing. Later file will be deleted.
 import 'package:flutter/material.dart';
 
 import 'custom_code_box.dart';
@@ -8,7 +7,7 @@ void main() {
 }
 
 class CodeEditor extends StatelessWidget {
-  const CodeEditor({Key? key}) : super(key: key);
+  const CodeEditor({super.key});
 
   @override
   Widget build(BuildContext context) {

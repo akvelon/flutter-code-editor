@@ -2,46 +2,56 @@ import 'package:meta/meta.dart';
 
 @immutable
 class SingleLineComment {
-  /// Zero-based index of the line at which this comment is found.
-  final int lineIndex;
+  /// Zero-based index of the first character from the beginning of the text.
+  final int characterIndex;
 
   /// The comment text without the characters signifying the comment.
   final String innerContent;
+
+  /// Zero-based index of the line at which this comment is found.
+  final int lineIndex;
 
   /// The comment text with the characters signifying the comment.
   final String outerContent;
 
   const SingleLineComment({
-    required this.lineIndex,
     required this.innerContent,
+    required this.lineIndex,
+    this.characterIndex = 0,
     this.outerContent = '',
   });
 
+  /// Creates the object from [outerContent] by extracting [innerContent]
+  /// from it.
   SingleLineComment.cut(
     String outerContent, {
+    required int characterIndex,
     required int lineIndex,
     required List<String> sequences,
   }) : this(
-          lineIndex: lineIndex,
-          outerContent: outerContent,
+          characterIndex: characterIndex,
           innerContent: _cutSequence(
             outerContent: outerContent,
             sequences: sequences,
           ),
+          lineIndex: lineIndex,
+          outerContent: outerContent,
         );
 
   @override
   int get hashCode => Object.hash(
-        lineIndex,
+        characterIndex,
         innerContent,
+        lineIndex,
         outerContent,
       );
 
   @override
   bool operator ==(Object other) {
     return other is SingleLineComment &&
-        lineIndex == other.lineIndex &&
+        characterIndex == other.characterIndex &&
         innerContent == other.innerContent &&
+        lineIndex == other.lineIndex &&
         outerContent == other.outerContent;
   }
 

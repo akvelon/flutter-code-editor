@@ -21,6 +21,7 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
 
   void _parse() {
     int lineIndex = 0;
+    int characterIndex = 0;
 
     for (final node in highlighted.nodes ?? const <Node>[]) {
       if (node.className == 'comment') {
@@ -31,6 +32,7 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
             SingleLineComment.cut(
               value,
               lineIndex: lineIndex,
+              characterIndex: characterIndex,
               sequences: singleLineCommentSequences,
             ),
           );
@@ -38,6 +40,7 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
       }
 
       lineIndex += node.getNewLineCount();
+      characterIndex += node.getCharacterCount();
     }
   }
 
@@ -52,12 +55,22 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
   }
 }
 
-extension _NewLineCount on Node {
+extension on Node {
   int getNewLineCount() {
     int result = '\n'.allMatches(value ?? '').length;
 
     for (final child in children ?? const <Node>[]) {
       result += child.getNewLineCount();
+    }
+
+    return result;
+  }
+
+  int getCharacterCount() {
+    int result = value?.length ?? 0;
+
+    for (final child in children ?? const <Node>[]) {
+      result += child.getCharacterCount();
     }
 
     return result;

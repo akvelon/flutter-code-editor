@@ -6,7 +6,8 @@ class NamedSection {
   final int startLine;
 
   /// Zero-based index of the line with the ending tag.
-  final int endLine;
+  /// `null` if the section spans till the end of the document.
+  final int? endLine;
 
   final String name;
 
