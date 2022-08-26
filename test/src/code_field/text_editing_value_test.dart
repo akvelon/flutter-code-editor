@@ -311,12 +311,12 @@ void main() {
         ),
 
         _StringExample(
-          'Just after a word -> null',
+          'Just after a word',
           value: TextEditingValue(
             text: loremIpsum,
             selection: TextSelection.collapsed(offset: 7),
           ),
-          expected: null,
+          expected: 'Lorem',
         ),
 
         _StringExample(

@@ -56,28 +56,17 @@ extension MyTextEditingValue on TextEditingValue {
   /// The part of the word at the cursor from start to the cursor.
   /// `null` for a non-collapsed selection.
   String? get wordToCursor {
-    if (!selection.isCollapsed) {
+    final startEnd = _getWordAtCursorStartEnd();
+    if (startEnd == null) {
       return null;
     }
 
     final cursorPosition = selection.normalized.start;
-    if (cursorPosition <= 0) {
-      return null;
-    }
+    final start = startEnd[0];
 
-    final text = this.text;
-    final splitPosition = text.lastIndexOf(
-      RegExps.wordSplit,
-      cursorPosition,
-    );
-
-    if (splitPosition == cursorPosition) {
-      // On a split symbol. Including just after a word.
-      return null;
-    }
-
-    final result = text.substring(splitPosition + 1, cursorPosition);
-    return result.isEmpty ? null : result;
+    return cursorPosition > start
+        ? text.substring(start, cursorPosition)
+        : null;
   }
 
   TextEditingValue replacedSelection(String value) {
