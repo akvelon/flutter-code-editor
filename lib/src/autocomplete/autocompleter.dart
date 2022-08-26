@@ -34,6 +34,8 @@ class Autocompleter {
       _parseStringKeywords(keywords);
     } else if (keywords is Map<String, String>) {
       _parseStringStringKeywords(keywords);
+    } else if (keywords is Map<String, dynamic>) {
+      _parseStringDynamicKeywords(keywords);
     } else {
       throw Exception(
         'Unknown keywords type: ${keywords.runtimeType}, $keywords',
@@ -47,8 +49,18 @@ class Autocompleter {
     );
   }
 
+  void _addKeywords(Iterable<String> keywords) {
+    _keywordsAutocomplete.enterList(
+      keywords.where((k) => k.isNotEmpty).toList(growable: false),
+    );
+  }
+
   void _parseStringStringKeywords(Map<String, String> map) {
     map.values.forEach(_parseStringKeywords);
+  }
+
+  void _parseStringDynamicKeywords(Map<String, dynamic> map) {
+    _addKeywords(map.keys);
   }
 
   /// The words to exclude from suggestions if they are otherwise present.
