@@ -15,7 +15,7 @@ void method() {
 final _language = java;
 
 void main() {
-  group('CodeController. Value vs Code.', (){
+  group('CodeController. Value vs Code.', () {
     test('With no service comments, value == code', () {
       const text = '''
 public class MyClass {
@@ -89,6 +89,56 @@ public class MyClass {
         expect(
           controller.fullText,
           'void method() {\n}\n',
+        );
+      },
+    );
+
+    testWidgets(
+      'Indent new line before hidden range',
+      (WidgetTester wt) async {
+        final controller = CodeController(
+          text: '''
+class MyClass {
+  void method() {// [START section2]
+  }// [END section2]
+}
+''',
+          language: _language,
+          namedSectionParser: const BracketsStartEndNamedSectionParser(),
+        );
+        final focusNode = FocusNode();
+
+        await wt.pumpWidget(createApp(controller, focusNode));
+        focusNode.requestFocus();
+
+        // Go to the beginning.
+        await wt.sendKeyDownEvent(LogicalKeyboardKey.alt);
+        await wt.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await wt.sendKeyUpEvent(LogicalKeyboardKey.alt);
+
+        for (int i = 37; --i >= 0;) {
+          await wt.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+        }
+
+        controller.value = controller.value.replacedSelection('\n');
+
+        expect(
+          controller.value,
+          const TextEditingValue(
+            text: 'class MyClass {\n  void method() {\n  }\n  \n}\n',
+            //                                        cursor /
+            selection: TextSelection.collapsed(offset: 40),
+          ),
+        );
+        expect(
+          controller.fullText,
+          '''
+class MyClass {
+  void method() {// [START section2]
+  }
+  // [END section2]
+}
+''', // The new line is empty
         );
       },
     );

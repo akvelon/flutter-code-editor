@@ -286,6 +286,22 @@ class CodeController extends TextEditingController {
   @override
   set value(TextEditingValue newValue) {
     if (newValue.text != super.value.text) {
+      final loc = _insertedLoc(text, newValue.text);
+
+      if (loc != null) {
+        final char = newValue.text[loc];
+        final modifier = modifierMap[char];
+        final val = modifier?.updateString(rawText, selection, params);
+
+        if (val != null) {
+          // Update newValue
+          newValue = newValue.copyWith(
+            text: val.text,
+            selection: val.selection,
+          );
+        }
+      }
+
       final editResult = _getEditResultNotBreakingReadOnly(newValue);
 
       if (editResult == null) {
@@ -294,30 +310,14 @@ class CodeController extends TextEditingController {
 
       _updateLastCodeIfChanged(editResult.fullTextAfter);
 
-      if (newValue.text != _lastCode.text) {
+      if (newValue.text != _lastCode.visibleText) {
         // Manually typed in a text that has become a hidden range.
         newValue = newValue.replacedText(_lastCode.visibleText);
       }
 
       // Uncomment this to see the hidden text in the console
       // as you change the visible text.
-      //print('\n\n${_lastCode.text');
-    }
-
-    final loc = _insertedLoc(text, newValue.text);
-
-    if (loc != null) {
-      final char = newValue.text[loc];
-      final modifier = modifierMap[char];
-      final val = modifier?.updateString(rawText, selection, params);
-
-      if (val != null) {
-        // Update newValue
-        newValue = newValue.copyWith(
-          text: val.text,
-          selection: val.selection,
-        );
-      }
+      //print('\n\n${_lastCode.text}');
     }
 
     bool hasTextChanged = newValue.text != super.value.text;
