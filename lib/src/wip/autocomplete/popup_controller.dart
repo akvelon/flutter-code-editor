@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import 'suggestion.dart';
-
 class PopupController extends ChangeNotifier {
-  late List<Suggestion> suggestions;
+  late List<String> suggestions;
   int _selectedIndex = 0;
   bool isPopupShown = false;
 
@@ -24,7 +22,7 @@ class PopupController extends ChangeNotifier {
 
   int get selectedIndex => _selectedIndex;
 
-  void show(List<Suggestion> suggestions) {
+  void show(List<String> suggestions) {
     this.suggestions = suggestions;
     _selectedIndex = 0;
     isPopupShown = true;
@@ -69,7 +67,7 @@ class PopupController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String getSelectedWord() => suggestions[selectedIndex].word;
+  String getSelectedWord() => suggestions[selectedIndex];
 }
 
 /// Possible directions of completions list navigation
