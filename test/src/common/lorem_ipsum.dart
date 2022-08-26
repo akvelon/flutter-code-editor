@@ -1,4 +1,4 @@
-const lorenIpsum = '''
+const loremIpsum = '''
 1 Lorem ipsum dolor sit amet,
 2 consectetur adipiscing elit,
 3 sed do eiusmod tempor incididunt ut labore et dolore magna

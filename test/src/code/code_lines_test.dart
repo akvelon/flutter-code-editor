@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 
-import '../common/loren_ipsum.dart';
+import '../common/lorem_ipsum.dart';
 
 final _language = java;
 
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('Parses lines', () {
-      final code = Code(text: lorenIpsum, language: _language);
+      final code = Code(text: loremIpsum, language: _language);
 
       expect(
         code.lines,
@@ -137,7 +137,7 @@ void main() {
     test('characterIndexToLineIndex', () {
       const tails = ['', '\n'];
       for (final tail in tails) {
-        final textWithTail = lorenIpsum + tail;
+        final textWithTail = loremIpsum + tail;
         final code = Code(
           text: textWithTail,
           language: _language,
