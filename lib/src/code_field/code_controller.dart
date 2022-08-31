@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../autocomplete/autocompleter.dart';
 import '../code/code.dart';
 import '../code/code_edit_result.dart';
+import '../code/text_range.dart';
 import '../code_field/text_editing_value.dart';
 import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
@@ -16,8 +18,6 @@ import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
 import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
-import '../wip/autocomplete/suggestion.dart';
-import '../wip/autocomplete/suggestion_generator.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
@@ -40,6 +40,7 @@ class CodeController extends TextEditingController {
     }
 
     _language = language;
+    autocompleter.mode = language;
     notifyListeners();
   }
 
@@ -96,7 +97,7 @@ class CodeController extends TextEditingController {
   bool isPopupShown = false;
   RegExp? styleRegExp;
   late PopupController popupController;
-  SuggestionGenerator? suggestionGenerator;
+  final autocompleter = Autocompleter();
 
   CodeController({
     String? text,
@@ -127,8 +128,6 @@ class CodeController extends TextEditingController {
       modifierMap[el.char] = el;
     }
 
-    suggestionGenerator = SuggestionGenerator(
-        'language_id'); // TODO: replace string with some generated value for current language id
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
 
@@ -221,13 +220,21 @@ class CodeController extends TextEditingController {
   void insertSelectedWord() {
     final previousSelection = selection;
     String selectedWord = popupController.getSelectedWord();
-    int startPosition = selection.baseOffset -
-        suggestionGenerator!.getCurrentWordPrefix().length;
-    text = text.replaceRange(startPosition, selection.baseOffset, selectedWord);
-    selection = previousSelection.copyWith(
-      baseOffset: startPosition + selectedWord.length,
-      extentOffset: startPosition + selectedWord.length,
-    );
+    final startPosition = value.wordAtCursorStart;
+
+    if (startPosition != null) {
+      text = text.replaceRange(
+        startPosition,
+        selection.baseOffset,
+        selectedWord,
+      );
+
+      selection = previousSelection.copyWith(
+        baseOffset: startPosition + selectedWord.length,
+        extentOffset: startPosition + selectedWord.length,
+      );
+    }
+
     popupController.hide();
   }
 
@@ -335,6 +342,8 @@ class CodeController extends TextEditingController {
 
     super.value = newValue;
     if (hasTextChanged) {
+      autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
+      autocompleter.setText(this, text);
       generateSuggestions();
     } else if (hasSelectionChanged) {
       popupController.hide();
@@ -457,11 +466,15 @@ class CodeController extends TextEditingController {
     return TextSpan(style: style, children: children);
   }
 
-  void generateSuggestions() {
-    List<Suggestion> suggestions = suggestionGenerator!.getSuggestions(
-      text,
-      selection.start,
-    );
+  void generateSuggestions() async {
+    final prefix = value.wordToCursor;
+    if (prefix == null) {
+      popupController.hide();
+      return;
+    }
+
+    final suggestions =
+        (await autocompleter.getSuggestions(prefix)).toList(growable: false);
 
     if (suggestions.isNotEmpty) {
       popupController.show(suggestions);

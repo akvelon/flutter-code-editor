@@ -88,7 +88,7 @@ class _PopupState extends State<Popup> {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
             child: Text(
-              widget.controller.suggestions[index].word,
+              widget.controller.suggestions[index],
               overflow: TextOverflow.ellipsis,
               style: widget.style,
             ),
