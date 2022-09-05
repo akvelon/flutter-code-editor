@@ -16,6 +16,11 @@ export 'src/code_modifiers/tab_code_modifier.dart';
 export 'src/code_theme/code_theme.dart';
 export 'src/code_theme/code_theme_data.dart';
 
+export 'src/folding/foldable_block.dart';
+export 'src/folding/foldable_block_type.dart';
+export 'src/folding/invalid_foldable_block.dart';
+export 'src/folding/parsers/highlight.dart';
+
 export 'src/line_numbers/line_number_controller.dart';
 export 'src/line_numbers/line_number_style.dart';
 
