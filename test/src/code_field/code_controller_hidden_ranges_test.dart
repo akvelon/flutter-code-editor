@@ -1,6 +1,6 @@
-import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 

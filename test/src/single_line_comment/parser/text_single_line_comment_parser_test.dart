@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_redundant_argument_values
 
-import 'package:code_text_field/src/single_line_comments/parser/text_single_line_comment_parser.dart';
-import 'package:code_text_field/src/single_line_comments/single_line_comment.dart';
+import 'package:flutter_code_editor/src/single_line_comments/parser/text_single_line_comment_parser.dart';
+import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

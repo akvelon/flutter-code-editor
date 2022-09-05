@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:code_text_field/src/code/string.dart';
+import 'package:flutter_code_editor/src/code/string.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:code_text_field/src/code/code.dart';
-import 'package:code_text_field/src/code/code_line.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_code_editor/src/code/code.dart';
+import 'package:flutter_code_editor/src/code/code_line.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 

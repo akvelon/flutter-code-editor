@@ -1,8 +1,8 @@
 // ignore_for_file: implementation_imports
 
-import 'package:code_text_field/code_text_field.dart';
-import 'package:code_text_field/src/wip/autoRefactorService.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_code_editor/src/wip/autoRefactorService.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/go.dart';
 import 'package:highlight/languages/java.dart';

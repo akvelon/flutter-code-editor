@@ -1,6 +1,6 @@
-import 'package:code_text_field/src/named_sections/named_section.dart';
-import 'package:code_text_field/src/named_sections/parsers/brackets_start_end.dart';
-import 'package:code_text_field/src/single_line_comments/single_line_comment.dart';
+import 'package:flutter_code_editor/src/named_sections/named_section.dart';
+import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_end.dart';
+import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

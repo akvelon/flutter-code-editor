@@ -1,4 +1,4 @@
-import 'package:code_text_field/src/autocomplete/autocompleter.dart';
+import 'package:flutter_code_editor/src/autocomplete/autocompleter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/java.dart';

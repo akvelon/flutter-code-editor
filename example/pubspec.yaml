@@ -8,8 +8,8 @@ environment:
   flutter: '>=3.0.0'
 
 dependencies:
-  code_text_field: { path: ../ }
   flutter: { sdk: flutter }
+  flutter_code_editor: { path: ../ }
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
 
