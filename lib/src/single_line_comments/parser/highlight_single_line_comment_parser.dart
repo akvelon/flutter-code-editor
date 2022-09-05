@@ -1,5 +1,6 @@
 import 'package:highlight/highlight_core.dart';
 
+import '../../highlight/node.dart';
 import '../single_line_comment.dart';
 import 'abstract_single_line_comment_parser.dart';
 
@@ -39,7 +40,7 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
         }
       }
 
-      lineIndex += node.getNewLineCount();
+      lineIndex += node.getNewlineCount();
       characterIndex += node.getCharacterCount();
     }
   }
@@ -52,27 +53,5 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
     }
 
     return false;
-  }
-}
-
-extension on Node {
-  int getNewLineCount() {
-    int result = '\n'.allMatches(value ?? '').length;
-
-    for (final child in children ?? const <Node>[]) {
-      result += child.getNewLineCount();
-    }
-
-    return result;
-  }
-
-  int getCharacterCount() {
-    int result = value?.length ?? 0;
-
-    for (final child in children ?? const <Node>[]) {
-      result += child.getCharacterCount();
-    }
-
-    return result;
   }
 }

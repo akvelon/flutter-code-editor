@@ -1,6 +1,6 @@
-import 'package:code_text_field/code_text_field.dart';
-import 'package:code_text_field/src/code_field/span_builder.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_code_editor/src/code_field/span_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/java.dart';
