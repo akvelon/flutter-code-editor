@@ -143,6 +143,7 @@ package com.akvelon.temp;
 import java.util.Arrays;
 
 /* */
+/* */
 import java.util.Date;
 
 /*
@@ -153,8 +154,9 @@ public class MyClass {}
 ''',
           mode: java,
           expected: const [
-            _FB(startLine: 0, endLine: 5, type: _T.imports),
-            _FB(startLine: 7, endLine: 8, type: _T.multilineComment),
+            _FB(startLine: 0, endLine: 6, type: _T.imports),
+            _FB(startLine: 4, endLine: 5, type: _T.singleLineComment),
+            _FB(startLine: 8, endLine: 9, type: _T.multilineComment),
           ],
           expectedInvalid: const [],
         ),
