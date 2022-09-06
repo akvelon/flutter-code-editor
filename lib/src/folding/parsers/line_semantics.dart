@@ -1,7 +1,7 @@
 import '../../highlight/keyword_semantics.dart';
 
 /// The semantics of a line from the perspective of a sequence
-/// of similar lines that can from a foldable block.
+/// of similar lines that can form a foldable block.
 enum LineSemantics {
   /// A blank line or line with only whitespace characters.
   blank,
