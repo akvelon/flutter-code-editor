@@ -115,7 +115,7 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
         children: [
           const Spacer(flex: 2),
           const Text(
-            'Code editor',
+            'Code Editor by Akvelon',
             style: TextStyle(fontSize: 28, color: Colors.white),
           ),
           const Spacer(flex: 35),
@@ -200,6 +200,13 @@ class MyClass {
               child: CodeField(
                 controller: _codeController!,
                 textStyle: const TextStyle(fontFamily: 'SourceCode'),
+                lineNumberStyle: const LineNumberStyle(
+                  textStyle: TextStyle(
+                    fontFamily: 'Tahoma', // Ignored
+                    color: Colors.purple,
+                    fontSize: 30, // Ignored
+                  ),
+                ),
               ),
             ),
             Align(

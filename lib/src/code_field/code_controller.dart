@@ -8,7 +8,6 @@ import 'package:highlight/highlight_core.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code.dart';
 import '../code/code_edit_result.dart';
-import '../code/text_range.dart';
 import '../code_field/text_editing_value.dart';
 import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
@@ -349,6 +348,8 @@ class CodeController extends TextEditingController {
       popupController.hide();
     }
   }
+
+  Code get code => _lastCode;
 
   CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
     final editResult = _lastCode.getEditResult(newValue);
