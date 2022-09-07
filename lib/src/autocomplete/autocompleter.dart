@@ -103,7 +103,9 @@ class Autocompleter {
     ac.clearEntries();
     ac.enterList(
       text
-          .split(RegExps.wordSplit)
+          // https://github.com/akvelon/flutter-code-editor/issues/61
+          //.split(RegExps.wordSplit)
+          .split(RegExp(RegExps.wordSplit.pattern))
           .where((t) => t.isNotEmpty)
           .toList(growable: false),
     );
