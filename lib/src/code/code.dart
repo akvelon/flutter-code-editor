@@ -4,8 +4,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../folding/foldable_block.dart';
+import '../folding/parsers/highlight.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
+import '../issues/issue.dart';
 import '../named_sections/named_section.dart';
 import '../named_sections/parsers/abstract.dart';
 import '../single_line_comments/parser/single_line_comment_parser.dart';
@@ -19,8 +22,10 @@ import 'tokens.dart';
 
 class Code {
   final String text;
+  final List<FoldableBlock> foldableBlocks;
   final HiddenRanges hiddenRanges;
   final Result? highlighted;
+  final List<Issue> issues;
   final List<CodeLine> lines;
   final Map<String, NamedSection> namedSections;
   final Result? visibleHighlighted;
@@ -53,6 +58,18 @@ class Code {
       commentsByLines: commentParser.getCommentsByLines(),
     );
 
+    final issues = <Issue>[];
+    final List<FoldableBlock> foldableBlocks;
+
+    if (highlighted == null) {
+      foldableBlocks = const [];
+    } else {
+      final parser = HighlightFoldableBlockParser();
+      parser.parse(highlighted);
+      foldableBlocks = parser.blocks;
+      issues.addAll(parser.invalidBlocks.map((b) => b.issue));
+    }
+
     final sections = namedSectionParser?.parse(
           singleLineComments: commentParser.comments,
         ) ??
@@ -72,8 +89,10 @@ class Code {
 
     return Code._(
       text: text,
+      foldableBlocks: foldableBlocks,
       hiddenRanges: hiddenRanges,
       highlighted: highlighted,
+      issues: issues,
       lines: lines,
       namedSections: sectionsMap,
       visibleHighlighted:
@@ -84,8 +103,10 @@ class Code {
 
   const Code._({
     required this.text,
+    required this.foldableBlocks,
     required this.hiddenRanges,
     required this.highlighted,
+    required this.issues,
     required this.lines,
     required this.namedSections,
     required this.visibleHighlighted,
@@ -94,8 +115,10 @@ class Code {
 
   static const empty = Code._(
     text: '',
+    foldableBlocks: [],
     hiddenRanges: HiddenRanges.empty,
     highlighted: null,
+    issues: [],
     lines: [],
     namedSections: {},
     visibleHighlighted: null,

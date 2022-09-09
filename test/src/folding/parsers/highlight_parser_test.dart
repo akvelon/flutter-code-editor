@@ -6,7 +6,7 @@ import 'package:highlight/languages/java.dart';
 void main() {
   group('HighlightFoldableBlockParser', () {
     test('parses', () {
-      final _examples = [
+      final examples = [
         //
         _Example(
           'Java. Empty string',
@@ -61,7 +61,7 @@ public class MyClass }
 ''',
           mode: java,
           expected: const [],
-          expectedInvalid: const [
+          expectedInvalid: [
             InvalidFoldableBlock(endLine: 0, type: _T.braces),
             InvalidFoldableBlock(endLine: 1, type: _T.parentheses),
             InvalidFoldableBlock(endLine: 1, type: _T.brackets),
@@ -179,7 +179,7 @@ import java.lang.Exception;''',
         ),
       ];
 
-      for (final example in _examples) {
+      for (final example in examples) {
         highlight.registerLanguage('language', example.mode);
         final highlighted = highlight.parse(example.code, language: 'language');
         final parser = HighlightFoldableBlockParser();
