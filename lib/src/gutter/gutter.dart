@@ -5,6 +5,9 @@ import '../line_numbers/line_number_style.dart';
 
 const _foldingColumnWidth = 16.0;
 
+const _lineNumberColumn = 0;
+const _foldingColumn = 1;
+
 class GutterWidget extends StatelessWidget {
   const GutterWidget({
     required this.code,
@@ -31,7 +34,7 @@ class GutterWidget extends StatelessWidget {
     ];
 
     for (final issue in code.issues) {
-      tableRows[issue.line].children![1] = Container(
+      tableRows[issue.line].children![_foldingColumn] = Container(
         width: 10,
         height: 10,
         decoration: const BoxDecoration(
@@ -46,8 +49,8 @@ class GutterWidget extends StatelessWidget {
       width: style.width,
       child: Table(
         columnWidths: const {
-          0: FlexColumnWidth(),
-          1: FixedColumnWidth(_foldingColumnWidth),
+          _lineNumberColumn: FlexColumnWidth(),
+          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
