@@ -67,8 +67,6 @@ void main() {
       SingleLineComment(lineIndex: -2, innerContent: '[END before0]'),
     ];
 
-    const lineCount = 95;
-
     const expected = [
       NamedSection(startLine: 0, endLine: 14, name: 'never_started'),
       NamedSection(startLine: 11, endLine: null, name: 'never_ending'),

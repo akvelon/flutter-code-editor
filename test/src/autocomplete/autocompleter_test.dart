@@ -29,7 +29,7 @@ $dollar1 dollar2$ $dollar3$
 
 void main() {
   group('Autocompleter', () {
-    test('Changeable mode, keywords from mode, sorted ascending', () async {
+    test('Mutable mode, keywords from mode, sorted ascending', () async {
       final ac = Autocompleter();
 
       final initialResults = await ac.getSuggestions('f');
