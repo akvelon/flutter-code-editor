@@ -2,10 +2,10 @@ import 'package:charcode/ascii.dart';
 import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../../flutter_code_editor.dart';
 import '../../highlight/keyword_semantics.dart';
 import '../../highlight/node.dart';
 import '../../highlight/node_classes.dart';
-import '../foldable_block_type.dart';
 import 'abstract.dart';
 import 'line_semantics.dart';
 
@@ -65,6 +65,19 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
 
   void _processComment(Node node) {
     final newlineCount = node.getNewlineCount();
+
+    if (_foundNonWhitespace) {
+      return;
+    }
+
+    if (node.children?.any(
+          (subnode) => BracketsStartEndNamedSectionParser.isNamedSectionTag(
+            subnode.value ?? '',
+          ),
+        ) ??
+        false) {
+      return;
+    }
 
     if (newlineCount == 0) {
       _foundSingleLineComment = true;

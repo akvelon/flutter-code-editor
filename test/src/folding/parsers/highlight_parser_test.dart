@@ -177,6 +177,34 @@ import java.lang.Exception;''',
           ],
           expectedInvalid: const [],
         ),
+        _Example(
+          'Java. Comment after close brace',
+          code: '''
+class MyClass {
+  void method() {
+  }// comment
+  // comment
+}''',
+          mode: java,
+          expected: const [
+            _FB(startLine: 0, endLine: 4, type: _T.braces),
+            _FB(startLine: 1, endLine: 2, type: _T.braces),
+          ],
+          expectedInvalid: const [],
+        ),
+        _Example(
+          'Java. Comment after close brace',
+          code: '''
+class MyClass {
+  // [START section1]
+  // [END section2]
+}''',
+          mode: java,
+          expected: const [
+            _FB(startLine: 0, endLine: 3, type: _T.braces),
+          ],
+          expectedInvalid: const [],
+        ),
       ];
 
       for (final example in examples) {
