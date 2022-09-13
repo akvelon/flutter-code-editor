@@ -282,7 +282,7 @@ class CodeController extends TextEditingController {
   int? _insertedLoc(String a, String b) {
     final sel = selection;
 
-    if (a.length + 1 != b.length || sel.start != sel.end) {
+    if (a.length + 1 != b.length || sel.start != sel.end || sel.start == -1) {
       return null;
     }
 
