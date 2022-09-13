@@ -90,8 +90,8 @@ class CodeFieldState extends State<CodeField> {
   ScrollController? _horizontalCodeScroll;
   final _codeFieldKey = GlobalKey();
 
-  Offset _preferredPopupOffset = Offset.zero;
-  bool _isPopupCropped = false;
+  Offset _normalPopupOffset = Offset.zero;
+  Offset _flippedPopupOffset = Offset.zero;
   double painterWidth = 0;
   double painterHeight = 0;
 
@@ -111,7 +111,7 @@ class CodeFieldState extends State<CodeField> {
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(() {
-      _updateCursorOffset(widget.controller.text);
+      _updatePopupOffset(widget.controller.text);
     });
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
@@ -133,7 +133,7 @@ class CodeFieldState extends State<CodeField> {
   void dispose() {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(() {
-      _updateCursorOffset(widget.controller.text);
+      _updatePopupOffset(widget.controller.text);
     });
     _numberScroll?.dispose();
     _codeScroll?.dispose();
@@ -309,8 +309,8 @@ class CodeFieldState extends State<CodeField> {
                 editingField,
                 if (widget.controller.popupController.isPopupShown)
                   Popup(
-                    preferredOffset: _preferredPopupOffset,
-                    isPopupCropped: _isPopupCropped,
+                    normalOffset: _normalPopupOffset,
+                    flippedOffset: _flippedPopupOffset,
                     controller: widget.controller.popupController,
                     editingWindowSize: windowSize,
                     style: textStyle,
@@ -325,15 +325,21 @@ class CodeFieldState extends State<CodeField> {
     );
   }
 
-  void _updateCursorOffset(String text) {
+  void _updatePopupOffset(String text) {
     final TextPainter textPainter = _getTextPainter(text);
     final caretHeight = _getCaretHeight(textPainter);
 
-    final double popupLeftOffset = _getPopupLeftOffset(textPainter);
-    final double popupTopOffset = _getPopupTopOffset(textPainter, caretHeight);
+    final double normalLeftOffset = _getPopupLeftOffset(textPainter);
+    final double normalTopOffset = _getPopupTopOffset(textPainter, caretHeight);
+    final double flippedLeftOffset =
+        // TODO(nausharipov): find where 100 comes from
+        windowSize.width - Sizes.autocompletePopupMaxWidth - 100;
+    final double flippedTopOffset = normalTopOffset -
+        (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
     setState(() {
-      _preferredPopupOffset = Offset(popupLeftOffset, popupTopOffset);
+      _normalPopupOffset = Offset(normalLeftOffset, normalTopOffset);
+      _flippedPopupOffset = Offset(flippedLeftOffset, flippedTopOffset);
     });
   }
 
@@ -369,7 +375,7 @@ class CodeFieldState extends State<CodeField> {
   }
 
   double _getPopupTopOffset(TextPainter textPainter, double caretHeight) {
-    final double normalOffset = max(
+    return max(
       _getCaretOffset(textPainter).dy +
           caretHeight +
           16 +
@@ -377,15 +383,5 @@ class CodeFieldState extends State<CodeField> {
           _codeScroll!.offset,
       0,
     );
-
-    _isPopupCropped =
-        normalOffset + Sizes.autocompletePopupMaxHeight > windowSize.height;
-
-    if (_isPopupCropped) {
-      final flippedOffset = normalOffset -
-          (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
-      return flippedOffset;
-    }
-    return normalOffset;
   }
 }

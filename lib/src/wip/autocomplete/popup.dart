@@ -6,8 +6,8 @@ import 'popup_controller.dart';
 
 /// Popup window displaying the list of possible completions
 class Popup extends StatefulWidget {
-  final Offset preferredOffset;
-  final bool isPopupCropped;
+  final Offset normalOffset;
+  final Offset flippedOffset;
   final Size editingWindowSize;
   final TextStyle style;
   final Color? backgroundColor;
@@ -16,8 +16,8 @@ class Popup extends StatefulWidget {
 
   Popup({
     Key? key,
-    required this.preferredOffset,
-    required this.isPopupCropped,
+    required this.normalOffset,
+    required this.flippedOffset,
     required this.controller,
     required this.editingWindowSize,
     required this.style,
@@ -30,12 +30,20 @@ class Popup extends StatefulWidget {
 }
 
 class PopupState extends State<Popup> {
-  static const double width = 300;
-  static const double height = Sizes.autocompletePopupMaxHeight;
+  static const double _maxWidth = Sizes.autocompletePopupMaxWidth;
+  static const double _maxHeight = Sizes.autocompletePopupMaxHeight;
+  bool _verticalOverflow = false;
+  bool _horizontalOverflow = false;
 
   @override
   void initState() {
     widget.controller.addListener(rebuild);
+    _verticalOverflow =
+        widget.normalOffset.dy + Sizes.autocompletePopupMaxHeight >
+            widget.editingWindowSize.height;
+    _horizontalOverflow =
+        widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
+            widget.editingWindowSize.width;
     super.initState();
   }
 
@@ -48,15 +56,16 @@ class PopupState extends State<Popup> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: widget.preferredOffset.dx,
-      top: widget.preferredOffset.dy,
+      left: _horizontalOverflow
+          ? widget.flippedOffset.dx
+          : widget.normalOffset.dx,
+      top: _verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
       child: Container(
-        alignment: widget.isPopupCropped
-            ? Alignment.bottomCenter
-            : Alignment.topCenter,
+        alignment:
+            _verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
         constraints: const BoxConstraints(
-          maxHeight: height,
-          maxWidth: width,
+          maxHeight: _maxHeight,
+          maxWidth: _maxWidth,
         ),
         // DecoratedBox is rendered differently.
         // ignore_for_file: use_decorated_box
