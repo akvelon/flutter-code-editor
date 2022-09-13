@@ -92,7 +92,7 @@ class PopupState extends State<Popup> {
 
   Widget _buildListItem(int index) {
     return Material(
-      color: const Color(0xff2e312c),
+      color: Colors.grey.withOpacity(0.1),
       child: InkWell(
         onTap: () {
           widget.controller.selectedIndex = index;
