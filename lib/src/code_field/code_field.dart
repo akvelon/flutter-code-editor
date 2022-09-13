@@ -329,17 +329,14 @@ class CodeFieldState extends State<CodeField> {
     final TextPainter textPainter = _getTextPainter(text);
     final caretHeight = _getCaretHeight(textPainter);
 
-    final double normalLeftOffset = _getPopupLeftOffset(textPainter);
+    final double leftOffset = _getPopupLeftOffset(textPainter);
     final double normalTopOffset = _getPopupTopOffset(textPainter, caretHeight);
-    final double flippedLeftOffset =
-        // TODO(nausharipov): find where 100 comes from
-        windowSize.width - Sizes.autocompletePopupMaxWidth - 100;
     final double flippedTopOffset = normalTopOffset -
         (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
     setState(() {
-      _normalPopupOffset = Offset(normalLeftOffset, normalTopOffset);
-      _flippedPopupOffset = Offset(flippedLeftOffset, flippedTopOffset);
+      _normalPopupOffset = Offset(leftOffset, normalTopOffset);
+      _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
     });
   }
 

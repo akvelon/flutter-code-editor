@@ -30,20 +30,9 @@ class Popup extends StatefulWidget {
 }
 
 class PopupState extends State<Popup> {
-  static const double _maxWidth = Sizes.autocompletePopupMaxWidth;
-  static const double _maxHeight = Sizes.autocompletePopupMaxHeight;
-  bool _verticalOverflow = false;
-  bool _horizontalOverflow = false;
-
   @override
   void initState() {
     widget.controller.addListener(rebuild);
-    _verticalOverflow =
-        widget.normalOffset.dy + Sizes.autocompletePopupMaxHeight >
-            widget.editingWindowSize.height;
-    _horizontalOverflow =
-        widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
-            widget.editingWindowSize.width;
     super.initState();
   }
 
@@ -55,20 +44,29 @@ class PopupState extends State<Popup> {
 
   @override
   Widget build(BuildContext context) {
+    final bool verticalOverflow =
+        widget.normalOffset.dy + Sizes.autocompletePopupMaxHeight >
+            widget.editingWindowSize.height;
+    final bool horizontalOverflow =
+        widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
+            widget.editingWindowSize.width;
+    final double leftOffsetLimit =
+        // TODO(nausharipov): find where 100 comes from
+        widget.editingWindowSize.width - Sizes.autocompletePopupMaxWidth - 100;
+
     return Positioned(
-      left: _horizontalOverflow
-          ? widget.flippedOffset.dx
-          : widget.normalOffset.dx,
-      top: _verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
+      left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
+      top: verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
       child: Container(
         alignment:
-            _verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
+            verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
         constraints: const BoxConstraints(
-          maxHeight: _maxHeight,
-          maxWidth: _maxWidth,
+          maxHeight: Sizes.autocompletePopupMaxHeight,
+          maxWidth: Sizes.autocompletePopupMaxWidth,
         ),
-        // DecoratedBox is rendered differently.
-        // ignore_for_file: use_decorated_box
+        // Container is used because the vertical borders
+        // in DecoratedBox are hidden under scroll.
+        // ignore: use_decorated_box
         child: Container(
           decoration: BoxDecoration(
             color: widget.backgroundColor,
