@@ -14,11 +14,15 @@ class SingleLineComment {
   /// The comment text with the characters signifying the comment.
   final String outerContent;
 
+  //source, which provided comment to parse
+  final Object? source;
+
   const SingleLineComment({
     required this.innerContent,
     required this.lineIndex,
     this.characterIndex = 0,
     this.outerContent = '',
+    this.source,
   });
 
   /// Creates the object from [outerContent] by extracting [innerContent]
@@ -28,6 +32,7 @@ class SingleLineComment {
     required int characterIndex,
     required int lineIndex,
     required List<String> sequences,
+    Object? source,
   }) : this(
           characterIndex: characterIndex,
           innerContent: _cutSequence(
@@ -36,6 +41,7 @@ class SingleLineComment {
           ),
           lineIndex: lineIndex,
           outerContent: outerContent,
+          source: source,
         );
 
   @override

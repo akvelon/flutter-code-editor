@@ -31,23 +31,25 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
   /// not a comment.
   bool _foundNonWhitespace = false;
 
-  void parse(Result highlighted) {
+  void parse(Result highlighted, Set<Object?> serviceCommentsSources) {
     if (highlighted.nodes != null) {
-      _processNodes(highlighted.nodes!);
+      _processNodes(highlighted.nodes!, serviceCommentsSources);
     }
 
     _submitLine(); // In case the last one did not end with '\n'.
     finalize();
   }
 
-  void _processNodes(List<Node> nodes) {
-    nodes.forEach(_processNode);
+  void _processNodes(List<Node> nodes, Set<Object?> serviceCommentsSources) {
+    for (final node in nodes) {
+      _processNode(node, serviceCommentsSources);
+    }
   }
 
-  void _processNode(Node node) {
+  void _processNode(Node node, Set<Object?> serviceCommentsSources) {
     switch (node.className) {
       case NodeClasses.comment:
-        _processComment(node);
+        _processComment(node, serviceCommentsSources);
         break;
 
       case NodeClasses.keyword:
@@ -59,23 +61,18 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
         break;
 
       default:
-        _processDefault(node);
+        _processDefault(node, serviceCommentsSources);
     }
   }
 
-  void _processComment(Node node) {
+  void _processComment(Node node, Set<Object?> serviceComments) {
     final newlineCount = node.getNewlineCount();
 
     if (_foundNonWhitespace) {
       return;
     }
 
-    if (node.children?.any(
-          (subnode) => BracketsStartEndNamedSectionParser.isNamedSectionTag(
-            subnode.value ?? '',
-          ),
-        ) ??
-        false) {
+    if (serviceComments.contains(node)) {
       return;
     }
 
@@ -127,11 +124,11 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
     _lineIndex += newlineCount;
   }
 
-  void _processDefault(Node node) {
+  void _processDefault(Node node, Set<Object?> serviceCommentsSources) {
     _processDefaultValue(node);
 
     if (node.children != null) {
-      _processNodes(node.children!);
+      _processNodes(node.children!, serviceCommentsSources);
     }
   }
 
