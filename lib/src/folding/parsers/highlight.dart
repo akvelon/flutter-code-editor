@@ -2,10 +2,10 @@ import 'package:charcode/ascii.dart';
 import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 
-import '../../../flutter_code_editor.dart';
 import '../../highlight/keyword_semantics.dart';
 import '../../highlight/node.dart';
 import '../../highlight/node_classes.dart';
+import '../foldable_block_type.dart';
 import 'abstract.dart';
 import 'line_semantics.dart';
 
