@@ -89,8 +89,4 @@ class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
 
     return sections;
   }
-
-  static bool isNamedSectionTag(String comment) {
-    return _startRe.hasMatch(comment) || _endRe.hasMatch(comment);
-  }
 }
