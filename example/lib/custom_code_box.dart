@@ -167,11 +167,11 @@ class _InnerFieldState extends State<InnerField> {
       language: allLanguages[widget.language],
       text: '''
 class MyClass {
-  void readOnlyMethod() {// [START section1]
-  }// [END section1]
-  // [START section2]
-  void method() {
-  }// [END section2]
+\tvoid readOnlyMethod() {// [START section1]
+\t}// [END section1]
+\t// [START section2]
+\tvoid method() {
+\t}// [END section2]
 }
 ''',
       namedSectionParser: const BracketsStartEndNamedSectionParser(),

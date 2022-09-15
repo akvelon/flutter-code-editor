@@ -260,7 +260,7 @@ class CodeController extends TextEditingController {
   String get fullText => _lastCode.text;
 
   set fullText(String fullText) {
-    _updateLastCodeIfChanged(fullText);
+    _updateLastCodeIfChanged(_replaceTabsIfNeeded(fullText));
     super.value = TextEditingValue(text: _lastCode.visibleText);
   }
 
@@ -376,6 +376,13 @@ class CodeController extends TextEditingController {
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
     );
+  }
+
+  String _replaceTabsIfNeeded(String text) {
+    if (modifiers.contains(const TabModifier())) {
+      return text.replaceAll('\t', '  ');
+    }
+    return text;
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
