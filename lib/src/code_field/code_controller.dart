@@ -16,6 +16,7 @@ import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
 import '../named_sections/parsers/abstract.dart';
+import '../symbols.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
@@ -260,7 +261,7 @@ class CodeController extends TextEditingController {
   String get fullText => _lastCode.text;
 
   set fullText(String fullText) {
-    _updateLastCodeIfChanged(_replaceTabsIfNeeded(fullText));
+    _updateLastCodeIfChanged(_replaceTabsWithSpacesIfNeeded(fullText));
     super.value = TextEditingValue(text: _lastCode.visibleText);
   }
 
@@ -378,9 +379,9 @@ class CodeController extends TextEditingController {
     );
   }
 
-  String _replaceTabsIfNeeded(String text) {
+  String _replaceTabsWithSpacesIfNeeded(String text) {
     if (modifiers.contains(const TabModifier())) {
-      return text.replaceAll('\t', '  ');
+      return text.replaceAll(Symbols.tab, Symbols.space * params.tabSpaces);
     }
     return text;
   }
