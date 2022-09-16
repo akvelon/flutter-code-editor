@@ -6,14 +6,15 @@ import 'package:highlight/languages/go.dart';
 void main() {
   const textWithTabs = '''
 public class MyClass {
-\tpublic void main() {// comment
-\t}
-}
+\tpublic void main() {\t\t
+\t}\t
+}\t
+\t
 ''';
 
-  group('tab replacement', () {
+  group('Tab replacement', () {
     test(
-      'tabs are replaced if TabModifier is present',
+      'applied if TabModifier is present',
       () {
         final controller = CodeController(
           text: textWithTabs,
@@ -25,7 +26,7 @@ public class MyClass {
     );
 
     test(
-      'tabs are not replaced if TabModifier is not present',
+      'not applied if TabModifier is not present',
       () {
         final controller = CodeController(
           text: textWithTabs,
