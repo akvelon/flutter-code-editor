@@ -2,6 +2,7 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_code_editor/src/service_comment_filter/service_comment_filter.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comment_parser.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comments.dart';
+import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight.dart';
 import 'package:highlight/languages/java.dart';
@@ -180,8 +181,9 @@ import java.lang.Exception;''',
           ],
           expectedInvalid: const [],
         ),
+
         _Example(
-          'Java. Comment after close brace',
+          'Java. Comment after a closing brace',
           code: '''
 class MyClass {
   void method() {
@@ -194,10 +196,10 @@ class MyClass {
             _FB(startLine: 1, endLine: 2, type: _T.braces),
           ],
           expectedInvalid: const [],
-          namedSectionParser: const BracketsStartEndNamedSectionParser(),
         ),
+
         _Example(
-          'Java. Named comments',
+          'Java. Service comment sequences do not form a foldable block.',
           code: '''
 class MyClass {
   // [START section1]
@@ -208,7 +210,6 @@ class MyClass {
             _FB(startLine: 0, endLine: 3, type: _T.braces),
           ],
           expectedInvalid: const [],
-          namedSectionParser: const BracketsStartEndNamedSectionParser(),
         ),
       ];
 
@@ -227,10 +228,10 @@ class MyClass {
 
         final serviceComments = ServiceCommentFilter.filter(
           commentParser.comments,
-          namedSectionParser: example.namedSectionParser,
+          namedSectionParser: const BracketsStartEndNamedSectionParser(),
         );
 
-        parser.parse(highlighted, serviceComments.map((e) => e.source).toSet());
+        parser.parse(highlighted, serviceComments.sources);
 
         expect(
           parser.blocks,
@@ -253,7 +254,6 @@ class _Example {
   final Mode mode;
   final List<FoldableBlock> expected;
   final List<InvalidFoldableBlock> expectedInvalid;
-  final AbstractNamedSectionParser? namedSectionParser;
 
   const _Example(
     this.name, {
@@ -261,7 +261,6 @@ class _Example {
     required this.mode,
     required this.expected,
     required this.expectedInvalid,
-    this.namedSectionParser,
   });
 }
 

@@ -14,7 +14,9 @@ class SingleLineComment {
   /// The comment text with the characters signifying the comment.
   final String outerContent;
 
-  //source, which provided comment to parse
+  /// The object this comment was parsed from, if any.
+  ///
+  /// The object class is specific to the parser.
   final Object? source;
 
   const SingleLineComment({
@@ -76,4 +78,8 @@ class SingleLineComment {
 
     throw Exception('$outerContent does not start with any of $sequences');
   }
+}
+
+extension SingleLineCommentIterable on Iterable<SingleLineComment> {
+  Set<Object?> get sources => {... map((e) => e.source)};
 }
