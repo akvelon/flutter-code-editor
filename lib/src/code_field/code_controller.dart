@@ -16,12 +16,13 @@ import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
 import '../named_sections/parsers/abstract.dart';
-import '../symbols.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
 const _middleDot = '·';
+const _tab = '\t';
+const _space = ' ';
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -381,7 +382,7 @@ class CodeController extends TextEditingController {
 
   String _replaceTabsWithSpacesIfNeeded(String text) {
     if (modifiers.contains(const TabModifier())) {
-      return text.replaceAll(Symbols.tab, Symbols.space * params.tabSpaces);
+      return text.replaceAll(_tab, _space * params.tabSpaces);
     }
     return text;
   }
