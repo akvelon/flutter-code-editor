@@ -81,5 +81,5 @@ class SingleLineComment {
 }
 
 extension SingleLineCommentIterable on Iterable<SingleLineComment> {
-  Set<Object?> get sources => {... map((e) => e.source)};
+  Set<Object?> get sources => {...map((e) => e.source)};
 }
