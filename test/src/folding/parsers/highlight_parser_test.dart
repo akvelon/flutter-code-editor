@@ -1,4 +1,8 @@
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_code_editor/src/service_comment_filter/service_comment_filter.dart';
+import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comment_parser.dart';
+import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comments.dart';
+import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight.dart';
 import 'package:highlight/languages/java.dart';
@@ -177,6 +181,36 @@ import java.lang.Exception;''',
           ],
           expectedInvalid: const [],
         ),
+
+        _Example(
+          'Java. Comment after a closing brace',
+          code: '''
+class MyClass {
+  void method() {
+  }// comment
+  // comment
+}''',
+          mode: java,
+          expected: const [
+            _FB(startLine: 0, endLine: 4, type: _T.braces),
+            _FB(startLine: 1, endLine: 2, type: _T.braces),
+          ],
+          expectedInvalid: const [],
+        ),
+
+        _Example(
+          'Java. Service comment sequences do not form a foldable block.',
+          code: '''
+class MyClass {
+  // [START section1]
+  // [END section2]
+}''',
+          mode: java,
+          expected: const [
+            _FB(startLine: 0, endLine: 3, type: _T.braces),
+          ],
+          expectedInvalid: const [],
+        ),
       ];
 
       for (final example in examples) {
@@ -184,7 +218,20 @@ import java.lang.Exception;''',
         final highlighted = highlight.parse(example.code, language: 'language');
         final parser = HighlightFoldableBlockParser();
 
-        parser.parse(highlighted);
+        final sequences = SingleLineComments.byMode[example.mode] ?? [];
+
+        final commentParser = SingleLineCommentParser.parseHighlighted(
+          text: example.code,
+          highlighted: highlighted,
+          singleLineCommentSequences: sequences,
+        );
+
+        final serviceComments = ServiceCommentFilter.filter(
+          commentParser.comments,
+          namedSectionParser: const BracketsStartEndNamedSectionParser(),
+        );
+
+        parser.parse(highlighted, serviceComments.sources);
 
         expect(
           parser.blocks,

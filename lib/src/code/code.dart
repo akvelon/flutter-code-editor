@@ -11,6 +11,7 @@ import '../hidden_ranges/hidden_ranges.dart';
 import '../issues/issue.dart';
 import '../named_sections/named_section.dart';
 import '../named_sections/parsers/abstract.dart';
+import '../service_comment_filter/service_comment_filter.dart';
 import '../single_line_comments/parser/single_line_comment_parser.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../single_line_comments/single_line_comment.dart';
@@ -46,17 +47,12 @@ class Code {
       singleLineCommentSequences: sequences,
     );
 
-    final serviceComments = _filterServiceComments(
+    final serviceComments = ServiceCommentFilter.filter(
       commentParser.comments,
       namedSectionParser: namedSectionParser,
     );
 
-    final lines = _textToCodeLines(
-      text: text,
-      highlighted: highlighted,
-      language: language,
-      commentsByLines: commentParser.getCommentsByLines(),
-    );
+    final serviceCommentsNodesSet = serviceComments.sources;
 
     final issues = <Issue>[];
     final List<FoldableBlock> foldableBlocks;
@@ -65,7 +61,7 @@ class Code {
       foldableBlocks = const [];
     } else {
       final parser = HighlightFoldableBlockParser();
-      parser.parse(highlighted);
+      parser.parse(highlighted, serviceCommentsNodesSet);
       foldableBlocks = parser.blocks;
       issues.addAll(parser.invalidBlocks.map((b) => b.issue));
     }
@@ -75,6 +71,13 @@ class Code {
         ) ??
         const [];
     final sectionsMap = {for (final s in sections) s.name: s};
+
+    final lines = _textToCodeLines(
+      text: text,
+      highlighted: highlighted,
+      language: language,
+      commentsByLines: commentParser.getCommentsByLines(),
+    );
 
     _applyNamedSectionsToLines(
       lines: lines,
@@ -124,38 +127,6 @@ class Code {
     visibleHighlighted: null,
     visibleText: '',
   );
-
-  static Iterable<SingleLineComment> _filterServiceComments(
-    List<SingleLineComment> comments, {
-    required AbstractNamedSectionParser? namedSectionParser,
-  }) sync* {
-    for (final comment in comments) {
-      if (_isServiceComment(comment, namedSectionParser: namedSectionParser)) {
-        yield comment;
-      }
-    }
-  }
-
-  static bool _isServiceComment(
-    SingleLineComment comment, {
-    required AbstractNamedSectionParser? namedSectionParser,
-  }) {
-    final words = _getCommentWords(comment.innerContent);
-    if (words.contains(Tokens.readonly)) {
-      return true;
-    }
-
-    if (namedSectionParser != null) {
-      final namedSections = namedSectionParser.parseUnsorted(
-        singleLineComments: [comment],
-      );
-      if (namedSections.isNotEmpty) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 
   static List<CodeLine> _textToCodeLines({
     required String text,

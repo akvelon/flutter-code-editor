@@ -35,6 +35,7 @@ class HighlightSingleLineCommentParser extends AbstractSingleLineCommentParser {
               lineIndex: lineIndex,
               characterIndex: characterIndex,
               sequences: singleLineCommentSequences,
+              source: node,
             ),
           );
         }

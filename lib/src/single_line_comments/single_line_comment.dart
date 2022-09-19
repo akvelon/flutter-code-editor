@@ -14,11 +14,17 @@ class SingleLineComment {
   /// The comment text with the characters signifying the comment.
   final String outerContent;
 
+  /// The object this comment was parsed from, if any.
+  ///
+  /// The object class is specific to the parser.
+  final Object? source;
+
   const SingleLineComment({
     required this.innerContent,
     required this.lineIndex,
     this.characterIndex = 0,
     this.outerContent = '',
+    this.source,
   });
 
   /// Creates the object from [outerContent] by extracting [innerContent]
@@ -28,6 +34,7 @@ class SingleLineComment {
     required int characterIndex,
     required int lineIndex,
     required List<String> sequences,
+    Object? source,
   }) : this(
           characterIndex: characterIndex,
           innerContent: _cutSequence(
@@ -36,6 +43,7 @@ class SingleLineComment {
           ),
           lineIndex: lineIndex,
           outerContent: outerContent,
+          source: source,
         );
 
   @override
@@ -70,4 +78,8 @@ class SingleLineComment {
 
     throw Exception('$outerContent does not start with any of $sequences');
   }
+}
+
+extension SingleLineCommentIterable on Iterable<SingleLineComment> {
+  Set<Object?> get sources => {...map((e) => e.source)};
 }
