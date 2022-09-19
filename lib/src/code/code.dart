@@ -3,9 +3,12 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
+import 'package:highlight/languages/python.dart';
 
 import '../folding/foldable_block.dart';
 import '../folding/parsers/highlight.dart';
+import '../folding/parsers/python_parser.dart';
+import '../folding/parsers/spaces_foldable_block_parser.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
 import '../issues/issue.dart';
@@ -52,7 +55,8 @@ class Code {
       namedSectionParser: namedSectionParser,
     );
 
-    final serviceCommentsNodesSet = serviceComments.map((e) => e.source).toSet();
+    final serviceCommentsNodesSet =
+        serviceComments.map((e) => e.source).toSet();
 
     final issues = <Issue>[];
     final List<FoldableBlock> foldableBlocks;
@@ -62,7 +66,12 @@ class Code {
     } else {
       final parser = HighlightFoldableBlockParser();
       parser.parse(highlighted, serviceCommentsNodesSet);
-      foldableBlocks = parser.blocks;
+      foldableBlocks = _getFoldableBlocks(
+        text,
+        highlighted.top,
+        parser,
+        serviceCommentsNodesSet,
+      );
       issues.addAll(parser.invalidBlocks.map((b) => b.issue));
     }
 
@@ -259,6 +268,24 @@ class Code {
 
       return lineIndex;
     }
+  }
+
+  static List<FoldableBlock> _getFoldableBlocks(
+    String text,
+    Mode? language,
+    HighlightFoldableBlockParser highlightParser,
+    Set<Object?> serviceComments,
+  ) {
+    if (language == python) {
+      final spacesParser = SpacesFoldableBlockParser();
+      spacesParser.parse(text);
+      
+      return PythonParser().parse(
+        highlightParser.blocks,
+        spacesParser.blocks,
+      );
+    }
+    return highlightParser.blocks;
   }
 
   /// Returns whether the current selection has any read-only part.
