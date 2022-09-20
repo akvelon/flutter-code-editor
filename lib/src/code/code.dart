@@ -55,8 +55,7 @@ class Code {
       namedSectionParser: namedSectionParser,
     );
 
-    final serviceCommentsNodesSet =
-        serviceComments.map((e) => e.source).toSet();
+    final serviceCommentsNodesSet = serviceComments.sources;
 
     final issues = <Issue>[];
     final List<FoldableBlock> foldableBlocks;

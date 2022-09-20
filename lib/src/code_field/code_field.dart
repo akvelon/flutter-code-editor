@@ -7,6 +7,7 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import '../code_theme/code_theme.dart';
 import '../gutter/gutter.dart';
 import '../line_numbers/line_number_style.dart';
+import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'code_controller.dart';
 
@@ -89,8 +90,8 @@ class CodeFieldState extends State<CodeField> {
   ScrollController? _horizontalCodeScroll;
   final _codeFieldKey = GlobalKey();
 
-  double cursorX = 0;
-  double cursorY = 0;
+  Offset _normalPopupOffset = Offset.zero;
+  Offset _flippedPopupOffset = Offset.zero;
   double painterWidth = 0;
   double painterHeight = 0;
 
@@ -110,15 +111,15 @@ class CodeFieldState extends State<CodeField> {
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(() {
-      _updateCursorOffset(widget.controller.text);
+      _updatePopupOffset(widget.controller.text);
     });
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      double width = _codeFieldKey.currentContext!.size!.width;
-      double height = _codeFieldKey.currentContext!.size!.height;
+      final double width = _codeFieldKey.currentContext!.size!.width;
+      final double height = _codeFieldKey.currentContext!.size!.height;
       windowSize = Size(width, height);
     });
     _onTextChanged();
@@ -132,7 +133,7 @@ class CodeFieldState extends State<CodeField> {
   void dispose() {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(() {
-      _updateCursorOffset(widget.controller.text);
+      _updatePopupOffset(widget.controller.text);
     });
     _numberScroll?.dispose();
     _codeScroll?.dispose();
@@ -148,8 +149,8 @@ class CodeFieldState extends State<CodeField> {
         // so check first.
         final context = _codeFieldKey.currentContext;
         if (context != null) {
-          double width = context.size!.width;
-          double height = context.size!.height;
+          final double width = context.size!.width;
+          final double height = context.size!.height;
           windowSize = Size(width, height);
         }
       });
@@ -306,17 +307,16 @@ class CodeFieldState extends State<CodeField> {
             child: Stack(
               children: [
                 editingField,
-                widget.controller.popupController.isPopupShown
-                    ? Popup(
-                        row: cursorY,
-                        column: cursorX,
-                        controller: widget.controller.popupController,
-                        editingWindowSize: windowSize,
-                        style: textStyle,
-                        backgroundColor: backgroundCol,
-                        parentFocusNode: _focusNode!,
-                      )
-                    : Container(),
+                if (widget.controller.popupController.isPopupShown)
+                  Popup(
+                    normalOffset: _normalPopupOffset,
+                    flippedOffset: _flippedPopupOffset,
+                    controller: widget.controller.popupController,
+                    editingWindowSize: windowSize,
+                    style: textStyle,
+                    backgroundColor: backgroundCol,
+                    parentFocusNode: _focusNode!,
+                  ),
               ],
             ),
           ),
@@ -325,32 +325,60 @@ class CodeFieldState extends State<CodeField> {
     );
   }
 
-  void _updateCursorOffset(String text) {
-    TextPainter painter = TextPainter(
+  void _updatePopupOffset(String text) {
+    final TextPainter textPainter = _getTextPainter(text);
+    final caretHeight = _getCaretHeight(textPainter);
+
+    final double leftOffset = _getPopupLeftOffset(textPainter);
+    final double normalTopOffset = _getPopupTopOffset(textPainter, caretHeight);
+    final double flippedTopOffset = normalTopOffset -
+        (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
+
+    setState(() {
+      _normalPopupOffset = Offset(leftOffset, normalTopOffset);
+      _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
+    });
+  }
+
+  TextPainter _getTextPainter(String text) {
+    return TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(text: text, style: textStyle),
     )..layout();
-    TextPosition cursorTextPosition = widget.controller.selection.base;
-    Rect caretPrototype = Rect.zero;
-    Offset caretOffset =
-        painter.getOffsetForCaret(cursorTextPosition, caretPrototype);
-    double caretHeight = (widget.controller.selection.base.offset > 0)
-        ? painter.getFullHeightForCaret(cursorTextPosition, caretPrototype)!
-        : 0;
+  }
 
-    setState(() {
-      cursorX = max(
-          caretOffset.dx + widget.padding.left - _horizontalCodeScroll!.offset,
-          0);
-      cursorY = max(
-          caretOffset.dy +
-              caretHeight +
-              16 +
-              widget.padding.top -
-              _codeScroll!.offset,
-          0);
-      painterWidth = painter.width;
-      painterHeight = painter.height;
-    });
+  Offset _getCaretOffset(TextPainter textPainter) {
+    return textPainter.getOffsetForCaret(
+      widget.controller.selection.base,
+      Rect.zero,
+    );
+  }
+
+  double _getCaretHeight(TextPainter textPainter) {
+    final double? caretFullHeight = textPainter.getFullHeightForCaret(
+      widget.controller.selection.base,
+      Rect.zero,
+    );
+    return (widget.controller.selection.base.offset > 0) ? caretFullHeight! : 0;
+  }
+
+  double _getPopupLeftOffset(TextPainter textPainter) {
+    return max(
+      _getCaretOffset(textPainter).dx +
+          widget.padding.left -
+          _horizontalCodeScroll!.offset,
+      0,
+    );
+  }
+
+  double _getPopupTopOffset(TextPainter textPainter, double caretHeight) {
+    return max(
+      _getCaretOffset(textPainter).dy +
+          caretHeight +
+          16 +
+          widget.padding.top -
+          _codeScroll!.offset,
+      0,
+    );
   }
 }

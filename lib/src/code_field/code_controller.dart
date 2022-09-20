@@ -21,6 +21,8 @@ import 'editor_params.dart';
 import 'span_builder.dart';
 
 const _middleDot = '·';
+const _tab = '\t';
+const _space = ' ';
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -260,7 +262,7 @@ class CodeController extends TextEditingController {
   String get fullText => _lastCode.text;
 
   set fullText(String fullText) {
-    _updateLastCodeIfChanged(fullText);
+    _updateLastCodeIfChanged(_replaceTabsWithSpacesIfNeeded(fullText));
     super.value = TextEditingValue(text: _lastCode.visibleText);
   }
 
@@ -282,7 +284,7 @@ class CodeController extends TextEditingController {
   int? _insertedLoc(String a, String b) {
     final sel = selection;
 
-    if (a.length + 1 != b.length || sel.start != sel.end) {
+    if (a.length + 1 != b.length || sel.start != sel.end || sel.start == -1) {
       return null;
     }
 
@@ -376,6 +378,13 @@ class CodeController extends TextEditingController {
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
     );
+  }
+
+  String _replaceTabsWithSpacesIfNeeded(String text) {
+    if (modifiers.contains(const TabModifier())) {
+      return text.replaceAll(_tab, _space * params.tabSpaces);
+    }
+    return text;
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
