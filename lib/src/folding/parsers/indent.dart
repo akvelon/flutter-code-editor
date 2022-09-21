@@ -11,7 +11,7 @@ import 'abstract.dart';
 class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   static const _kSeparatorLine = -1;
 
-  final openBlocksByIndent = HashMap<int, List<int>>();
+  final openBlocksLinesByIndent = HashMap<int, List<int>>();
 
   @override
   void parse(
@@ -50,26 +50,26 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
       }
 
       if (nextExistingIndent < currentLineIndent) {
-        openBlocksByIndent.forEach((spacesCount, openedBlocks) {
+        openBlocksLinesByIndent.forEach((spacesCount, openedBlocks) {
           if (spacesCount >= nextExistingIndent) {
             _closeBlocks(openedBlocks, i);
           }
         });
-        openBlocksByIndent.removeWhere(
+        openBlocksLinesByIndent.removeWhere(
           (key, value) => key >= nextExistingIndent,
         );
       }
     }
-    openBlocksByIndent.forEach((spacesCount, openedBlocks) {
+    openBlocksLinesByIndent.forEach((spacesCount, openedBlocks) {
       _closeBlocks(openedBlocks, lastValuableLine);
     });
   }
 
   void _openBlock(int indent, int lineIndex) {
-    if (openBlocksByIndent[indent] == null) {
-      openBlocksByIndent[indent] = List.empty(growable: true);
+    if (openBlocksLinesByIndent[indent] == null) {
+      openBlocksLinesByIndent[indent] = List.empty(growable: true);
     }
-    openBlocksByIndent[indent]!.add(lineIndex);
+    openBlocksLinesByIndent[indent]!.add(lineIndex);
   }
 
   void _closeBlocks(List<int> openedBlocks, int endLine) {
