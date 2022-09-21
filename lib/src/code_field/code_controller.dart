@@ -316,7 +316,9 @@ class CodeController extends TextEditingController {
         return;
       }
 
-      _updateLastCodeIfChanged(editResult.fullTextAfter);
+      _updateLastCodeIfChanged(
+        _replaceTabsWithSpacesIfNeeded(editResult.fullTextAfter),
+      );
 
       if (newValue.text != _lastCode.visibleText) {
         // Manually typed in a text that has become a hidden range.
