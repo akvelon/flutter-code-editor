@@ -8,8 +8,8 @@ enum FoldableBlockType {
   /// ( )
   parentheses,
 
-  //just for python
-  spaces,
+  /// Spaces or tabs.
+  indent,
 
   multilineComment,
   singleLineComment,

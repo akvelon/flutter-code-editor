@@ -1,6 +1,6 @@
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_code_editor/src/folding/parsers/python_parser.dart';
-import 'package:flutter_code_editor/src/folding/parsers/spaces_foldable_block_parser.dart';
+import 'package:flutter_code_editor/src/code/code_line_builder.dart';
+import 'package:flutter_code_editor/src/folding/parsers/python.dart';
 import 'package:flutter_code_editor/src/service_comment_filter/service_comment_filter.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comment_parser.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comments.dart';
@@ -17,6 +17,7 @@ void main() {
           code: '',
           expected: [],
         ),
+        //
         _Example(
           'Python. Nesting with multiline list',
           code: '''
@@ -36,13 +37,14 @@ class Mapping:
             8
         ]''',
           expected: [
-            _FB(startLine: 0, endLine: 14, type: FoldableBlockType.spaces),
-            _FB(startLine: 1, endLine: 3, type: FoldableBlockType.spaces),
-            _FB(startLine: 5, endLine: 14, type: FoldableBlockType.spaces),
-            _FB(startLine: 6, endLine: 7, type: FoldableBlockType.spaces),
+            _FB(startLine: 0, endLine: 14, type: FoldableBlockType.indent),
+            _FB(startLine: 1, endLine: 3, type: FoldableBlockType.indent),
+            _FB(startLine: 5, endLine: 14, type: FoldableBlockType.indent),
+            _FB(startLine: 6, endLine: 7, type: FoldableBlockType.indent),
             _FB(startLine: 9, endLine: 14, type: FoldableBlockType.brackets),
           ],
         ),
+        //
         _Example(
           'Python. Invalid code',
           code: '''
@@ -62,13 +64,14 @@ class Mapping:
             8
         ]''',
           expected: [
-            _FB(startLine: 0, endLine: 14, type: FoldableBlockType.spaces),
-            _FB(startLine: 1, endLine: 3, type: FoldableBlockType.spaces),
-            _FB(startLine: 5, endLine: 14, type: FoldableBlockType.spaces),
-            _FB(startLine: 6, endLine: 7, type: FoldableBlockType.spaces),
+            _FB(startLine: 0, endLine: 14, type: FoldableBlockType.indent),
+            _FB(startLine: 1, endLine: 3, type: FoldableBlockType.indent),
+            _FB(startLine: 5, endLine: 14, type: FoldableBlockType.indent),
+            _FB(startLine: 6, endLine: 7, type: FoldableBlockType.indent),
             _FB(startLine: 9, endLine: 14, type: FoldableBlockType.brackets),
           ],
         ),
+        //
         _Example(
           'Python. Nesting list',
           code: '''
@@ -85,13 +88,14 @@ class Mapping:
             ]
         ]''',
           expected: [
-            _FB(startLine: 0, endLine: 11, type: FoldableBlockType.spaces),
-            _FB(startLine: 1, endLine: 11, type: FoldableBlockType.spaces),
+            _FB(startLine: 0, endLine: 11, type: FoldableBlockType.indent),
+            _FB(startLine: 1, endLine: 11, type: FoldableBlockType.indent),
             _FB(startLine: 2, endLine: 11, type: FoldableBlockType.brackets),
             _FB(startLine: 3, endLine: 6, type: FoldableBlockType.brackets),
             _FB(startLine: 7, endLine: 10, type: FoldableBlockType.brackets),
           ],
         ),
+        //
         _Example(
           'Python. Single-line comments',
           code: '''
@@ -111,8 +115,8 @@ class Mapping:
             ]
         ]''',
           expected: [
-            _FB(startLine: 0, endLine: 14, type: FoldableBlockType.spaces),
-            _FB(startLine: 1, endLine: 14, type: FoldableBlockType.spaces),
+            _FB(startLine: 0, endLine: 14, type: FoldableBlockType.indent),
+            _FB(startLine: 1, endLine: 14, type: FoldableBlockType.indent),
             _FB(startLine: 2, endLine: 14, type: FoldableBlockType.brackets),
             _FB(startLine: 3, endLine: 9, type: FoldableBlockType.brackets),
             _FB(
@@ -123,6 +127,7 @@ class Mapping:
             _FB(startLine: 10, endLine: 13, type: FoldableBlockType.brackets),
           ],
         ),
+        //
         _Example(
           'Python. Pair characters in literals are ignored',
           code: '''
@@ -131,6 +136,7 @@ b = ")]}";
 ''',
           expected: [],
         ),
+        //
         _Example(
           'Python. Named comments',
           code: '''
@@ -140,8 +146,8 @@ class Mapping:
         # [END section1]
         a = 5''',
           expected: [
-            _FB(startLine: 0, endLine: 4, type: FoldableBlockType.spaces),
-            _FB(startLine: 1, endLine: 4, type: FoldableBlockType.spaces),
+            _FB(startLine: 0, endLine: 4, type: FoldableBlockType.indent),
+            _FB(startLine: 1, endLine: 4, type: FoldableBlockType.indent),
           ],
         ),
       ];
@@ -149,7 +155,6 @@ class Mapping:
       for (final example in examples) {
         highlight.registerLanguage('language', python);
         final highlighted = highlight.parse(example.code, language: 'language');
-        final highlightParser = HighlightFoldableBlockParser();
 
         final sequences = SingleLineComments.byMode[python] ?? [];
 
@@ -164,18 +169,14 @@ class Mapping:
           namedSectionParser: const BracketsStartEndNamedSectionParser(),
         );
 
-        highlightParser.parse(
-          highlighted,
-          serviceComments.map((e) => e.source).toSet(),
+        final codeLines = CodeLineBuilder.textToCodeLines(
+          text: example.code,
+          highlighted: highlighted,
+          commentsByLines: commentParser.getCommentsByLines(),
         );
 
-        final spacesParser = SpacesFoldableBlockParser();
-        spacesParser.parse(example.code);
-
-        final pythonParser = PythonParser().parse(
-          highlightParser.blocks,
-          spacesParser.blocks,
-        );
+        final pythonParser = PythonFoldableBlockParser().parse(highlighted,
+            serviceComments.map((e) => e.source).toSet(), codeLines);
 
         expect(
           pythonParser,

@@ -3,12 +3,10 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
-import 'package:highlight/languages/python.dart';
+import 'package:highlight/languages/java.dart';
 
 import '../folding/foldable_block.dart';
-import '../folding/parsers/highlight.dart';
-import '../folding/parsers/python_parser.dart';
-import '../folding/parsers/spaces_foldable_block_parser.dart';
+import '../folding/parsers/parser_factory.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
 import '../issues/issue.dart';
@@ -20,9 +18,9 @@ import '../single_line_comments/parser/single_line_comments.dart';
 import '../single_line_comments/single_line_comment.dart';
 import 'code_edit_result.dart';
 import 'code_line.dart';
+import 'code_line_builder.dart';
 import 'string.dart';
 import 'text_range.dart';
-import 'tokens.dart';
 
 class Code {
   final String text;
@@ -60,17 +58,24 @@ class Code {
     final issues = <Issue>[];
     final List<FoldableBlock> foldableBlocks;
 
+    final lines = CodeLineBuilder.textToCodeLines(
+      text: text,
+      highlighted: highlighted,
+      commentsByLines: commentParser.getCommentsByLines(),
+    );
+
     if (highlighted == null) {
       foldableBlocks = const [];
     } else {
-      final parser = HighlightFoldableBlockParser();
-      parser.parse(highlighted, serviceCommentsNodesSet);
-      foldableBlocks = _getFoldableBlocks(
-        text,
-        highlighted.top,
-        parser,
+      final parser = FoldableBlockParserFactory.provideParser(language ?? java);
+
+      parser.parse(
+        highlighted,
         serviceCommentsNodesSet,
+        lines,
       );
+
+      foldableBlocks = parser.blocks;
       issues.addAll(parser.invalidBlocks.map((b) => b.issue));
     }
 
@@ -79,13 +84,6 @@ class Code {
         ) ??
         const [];
     final sectionsMap = {for (final s in sections) s.name: s};
-
-    final lines = _textToCodeLines(
-      text: text,
-      highlighted: highlighted,
-      language: language,
-      commentsByLines: commentParser.getCommentsByLines(),
-    );
 
     _applyNamedSectionsToLines(
       lines: lines,
@@ -135,59 +133,6 @@ class Code {
     visibleHighlighted: null,
     visibleText: '',
   );
-
-  static List<CodeLine> _textToCodeLines({
-    required String text,
-    required Result? highlighted,
-    required Mode? language,
-    required Map<int, SingleLineComment> commentsByLines,
-  }) {
-    final result = <CodeLine>[];
-    final lines = text.split('\n');
-    int charIndex = 0;
-
-    int lineIndex = 0;
-    final lastLineIndex = lines.length - 1;
-
-    for (final line in lines) {
-      final comment = commentsByLines[lineIndex];
-      final words = _getCommentWords(comment?.innerContent);
-
-      String lineText = '$line\n';
-      bool isReadOnly = words.contains(Tokens.readonly);
-
-      if (lineIndex == lastLineIndex) {
-        // The last line is special. It has no newline at the end.
-        // If it's empty, it inherits isReadOnly from the previous line.
-        // Otherwise, if we wanted a read-only document end, we could
-        // not use newline at the end of it as POSIX requires.
-        lineText = line;
-        if (line == '') {
-          isReadOnly = result.lastOrNull?.isReadOnly ?? false;
-        }
-      }
-
-      result.add(
-        CodeLine.fromTextAndStart(
-          lineText,
-          charIndex,
-          isReadOnly: isReadOnly,
-        ),
-      );
-
-      charIndex += line.length + 1;
-      lineIndex++;
-    }
-
-    return result;
-  }
-
-  static List<String> _getCommentWords(
-    String? comment,
-  ) {
-    // Split by any whitespaces.
-    return comment?.split(RegExp(r'\s+')) ?? const <String>[];
-  }
 
   static void _applyNamedSectionsToLines({
     required List<CodeLine> lines,
@@ -267,24 +212,6 @@ class Code {
 
       return lineIndex;
     }
-  }
-
-  static List<FoldableBlock> _getFoldableBlocks(
-    String text,
-    Mode? language,
-    HighlightFoldableBlockParser highlightParser,
-    Set<Object?> serviceComments,
-  ) {
-    if (language == python) {
-      final spacesParser = SpacesFoldableBlockParser();
-      spacesParser.parse(text);
-      
-      return PythonParser().parse(
-        highlightParser.blocks,
-        spacesParser.blocks,
-      );
-    }
-    return highlightParser.blocks;
   }
 
   /// Returns whether the current selection has any read-only part.

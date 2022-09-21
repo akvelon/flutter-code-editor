@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:charcode/ascii.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -8,8 +9,9 @@ class CodeLine {
 
   final TextRange textRange;
   final bool isReadOnly;
+  late final indent = _calculateIndent();
 
-  const CodeLine({
+  CodeLine({
     required this.text,
     required this.textRange,
     this.isReadOnly = false,
@@ -47,4 +49,17 @@ class CodeLine {
         textRange,
         isReadOnly,
       );
+
+  int _calculateIndent() {
+    int indentation = 0;
+    for (final character in text.runes) {
+      if (character == $space || character == $tab || character == $lf) {
+        indentation++;
+      } else {
+        break;
+      }
+    }
+
+    return indentation;
+  }
 }

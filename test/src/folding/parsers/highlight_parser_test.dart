@@ -1,4 +1,5 @@
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_code_editor/src/code/code_line_builder.dart';
 import 'package:flutter_code_editor/src/service_comment_filter/service_comment_filter.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comment_parser.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comments.dart';
@@ -231,7 +232,13 @@ class MyClass {
           namedSectionParser: const BracketsStartEndNamedSectionParser(),
         );
 
-        parser.parse(highlighted, serviceComments.sources);
+        final lines = CodeLineBuilder.textToCodeLines(
+          text: example.code,
+          highlighted: highlighted,
+          commentsByLines: commentParser.getCommentsByLines(),
+        );
+
+        parser.parse(highlighted, serviceComments.sources, lines);
 
         expect(
           parser.blocks,
