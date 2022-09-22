@@ -1,19 +1,21 @@
 import 'dart:math';
 
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 
-import '../../../flutter_code_editor.dart';
+import '../../code/code_line.dart';
+import '../foldable_block.dart';
 import 'abstract.dart';
+import 'highlight.dart';
 import 'indent.dart';
 
 ///A parser for foldable blocks for python
 class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   @override
-  List<FoldableBlock> parse(
-    Result highlighted,
-    Set<Object?> serviceCommentsSources,
-    List<CodeLine> lines,
-  ) {
+  List<FoldableBlock> parse({
+    required Result highlighted,
+    required Set<Object?> serviceCommentsSources,
+    required List<CodeLine> lines,
+  }) {
     final highlightBlocks = getBlocksFromParser(
       HighlightFoldableBlockParser(),
       highlighted,
@@ -27,6 +29,15 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       lines,
     );
 
+    return _combineBlocks(highlightBlocks, indentBlocks);
+  }
+
+  /// Compares two lists of blocks and combines them into one list
+  /// with priority to highlight blocks if blocks intersect.
+  List<FoldableBlock> _combineBlocks(
+    List<FoldableBlock> highlightBlocks,
+    List<FoldableBlock> indentBlocks,
+  ) {
     if (indentBlocks.isEmpty) {
       return highlightBlocks;
     }
@@ -39,15 +50,15 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     int highlightBlockIndex = 0;
     int spacesBlockIndex = 0;
 
-    final result = List<FoldableBlock>.empty(growable: true);
+    final result = <FoldableBlock>[];
 
     for (int i = 0; i < lastLine; i++) {
       final highlightStartLine = highlightBlockIndex < highlightBlocks.length
           ? highlightBlocks[highlightBlockIndex].startLine
-          : -1;
+          : null;
       final spacesStartLine = spacesBlockIndex < indentBlocks.length
           ? indentBlocks[spacesBlockIndex].startLine
-          : -1;
+          : null;
 
       if (i == highlightStartLine && i == spacesStartLine) {
         result.add(highlightBlocks[highlightBlockIndex]);
@@ -77,9 +88,9 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     List<CodeLine> lines,
   ) {
     parser.parse(
-      highlighted,
-      serviceCommentsSources,
-      lines,
+      highlighted: highlighted,
+      serviceCommentsSources: serviceCommentsSources,
+      lines: lines,
     );
     invalidBlocks.addAll(parser.invalidBlocks);
     return parser.blocks;
@@ -95,7 +106,19 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     if (spacesBlocks.isEmpty) {
       return highlightBlocks.last.endLine;
     }
-    return max(spacesBlocks.last.endLine, highlightBlocks.last.endLine);
+
+    return max(
+      _getMaxFoldableBlockEndLine(highlightBlocks),
+      _getMaxFoldableBlockEndLine(spacesBlocks),
+    );
+  }
+
+  int _getMaxFoldableBlockEndLine(List<FoldableBlock> blocks) {
+    var maxLine = 0;
+    for (final block in blocks) {
+      maxLine = max(maxLine, block.endLine);
+    }
+    return maxLine;
   }
 
   List<bool> _findLinesContainingHighlightBlocks(
@@ -110,7 +133,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
 
     for (int i = 0; i < highlightBlocks.length; i++) {
       final currentBlock = highlightBlocks[i];
-      for (int j = currentBlock.startLine; j < currentBlock.endLine; j++) {
+      for (int j = currentBlock.startLine; j <= currentBlock.endLine; j++) {
         result[j] = true;
       }
     }

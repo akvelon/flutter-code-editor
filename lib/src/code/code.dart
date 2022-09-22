@@ -70,9 +70,9 @@ class Code {
       final parser = FoldableBlockParserFactory.provideParser(language ?? java);
 
       parser.parse(
-        highlighted,
-        serviceCommentsNodesSet,
-        lines,
+        highlighted: highlighted,
+        serviceCommentsSources: serviceCommentsNodesSet,
+        lines: lines,
       );
 
       foldableBlocks = parser.blocks;

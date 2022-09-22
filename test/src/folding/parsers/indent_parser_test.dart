@@ -1,23 +1,24 @@
-import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_code_editor/src/code/code_line_builder.dart';
+import 'package:flutter_code_editor/src/folding/foldable_block.dart';
+import 'package:flutter_code_editor/src/folding/foldable_block_type.dart';
 import 'package:flutter_code_editor/src/folding/parsers/indent.dart';
-import 'package:flutter_code_editor/src/service_comment_filter/service_comment_filter.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comment_parser.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comments.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/python.dart';
 
 void main() {
   group('SpacesFoldableBlockParser', () {
     test('parses spaces', () {
       const examples = [
+        //
         _Example(
           'Python. Empty text',
           code: '',
           expected: [],
         ),
-        //
+
         _Example(
           'Python. One nesting',
           code: '''
@@ -30,7 +31,7 @@ class Mapping:
             _FB(startLine: 1, endLine: 3, type: _T.indent),
           ],
         ),
-        //
+
         _Example(
           'Python. Several nesting',
           code: '''
@@ -49,7 +50,7 @@ class Mapping:
             _FB(startLine: 6, endLine: 7, type: _T.indent),
           ],
         ),
-        //
+
         _Example(
           'Python. Several separators at the mid',
           code: '''
@@ -75,7 +76,7 @@ class Mapping:
             _FB(startLine: 12, endLine: 14, type: _T.indent),
           ],
         ),
-        //
+
         _Example(
           'Python. Several separators at start and end',
           code: '''
@@ -99,6 +100,7 @@ class Mapping:
             _FB(startLine: 8, endLine: 9, type: _T.indent),
           ],
         ),
+
         _Example(
           'Python. Without separator lines',
           code: '''
@@ -118,7 +120,7 @@ class Foo:
             _FB(startLine: 6, endLine: 7, type: _T.indent),
           ],
         ),
-        //example with invalid indent
+
         _Example(
           'Python. Invalid indent',
           code: '''
@@ -149,11 +151,6 @@ class Mapping:
           singleLineCommentSequences: sequences,
         );
 
-        final serviceComments = ServiceCommentFilter.filter(
-          commentParser.comments,
-          namedSectionParser: const BracketsStartEndNamedSectionParser(),
-        );
-
         final codeLines = CodeLineBuilder.textToCodeLines(
           text: example.code,
           highlighted: highlighted,
@@ -161,11 +158,7 @@ class Mapping:
         );
 
         final parser = IndentFoldableBlockParser();
-        parser.parse(
-          highlighted,
-          serviceComments.map((e) => e.source).toSet(),
-          codeLines,
-        );
+        parser.parse(lines: codeLines);
         expect(
           parser.blocks,
           example.expected,

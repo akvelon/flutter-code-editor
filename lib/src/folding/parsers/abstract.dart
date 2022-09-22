@@ -1,8 +1,11 @@
 import 'package:collection/collection.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
-import '../../../flutter_code_editor.dart';
+import '../../code/code_line.dart';
+import '../foldable_block.dart';
+import '../foldable_block_type.dart';
+import '../invalid_foldable_block.dart';
 import 'line_semantics.dart';
 
 /// A base class for parsers that go through some representation
@@ -24,11 +27,11 @@ abstract class AbstractFoldableBlockParser {
   /// Used when grouping sequential imports and single line comments.
   final _linesWithSemantics = <_LineWithSemantics>[];
 
-  void parse(
-    Result highlighted,
-    Set<Object?> serviceCommentsSources,
-    List<CodeLine> lines,
-  );
+  void parse({
+    required Result highlighted,
+    required Set<Object?> serviceCommentsSources,
+    required List<CodeLine> lines,
+  });
 
   /// Records that a block has started at [line].
   @protected

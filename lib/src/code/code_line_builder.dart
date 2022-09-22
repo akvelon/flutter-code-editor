@@ -1,8 +1,9 @@
 import 'package:collection/collection.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 
-import '../../flutter_code_editor.dart';
 import '../single_line_comments/single_line_comment.dart';
+import 'code_line.dart';
+import 'tokens.dart';
 
 class CodeLineBuilder {
   static List<CodeLine> textToCodeLines({

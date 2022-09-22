@@ -1,6 +1,4 @@
-import 'dart:collection';
-
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 
 import '../../code/code_line.dart';
 import '../foldable_block.dart';
@@ -9,16 +7,14 @@ import 'abstract.dart';
 
 /// A parser for foldable blocks from lines indentation
 class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
-  static const _kSeparatorLine = -1;
-
-  final openBlocksLinesByIndent = HashMap<int, List<int>>();
+  final _openBlocksLinesByIndent = <int, int>{};
 
   @override
-  void parse(
-    Result highlighted,
-    Set<Object?> serviceCommentsSources,
-    List<CodeLine> lines,
-  ) {
+  void parse({
+    Result? highlighted,
+    Set<Object?> serviceCommentsSources = const {},
+    required List<CodeLine> lines,
+  }) {
     _addWhitespacesBlocks(lines);
     finalize();
   }
@@ -26,71 +22,77 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   void _addWhitespacesBlocks(List<CodeLine> lines) {
     final lineIndents = _calculateLineIndents(lines);
 
-    int lastValuableLine = lineIndents.length - 1;
+    int lastNonEmptyLine = lineIndents.length - 1;
 
     for (int i = 0; i < lineIndents.length - 1; i++) {
       final currentLineIndent = lineIndents[i];
 
-      if (currentLineIndent == _kSeparatorLine) {
+      if (currentLineIndent == null) {
         continue;
       }
 
-      final nextExistingIndent = lineIndents.skip(i + 1).firstWhere(
-            (element) => element != _kSeparatorLine,
-            orElse: () => _kSeparatorLine,
+      final nextNonEmptyIndent = lineIndents.skip(i + 1).firstWhere(
+            (element) => element != null,
+            orElse: () => null,
           );
 
-      if (nextExistingIndent == _kSeparatorLine) {
-        lastValuableLine = i;
+      if (nextNonEmptyIndent == null) {
+        lastNonEmptyLine = i;
         break;
-      }
-
-      if (nextExistingIndent > currentLineIndent) {
+      } else if (nextNonEmptyIndent > currentLineIndent) {
         _openBlock(currentLineIndent, i);
-      }
-
-      if (nextExistingIndent < currentLineIndent) {
-        openBlocksLinesByIndent.forEach((spacesCount, openedBlocks) {
-          if (spacesCount >= nextExistingIndent) {
-            _closeBlocks(openedBlocks, i);
-          }
-        });
-        openBlocksLinesByIndent.removeWhere(
-          (key, value) => key >= nextExistingIndent,
+      } else {
+        _openBlocksLinesByIndent.forEachInvertedWhile((spacesCount, startLine) {
+          _closeBlock(startLine, i);
+        }, executeWhile: (spacesCount, _) => spacesCount >= nextNonEmptyIndent);
+        _openBlocksLinesByIndent.removeWhere(
+          (key, value) => key >= nextNonEmptyIndent,
         );
       }
     }
-    openBlocksLinesByIndent.forEach((spacesCount, openedBlocks) {
-      _closeBlocks(openedBlocks, lastValuableLine);
+    _openBlocksLinesByIndent.forEach((spacesCount, startLine) {
+      _closeBlock(startLine, lastNonEmptyLine);
     });
   }
 
   void _openBlock(int indent, int lineIndex) {
-    if (openBlocksLinesByIndent[indent] == null) {
-      openBlocksLinesByIndent[indent] = List.empty(growable: true);
-    }
-    openBlocksLinesByIndent[indent]!.add(lineIndex);
+    _openBlocksLinesByIndent[indent] = lineIndex;
   }
 
-  void _closeBlocks(List<int> openedBlocks, int endLine) {
-    blocks.addAll(
-      openedBlocks.map(
-        (lineIndex) => FoldableBlock(
-          startLine: lineIndex,
-          endLine: endLine,
-          type: FoldableBlockType.indent,
-        ),
+  void _closeBlock(int startLine, int endLine) {
+    blocks.add(
+      FoldableBlock(
+        type: FoldableBlockType.indent,
+        startLine: startLine,
+        endLine: endLine,
       ),
     );
   }
 
-  List<int> _calculateLineIndents(List<CodeLine> lines) {
-    final result = List.filled(lines.length, 0);
+  List<int?> _calculateLineIndents(List<CodeLine> lines) {
+    final result = List<int?>.filled(lines.length, 0);
     for (int i = 0; i < lines.length; i++) {
       final line = lines[i];
-      result[i] =
-          line.indent == line.text.length ? _kSeparatorLine : line.indent;
+      result[i] = line.indent == line.text.length ? null : line.indent;
     }
     return result;
+  }
+}
+
+extension _MyMap<K, V> on Map<K, V> {
+  //for each inverted and break with condition
+  void forEachInvertedWhile(
+    void Function(K key, V value) f, {
+    required bool Function(K key, V value) executeWhile,
+  }) {
+    final keys = this.keys.toList();
+    for (int i = keys.length - 1; i >= 0; i--) {
+      if (!executeWhile(keys[i], this[keys[i]]!)) {
+        break;
+      }
+      final key = keys[i];
+      final value = this[key];
+      f(key, value!);
+    }
   }
 }
