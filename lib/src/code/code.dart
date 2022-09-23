@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
-import 'package:highlight/languages/java.dart';
 
 import '../folding/foldable_block.dart';
 import '../folding/parsers/parser_factory.dart';
@@ -64,10 +63,10 @@ class Code {
       commentsByLines: commentParser.getCommentsByLines(),
     );
 
-    if (highlighted == null) {
+    if (highlighted == null || language == null) {
       foldableBlocks = const [];
     } else {
-      final parser = FoldableBlockParserFactory.provideParser(language ?? java);
+      final parser = FoldableBlockParserFactory.provideParser(language);
 
       parser.parse(
         highlighted: highlighted,

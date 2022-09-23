@@ -9,8 +9,8 @@ import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/python.dart';
 
 void main() {
-  group('SpacesFoldableBlockParser', () {
-    test('parses spaces', () {
+  group('IndentFoldableBlockParser', () {
+    test('parses indents', () {
       const examples = [
         //
         _Example(
@@ -33,16 +33,16 @@ class Mapping:
         ),
 
         _Example(
-          'Python. Several nesting',
+          'Python. Several nesting with one space indent',
           code: '''
 class Mapping:
-    def __init__(self, iterable):
-        self.items_list = []
-        self.__update(iterable)
+ def __init__(self, iterable):
+  self.items_list = []
+  self.__update(iterable)
 
-    def update(self, iterable):
-        for item in iterable:
-            self.items_list.append(item)''',
+ def update(self, iterable):
+  for item in iterable:
+   self.items_list.append(item)''',
           expected: [
             _FB(startLine: 0, endLine: 7, type: _T.indent),
             _FB(startLine: 1, endLine: 3, type: _T.indent),
@@ -137,6 +137,37 @@ class Mapping:
             _FB(startLine: 4, endLine: 6, type: _T.indent),
           ],
         ),
+
+        _Example(
+          'Python. Different indents',
+          code: '''
+class Mapping:                                # 0
+ def __init__(self, iterable):                # 1
+        self.items_list = []                  # 2
+        self.__update(iterable)               # 3
+
+ def update(self, iterable):                  # 5
+      for item in iterable:                   # 6
+        self.items_list.append(item)          # 7''',
+          expected: [
+            _FB(startLine: 0, endLine: 7, type: _T.indent),
+            _FB(startLine: 1, endLine: 3, type: _T.indent),
+            _FB(startLine: 5, endLine: 7, type: _T.indent),
+            _FB(startLine: 6, endLine: 7, type: _T.indent),
+          ],
+        ),
+
+        _Example(
+          'Python. Multiline list',
+          code: '''
+numbers = [1, 
+    2, 
+    3, 
+    4, 
+    5
+]''',
+          expected: [_FB(startLine: 0, endLine: 4, type: _T.indent)],
+        )
       ];
 
       for (final example in examples) {

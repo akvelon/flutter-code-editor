@@ -34,6 +34,16 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
 
   /// Compares two lists of blocks and combines them into one list
   /// with priority to highlight blocks if blocks intersect.
+  /// 
+  /// Lets consider this python code for example:
+  /// a = [     # 0
+  ///     1,    # 1
+  ///     2,    # 2
+  ///     3,    # 3
+  ///     4,]   # 4
+  /// Highlight block will return [0, 4].
+  /// Indent block will return [1, 3] block.
+  /// We need to skip [1, 3] block because it is inside [0, 4] block.
   List<FoldableBlock> _combineBlocks(
     List<FoldableBlock> highlightBlocks,
     List<FoldableBlock> indentBlocks,
@@ -48,7 +58,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
         _findLinesContainingHighlightBlocks(lastLine + 1, highlightBlocks);
 
     int highlightBlockIndex = 0;
-    int spacesBlockIndex = 0;
+    int indentBlockIndex = 0;
 
     final result = <FoldableBlock>[];
 
@@ -56,14 +66,14 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       final highlightStartLine = highlightBlockIndex < highlightBlocks.length
           ? highlightBlocks[highlightBlockIndex].startLine
           : null;
-      final spacesStartLine = spacesBlockIndex < indentBlocks.length
-          ? indentBlocks[spacesBlockIndex].startLine
+      final indentsStartLine = indentBlockIndex < indentBlocks.length
+          ? indentBlocks[indentBlockIndex].startLine
           : null;
 
-      if (i == highlightStartLine && i == spacesStartLine) {
+      if (i == highlightStartLine && i == indentsStartLine) {
         result.add(highlightBlocks[highlightBlockIndex]);
         highlightBlockIndex++;
-        spacesBlockIndex++;
+        indentBlockIndex++;
         continue;
       }
 
@@ -72,9 +82,9 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
         highlightBlockIndex++;
       }
 
-      if (i == spacesStartLine && !isLinesContainsHighlightBlock[i]) {
-        result.add(indentBlocks[spacesBlockIndex]);
-        spacesBlockIndex++;
+      if (i == indentsStartLine && !isLinesContainsHighlightBlock[i]) {
+        result.add(indentBlocks[indentBlockIndex]);
+        indentBlockIndex++;
       }
     }
 
@@ -98,18 +108,18 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
 
   int _getLastLine(
     List<FoldableBlock> highlightBlocks,
-    List<FoldableBlock> spacesBlocks,
+    List<FoldableBlock> indentsBlocks,
   ) {
     if (highlightBlocks.isEmpty) {
-      return spacesBlocks.last.endLine;
+      return _getMaxFoldableBlockEndLine(indentsBlocks);
     }
-    if (spacesBlocks.isEmpty) {
-      return highlightBlocks.last.endLine;
+    if (indentsBlocks.isEmpty) {
+      return _getMaxFoldableBlockEndLine(highlightBlocks);
     }
 
     return max(
       _getMaxFoldableBlockEndLine(highlightBlocks),
-      _getMaxFoldableBlockEndLine(spacesBlocks),
+      _getMaxFoldableBlockEndLine(indentsBlocks),
     );
   }
 

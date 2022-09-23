@@ -24,21 +24,21 @@ void main() {
         _Example(
           'Python. Nesting with multiline list',
           code: '''
-class Mapping:                                # 1
-    def __init__(self, iterable):             # 2
-        self.items_list = []                  # 3
-        self.__update(iterable)               # 4
+class Mapping:                      # 0
+ def __init__(self, iterable):      # 1
+  self.items_list = []              # 2
+  self.__update(iterable)           # 3
 
-    def update(self, iterable):               # 6
-        for item in iterable:                 # 7
-            self.items_list.append(item)      # 8
+ def update(self, iterable):        # 5
+  for item in iterable:             # 6
+    self.items_list.append(item)    # 7
 
-        a = [                                 # 9
-            5,                                # 10
-            6,                                # 11
-            7,                                # 12
-            8                                 # 13
-        ]                                     # 14''',
+  a = [                             # 9
+       5,                           # 10
+       6,                           # 11
+       7,                           # 12
+       8                            # 13
+  ]                                 # 14''',
           expected: [
             _FB(startLine: 0, endLine: 14, type: _T.indent),
             _FB(startLine: 1, endLine: 3, type: _T.indent),
@@ -49,7 +49,7 @@ class Mapping:                                # 1
         ),
 
         _Example(
-          'Python. Invalid code. Removed : symbols',
+          '''Python. Invalid code. Removed ':' symbols''',
           code: '''
 class Mapping:                                   # 0
     def __init__(self, iterable)                 # 1
@@ -182,14 +182,52 @@ squareNumbers([1, 2, 3, 4, 5])                 # 9''',
           'Python. Return only highlight blocks if it does not contain indents',
           code: '''
 numbers = [1, 
-    2, 
-    3, 
-    4, 
-    5
+2,
+3, 
+4, 
+5
 ]
 squaredNumbers = [x**2 for x in numbers]
 print(squaredNumbers)''',
           expected: [_FB(startLine: 0, endLine: 5, type: _T.brackets)],
+        ),
+
+        _Example(
+          'Python. Imports form foldable block',
+          code: '''
+import math
+from math import sqrt
+from flutter import dart as language
+
+import foo
+import bar
+
+pie = math.pi
+print("The value of pi is : ",pie)''',
+          expected: [
+            _FB(startLine: 0, endLine: 5, type: _T.imports),
+          ],
+        ),
+
+        _Example(
+          'Python. Single line comments at start of file',
+          code: '''
+# This is a comment                   # 0
+# This is another comment             # 1
+# This is a third comment             # 2
+
+import math                           # 4
+from math import sqrt                 # 5
+from flutter import dart as language  # 6
+import foo                            # 7
+import bar                            # 8
+
+pie = math.pi                         # 10
+print("The value of pi is : ",pie)    # 11''',
+          expected: [
+            _FB(startLine: 0, endLine: 2, type: _T.singleLineComment),
+            _FB(startLine: 4, endLine: 8, type: _T.imports),
+          ],
         ),
       ];
 

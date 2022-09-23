@@ -15,11 +15,11 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     Set<Object?> serviceCommentsSources = const {},
     required List<CodeLine> lines,
   }) {
-    _addWhitespacesBlocks(lines);
+    _addIndentBlocks(lines);
     finalize();
   }
 
-  void _addWhitespacesBlocks(List<CodeLine> lines) {
+  void _addIndentBlocks(List<CodeLine> lines) {
     final lineIndents = _calculateLineIndents(lines);
 
     int lastNonEmptyLine = lineIndents.length - 1;
@@ -39,24 +39,30 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
       if (nextNonEmptyIndent == null) {
         lastNonEmptyLine = i;
         break;
-      } else if (nextNonEmptyIndent > currentLineIndent) {
+      } 
+      
+      if (nextNonEmptyIndent > currentLineIndent) {
         _openBlock(currentLineIndent, i);
       } else {
-        _openBlocksLinesByIndent.forEachInvertedWhile((spacesCount, startLine) {
-          _closeBlock(startLine, i);
-        }, executeWhile: (spacesCount, _) => spacesCount >= nextNonEmptyIndent);
-        _openBlocksLinesByIndent.removeWhere(
-          (key, value) => key >= nextNonEmptyIndent,
-        );
+        _closeBlocks(i, nextNonEmptyIndent);
       }
     }
-    _openBlocksLinesByIndent.forEach((spacesCount, startLine) {
+    _openBlocksLinesByIndent.forEach((indentsCount, startLine) {
       _closeBlock(startLine, lastNonEmptyLine);
     });
   }
 
   void _openBlock(int indent, int lineIndex) {
     _openBlocksLinesByIndent[indent] = lineIndex;
+  }
+
+  void _closeBlocks(int i, int nextNonEmptyIndent) {
+    _openBlocksLinesByIndent.forEachInvertedWhile((indentsCount, startLine) {
+      _closeBlock(startLine, i);
+    }, executeWhile: (indentsCount, _) => indentsCount >= nextNonEmptyIndent);
+    _openBlocksLinesByIndent.removeWhere(
+      (key, value) => key >= nextNonEmptyIndent,
+    );
   }
 
   void _closeBlock(int startLine, int endLine) {
@@ -80,7 +86,7 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
 }
 
 extension _MyMap<K, V> on Map<K, V> {
-  //for each inverted and break with condition
+  /// Iterates over the map in reverse order while [executeWhile] returns true.
   void forEachInvertedWhile(
     void Function(K key, V value) f, {
     required bool Function(K key, V value) executeWhile,
