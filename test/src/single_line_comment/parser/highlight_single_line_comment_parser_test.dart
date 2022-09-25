@@ -28,7 +28,7 @@ public class MyClass {
   text // slashed comment2 // still comment2
 }
 ''',
-        comments: const [
+        comments:[
           SingleLineComment(
             lineIndex: 0,
             characterIndex: 0,
@@ -56,7 +56,7 @@ public class MyClass { // comment
   private string str3 = "// not a comment";
 }
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 3,
             characterIndex: 49,
@@ -120,7 +120,7 @@ public class MyClass {
   text // slashed comment2 // still comment2
 }
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 0,
             characterIndex: 0,
@@ -152,7 +152,7 @@ public class MyClass { // comment
   #
 }
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 3,
             characterIndex: 49,
@@ -174,7 +174,7 @@ public class MyClass { // comment
 def fn():
   text # hash comment2 # still comment2
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 0,
             characterIndex: 0,
@@ -204,7 +204,7 @@ def fn(): # comment
   # not a comment
   """
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 0,
             characterIndex: 10,
@@ -238,7 +238,7 @@ public class MyClass {
   text // slashed comment2 // still comment2
 }
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 0,
             characterIndex: 0,
@@ -265,7 +265,7 @@ public class MyClass { // comment
   val str3 = "// not a comment";
 }
 ''',
-        comments: const [
+        comments: [
           SingleLineComment(
             lineIndex: 3,
             characterIndex: 49,

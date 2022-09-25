@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('BracketsStartEndNamedSectionParser. Parses comments', () {
-    const comments = [
+    final comments = [
       //
       SingleLineComment(lineIndex: 13, innerContent: ' no named section'),
 

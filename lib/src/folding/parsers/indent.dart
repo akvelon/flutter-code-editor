@@ -5,9 +5,10 @@ import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import 'abstract.dart';
 
-/// A parser for foldable blocks from lines indentation
+/// A parser for foldable blocks from lines indentation.
 class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
-  final _openBlocksLinesByIndent = <int, int>{};
+  Map<int, int> _openBlocksLinesByIndent = <int, int>{};
+  List<int?> _lineIndents = [];
 
   @override
   void parse({
@@ -15,51 +16,81 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     Set<Object?> serviceCommentsSources = const {},
     required List<CodeLine> lines,
   }) {
-    _addIndentBlocks(lines);
+    _parse(lines);
     finalize();
   }
 
-  void _addIndentBlocks(List<CodeLine> lines) {
-    final lineIndents = _calculateLineIndents(lines);
+  @override
+  void finalize() {
+    super.finalize();
+    _openBlocksLinesByIndent = {};
+    _lineIndents = [];
+  }
 
-    int lastNonEmptyLine = lineIndents.length - 1;
+  void _parse(List<CodeLine> lines) {
+    _lineIndents = _calculateLineIndents(lines);
+    final significantIndentIndexes =
+        _SignificantIndentIndexes.fromLineIndents(_lineIndents);
 
-    for (int i = 0; i < lineIndents.length - 1; i++) {
-      final currentLineIndent = lineIndents[i];
+    if (!significantIndentIndexes.areExist) {
+      return;
+    }
 
-      if (currentLineIndent == null) {
+    _createBlocks(significantIndentIndexes);
+    _closeAllOpenedBlocksAt(significantIndentIndexes.last!);
+  }
+
+  List<int?> _calculateLineIndents(List<CodeLine> lines) {
+    final result = List<int?>.filled(lines.length, 0);
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      result[i] = line.indent == line.text.length ? null : line.indent;
+    }
+    return result;
+  }
+
+  void _createBlocks(_SignificantIndentIndexes significantIndentIndexes) {
+    int lastExistingIndent = _lineIndents[significantIndentIndexes.first!]!;
+    int lastExistingIndentIndex = significantIndentIndexes.first!;
+
+    for (int i = significantIndentIndexes.second!;
+        i < _lineIndents.length;
+        i++) {
+      final currentLineIndent = _lineIndents[i];
+
+      if (_isSeparatorLine(currentLineIndent)) {
         continue;
       }
 
-      final nextNonEmptyIndent = lineIndents.skip(i + 1).firstWhere(
-            (element) => element != null,
-            orElse: () => null,
-          );
-
-      if (nextNonEmptyIndent == null) {
-        lastNonEmptyLine = i;
-        break;
-      } 
-      
-      if (nextNonEmptyIndent > currentLineIndent) {
-        _openBlock(currentLineIndent, i);
+      if (currentLineIndent! > lastExistingIndent) {
+        _openBlock(lastExistingIndent, lastExistingIndentIndex);
       } else {
-        _closeBlocks(i, nextNonEmptyIndent);
+        _closeBlocks(lastExistingIndentIndex, currentLineIndent);
       }
+      lastExistingIndentIndex = i;
+      lastExistingIndent = currentLineIndent;
     }
+  }
+
+  void _closeAllOpenedBlocksAt(int index) {
     _openBlocksLinesByIndent.forEach((indentsCount, startLine) {
-      _closeBlock(startLine, lastNonEmptyLine);
+      _closeBlock(startLine, index);
     });
   }
+
+  bool _isSeparatorLine(int? indent) => indent == null;
 
   void _openBlock(int indent, int lineIndex) {
     _openBlocksLinesByIndent[indent] = lineIndex;
   }
 
   void _closeBlocks(int i, int nextNonEmptyIndent) {
-    _openBlocksLinesByIndent.forEachInvertedWhile((indentsCount, startLine) {
-      _closeBlock(startLine, i);
-    }, executeWhile: (indentsCount, _) => indentsCount >= nextNonEmptyIndent);
+    _openBlocksLinesByIndent.forEachInvertedWhile(
+      (indentsCount, startLine) {
+        _closeBlock(startLine, i);
+      },
+      executeWhile: (indentsCount, _) => indentsCount >= nextNonEmptyIndent,
+    );
     _openBlocksLinesByIndent.removeWhere(
       (key, value) => key >= nextNonEmptyIndent,
     );
@@ -74,15 +105,54 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
       ),
     );
   }
+}
 
-  List<int?> _calculateLineIndents(List<CodeLine> lines) {
-    final result = List<int?>.filled(lines.length, 0);
-    for (int i = 0; i < lines.length; i++) {
-      final line = lines[i];
-      result[i] = line.indent == line.text.length ? null : line.indent;
+class _SignificantIndentIndexes {
+  late final int? first;
+  late final int? second;
+  late final int? last;
+  late final bool areExist;
+
+  _SignificantIndentIndexes.fromLineIndents(List<int?> lineIndents) {
+    first = _getNextSignificantIndentIndex(lineIndents);
+    
+    if (first == null) {
+      second = null;
+      last = null;
+      areExist = false;
+      return;
     }
-    return result;
+    
+    second = _getNextSignificantIndentIndex(
+      lineIndents,
+      startIndex: first! + 1,
+    );
+    last = _getLastExistingIndentIndex(lineIndents);
+    areExist = first != null && second != null && last != null;
   }
+
+  int? _getNextSignificantIndentIndex(
+    List<int?> indents, {
+    int startIndex = 0,
+  }) {
+    for (int i = startIndex; i < indents.length; i++) {
+      if (!_isSeparatorLine(indents[i])) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  int? _getLastExistingIndentIndex(List<int?> indents) {
+    for (int i = indents.length - 1; i >= 0; i--) {
+      if (!_isSeparatorLine(indents[i])) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  bool _isSeparatorLine(int? indent) => indent == null;
 }
 
 extension _MyMap<K, V> on Map<K, V> {

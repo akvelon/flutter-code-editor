@@ -1,4 +1,4 @@
-import 'package:flutter_code_editor/src/code/code_line_builder.dart';
+import 'package:flutter_code_editor/src/code/code_lines_builder.dart';
 import 'package:flutter_code_editor/src/folding/foldable_block.dart';
 import 'package:flutter_code_editor/src/folding/foldable_block_type.dart';
 import 'package:flutter_code_editor/src/folding/parsers/python.dart';
@@ -248,10 +248,9 @@ print("The value of pi is : ",pie)    # 11''',
           namedSectionParser: const BracketsStartEndNamedSectionParser(),
         );
 
-        final codeLines = CodeLineBuilder.textToCodeLines(
+        final codeLines = CodeLinesBuilder.textToCodeLines(
           text: example.code,
-          highlighted: highlighted,
-          commentsByLines: commentParser.getCommentsByLines(),
+          readonlyCommentsByLine: commentParser.getIfReadonlyCommentByLine(),
         );
 
         final pythonParser = PythonFoldableBlockParser().parse(

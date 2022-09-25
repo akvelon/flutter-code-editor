@@ -17,7 +17,7 @@ import '../single_line_comments/parser/single_line_comments.dart';
 import '../single_line_comments/single_line_comment.dart';
 import 'code_edit_result.dart';
 import 'code_line.dart';
-import 'code_line_builder.dart';
+import 'code_lines_builder.dart';
 import 'string.dart';
 import 'text_range.dart';
 
@@ -57,10 +57,9 @@ class Code {
     final issues = <Issue>[];
     final List<FoldableBlock> foldableBlocks;
 
-    final lines = CodeLineBuilder.textToCodeLines(
+    final lines = CodeLinesBuilder.textToCodeLines(
       text: text,
-      highlighted: highlighted,
-      commentsByLines: commentParser.getCommentsByLines(),
+      readonlyCommentsByLine: commentParser.getIfReadonlyCommentByLine(),
     );
 
     if (highlighted == null || language == null) {

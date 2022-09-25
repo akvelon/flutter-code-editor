@@ -16,13 +16,13 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     required Set<Object?> serviceCommentsSources,
     required List<CodeLine> lines,
   }) {
-    final highlightBlocks = getBlocksFromParser(
+    final highlightBlocks = _getBlocksFromParser(
       HighlightFoldableBlockParser(),
       highlighted,
       serviceCommentsSources,
       lines,
     );
-    final indentBlocks = getBlocksFromParser(
+    final indentBlocks = _getBlocksFromParser(
       IndentFoldableBlockParser(),
       highlighted,
       serviceCommentsSources,
@@ -32,9 +32,24 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     return _combineBlocks(highlightBlocks, indentBlocks);
   }
 
+  List<FoldableBlock> _getBlocksFromParser(
+    AbstractFoldableBlockParser parser,
+    Result highlighted,
+    Set<Object?> serviceCommentsSources,
+    List<CodeLine> lines,
+  ) {
+    parser.parse(
+      highlighted: highlighted,
+      serviceCommentsSources: serviceCommentsSources,
+      lines: lines,
+    );
+    invalidBlocks.addAll(parser.invalidBlocks);
+    return parser.blocks;
+  }
+
   /// Compares two lists of blocks and combines them into one list
   /// with priority to highlight blocks if blocks intersect.
-  /// 
+  ///
   /// Lets consider this python code for example:
   /// a = [     # 0
   ///     1,    # 1
@@ -54,7 +69,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
 
     final lastLine = _getLastLine(highlightBlocks, indentBlocks);
 
-    final isLinesContainsHighlightBlock =
+    final areLinesContainsHighlightBlock =
         _findLinesContainingHighlightBlocks(lastLine + 1, highlightBlocks);
 
     int highlightBlockIndex = 0;
@@ -82,28 +97,13 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
         highlightBlockIndex++;
       }
 
-      if (i == indentsStartLine && !isLinesContainsHighlightBlock[i]) {
+      if (i == indentsStartLine && !areLinesContainsHighlightBlock[i]) {
         result.add(indentBlocks[indentBlockIndex]);
         indentBlockIndex++;
       }
     }
 
     return result;
-  }
-
-  List<FoldableBlock> getBlocksFromParser(
-    AbstractFoldableBlockParser parser,
-    Result highlighted,
-    Set<Object?> serviceCommentsSources,
-    List<CodeLine> lines,
-  ) {
-    parser.parse(
-      highlighted: highlighted,
-      serviceCommentsSources: serviceCommentsSources,
-      lines: lines,
-    );
-    invalidBlocks.addAll(parser.invalidBlocks);
-    return parser.blocks;
   }
 
   int _getLastLine(
