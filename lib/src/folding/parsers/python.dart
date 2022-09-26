@@ -31,7 +31,10 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       return highlightBlocks;
     }
 
-    return _combineBlocks(highlightBlocks, indentBlocks);
+    return _combineBlocks(
+      highlightBlocks: highlightBlocks,
+      indentBlocks: indentBlocks,
+    );
   }
 
   List<FoldableBlock> _getBlocksFromParser(
@@ -59,12 +62,12 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   ///     3,    # 3
   ///     4,]   # 4
   /// Highlight block will return [0, 4].
-  /// Indent block will return [1, 3] block.
-  /// We need to skip [1, 3] block because it is inside [0, 4] block.
-  List<FoldableBlock> _combineBlocks(
-    List<FoldableBlock> highlightBlocks,
-    List<FoldableBlock> indentBlocks,
-  ) {
+  /// Indent block will return [0, 3] block.
+  /// We need to skip [0, 3] block because it is inside [0, 4] block.
+  List<FoldableBlock> _combineBlocks({
+    required List<FoldableBlock> highlightBlocks,
+    required List<FoldableBlock> indentBlocks,
+  }) {
     int highlightBlockIndex = 0;
     int indentBlockIndex = 0;
 

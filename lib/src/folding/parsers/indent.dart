@@ -7,7 +7,7 @@ import 'abstract.dart';
 
 /// A parser for foldable blocks from lines indentation.
 class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
-  Map<int, int> _openBlocksLinesByIndent = <int, int>{};
+  final Map<int, int> _openBlocksLinesByIndent = <int, int>{};
   List<int?> _linesIndents = [];
 
   @override
@@ -20,24 +20,20 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     finalize();
   }
 
-  @override
-  void finalize() {
-    super.finalize();
-    _openBlocksLinesByIndent = {};
-    _linesIndents = [];
-  }
-
   void _parse(List<CodeLine> lines) {
     _linesIndents = _calculateLinesIndents(lines);
     final significantIndentIndexes =
-        _SignificantIndentIndexes.fromLineIndents(_linesIndents);
+        _SignificantIndentIndexesBuilder.buildIfExists(_linesIndents);
 
-    if (!significantIndentIndexes.areExist) {
+    if (significantIndentIndexes == null) {
       return;
     }
 
     _createBlocks(significantIndentIndexes);
-    _closeAllOpenedBlocksAt(significantIndentIndexes.last!);
+    _closeAllOpenedBlocksAt(significantIndentIndexes.last);
+
+    _openBlocksLinesByIndent.clear();
+    _linesIndents = [];
   }
 
   List<int?> _calculateLinesIndents(List<CodeLine> lines) {
@@ -51,10 +47,10 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   }
 
   void _createBlocks(_SignificantIndentIndexes significantIndentIndexes) {
-    int lastExistingIndent = _linesIndents[significantIndentIndexes.first!]!;
-    int lastExistingIndentIndex = significantIndentIndexes.first!;
+    int lastExistingIndent = _linesIndents[significantIndentIndexes.first]!;
+    int lastExistingIndentIndex = significantIndentIndexes.first;
 
-    for (int i = significantIndentIndexes.second!;
+    for (int i = significantIndentIndexes.second;
         i < _linesIndents.length;
         i++) {
       final currentLineIndent = _linesIndents[i];
@@ -108,31 +104,30 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   }
 }
 
-class _SignificantIndentIndexes {
-  late final int? first;
-  late final int? second;
-  late final int? last;
-  late final bool areExist;
-
-  _SignificantIndentIndexes.fromLineIndents(List<int?> lineIndents) {
-    first = _getNextSignificantIndentIndex(lineIndents);
-
+class _SignificantIndentIndexesBuilder {
+  static _SignificantIndentIndexes? buildIfExists(List<int?> linesIndents) {
+    final first = _getNextSignificantIndentIndex(linesIndents);
     if (first == null) {
-      second = null;
-      last = null;
-      areExist = false;
-      return;
+      return null;
     }
 
-    second = _getNextSignificantIndentIndex(
-      lineIndents,
-      startIndex: first! + 1,
+    final second = _getNextSignificantIndentIndex(
+      linesIndents,
+      startIndex: first + 1,
     );
-    last = _getLastExistingIndentIndex(lineIndents);
-    areExist = first != null && second != null && last != null;
+    if (second == null) {
+      return null;
+    }
+
+    final last = _getLastSignificantIndentIndex(linesIndents);
+    if (last == null) {
+      return null;
+    }
+
+    return _SignificantIndentIndexes(first, second, last);
   }
 
-  int? _getNextSignificantIndentIndex(
+  static int? _getNextSignificantIndentIndex(
     List<int?> indents, {
     int startIndex = 0,
   }) {
@@ -144,7 +139,7 @@ class _SignificantIndentIndexes {
     return null;
   }
 
-  int? _getLastExistingIndentIndex(List<int?> indents) {
+  static int? _getLastSignificantIndentIndex(List<int?> indents) {
     for (int i = indents.length - 1; i >= 0; i--) {
       if (!_isSeparatorLine(indents[i])) {
         return i;
@@ -153,7 +148,15 @@ class _SignificantIndentIndexes {
     return null;
   }
 
-  bool _isSeparatorLine(int? indent) => indent == null;
+  static bool _isSeparatorLine(int? indent) => indent == null;
+}
+
+class _SignificantIndentIndexes {
+  late final int first;
+  late final int second;
+  late final int last;
+
+  _SignificantIndentIndexes(this.first, this.second, this.last);
 }
 
 extension _MyMap<K, V> on Map<K, V> {
