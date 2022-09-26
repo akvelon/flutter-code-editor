@@ -7,7 +7,7 @@ import 'abstract.dart';
 
 /// A parser for foldable blocks from lines indentation.
 class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
-  final Map<int, int> _openBlocksLinesByIndent = <int, int>{};
+  final _openBlocksLinesByIndent = <int, int>{};
   List<int?> _linesIndents = [];
 
   @override
@@ -23,7 +23,7 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   void _parse(List<CodeLine> lines) {
     _linesIndents = _calculateLinesIndents(lines);
     final significantIndentIndexes =
-        _SignificantIndentIndexesBuilder.buildIfExists(_linesIndents);
+        _SignificantIndentIndexes.fromLineIndents(_linesIndents);
 
     if (significantIndentIndexes == null) {
       return;
@@ -104,8 +104,14 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   }
 }
 
-class _SignificantIndentIndexesBuilder {
-  static _SignificantIndentIndexes? buildIfExists(List<int?> linesIndents) {
+class _SignificantIndentIndexes {
+  final int first;
+  final int second;
+  final int last;
+
+  _SignificantIndentIndexes(this.first, this.second, this.last);
+
+  static _SignificantIndentIndexes? fromLineIndents(List<int?> linesIndents) {
     final first = _getNextSignificantIndentIndex(linesIndents);
     if (first == null) {
       return null;
@@ -128,9 +134,9 @@ class _SignificantIndentIndexesBuilder {
   }
 
   static int? _getNextSignificantIndentIndex(
-    List<int?> indents, {
-    int startIndex = 0,
-  }) {
+      List<int?> indents, {
+        int startIndex = 0,
+      }) {
     for (int i = startIndex; i < indents.length; i++) {
       if (!_isSeparatorLine(indents[i])) {
         return i;
@@ -149,14 +155,6 @@ class _SignificantIndentIndexesBuilder {
   }
 
   static bool _isSeparatorLine(int? indent) => indent == null;
-}
-
-class _SignificantIndentIndexes {
-  late final int first;
-  late final int second;
-  late final int last;
-
-  _SignificantIndentIndexes(this.first, this.second, this.last);
 }
 
 extension _MyMap<K, V> on Map<K, V> {

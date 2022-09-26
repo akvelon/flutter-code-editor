@@ -60,10 +60,11 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   ///     1,    # 1
   ///     2,    # 2
   ///     3,    # 3
-  ///     4,]   # 4
-  /// Highlight block will return [0, 4].
-  /// Indent block will return [0, 3] block.
-  /// We need to skip [0, 3] block because it is inside [0, 4] block.
+  ///     4,    # 4
+  ///  ]        # 5
+  /// Highlight block will return [0, 5].
+  /// Indent block will return [0, 4] block.
+  /// We need to skip [0, 4] block because it is inside [0, 5] block.
   List<FoldableBlock> _combineBlocks({
     required List<FoldableBlock> highlightBlocks,
     required List<FoldableBlock> indentBlocks,
