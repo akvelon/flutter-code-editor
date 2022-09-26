@@ -8,7 +8,7 @@ import 'abstract.dart';
 /// A parser for foldable blocks from lines indentation.
 class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   Map<int, int> _openBlocksLinesByIndent = <int, int>{};
-  List<int?> _lineIndents = [];
+  List<int?> _linesIndents = [];
 
   @override
   void parse({
@@ -24,13 +24,13 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   void finalize() {
     super.finalize();
     _openBlocksLinesByIndent = {};
-    _lineIndents = [];
+    _linesIndents = [];
   }
 
   void _parse(List<CodeLine> lines) {
-    _lineIndents = _calculateLineIndents(lines);
+    _linesIndents = _calculateLinesIndents(lines);
     final significantIndentIndexes =
-        _SignificantIndentIndexes.fromLineIndents(_lineIndents);
+        _SignificantIndentIndexes.fromLineIndents(_linesIndents);
 
     if (!significantIndentIndexes.areExist) {
       return;
@@ -40,23 +40,24 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     _closeAllOpenedBlocksAt(significantIndentIndexes.last!);
   }
 
-  List<int?> _calculateLineIndents(List<CodeLine> lines) {
+  List<int?> _calculateLinesIndents(List<CodeLine> lines) {
     final result = List<int?>.filled(lines.length, 0);
     for (int i = 0; i < lines.length; i++) {
       final line = lines[i];
-      result[i] = line.indent == line.text.length ? null : line.indent;
+      final isSeparatorLine = line.indent == line.text.length;
+      result[i] = isSeparatorLine ? null : line.indent;
     }
     return result;
   }
 
   void _createBlocks(_SignificantIndentIndexes significantIndentIndexes) {
-    int lastExistingIndent = _lineIndents[significantIndentIndexes.first!]!;
+    int lastExistingIndent = _linesIndents[significantIndentIndexes.first!]!;
     int lastExistingIndentIndex = significantIndentIndexes.first!;
 
     for (int i = significantIndentIndexes.second!;
-        i < _lineIndents.length;
+        i < _linesIndents.length;
         i++) {
-      final currentLineIndent = _lineIndents[i];
+      final currentLineIndent = _linesIndents[i];
 
       if (_isSeparatorLine(currentLineIndent)) {
         continue;
@@ -115,14 +116,14 @@ class _SignificantIndentIndexes {
 
   _SignificantIndentIndexes.fromLineIndents(List<int?> lineIndents) {
     first = _getNextSignificantIndentIndex(lineIndents);
-    
+
     if (first == null) {
       second = null;
       last = null;
       areExist = false;
       return;
     }
-    
+
     second = _getNextSignificantIndentIndex(
       lineIndents,
       startIndex: first! + 1,

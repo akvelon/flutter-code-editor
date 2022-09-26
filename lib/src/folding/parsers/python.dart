@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:highlight/highlight_core.dart';
 
 import '../../code/code_line.dart';
@@ -28,6 +26,10 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       serviceCommentsSources,
       lines,
     );
+
+    if (indentBlocks.isEmpty) {
+      return highlightBlocks;
+    }
 
     return _combineBlocks(highlightBlocks, indentBlocks);
   }
@@ -63,91 +65,72 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     List<FoldableBlock> highlightBlocks,
     List<FoldableBlock> indentBlocks,
   ) {
-    if (indentBlocks.isEmpty) {
-      return highlightBlocks;
-    }
-
-    final lastLine = _getLastLine(highlightBlocks, indentBlocks);
-
-    final areLinesContainsHighlightBlock =
-        _findLinesContainingHighlightBlocks(lastLine + 1, highlightBlocks);
-
     int highlightBlockIndex = 0;
     int indentBlockIndex = 0;
 
     final result = <FoldableBlock>[];
 
-    for (int i = 0; i < lastLine; i++) {
-      final highlightStartLine = highlightBlockIndex < highlightBlocks.length
-          ? highlightBlocks[highlightBlockIndex].startLine
-          : null;
-      final indentsStartLine = indentBlockIndex < indentBlocks.length
-          ? indentBlocks[indentBlockIndex].startLine
-          : null;
-
-      if (i == highlightStartLine && i == indentsStartLine) {
-        result.add(highlightBlocks[highlightBlockIndex]);
-        highlightBlockIndex++;
-        indentBlockIndex++;
-        continue;
+    while (highlightBlockIndex < highlightBlocks.length ||
+        indentBlockIndex < indentBlocks.length) {
+      if (highlightBlockIndex >= highlightBlocks.length) {
+        result.addAll(indentBlocks.skip(indentBlockIndex));
+        break;
       }
 
-      if (i == highlightStartLine) {
-        result.add(highlightBlocks[highlightBlockIndex]);
-        highlightBlockIndex++;
-      }
+      final highlightBlock = highlightBlocks[highlightBlockIndex];
 
-      if (i == indentsStartLine && !areLinesContainsHighlightBlock[i]) {
-        result.add(indentBlocks[indentBlockIndex]);
+      indentBlockIndex = _addAllPossibleIndentBlocks(
+        indentBlockIndex,
+        indentBlocks,
+        highlightBlock.startLine,
+        result,
+      );
+
+      while (indentBlockIndex < indentBlocks.length &&
+          highlightBlock.includes(indentBlocks[indentBlockIndex])) {
         indentBlockIndex++;
       }
+
+      result.add(highlightBlock);
+      highlightBlockIndex++;
     }
 
     return result;
   }
 
-  int _getLastLine(
-    List<FoldableBlock> highlightBlocks,
-    List<FoldableBlock> indentsBlocks,
+  int _addAllPossibleIndentBlocks(
+    int indentBlockIndex,
+    List<FoldableBlock> indentBlocks,
+    int highlightBlockStartLine,
+    List<FoldableBlock> result,
   ) {
-    if (highlightBlocks.isEmpty) {
-      return _getMaxFoldableBlockEndLine(indentsBlocks);
-    }
-    if (indentsBlocks.isEmpty) {
-      return _getMaxFoldableBlockEndLine(highlightBlocks);
-    }
-
-    return max(
-      _getMaxFoldableBlockEndLine(highlightBlocks),
-      _getMaxFoldableBlockEndLine(indentsBlocks),
+    final indentBlocksBeforeHighlight = _getBlocksCountBeforeLineFrom(
+      startIndex: indentBlockIndex,
+      line: highlightBlockStartLine,
+      blocks: indentBlocks,
     );
+    final possibleToAddBlocks = indentBlocks.sublist(
+      indentBlockIndex,
+      indentBlockIndex + indentBlocksBeforeHighlight,
+    );
+    result.addAll(possibleToAddBlocks);
+    return indentBlockIndex + indentBlocksBeforeHighlight;
   }
 
-  int _getMaxFoldableBlockEndLine(List<FoldableBlock> blocks) {
-    var maxLine = 0;
-    for (final block in blocks) {
-      maxLine = max(maxLine, block.endLine);
-    }
-    return maxLine;
-  }
-
-  List<bool> _findLinesContainingHighlightBlocks(
-    int linesCount,
-    List<FoldableBlock> highlightBlocks,
-  ) {
-    final result = List<bool>.generate(
-      linesCount,
-      (_) => false,
-      growable: false,
-    );
-
-    for (int i = 0; i < highlightBlocks.length; i++) {
-      final currentBlock = highlightBlocks[i];
-      for (int j = currentBlock.startLine; j <= currentBlock.endLine; j++) {
-        result[j] = true;
+  int _getBlocksCountBeforeLineFrom({
+    required int startIndex,
+    required int line,
+    required List<FoldableBlock> blocks,
+  }) {
+    int result = 0;
+    for (int i = startIndex; i < blocks.length; i++) {
+      final indentBlock = blocks[i];
+      if (indentBlock.startLine < line) {
+        result++;
+      } else {
+        break;
       }
     }
-
     return result;
   }
 }

@@ -19,6 +19,10 @@ class FoldableBlock with EquatableMixin {
         endLine,
         type,
       ];
+
+  bool includes(FoldableBlock other) {
+    return startLine <= other.startLine && endLine >= other.endLine;
+  }
 }
 
 extension FoldableBlockList on List<FoldableBlock> {

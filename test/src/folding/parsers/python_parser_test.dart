@@ -229,6 +229,19 @@ print("The value of pi is : ",pie)    # 11''',
             _FB(startLine: 4, endLine: 8, type: _T.imports),
           ],
         ),
+
+        _Example(
+          'Python. Nested highlight blocks',
+          code: '''
+a = [[
+  5
+  ]
+]''',
+          expected: [
+            _FB(startLine: 0, endLine: 2, type: _T.brackets),
+            _FB(startLine: 0, endLine: 3, type: _T.brackets),
+          ],
+        ),
       ];
 
       for (final example in examples) {
