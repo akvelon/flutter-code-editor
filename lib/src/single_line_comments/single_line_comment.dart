@@ -1,5 +1,7 @@
 import 'package:meta/meta.dart';
 
+import '../code/tokens.dart';
+
 @immutable
 class SingleLineComment {
   /// Zero-based index of the first character from the beginning of the text.
@@ -19,7 +21,9 @@ class SingleLineComment {
   /// The object class is specific to the parser.
   final Object? source;
 
-  const SingleLineComment({
+  late final isReadonly = _checkIfReadonly();
+
+  SingleLineComment({
     required this.innerContent,
     required this.lineIndex,
     this.characterIndex = 0,
@@ -65,6 +69,11 @@ class SingleLineComment {
 
   @override
   String toString() => 'Line $lineIndex: "$outerContent"';
+
+  bool _checkIfReadonly() {
+    final words = innerContent.split(RegExp(r'\s+'));
+    return words.contains(Tokens.readonly);
+  }
 
   static String _cutSequence({
     required String outerContent,

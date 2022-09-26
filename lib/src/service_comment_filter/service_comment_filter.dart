@@ -17,8 +17,7 @@ class ServiceCommentFilter {
     SingleLineComment comment, {
     required AbstractNamedSectionParser? namedSectionParser,
   }) {
-    final words = _getCommentWords(comment.innerContent);
-    if (words.contains(Tokens.readonly)) {
+    if (comment.isReadonly) {
       return true;
     }
 
@@ -32,12 +31,5 @@ class ServiceCommentFilter {
     }
 
     return false;
-  }
-
-  static List<String> _getCommentWords(
-    String? comment,
-  ) {
-    // Split by any whitespaces.
-    return comment?.split(RegExp(r'\s+')) ?? const <String>[];
   }
 }

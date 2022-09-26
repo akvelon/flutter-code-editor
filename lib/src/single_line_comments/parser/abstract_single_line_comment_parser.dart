@@ -5,4 +5,13 @@ abstract class AbstractSingleLineCommentParser {
 
   Map<int, SingleLineComment> getCommentsByLines() =>
       {for (final comment in comments) comment.lineIndex: comment};
+
+
+  Map<int, bool> getIfReadonlyCommentByLine() {
+    final result = <int, bool>{};
+    for (final comment in comments) {
+      result[comment.lineIndex] = comment.isReadonly;
+    }
+    return result;
+  }
 }

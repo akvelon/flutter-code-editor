@@ -8,6 +8,9 @@ enum FoldableBlockType {
   /// ( )
   parentheses,
 
+  /// Spaces or tabs.
+  indent,
+
   multilineComment,
   singleLineComment,
   imports,

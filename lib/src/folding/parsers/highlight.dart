@@ -2,6 +2,7 @@ import 'package:charcode/ascii.dart';
 import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../code/code_line.dart';
 import '../../highlight/keyword_semantics.dart';
 import '../../highlight/node.dart';
 import '../../highlight/node_classes.dart';
@@ -31,7 +32,12 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
   /// not a comment.
   bool _foundNonWhitespace = false;
 
-  void parse(Result highlighted, Set<Object?> serviceCommentsSources) {
+  @override
+  void parse({
+    required Result highlighted,
+    required Set<Object?> serviceCommentsSources,
+    List<CodeLine> lines = const [],
+  }) {
     if (highlighted.nodes != null) {
       _processNodes(highlighted.nodes!, serviceCommentsSources);
     }

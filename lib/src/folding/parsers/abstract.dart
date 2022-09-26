@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
+import '../../code/code_line.dart';
 import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import '../invalid_foldable_block.dart';
@@ -10,7 +12,7 @@ import 'line_semantics.dart';
 /// of code to parse blocks from it.
 ///
 /// This object accumulates data in its fields as the parsing progresses.
-class AbstractFoldableBlockParser {
+abstract class AbstractFoldableBlockParser {
   /// Valid blocks by the end of the parsing.
   final blocks = <FoldableBlock>[];
 
@@ -24,6 +26,12 @@ class AbstractFoldableBlockParser {
   /// A semantics for each line.
   /// Used when grouping sequential imports and single line comments.
   final _linesWithSemantics = <_LineWithSemantics>[];
+
+  void parse({
+    required Result highlighted,
+    required Set<Object?> serviceCommentsSources,
+    required List<CodeLine> lines,
+  });
 
   /// Records that a block has started at [line].
   @protected

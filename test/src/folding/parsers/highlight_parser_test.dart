@@ -1,10 +1,14 @@
-import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_code_editor/src/folding/foldable_block.dart';
+import 'package:flutter_code_editor/src/folding/foldable_block_type.dart';
+import 'package:flutter_code_editor/src/folding/invalid_foldable_block.dart';
+import 'package:flutter_code_editor/src/folding/parsers/highlight.dart';
+import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_end.dart';
 import 'package:flutter_code_editor/src/service_comment_filter/service_comment_filter.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comment_parser.dart';
 import 'package:flutter_code_editor/src/single_line_comments/parser/single_line_comments.dart';
 import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/java.dart';
 
 void main() {
@@ -231,7 +235,10 @@ class MyClass {
           namedSectionParser: const BracketsStartEndNamedSectionParser(),
         );
 
-        parser.parse(highlighted, serviceComments.sources);
+        parser.parse(
+          highlighted: highlighted,
+          serviceCommentsSources: serviceComments.sources,
+        );
 
         expect(
           parser.blocks,

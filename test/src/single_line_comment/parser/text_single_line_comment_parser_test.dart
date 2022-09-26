@@ -17,7 +17,7 @@ text ~ tilde comment3
 'single // quotes ~ line'
 "double ~ quotes // line"
 /* multi //line comment */''';
-      const expected = [
+      final expected = [
         SingleLineComment(
           lineIndex: 0,
           characterIndex: 0,
