@@ -227,7 +227,7 @@ abstract class AbstractFoldableBlockParser {
     _startedBlocks.clear();
 
     blocks.sortByStartLine();
-    blocks.joinIntersectedBlocks();
+    blocks.joinIntersecting();
     invalidBlocks.sortByStartOrEndLine();
   }
 }

@@ -27,14 +27,17 @@ class FoldableBlock with EquatableMixin {
   }
 
   bool intersects(FoldableBlock other) {
-    final minStartLine = min(startLine, other.startLine);
-    final maxStartLine = max(startLine, other.startLine);
-    final minEndLine = min(endLine, other.endLine);
-    final maxEndLine = max(endLine, other.endLine);
-    return maxStartLine <= minEndLine &&
-        minStartLine <= maxEndLine &&
-        !includes(other) &&
-        !other.includes(this);
+    return other.endLine >= startLine &&
+        other.endLine < endLine &&
+        !includes(other);
+  }
+
+  FoldableBlock copy() {
+    return FoldableBlock(
+      startLine: startLine,
+      endLine: endLine,
+      type: type,
+    );
   }
 }
 
@@ -43,19 +46,11 @@ extension FoldableBlockList on List<FoldableBlock> {
     sort((a, b) => a.startLine - b.startLine);
   }
 
-  void joinIntersectedBlocks() {
+  void joinIntersecting() {
     if (length < 2) {
       return;
     }
 
-    _joinExistingIntersectedBlocks();
-
-    if (_containIntersectsBlocks()) {
-      joinIntersectedBlocks();
-    }
-  }
-
-  void _joinExistingIntersectedBlocks() {
     for (int i = 1; i < length; i++) {
       final currentBlock = this[i];
       final previousBlock = this[i - 1];
@@ -66,19 +61,8 @@ extension FoldableBlockList on List<FoldableBlock> {
           type: FoldableBlockType.union,
         );
         removeAt(i);
-        i--;
+        i = max(i - 2, 0);
       }
     }
-  }
-
-  bool _containIntersectsBlocks() {
-    for (int i = 1; i < length; i++) {
-      final currentBlock = this[i];
-      final previousBlock = this[i - 1];
-      if (currentBlock.intersects(previousBlock)) {
-        return true;
-      }
-    }
-    return false;
   }
 }
