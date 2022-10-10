@@ -46,6 +46,8 @@ extension FoldableBlockList on List<FoldableBlock> {
     sort((a, b) => a.startLine - b.startLine);
   }
 
+  /// Joins intersecting blocks in list.
+  /// Expected that list is sorted by start line.
   void joinIntersecting() {
     if (length < 2) {
       return;
