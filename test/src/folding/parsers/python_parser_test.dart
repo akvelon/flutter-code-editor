@@ -231,15 +231,14 @@ print("The value of pi is : ",pie)    # 11''',
         ),
 
         _Example(
-          'Python. Nested highlight blocks',
+          'Python. Nested blocks opened at the same row joined into one',
           code: '''
 a = [[
   5
   ]
 ]''',
           expected: [
-            _FB(startLine: 0, endLine: 2, type: _T.brackets),
-            _FB(startLine: 0, endLine: 3, type: _T.brackets),
+            _FB(startLine: 0, endLine: 3, type: _T.union),
           ],
         ),
       ];

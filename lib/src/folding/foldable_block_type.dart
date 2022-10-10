@@ -14,4 +14,5 @@ enum FoldableBlockType {
   multilineComment,
   singleLineComment,
   imports,
+  union,
 }
