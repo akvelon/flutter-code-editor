@@ -104,11 +104,11 @@ void main() {
     // blocks[0] and blocks[3] should be joined, but they aren't.
     test('Containing children blocks will not join', () {
       const blocks = [
-        FB(startLine: 0, endLine: 6, type: FBT.braces), // 0
-        FB(startLine: 1, endLine: 3, type: FBT.parentheses), // 1
-        FB(startLine: 4, endLine: 5, type: FBT.parentheses), // 2
-        FB(startLine: 6, endLine: 12, type: FBT.braces), // 3
-        FB(startLine: 7, endLine: 9, type: FBT.parentheses), // 4
+        FB(startLine: 0, endLine: 6, type: FBT.braces),        // 0
+        FB(startLine: 1, endLine: 3, type: FBT.parentheses),   // 1
+        FB(startLine: 4, endLine: 5, type: FBT.parentheses),   // 2
+        FB(startLine: 6, endLine: 12, type: FBT.braces),       // 3
+        FB(startLine: 7, endLine: 9, type: FBT.parentheses),   // 4
         FB(startLine: 10, endLine: 11, type: FBT.parentheses), // 5
       ];
 
