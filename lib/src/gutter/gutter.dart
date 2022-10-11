@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../code/code.dart';
 import '../line_numbers/line_number_style.dart';
+import 'error.dart';
 
+const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;
 
 const _lineNumberColumn = 0;
-const _foldingColumn = 1;
+const _issueColumn = 1;
+const _foldingColumn = 2;
 
 class GutterWidget extends StatelessWidget {
   const GutterWidget({
@@ -29,19 +32,14 @@ class GutterWidget extends StatelessWidget {
               textAlign: style.textAlign,
             ),
             const SizedBox(),
+            const SizedBox(),
           ],
         ),
     ];
 
     for (final issue in code.issues) {
-      tableRows[issue.line].children![_foldingColumn] = Container(
-        width: 10,
-        height: 10,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.red,
-        ),
-      );
+      final lineIndex = _lineIndexToTableRowIndex(issue.line);
+      tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
     }
 
     return Container(
@@ -50,11 +48,17 @@ class GutterWidget extends StatelessWidget {
       child: Table(
         columnWidths: const {
           _lineNumberColumn: FlexColumnWidth(),
+          _issueColumn: FixedColumnWidth(_issueColumnWidth),
           _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
       ),
     );
+  }
+
+  int _lineIndexToTableRowIndex(int line) {
+    // TODO(alexeyinkin): Adjust for hidden lines if any.
+    return line;
   }
 }
