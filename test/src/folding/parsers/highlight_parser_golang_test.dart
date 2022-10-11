@@ -121,16 +121,16 @@ func main() {
 
     test('Imports at beginning.', () {
       const code = '''
-package main
+package main //      0
 
-import "time"
+import "time" //     2
 /* */
 
-import "fmt"
+import "fmt" //      5
 
 /* */
 
-import "strings"
+import "strings" //  9
 
 
 func main() {}''';
@@ -164,8 +164,7 @@ import "time"
 func foo() {}
 import "fmt"
 import "strings"
-func main() {}
-''';
+func main() {}''';
       const expectedBlocks = [
         FB(startLine: 0, endLine: 1, type: FBT.imports),
         FB(startLine: 3, endLine: 4, type: FBT.imports),
