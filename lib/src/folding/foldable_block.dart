@@ -25,20 +25,6 @@ class FoldableBlock with EquatableMixin {
   bool includes(FoldableBlock other) {
     return startLine <= other.startLine && endLine >= other.endLine;
   }
-
-  bool intersects(FoldableBlock other) {
-    return other.endLine >= startLine &&
-        other.endLine < endLine &&
-        !includes(other);
-  }
-
-  FoldableBlock copy() {
-    return FoldableBlock(
-      startLine: startLine,
-      endLine: endLine,
-      type: type,
-    );
-  }
 }
 
 extension FoldableBlockList on List<FoldableBlock> {
@@ -46,6 +32,8 @@ extension FoldableBlockList on List<FoldableBlock> {
     sort((a, b) => a.startLine - b.startLine);
   }
 
+  /// Joins intersecting blocks in list.
+  /// Expected that list is sorted by start line.
   void joinIntersecting() {
     if (length < 2) {
       return;
@@ -54,7 +42,9 @@ extension FoldableBlockList on List<FoldableBlock> {
     for (int i = 1; i < length; i++) {
       final currentBlock = this[i];
       final previousBlock = this[i - 1];
-      if (currentBlock.intersects(previousBlock)) {
+      final areIntersected = previousBlock.endLine >= currentBlock.startLine &&
+          previousBlock.endLine < currentBlock.endLine;
+      if (areIntersected) {
         this[i - 1] = FoldableBlock(
           startLine: previousBlock.startLine,
           endLine: currentBlock.endLine,

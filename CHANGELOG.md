@@ -1,3 +1,7 @@
+## 0.1.0
+
+* Highlights unterminated blocks for Java and Python.
+
 ## 0.0.9
 
 * Forked https://github.com/BertrandBev/code_field
