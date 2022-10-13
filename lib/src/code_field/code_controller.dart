@@ -46,7 +46,7 @@ class CodeController extends TextEditingController {
   }
 
   final AbstractNamedSectionParser? namedSectionParser;
-  Set<String> _readOnlySectionNames;
+  final Set<String> _readOnlySectionNames;
 
   Map<String, TextStyle>? _theme;
 
@@ -316,20 +316,32 @@ class CodeController extends TextEditingController {
         return;
       }
 
-      _updateLastCodeIfChanged(editResult.fullTextAfter);
+      final isTabReplacingEnabled = modifiers.any(
+        (element) => element is TabModifier,
+      );
+      final textAfterWithoutTabs =
+          editResult.fullTextAfter.replaceAll('\t', ' ' * params.tabSpaces);
 
-      if (newValue.text != _lastCode.visibleText) {
-        // Manually typed in a text that has become a hidden range.
-        newValue = newValue.replacedText(_lastCode.visibleText);
+      if (isTabReplacingEnabled) {
+        _updateLastCodeIfChanged(textAfterWithoutTabs);
+      } else {
+        _updateLastCodeIfChanged(editResult.fullTextAfter);
       }
 
+      newValue = _updateSelectionPosition(
+        newValue,
+        editResult,
+        textAfterWithoutTabs,
+        isTabReplacingEnabled,
+      );
       // Uncomment this to see the hidden text in the console
       // as you change the visible text.
       //print('\n\n${_lastCode.text}');
     }
 
-    bool hasTextChanged = newValue.text != super.value.text;
-    bool hasSelectionChanged = newValue.selection != super.value.selection;
+    final bool hasTextChanged = newValue.text != super.value.text;
+    final bool hasSelectionChanged =
+        newValue.selection != super.value.selection;
 
     //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
     // Now fix the textfield for web
@@ -342,6 +354,7 @@ class CodeController extends TextEditingController {
     );
 
     super.value = newValue;
+
     if (hasTextChanged) {
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
@@ -349,6 +362,39 @@ class CodeController extends TextEditingController {
     } else if (hasSelectionChanged) {
       popupController.hide();
     }
+  }
+
+  TextEditingValue _updateSelectionPosition(
+    TextEditingValue newValue,
+    CodeEditResult editResult,
+    String textAfterWithoutTabs,
+    bool isTabReplacingEnabled,
+  ) {
+    final tabsSpacesDiff =
+        textAfterWithoutTabs.length - editResult.fullTextAfter.length;
+    var visibleTextsDiff = 0;
+    if (newValue.text != _lastCode.visibleText) {
+      visibleTextsDiff =
+          newValue.text.length - _lastCode.visibleText.length + tabsSpacesDiff;
+      // Manually typed in a text that has become a hidden range.
+      newValue = newValue.replacedText(_lastCode.visibleText);
+    }
+
+    if (isTabReplacingEnabled &&
+        tabsSpacesDiff != 0 &&
+        editResult.indexesChanged.length > 1) {
+      final offset = editResult.indexesChanged.end +
+          fullText.length -
+          editResult.fullTextAfter.length -
+          visibleTextsDiff;
+      newValue = newValue.copyWith(
+        selection: newValue.selection.copyWith(
+          baseOffset: offset,
+          extentOffset: offset,
+        ),
+      );
+    }
+    return newValue;
   }
 
   Code get code => _lastCode;

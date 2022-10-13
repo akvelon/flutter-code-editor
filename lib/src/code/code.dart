@@ -250,6 +250,7 @@ class Code {
       return CodeEditResult(
         fullTextAfter: text,
         linesChanged: TextRange.empty,
+        indexesChanged: visibleRangeAfter,
       );
     }
 
@@ -312,6 +313,7 @@ class Code {
     return CodeEditResult(
       fullTextAfter: fullTextAfter,
       linesChanged: linesChanged,
+      indexesChanged: visibleRangeAfter,
     );
   }
 }

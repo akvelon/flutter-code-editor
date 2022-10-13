@@ -1,6 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/java.dart';
 
 void main() {
   const snippetWithTabs = '''
@@ -22,7 +24,27 @@ public class MyClass {
 }
 ''';
 
-  bool _areIdenticalTexts(String text1, String text2) {
+  const namedSectionsWithTabs = '''
+class MyClass {
+	void readOnlyMethod() {// [START section1]
+	}// [END section1]
+	// [START section2]
+	void method() {
+	}// [END section2]
+}
+''';
+
+  const namedSectionsWithDoubleSpaces = '''
+class MyClass {
+  void readOnlyMethod() {// [START section1]
+  }// [END section1]
+  // [START section2]
+  void method() {
+  }// [END section2]
+}
+''';
+
+  bool areIdenticalTexts(String text1, String text2) {
     return text1.compareTo(text2) == 0;
   }
 
@@ -36,7 +58,7 @@ public class MyClass {
           modifiers: [const TabModifier()],
         );
         expect(
-          _areIdenticalTexts(controller.text, snippetWithDoubleSpaces),
+          areIdenticalTexts(controller.text, snippetWithDoubleSpaces),
           true,
         );
       },
@@ -51,7 +73,7 @@ public class MyClass {
           modifiers: [],
         );
         expect(
-          _areIdenticalTexts(controller.text, snippetWithDoubleSpaces),
+          areIdenticalTexts(controller.text, snippetWithDoubleSpaces),
           false,
         );
       },
@@ -68,10 +90,50 @@ public class MyClass {
           modifiers: [const TabModifier()],
         );
         expect(
-          _areIdenticalTexts(controller.text, snippetWithTripleSpaces),
+          areIdenticalTexts(controller.text, snippetWithTripleSpaces),
           true,
         );
       },
     );
+
+    test('works with several tab insertion', () {
+      final controller = CodeController(
+        text: snippetWithTabs,
+        language: java,
+        modifiers: [const TabModifier()],
+      );
+      const tabCount = 2;
+      controller.value = TextEditingValue(
+        text: snippetWithTabs + '\t' * tabCount,
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+      expect(
+        areIdenticalTexts(
+          controller.text,
+          snippetWithDoubleSpaces +
+              ' ' * controller.params.tabSpaces * tabCount,
+        ),
+        true,
+      );
+    });
+
+    test('works with insertion code containing named blocks', () {
+      final controller = CodeController(
+        text: snippetWithTabs,
+        language: java,
+        modifiers: [const TabModifier()],
+      );
+      controller.value = const TextEditingValue(
+        text: '$snippetWithDoubleSpaces\n$namedSectionsWithTabs',
+        selection: TextSelection.collapsed(offset: 0),
+      );
+      expect(
+        areIdenticalTexts(
+          controller.text,
+          '$snippetWithDoubleSpaces\n$namedSectionsWithDoubleSpaces',
+        ),
+        true,
+      );
+    });
   });
 }
