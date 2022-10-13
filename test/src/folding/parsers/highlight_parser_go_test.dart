@@ -12,12 +12,6 @@ void main() {
       _Tester.parseAndCheck(mode: go, code: '', expected: []);
     });
 
-    test('', () {
-      const code = '''
-''';
-      _Tester.parseAndCheck(mode: go, code: code, expected: []);
-    });
-
     test('Multiline pair-character blocks', () {
       const code = '''
 func (
@@ -76,7 +70,7 @@ func (
       const code = '''
 func main() {
 	a := "{[("
-	b := ")]}"
+	b := `)]}`
 }''';
       const expectedBlocks = [
         FB(startLine: 0, endLine: 3, type: FBT.braces),
