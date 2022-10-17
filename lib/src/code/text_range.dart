@@ -6,6 +6,8 @@ extension MyTextRange on TextRange {
   }
 
   bool isAfter(TextRange other) => start >= other.end;
+
+  int get length => end - start;
 }
 
 class NormalizedTextRange extends TextRange {

@@ -4,12 +4,12 @@ import 'package:flutter/widgets.dart';
 class CodeEditResult {
   final String fullTextAfter;
   final TextRange linesChanged;
-  final TextRange indexesChanged;
+  final TextRange charactersChanged;
 
   const CodeEditResult({
     required this.fullTextAfter,
     required this.linesChanged,
-    required this.indexesChanged,
+    required this.charactersChanged,
   });
 
   @override
@@ -18,7 +18,7 @@ class CodeEditResult {
 
     buffer.write('fullTextAfter: $fullTextAfter, ');
     buffer.write('linesChanged: $linesChanged');
-    buffer.write('indexesChanged: $indexesChanged');
+    buffer.write('charactersChanged: $charactersChanged');
 
     return buffer.toString();
   }
@@ -27,7 +27,7 @@ class CodeEditResult {
   int get hashCode => Object.hash(
         fullTextAfter.hashCode,
         linesChanged.hashCode,
-        indexesChanged.hashCode,
+        charactersChanged.hashCode,
       );
 
   @override
@@ -35,10 +35,6 @@ class CodeEditResult {
     return other is CodeEditResult &&
         fullTextAfter == other.fullTextAfter &&
         linesChanged == other.linesChanged &&
-        indexesChanged == other.indexesChanged;
+        charactersChanged == other.charactersChanged;
   }
-}
-
-extension TextRangeExtension on TextRange {
-  int get length => end - start;
 }

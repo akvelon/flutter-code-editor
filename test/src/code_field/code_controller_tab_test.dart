@@ -26,11 +26,11 @@ public class MyClass {
 
   const namedSectionsWithTabs = '''
 class MyClass {
-	void readOnlyMethod() {// [START section1]
-	}// [END section1]
-	// [START section2]
-	void method() {
-	}// [END section2]
+\tvoid readOnlyMethod() {// [START section1]
+\t}// [END section1]
+\t// [START section2]
+\tvoid method() {
+\t}// [END section2]
 }
 ''';
 
@@ -103,10 +103,12 @@ class MyClass {
         modifiers: [const TabModifier()],
       );
       const tabCount = 2;
+
       controller.value = TextEditingValue(
         text: snippetWithTabs + '\t' * tabCount,
         selection: const TextSelection.collapsed(offset: 0),
       );
+
       expect(
         areIdenticalTexts(
           controller.text,
@@ -117,23 +119,44 @@ class MyClass {
       );
     });
 
-    test('works with insertion code containing named blocks', () {
+    test('works with inserting code containing named sections', () {
       final controller = CodeController(
         text: snippetWithTabs,
         language: java,
         modifiers: [const TabModifier()],
       );
+
       controller.value = const TextEditingValue(
-        text: '$snippetWithDoubleSpaces\n$namedSectionsWithTabs',
+        text: '$snippetWithDoubleSpaces$namedSectionsWithTabs',
         selection: TextSelection.collapsed(offset: 0),
       );
+
+      const text = '$snippetWithDoubleSpaces$namedSectionsWithDoubleSpaces';
       expect(
         areIdenticalTexts(
           controller.text,
-          '$snippetWithDoubleSpaces\n$namedSectionsWithDoubleSpaces',
+          text,
         ),
         true,
       );
+      expect(controller.value.selection.end, text.length);
+    });
+
+    test('sets correct selection when selection stands after tabs', () {
+      final controller = CodeController(
+        text: snippetWithTabs,
+        language: java,
+        modifiers: [const TabModifier()],
+      );
+
+      controller.value = const TextEditingValue(
+        text: '$snippetWithDoubleSpaces$namedSectionsWithTabs',
+        selection:
+            TextSelection.collapsed(offset: snippetWithDoubleSpaces.length - 1),
+      );
+
+      const text = '$snippetWithDoubleSpaces$namedSectionsWithDoubleSpaces';
+      expect(controller.value.selection.end, text.length);
     });
   });
 }

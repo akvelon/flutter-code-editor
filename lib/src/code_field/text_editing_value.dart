@@ -88,4 +88,8 @@ extension MyTextEditingValue on TextEditingValue {
       selection: TextSelection.collapsed(offset: rangeAfter.start),
     );
   }
+
+  TextEditingValue setSelection(int selection) {
+    return copyWith(selection: TextSelection.collapsed(offset: selection));
+  }
 }

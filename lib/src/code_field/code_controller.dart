@@ -8,6 +8,7 @@ import 'package:highlight/highlight_core.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code.dart';
 import '../code/code_edit_result.dart';
+import '../code/text_range.dart';
 import '../code_field/text_editing_value.dart';
 import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
@@ -78,6 +79,8 @@ class CodeController extends TextEditingController {
   /// A list of code modifiers to dynamically update the code upon certain keystrokes
   final List<CodeModifier> modifiers;
 
+  final bool _isTabReplacingEnabled;
+
   /// On web, replace spaces with invisible dots “·” to fix the current issue with spaces
   ///
   /// https://github.com/flutter/flutter/issues/77929
@@ -119,7 +122,8 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
-        _lastCode = Code.empty {
+        _lastCode = Code.empty,
+        _isTabReplacingEnabled = modifiers.any((m) => m is TabModifier) {
     this.language = language;
     _updateLastCode(text ?? '');
     fullText = text ?? '';
@@ -316,32 +320,17 @@ class CodeController extends TextEditingController {
         return;
       }
 
-      final isTabReplacingEnabled = modifiers.any(
-        (element) => element is TabModifier,
-      );
-      final textAfterWithoutTabs =
-          editResult.fullTextAfter.replaceAll('\t', ' ' * params.tabSpaces);
-
-      if (isTabReplacingEnabled) {
-        _updateLastCodeIfChanged(textAfterWithoutTabs);
-      } else {
-        _updateLastCodeIfChanged(editResult.fullTextAfter);
-      }
-
-      newValue = _updateSelectionPosition(
+      newValue = _updateCodeAndSetSelection(
         newValue,
         editResult,
-        textAfterWithoutTabs,
-        isTabReplacingEnabled,
       );
       // Uncomment this to see the hidden text in the console
       // as you change the visible text.
       //print('\n\n${_lastCode.text}');
     }
 
-    final bool hasTextChanged = newValue.text != super.value.text;
-    final bool hasSelectionChanged =
-        newValue.selection != super.value.selection;
+    bool hasTextChanged = newValue.text != super.value.text;
+    bool hasSelectionChanged = newValue.selection != super.value.selection;
 
     //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
     // Now fix the textfield for web
@@ -364,12 +353,18 @@ class CodeController extends TextEditingController {
     }
   }
 
-  TextEditingValue _updateSelectionPosition(
+  TextEditingValue _updateCodeAndSetSelection(
     TextEditingValue newValue,
     CodeEditResult editResult,
-    String textAfterWithoutTabs,
-    bool isTabReplacingEnabled,
   ) {
+    final textAfterWithoutTabs =
+        editResult.fullTextAfter.replaceAll('\t', ' ' * params.tabSpaces);
+
+    if (_isTabReplacingEnabled) {
+      _updateLastCodeIfChanged(textAfterWithoutTabs);
+    } else {
+      _updateLastCodeIfChanged(editResult.fullTextAfter);
+    }
     final tabsSpacesDiff =
         textAfterWithoutTabs.length - editResult.fullTextAfter.length;
     var visibleTextsDiff = 0;
@@ -380,21 +375,34 @@ class CodeController extends TextEditingController {
       newValue = newValue.replacedText(_lastCode.visibleText);
     }
 
-    if (isTabReplacingEnabled &&
-        tabsSpacesDiff != 0 &&
-        editResult.indexesChanged.length > 1) {
-      final offset = editResult.indexesChanged.end +
+    if (!_isTabReplacingEnabled) {
+      return newValue;
+    }
+
+    final tabsHaveBeenReplaced =
+        tabsSpacesDiff != 0 && editResult.charactersChanged.length > 1;
+    if (tabsHaveBeenReplaced) {
+      final sameSuffixLength = _getSameSuffixLength(newValue);
+      final selection = editResult.charactersChanged.end +
           fullText.length -
           editResult.fullTextAfter.length -
-          visibleTextsDiff;
-      newValue = newValue.copyWith(
-        selection: newValue.selection.copyWith(
-          baseOffset: offset,
-          extentOffset: offset,
-        ),
-      );
+          visibleTextsDiff +
+          sameSuffixLength;
+      newValue = newValue.setSelection(selection);
     }
     return newValue;
+  }
+
+  int _getSameSuffixLength(TextEditingValue newValue) {
+    int lastNewChar = newValue.text.length - 1;
+    int lastOldChar = value.text.length - 1;
+    int sameCharsCount = 0;
+    while (newValue.text[lastNewChar] == value.text[lastOldChar]) {
+      sameCharsCount++;
+      lastNewChar--;
+      lastOldChar--;
+    }
+    return sameCharsCount;
   }
 
   Code get code => _lastCode;
