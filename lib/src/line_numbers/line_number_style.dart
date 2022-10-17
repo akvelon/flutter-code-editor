@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// TODO(alexeyinkin): Rename to GutterStyle when we break compatibility.
 class LineNumberStyle {
   /// Width of the line number column.
   final double width;

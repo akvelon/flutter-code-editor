@@ -97,8 +97,8 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     blocks.add(
       FoldableBlock(
         type: FoldableBlockType.indent,
-        startLine: startLine,
-        endLine: endLine,
+        firstLine: startLine,
+        lastLine: endLine,
       ),
     );
   }

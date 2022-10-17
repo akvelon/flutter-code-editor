@@ -24,8 +24,8 @@ class MyClass(var myVar1: Int,
   }
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 8, type: FBT.union),
-        FB(startLine: 3, endLine: 7, type: FBT.union),
+        FB(firstLine: 0, lastLine: 8, type: FBT.union),
+        FB(firstLine: 3, lastLine: 7, type: FBT.union),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -36,7 +36,7 @@ class MyClass() {
   def main() = {}
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 2, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 2, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -73,8 +73,8 @@ class MyClass() {
 /// {                    5
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 6, type: FBT.braces),
-        FB(startLine: 2, endLine: 4, type: FBT.multilineComment),
+        FB(firstLine: 0, lastLine: 6, type: FBT.braces),
+        FB(firstLine: 2, lastLine: 4, type: FBT.multilineComment),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -98,10 +98,10 @@ def method2 // Not the only thing in the line        10
 // Single                                            14
 // Single                                            15''';
       const expected = [
-        FB(startLine: 0, endLine: 1, type: FBT.singleLineComment),
-        FB(startLine: 2, endLine: 13, type: FBT.braces),
-        FB(startLine: 4, endLine: 6, type: FBT.singleLineComment),
-        FB(startLine: 14, endLine: 15, type: FBT.singleLineComment),
+        FB(firstLine: 0, lastLine: 1, type: FBT.singleLineComment),
+        FB(firstLine: 2, lastLine: 13, type: FBT.braces),
+        FB(firstLine: 4, lastLine: 6, type: FBT.singleLineComment),
+        FB(firstLine: 14, lastLine: 15, type: FBT.singleLineComment),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -120,9 +120,9 @@ import users.{UserPreferences => UPrefs} // import and rename for convenience   
 
 class MyClass() {} //                                                           10 ''';
       const expected = [
-        FB(startLine: 0, endLine: 2, type: FBT.imports),
-        FB(startLine: 3, endLine: 5, type: FBT.multilineComment),
-        FB(startLine: 6, endLine: 8, type: FBT.imports),
+        FB(firstLine: 0, lastLine: 2, type: FBT.imports),
+        FB(firstLine: 3, lastLine: 5, type: FBT.multilineComment),
+        FB(firstLine: 6, lastLine: 8, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -136,8 +136,8 @@ class MyClass() {}
 import users.User  // import the class User
 import users.{ User, UserPreferences}  // Only imports selected members''';
       const expected = [
-        FB(startLine: 1, endLine: 2, type: FBT.imports),
-        FB(startLine: 4, endLine: 5, type: FBT.imports),
+        FB(firstLine: 1, lastLine: 2, type: FBT.imports),
+        FB(firstLine: 4, lastLine: 5, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -152,7 +152,7 @@ import users.{
   UserPreferences
 }  // Only imports selected members''';
       const expected = [
-        FB(startLine: 0, endLine: 4, type: FBT.union),
+        FB(firstLine: 0, lastLine: 4, type: FBT.union),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -165,8 +165,8 @@ def method() = {
 // comment
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 4, type: FBT.braces),
-        FB(startLine: 1, endLine: 2, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 4, type: FBT.braces),
+        FB(firstLine: 1, lastLine: 2, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -178,7 +178,7 @@ class MyClass() {
 // [END section2]
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 3, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 3, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -193,8 +193,8 @@ object IdFactory {
   }
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 6, type: FBT.braces),
-        FB(startLine: 2, endLine: 5, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 6, type: FBT.braces),
+        FB(firstLine: 2, lastLine: 5, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -206,7 +206,7 @@ object Main {
     println("Hello, Scala developer!")
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 3, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 3, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -221,7 +221,7 @@ val list: List[Any] = List(
   () => "an anonymous function returning a string"
 )''';
       const expected = [
-        FB(startLine: 0, endLine: 6, type: FBT.parentheses),
+        FB(firstLine: 0, lastLine: 6, type: FBT.parentheses),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -234,7 +234,7 @@ def matchTest(x: Int): String = x match {
   case _ => "other"
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 4, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 4, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });

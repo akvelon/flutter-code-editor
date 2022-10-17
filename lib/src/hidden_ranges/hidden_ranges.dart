@@ -17,26 +17,16 @@ class HiddenRanges {
   final List<HiddenRange> ranges;
   final int textLength;
 
-  factory HiddenRanges({
-    required List<HiddenRange> ranges,
-    required int textLength,
-  }) {
-    assert(
-      _areSortedAndNotOverlapping(ranges),
-      'Texts must be sorted and not overlap',
-    );
-
-    final nonEmptyRanges =
-        ranges.where((r) => r.text != '').toList(growable: false);
-
-    return HiddenRanges._(
-      hiddenCharactersBeforeRanges: _getHiddenCharactersBeforeRanges(
-        nonEmptyRanges,
-      ),
-      ranges: nonEmptyRanges,
-      textLength: textLength,
-    );
-  }
+  HiddenRanges({
+    required this.ranges,
+    required this.textLength,
+  })  : assert(
+          _areSortedAndNotOverlapping(ranges),
+          'Texts must be sorted and not overlap',
+        ),
+        hiddenCharactersBeforeRanges = _getHiddenCharactersBeforeRanges(
+          ranges,
+        );
 
   const HiddenRanges._({
     required this.hiddenCharactersBeforeRanges,
@@ -50,9 +40,9 @@ class HiddenRanges {
     textLength: 0,
   );
 
-  static bool _areSortedAndNotOverlapping(List<HiddenRange> texts) {
-    for (int i = texts.length; --i >= 1;) {
-      if (!texts[i].isAfter(texts[i - 1])) {
+  static bool _areSortedAndNotOverlapping(List<HiddenRange> ranges) {
+    for (int i = ranges.length; --i >= 1;) {
+      if (!ranges[i].isAfter(ranges[i - 1])) {
         return false;
       }
     }
@@ -65,7 +55,7 @@ class HiddenRanges {
     final result = List.filled(ranges.length + 1, 0);
 
     for (int i = 1; i <= ranges.length; i++) {
-      sum += ranges[i - 1].text.length;
+      sum += ranges[i - 1].length;
       result[i] = sum;
     }
 
@@ -75,7 +65,7 @@ class HiddenRanges {
   /// Cuts the hidden ranges from [str].
   ///
   /// [str] is considered a substring of a full text, starting at [start].
-  String cutString(String str, {required int start}) {
+  String cutString(String str, {int start = 0}) {
     if (ranges.isEmpty || str == '') {
       return str;
     }
@@ -128,7 +118,11 @@ class HiddenRanges {
   }
 
   /// Cuts hidden ranges from [highlighted].
-  Result cutHighlighted(Result highlighted) {
+  Result? cutHighlighted(Result? highlighted) {
+    if (highlighted == null) {
+      return null;
+    }
+
     int fullChar = 0;
 
     String? _cutString(String? nodeValue) {

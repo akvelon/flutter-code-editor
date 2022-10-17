@@ -60,8 +60,8 @@ abstract class AbstractFoldableBlockParser {
     if (line != started.line) {
       blocks.add(
         FoldableBlock(
-          startLine: started.line,
-          endLine: line,
+          firstLine: started.line,
+          lastLine: line,
           type: type,
         ),
       );
@@ -108,8 +108,8 @@ abstract class AbstractFoldableBlockParser {
 
       blocks.add(
         FoldableBlock(
-          startLine: first,
-          endLine: last!,
+          firstLine: first,
+          lastLine: last!,
           type: FoldableBlockType.imports,
         ),
       );
@@ -173,8 +173,8 @@ abstract class AbstractFoldableBlockParser {
 
       blocks.add(
         FoldableBlock(
-          startLine: first,
-          endLine: last!,
+          firstLine: first,
+          lastLine: last!,
           type: FoldableBlockType.singleLineComment,
         ),
       );

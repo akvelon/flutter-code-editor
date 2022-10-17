@@ -40,11 +40,11 @@ class Mapping:                      # 0
        8                            # 13
   ]                                 # 14''',
           expected: [
-            _FB(startLine: 0, endLine: 14, type: _T.indent),
-            _FB(startLine: 1, endLine: 3, type: _T.indent),
-            _FB(startLine: 5, endLine: 14, type: _T.indent),
-            _FB(startLine: 6, endLine: 7, type: _T.indent),
-            _FB(startLine: 9, endLine: 14, type: _T.brackets),
+            _FB(firstLine: 0, lastLine: 14, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 5, lastLine: 14, type: _T.indent),
+            _FB(firstLine: 6, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 9, lastLine: 14, type: _T.brackets),
           ],
         ),
 
@@ -67,11 +67,11 @@ class Mapping:                                   # 0
             8,
         ]                                        # 14''',
           expected: [
-            _FB(startLine: 0, endLine: 14, type: _T.indent),
-            _FB(startLine: 1, endLine: 3, type: _T.indent),
-            _FB(startLine: 5, endLine: 14, type: _T.indent),
-            _FB(startLine: 6, endLine: 7, type: _T.indent),
-            _FB(startLine: 9, endLine: 14, type: _T.brackets),
+            _FB(firstLine: 0, lastLine: 14, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 5, lastLine: 14, type: _T.indent),
+            _FB(firstLine: 6, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 9, lastLine: 14, type: _T.brackets),
           ],
         ),
 
@@ -91,11 +91,11 @@ class Mapping:                               # 0
             ],                               # 10
             ]                                # 11''',
           expected: [
-            _FB(startLine: 0, endLine: 11, type: _T.indent),
-            _FB(startLine: 1, endLine: 11, type: _T.indent),
-            _FB(startLine: 2, endLine: 11, type: _T.brackets),
-            _FB(startLine: 3, endLine: 6, type: _T.brackets),
-            _FB(startLine: 7, endLine: 10, type: _T.brackets),
+            _FB(firstLine: 0, lastLine: 11, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 11, type: _T.indent),
+            _FB(firstLine: 2, lastLine: 11, type: _T.brackets),
+            _FB(firstLine: 3, lastLine: 6, type: _T.brackets),
+            _FB(firstLine: 7, lastLine: 10, type: _T.brackets),
           ],
         ),
 
@@ -125,14 +125,14 @@ class Mapping:                               # 0
             ],                               # 20
         ]                                    # 21''',
           expected: [
-            _FB(startLine: 0, endLine: 21, type: _T.indent),
-            _FB(startLine: 1, endLine: 21, type: _T.indent),
-            _FB(startLine: 2, endLine: 21, type: _T.brackets),
-            _FB(startLine: 3, endLine: 9, type: _T.brackets),
-            _FB(startLine: 4, endLine: 6, type: _T.singleLineComment),
-            _FB(startLine: 10, endLine: 13, type: _T.brackets),
-            _FB(startLine: 14, endLine: 20, type: _T.brackets),
-            _FB(startLine: 17, endLine: 19, type: _T.singleLineComment),
+            _FB(firstLine: 0, lastLine: 21, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 21, type: _T.indent),
+            _FB(firstLine: 2, lastLine: 21, type: _T.brackets),
+            _FB(firstLine: 3, lastLine: 9, type: _T.brackets),
+            _FB(firstLine: 4, lastLine: 6, type: _T.singleLineComment),
+            _FB(firstLine: 10, lastLine: 13, type: _T.brackets),
+            _FB(firstLine: 14, lastLine: 20, type: _T.brackets),
+            _FB(firstLine: 17, lastLine: 19, type: _T.singleLineComment),
           ],
         ),
 
@@ -154,8 +154,8 @@ class Mapping:
         # [END section1]
         a = 5''',
           expected: [
-            _FB(startLine: 0, endLine: 4, type: _T.indent),
-            _FB(startLine: 1, endLine: 4, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 4, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 4, type: _T.indent),
           ],
         ),
 
@@ -173,8 +173,8 @@ def squareNumbers(numbers):                    # 4
 printAgeType(19)                               # 8
 squareNumbers([1, 2, 3, 4, 5])                 # 9''',
           expected: [
-            _FB(startLine: 0, endLine: 2, type: _T.indent),
-            _FB(startLine: 4, endLine: 6, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 2, type: _T.indent),
+            _FB(firstLine: 4, lastLine: 6, type: _T.indent),
           ],
         ),
 
@@ -189,7 +189,7 @@ numbers = [1,
 ]
 squaredNumbers = [x**2 for x in numbers]
 print(squaredNumbers)''',
-          expected: [_FB(startLine: 0, endLine: 5, type: _T.brackets)],
+          expected: [_FB(firstLine: 0, lastLine: 5, type: _T.brackets)],
         ),
 
         _Example(
@@ -205,7 +205,7 @@ import bar
 pie = math.pi
 print("The value of pi is : ",pie)''',
           expected: [
-            _FB(startLine: 0, endLine: 5, type: _T.imports),
+            _FB(firstLine: 0, lastLine: 5, type: _T.imports),
           ],
         ),
 
@@ -225,8 +225,8 @@ import bar                            # 8
 pie = math.pi                         # 10
 print("The value of pi is : ",pie)    # 11''',
           expected: [
-            _FB(startLine: 0, endLine: 2, type: _T.singleLineComment),
-            _FB(startLine: 4, endLine: 8, type: _T.imports),
+            _FB(firstLine: 0, lastLine: 2, type: _T.singleLineComment),
+            _FB(firstLine: 4, lastLine: 8, type: _T.imports),
           ],
         ),
 
@@ -238,7 +238,7 @@ a = [[
   ]
 ]''',
           expected: [
-            _FB(startLine: 0, endLine: 3, type: _T.union),
+            _FB(firstLine: 0, lastLine: 3, type: _T.union),
           ],
         ),
       ];

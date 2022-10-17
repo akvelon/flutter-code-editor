@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../code/code.dart';
+import '../code_field/code_controller.dart';
 import '../line_numbers/line_number_style.dart';
 import 'error.dart';
+import 'fold_toggle.dart';
 
 const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;
@@ -13,15 +14,24 @@ const _foldingColumn = 2;
 
 class GutterWidget extends StatelessWidget {
   const GutterWidget({
-    required this.code,
+    required this.codeController,
     required this.style,
   });
 
-  final Code code;
+  final CodeController codeController;
   final LineNumberStyle style;
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: codeController,
+      builder: _buildOnChanged,
+    );
+  }
+
+  Widget _buildOnChanged(BuildContext context, Widget? child) {
+    final code = codeController.code;
+
     final tableRows = [
       for (int i = 1; i <= code.lines.length; i++)
         TableRow(
@@ -42,6 +52,19 @@ class GutterWidget extends StatelessWidget {
       tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
     }
 
+    for (final block in code.foldableBlocks) {
+      final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
+      final isFolded = code.foldedBlocks.contains(block);
+
+      tableRows[lineIndex].children![_foldingColumn] = FoldToggle(
+        color: style.textStyle?.color,
+        isFolded: isFolded,
+        onTap: isFolded
+            ? () => codeController.unfoldAt(block.firstLine)
+            : () => codeController.foldAt(block.firstLine),
+      );
+    }
+
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
       width: style.width,
@@ -58,7 +81,7 @@ class GutterWidget extends StatelessWidget {
   }
 
   int _lineIndexToTableRowIndex(int line) {
-    // TODO(alexeyinkin): Adjust for hidden lines if any.
+    // TODO(alexeyinkin): Adjust for hidden lines if any, https://github.com/akvelon/flutter-code-editor/issues/58
     return line;
   }
 }

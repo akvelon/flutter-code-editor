@@ -5,31 +5,33 @@ import 'package:equatable/equatable.dart';
 import 'foldable_block_type.dart';
 
 class FoldableBlock with EquatableMixin {
-  final int startLine;
-  final int endLine;
+  final int firstLine;
+  final int lastLine;
   final FoldableBlockType type;
 
   const FoldableBlock({
-    required this.startLine,
-    required this.endLine,
+    required this.firstLine,
+    required this.lastLine,
     required this.type,
   });
 
   @override
   List<Object?> get props => [
-        startLine,
-        endLine,
+        firstLine,
+        lastLine,
         type,
       ];
 
   bool includes(FoldableBlock other) {
-    return startLine <= other.startLine && endLine >= other.endLine;
+    return firstLine <= other.firstLine && lastLine >= other.lastLine;
   }
+
+  int get lineCount => lastLine - firstLine + 1;
 }
 
 extension FoldableBlockList on List<FoldableBlock> {
   void sortByStartLine() {
-    sort((a, b) => a.startLine - b.startLine);
+    sort((a, b) => a.firstLine - b.firstLine);
   }
 
   /// Joins intersecting blocks in list.
@@ -42,12 +44,12 @@ extension FoldableBlockList on List<FoldableBlock> {
     for (int i = 1; i < length; i++) {
       final currentBlock = this[i];
       final previousBlock = this[i - 1];
-      final areIntersected = previousBlock.endLine >= currentBlock.startLine &&
-          previousBlock.endLine < currentBlock.endLine;
+      final areIntersected = previousBlock.lastLine >= currentBlock.firstLine &&
+          previousBlock.lastLine < currentBlock.lastLine;
       if (areIntersected) {
         this[i - 1] = FoldableBlock(
-          startLine: previousBlock.startLine,
-          endLine: currentBlock.endLine,
+          firstLine: previousBlock.firstLine,
+          lastLine: currentBlock.lastLine,
           type: FoldableBlockType.union,
         );
         removeAt(i);

@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../folding/foldable_block.dart';
+import '../folding/foldable_block_matcher.dart';
 import '../folding/parsers/parser_factory.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
+import '../hidden_ranges/hidden_ranges_builder.dart';
 import '../issues/issue.dart';
 import '../named_sections/named_section.dart';
 import '../named_sections/parsers/abstract.dart';
@@ -24,7 +26,9 @@ import 'text_range.dart';
 class Code {
   final String text;
   final List<FoldableBlock> foldableBlocks;
+  final Set<FoldableBlock> foldedBlocks;
   final HiddenRanges hiddenRanges;
+  final HiddenRangesBuilder hiddenRangesBuilder;
   final Result? highlighted;
   final List<Issue> issues;
   final List<CodeLine> lines;
@@ -89,29 +93,35 @@ class Code {
       readOnlySectionNames: readOnlySectionNames,
     );
 
-    final hiddenRanges = HiddenRanges(
-      ranges: _commentsToHiddenRanges(serviceComments),
+    final hiddenRangesBuilder = HiddenRangesBuilder.fromMaps(
+      {
+        int: _commentsToHiddenRanges(serviceComments),
+      },
       textLength: text.length,
     );
+    final hiddenRanges = hiddenRangesBuilder.ranges;
 
     return Code._(
       text: text,
       foldableBlocks: foldableBlocks,
+      foldedBlocks: {},
       hiddenRanges: hiddenRanges,
+      hiddenRangesBuilder: hiddenRangesBuilder,
       highlighted: highlighted,
       issues: issues,
       lines: lines,
       namedSections: sectionsMap,
-      visibleHighlighted:
-          highlighted == null ? null : hiddenRanges.cutHighlighted(highlighted),
-      visibleText: hiddenRanges.cutString(text, start: 0),
+      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
+      visibleText: hiddenRanges.cutString(text),
     );
   }
 
   const Code._({
     required this.text,
     required this.foldableBlocks,
+    required this.foldedBlocks,
     required this.hiddenRanges,
+    required this.hiddenRangesBuilder,
     required this.highlighted,
     required this.issues,
     required this.lines,
@@ -123,7 +133,9 @@ class Code {
   static const empty = Code._(
     text: '',
     foldableBlocks: [],
+    foldedBlocks: {},
     hiddenRanges: HiddenRanges.empty,
+    hiddenRangesBuilder: HiddenRangesBuilder.empty,
     highlighted: null,
     issues: [],
     lines: [],
@@ -152,14 +164,14 @@ class Code {
     }
   }
 
-  static List<HiddenRange> _commentsToHiddenRanges(
+  static Map<int, HiddenRange> _commentsToHiddenRanges(
     Iterable<SingleLineComment> comments,
   ) {
-    return comments
-        .map(
-          (c) => HiddenRange.fromStartAndText(c.characterIndex, c.outerContent),
-        )
-        .toList(growable: false);
+    return <int, HiddenRange>{
+      for (final comment in comments)
+        comment.characterIndex: HiddenRange.fromStartAndText(
+            comment.characterIndex, comment.outerContent),
+    };
   }
 
   /// Returns the 0-based line number of the character at [characterIndex].
@@ -312,6 +324,107 @@ class Code {
     return CodeEditResult(
       fullTextAfter: fullTextAfter,
       linesChanged: linesChanged,
+    );
+  }
+
+  Code foldedAt(int line) {
+    final block = _getFoldableBlockByStartLine(line);
+    if (block == null || foldedBlocks.contains(block)) {
+      return this;
+    }
+
+    final hiddenRange = foldableBlockToHiddenRange(block);
+    final newHiddenRangesBuilder = hiddenRangesBuilder.copyWithRange(
+      block,
+      hiddenRange,
+    );
+    final newHiddenRanges = newHiddenRangesBuilder.ranges;
+
+    return Code._(
+      text: text,
+      foldableBlocks: foldableBlocks,
+      foldedBlocks: {...foldedBlocks, block},
+      hiddenRanges: newHiddenRanges,
+      hiddenRangesBuilder: newHiddenRangesBuilder,
+      highlighted: highlighted,
+      issues: issues,
+      lines: lines,
+      namedSections: namedSections,
+      visibleHighlighted: newHiddenRanges.cutHighlighted(highlighted),
+      visibleText: newHiddenRanges.cutString(text),
+    );
+  }
+
+  Code unfoldedAt(int line) {
+    final block = _getFoldableBlockByStartLine(line);
+    if (block == null || !foldedBlocks.contains(block)) {
+      return this;
+    }
+
+    final newHiddenRangesBuilder = hiddenRangesBuilder.copyWithoutRange(block);
+    final newHiddenRanges = newHiddenRangesBuilder.ranges;
+
+    return Code._(
+      text: text,
+      foldableBlocks: foldableBlocks,
+      foldedBlocks: {...foldedBlocks}..remove(block),
+      hiddenRanges: newHiddenRanges,
+      hiddenRangesBuilder: newHiddenRangesBuilder,
+      highlighted: highlighted,
+      issues: issues,
+      lines: lines,
+      namedSections: namedSections,
+      visibleHighlighted: newHiddenRanges.cutHighlighted(highlighted),
+      visibleText: newHiddenRanges.cutString(text),
+    );
+  }
+
+  FoldableBlock? _getFoldableBlockByStartLine(int line) {
+    return foldableBlocks.firstWhereOrNull(
+      (block) => block.firstLine == line,
+    );
+  }
+
+  HiddenRange foldableBlockToHiddenRange(FoldableBlock block) {
+    final firstLine = lines[block.firstLine + 1];
+    final lastLine = lines[block.lastLine];
+
+    return HiddenRange(
+      start: firstLine.textRange.start - 1, // Includes '\n' before.
+      end: lastLine.textRange.end - 1, // Excludes '\n' after.
+    );
+  }
+
+  /// Folds this code at the same blocks as the [oldCode] is.
+  Code foldedAs(Code oldCode) {
+    final matcher = FoldableBlockMatcher(
+      oldBlocks: oldCode.foldableBlocks,
+      oldLines: oldCode.lines,
+      newBlocks: foldableBlocks,
+      newLines: lines,
+      oldFoldedBlocks: oldCode.foldedBlocks,
+    );
+
+    final newHiddenRangesBuilder = hiddenRangesBuilder.copyMergingSourceMap({
+      FoldableBlock: {
+        for (final block in matcher.newFoldedBlocks)
+          block: foldableBlockToHiddenRange(block),
+      },
+    });
+    final newHiddenRanges = newHiddenRangesBuilder.ranges;
+
+    return Code._(
+      text: text,
+      foldableBlocks: foldableBlocks,
+      foldedBlocks: matcher.newFoldedBlocks,
+      hiddenRanges: newHiddenRanges,
+      hiddenRangesBuilder: newHiddenRangesBuilder,
+      highlighted: highlighted,
+      issues: issues,
+      lines: lines,
+      namedSections: namedSections,
+      visibleHighlighted: newHiddenRanges.cutHighlighted(highlighted),
+      visibleText: newHiddenRanges.cutString(text),
     );
   }
 }

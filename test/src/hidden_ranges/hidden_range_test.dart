@@ -5,20 +5,24 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('HiddenText.', () {
-    test('text length = end - stat', () {
-      HiddenRange(start: 0, end: 3, text: '123');
+    test('start >= 0', () {
+      HiddenRange(start: 0, end: 3);
 
       expect(
-        () => HiddenRange(start: 0, end: 3, text: '12'),
+        () => HiddenRange(start: -1, end: 3),
         throwsAssertionError,
       );
     });
 
-    test('start >= 0', () {
-      HiddenRange(start: 0, end: 3, text: '123');
+    test('end > start', () {
+      HiddenRange(start: 2, end: 3);
 
       expect(
-        () => HiddenRange(start: -1, end: 3, text: '1234'),
+        () => HiddenRange(start: 2, end: 2),
+        throwsAssertionError,
+      );
+      expect(
+        () => HiddenRange(start: 3, end: 2),
         throwsAssertionError,
       );
     });

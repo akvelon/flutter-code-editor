@@ -1,35 +1,29 @@
-import 'package:meta/meta.dart';
-
 import '../code/text_range.dart';
 
-@immutable
 class HiddenRange extends NormalizedTextRange {
-  final String text;
-
   const HiddenRange({
     required super.start,
     required super.end,
-    required this.text,
   })  : assert(start >= 0, 'Start should be >= 0, $start given'),
-        assert(
-          text.length == end - start,
-          'Length of $text is not equal to $end - $start',
-        );
+        assert(end > start, 'Range should not be empty, $start-$end given');
 
-  const HiddenRange.fromStartAndText(int start, this.text)
+  const HiddenRange.fromStartAndText(int start, String text)
       : super(
           start: start,
           end: start + text.length,
         );
 
-  @override
-  int get hashCode => Object.hash(
-        super.hashCode,
-        text,
-      );
+  int get length => end - start;
 
-  @override
-  bool operator ==(Object other) {
-    return super == other && other is HiddenRange && text == other.text;
+  /// Sorts by [start], then by [end].
+  static int sort(HiddenRange a, HiddenRange b) {
+    switch ((a.start - b.start).sign) {
+      case -1:
+        return -1;
+      case 1:
+        return 1;
+    }
+
+    return a.end - b.end;
   }
 }

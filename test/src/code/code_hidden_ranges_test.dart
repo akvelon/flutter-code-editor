@@ -6,33 +6,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight.dart';
 import 'package:highlight/languages/java.dart';
 
-void main() {
-  group('Code. HiddenRanges.', () {
-    test('Section comments and readonly are parsed to hidden ranges', () {
-      const text = '''
+final _language = java;
+const _text = '''
 public class MyClass { // comment
   public void main() { // [START section1]
   } // comment readonly
 }
 ''';
 
-      final highlighted = highlight.parse(text, language: 'java');
-      final code = Code(
-        text: text,
-        highlighted: highlighted,
-        namedSectionParser: const BracketsStartEndNamedSectionParser(),
-        readOnlySectionNames: {'section1', 'nonexistent'},
-        language: java,
-      );
+void main() {
+  late Code code;
 
+  setUp(() {
+    final highlighted = highlight.parse(_text, language: 'java');
+    code = Code(
+      text: _text,
+      highlighted: highlighted,
+      namedSectionParser: const BracketsStartEndNamedSectionParser(),
+      readOnlySectionNames: {'section1', 'nonexistent'},
+      language: _language,
+    );
+  });
+
+  group('Code. Hidden ranges.', () {
+    test('Section comments and readonly are parsed to hidden ranges', () {
       expect(
         code.hiddenRanges,
         HiddenRanges(
           ranges: const [
-            HiddenRange(start: 57, end: 76, text: '// [START section1]'),
-            HiddenRange(start: 81, end: 100, text: '// comment readonly'),
+            HiddenRange(start: 57, end: 76), // '// [START section1]'
+            HiddenRange(start: 81, end: 100), // '// comment readonly'
           ],
-          textLength: text.length,
+          textLength: _text.length,
         ),
       );
 
@@ -44,6 +49,17 @@ public class MyClass { // comment
   } <span class="hljs-comment"></span>
 }
 ''',
+      );
+    });
+
+    test('foldableBlockToHiddenRange', () {
+      final hiddenRange = code.foldableBlockToHiddenRange(
+        code.foldableBlocks[1],
+      );
+
+      expect(
+        hiddenRange,
+        const HiddenRange(start: 76, end: 100), // '\n} // comment readonly'
       );
     });
   });

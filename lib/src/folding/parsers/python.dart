@@ -86,7 +86,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       indentBlockIndex = _addAllPossibleIndentBlocks(
         indentBlockIndex,
         indentBlocks,
-        highlightBlock.startLine,
+        highlightBlock.firstLine,
         result,
       );
 
@@ -129,7 +129,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     int result = 0;
     for (int i = startIndex; i < blocks.length; i++) {
       final indentBlock = blocks[i];
-      if (indentBlock.startLine < line) {
+      if (indentBlock.firstLine < line) {
         result++;
       } else {
         break;
