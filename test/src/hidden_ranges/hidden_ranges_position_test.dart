@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 final _hiddenRanges = HiddenRanges(
   ranges: const [
     //                How many chars hidden by the beginning of this range:
-    HiddenRange(start: 20, end: 23),   //  0
-    HiddenRange(start: 31, end: 38),   //  3
-    HiddenRange(start: 38, end: 42),   // 10
-    HiddenRange(start: 67, end: 91),   // 14
+    HiddenRange(start: 20, end: 23), //    0
+    HiddenRange(start: 31, end: 38), //    3
+    HiddenRange(start: 38, end: 42), //   10
+    HiddenRange(start: 67, end: 91), //   14
     HiddenRange(start: 100, end: 101), // 38
     HiddenRange(start: 102, end: 103), // 39
     HiddenRange(start: 104, end: 105), // 40

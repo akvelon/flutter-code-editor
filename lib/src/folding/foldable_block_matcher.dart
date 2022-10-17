@@ -72,6 +72,8 @@ class FoldableBlockMatcher {
       return false;
     }
 
+    // Allow the blocks to differ in the first line.
+    // This keeps a block folded when editing its first line.
     int oldLineIndex = oldBlock.firstLine + 1;
     int newLineIndex = newBlock.firstLine + 1;
 

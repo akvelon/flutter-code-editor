@@ -134,9 +134,9 @@ class _SignificantIndentIndexes {
   }
 
   static int? _getNextSignificantIndentIndex(
-      List<int?> indents, {
-        int startIndex = 0,
-      }) {
+    List<int?> indents, {
+    int startIndex = 0,
+  }) {
     for (int i = startIndex; i < indents.length; i++) {
       if (!_isSeparatorLine(indents[i])) {
         return i;

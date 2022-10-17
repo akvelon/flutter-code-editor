@@ -28,7 +28,7 @@ public class MyClass {
   text // slashed comment2 // still comment2
 }
 ''',
-        comments:[
+        comments: [
           SingleLineComment(
             lineIndex: 0,
             characterIndex: 0,

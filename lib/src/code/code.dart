@@ -386,7 +386,7 @@ class Code {
   }
 
   HiddenRange foldableBlockToHiddenRange(FoldableBlock block) {
-    final firstLine = lines[block.firstLine + 1];
+    final firstLine = lines[block.firstLine + 1]; // Keep the 1st line visible.
     final lastLine = lines[block.lastLine];
 
     return HiddenRange(

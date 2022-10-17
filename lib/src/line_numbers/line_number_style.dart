@@ -34,11 +34,12 @@ class LineNumberStyle {
 
   LineNumberStyle copyWith({
     TextStyle? textStyle,
-  }) => LineNumberStyle(
-    width: width,
-    textAlign: textAlign,
-    textStyle: textStyle ?? this.textStyle,
-    background: background,
-    margin: margin,
-  );
+  }) =>
+      LineNumberStyle(
+        width: width,
+        textAlign: textAlign,
+        textStyle: textStyle ?? this.textStyle,
+        background: background,
+        margin: margin,
+      );
 }

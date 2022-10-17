@@ -47,7 +47,6 @@ void main() {
 
   group('CodeController. Folding.', () {
     group('Trivial.', () {
-      // TODO: Test no folding blocks.
       test('With no folding blocks, nothing changes', () {
         const text = '''
 int a;
@@ -106,11 +105,14 @@ int c;
         final originalHtml = controller.code.visibleHighlighted?.toHtml();
 
         controller.foldAt(1);
-
         final foldedHtml = controller.code.visibleHighlighted?.toHtml();
+        controller.unfoldAt(1);
+        final unfoldedHtml = controller.code.visibleHighlighted?.toHtml();
+
         expect(
           foldedHtml,
-          '''<span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> </span>{
+          '''
+<span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span> </span>{
   <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">method1</span><span class="hljs-params">()</span> </span>{<span class="hljs-keyword"></span><span class="hljs-keyword"></span><span class="hljs-comment"></span><span class="hljs-keyword"></span><span class="hljs-comment"></span>
 
   <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">method2</span><span class="hljs-params">()</span> </span>{<span class="hljs-comment"></span>
@@ -119,10 +121,6 @@ int c;
 }
 ''',
         );
-
-        controller.unfoldAt(1);
-
-        final unfoldedHtml = controller.code.visibleHighlighted?.toHtml();
         expect(unfoldedHtml, originalHtml);
       });
 
@@ -206,7 +204,7 @@ public class MyClass {
         );
       });
 
-      testWidgets('at a folded block unfolded line', (WidgetTester wt) async {
+      testWidgets('the first line of a folded block', (WidgetTester wt) async {
         await wt.pumpWidget(createApp(controller, focusNode));
         focusNode.requestFocus();
 

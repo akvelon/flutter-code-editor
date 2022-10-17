@@ -25,11 +25,11 @@ class GutterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: codeController,
-      builder: _buildOnChanged,
+      builder: _buildOnChange,
     );
   }
 
-  Widget _buildOnChanged(BuildContext context, Widget? child) {
+  Widget _buildOnChange(BuildContext context, Widget? child) {
     final code = codeController.code;
 
     final tableRows = [
