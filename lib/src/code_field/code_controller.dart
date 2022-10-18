@@ -78,6 +78,8 @@ class CodeController extends TextEditingController {
   /// A list of code modifiers to dynamically update the code upon certain keystrokes
   final List<CodeModifier> modifiers;
 
+  final bool _isTabReplacementEnabled;
+
   /// On web, replace spaces with invisible dots “·” to fix the current issue with spaces
   ///
   /// https://github.com/flutter/flutter/issues/77929
@@ -119,7 +121,8 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
-        _lastCode = Code.empty {
+        _lastCode = Code.empty,
+        _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
     _updateLastCode(text ?? '');
     fullText = text ?? '';
@@ -310,6 +313,9 @@ class CodeController extends TextEditingController {
         }
       }
 
+      if (_isTabReplacementEnabled) {
+        newValue = newValue.tabsToSpaces(params.tabSpaces);
+      }
       final editResult = _getEditResultNotBreakingReadOnly(newValue);
 
       if (editResult == null) {
