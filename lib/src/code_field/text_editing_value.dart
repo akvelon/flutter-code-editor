@@ -123,8 +123,6 @@ extension TextEditingValueExtension on TextEditingValue {
     final result = selection.copyWith(
       baseOffset: baseOffset,
       extentOffset: extentOffset,
-      affinity: selection.affinity,
-      isDirectional: selection.isDirectional,
     );
 
     return selection.isSelectionNormalized ? result : result.reversed;
@@ -143,7 +141,7 @@ extension TextEditingValueExtension on TextEditingValue {
     }
     final selectionSubstring = text.substring(
       selection.start,
-      selection.start + selection.length,
+      selection.end,
     );
     return selectionSubstring;
   }

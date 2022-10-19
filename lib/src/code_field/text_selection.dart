@@ -1,17 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 
 extension TextSelectionExtension on TextSelection {
-  int get length =>
-      max(baseOffset, extentOffset) - min(baseOffset, extentOffset);
+  int get length => end - start;
 
   TextSelection get reversed {
-    return TextSelection(
+    return copyWith(
       baseOffset: extentOffset,
       extentOffset: baseOffset,
-      affinity: affinity,
-      isDirectional: isDirectional,
     );
   }
 
