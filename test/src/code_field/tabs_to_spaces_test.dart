@@ -21,23 +21,23 @@ class Foo {
 const _spaceCount = 2;
 
 void main() {
-  void expectWillNotChanged(TextEditingValue value) {
-    var actual = value;
-    final expected = value.copyWith();
+  group('TextEditingValue.tabsToSpaces.', () {
+    void expectSame(TextEditingValue value) {
+      var actual = value;
+      final expected = value.copyWith();
 
-    actual = actual.tabsToSpaces(_spaceCount);
+      actual = actual.tabsToSpaces(_spaceCount);
 
-    expect(actual, expected);
-  }
+      expect(actual, expected);
+    }
 
-  group('Replace tabs with spaces.', () {
     group('Empty', () {
       test('without selection do not changes', () {
-        expectWillNotChanged(TextEditingValue.empty);
+        expectSame(TextEditingValue.empty);
       });
 
       test('with cursor at start do not changes', () {
-        expectWillNotChanged(
+        expectSame(
           TextEditingValue.empty.copyWith(
             selection: const TextSelection.collapsed(offset: 0),
           ),
@@ -47,13 +47,13 @@ void main() {
 
     group('Code without tabs', () {
       test('without selection', () {
-        expectWillNotChanged(
+        expectSame(
           const TextEditingValue(text: _codeWithDoubleSpaces),
         );
       });
 
       test('with cursor at the start', () {
-        expectWillNotChanged(
+        expectSame(
           const TextEditingValue(
             text: _codeWithDoubleSpaces,
             selection: TextSelection.collapsed(offset: 0),
@@ -62,7 +62,7 @@ void main() {
       });
 
       test('with cursor at the middle', () {
-        expectWillNotChanged(
+        expectSame(
           const TextEditingValue(
             text: _codeWithDoubleSpaces,
             selection: TextSelection.collapsed(
@@ -74,7 +74,7 @@ void main() {
       });
 
       test('with cursor at the end', () {
-        expectWillNotChanged(
+        expectSame(
           const TextEditingValue(
             text: _codeWithDoubleSpaces,
             selection:
@@ -84,7 +84,7 @@ void main() {
       });
 
       test('with non-empty normalized selection', () {
-        expectWillNotChanged(
+        expectSame(
           const TextEditingValue(
             text: _codeWithDoubleSpaces,
             selection: TextSelection(
@@ -97,7 +97,7 @@ void main() {
       });
 
       test('with non-enpty reversed selection', () {
-        expectWillNotChanged(
+        expectSame(
           const TextEditingValue(
             text: _codeWithDoubleSpaces,
             selection: TextSelection(
