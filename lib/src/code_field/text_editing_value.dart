@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 
 import '../code/reg_exp.dart';
 import '../code/string.dart';
 import '../code/text_range.dart';
+import 'text_selection.dart';
 
 extension TextEditingValueExtension on TextEditingValue {
   /// The position where the word at the cursor starts.
@@ -92,19 +91,18 @@ extension TextEditingValueExtension on TextEditingValue {
   }
 
   TextEditingValue tabsToSpaces(int spaceCount) {
-    final replacedBeforeSelection = beforeSelection.tabsToSpaces(spaceCount);
-    final replacedInSelection = inSelection.tabsToSpaces(spaceCount);
-    final replacedAfterSelection = afterSelection.tabsToSpaces(spaceCount);
+    final replacedBefore = beforeSelection.tabsToSpaces(spaceCount);
+    final replacedSelected = selected.tabsToSpaces(spaceCount);
+    final replacedAfter = afterSelection.tabsToSpaces(spaceCount);
 
-    final finalText =
-        replacedBeforeSelection + replacedInSelection + replacedAfterSelection;
+    final finalText = replacedBefore + replacedSelected + replacedAfter;
 
     return TextEditingValue(
       text: finalText,
       selection: _getSelectionFromSubstrings(
-        replacedBeforeSelection,
-        replacedInSelection,
-        replacedAfterSelection,
+        replacedBefore,
+        replacedSelected,
+        replacedAfter,
       ),
       composing: composing,
     );
@@ -122,59 +120,38 @@ extension TextEditingValueExtension on TextEditingValue {
     final baseOffset = beforeSelection.length;
     final extentOffset = baseOffset + inSelection.length;
 
-    final result = TextSelection(
+    final result = selection.copyWith(
       baseOffset: baseOffset,
       extentOffset: extentOffset,
       affinity: selection.affinity,
       isDirectional: selection.isDirectional,
     );
 
-    return selection.isNormal ? result : result.reversed;
+    return selection.isSelectionNormalized ? result : result.reversed;
   }
 
   String get beforeSelection {
-    if (selection.baseOffset == -1 && selection.extentOffset == -1) {
+    if (selection.baseOffset == -1 || selection.extentOffset == -1) {
       return '';
     }
-    final minSelection = min(selection.baseOffset, selection.extentOffset);
-    return text.substring(0, minSelection);
+    return text.substring(0, selection.start);
   }
 
-  String get inSelection {
-    if (selection.baseOffset == -1 && selection.extentOffset == -1) {
+  String get selected {
+    if (selection.baseOffset == -1 || selection.extentOffset == -1) {
       return '';
     }
-    final minSelection = min(selection.baseOffset, selection.extentOffset);
     final selectionSubstring = text.substring(
-      minSelection,
-      minSelection + selection.length,
+      selection.start,
+      selection.start + selection.length,
     );
     return selectionSubstring;
   }
 
   String get afterSelection {
-    if (selection.baseOffset == -1 && selection.extentOffset == -1) {
+    if (selection.baseOffset == -1 || selection.extentOffset == -1) {
       return text;
     }
-    final maxSelection = max(selection.baseOffset, selection.extentOffset);
-    return text.substring(maxSelection);
-  }
-}
-
-extension TextSelectionExtension on TextSelection {
-  int get length =>
-      max(baseOffset, extentOffset) - min(baseOffset, extentOffset);
-
-  TextSelection get reversed {
-    return TextSelection(
-      baseOffset: extentOffset,
-      extentOffset: baseOffset,
-      affinity: affinity,
-      isDirectional: isDirectional,
-    );
-  }
-
-  bool get isNormal {
-    return baseOffset <= extentOffset;
+    return text.substring(selection.end);
   }
 }

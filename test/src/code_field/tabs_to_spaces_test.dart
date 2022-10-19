@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_code_editor/src/code_field/text_editing_value.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _codeRowWithoutTabs = 'int a = 1;';
 const _codeWithTabs = '''
 class Foo {
 \tint field;
@@ -21,203 +20,218 @@ class Foo {
 ''';
 const _spaceCount = 2;
 
-
 void main() {
-  group('Replace tabs with spaces', () {
-    test('Empty without selection', () {
-      TextEditingValue value = TextEditingValue.empty;
-      value = value.tabsToSpaces(_spaceCount);
-      
-      expect(value.text, '');
-      expect(value.selection.baseOffset, -1);
-      expect(value.selection.extentOffset, -1);
+  group('Replace tabs with spaces.', () {
+    group('Empty', () {
+      test('without selection do not changes', () {
+        TextEditingValue value = TextEditingValue.empty;
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value, TextEditingValue.empty);
+      });
+
+      test('with cursor at start do not changes', () {
+        TextEditingValue value = TextEditingValue.empty.copyWith(
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, '');
+        expect(value.selection, const TextSelection.collapsed(offset: 0));
+      });
     });
 
-    test('Empty with cursor at start', () {
-      TextEditingValue value = TextEditingValue.empty.copyWith(
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+    group('Code without tabs', () {
+      test('without selection', () {
+        TextEditingValue value =
+            const TextEditingValue(text: _codeWithDoubleSpaces);
 
-      value = value.tabsToSpaces(_spaceCount);
-      
-      expect(value.text, '');
-      expect(value.selection.baseOffset, 0);
-      expect(value.selection.extentOffset, 0);
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection, const TextSelection.collapsed(offset: -1));
+      });
+
+      test('with cursor at the start', () {
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithDoubleSpaces,
+          selection: TextSelection.collapsed(offset: 0),
+        );
+
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection, const TextSelection.collapsed(offset: 0));
+      });
+
+      test('with cursor at the middle', () {
+        const cursorPosition = 5;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithDoubleSpaces,
+          selection: TextSelection.collapsed(
+            offset: cursorPosition,
+            affinity: TextAffinity.upstream,
+          ),
+        );
+
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(
+          value.selection,
+          const TextSelection.collapsed(
+            offset: cursorPosition,
+            affinity: TextAffinity.upstream,
+          ),
+        );
+      });
+
+      test('with cursor at the end', () {
+        const cursorPosition = _codeWithDoubleSpaces.length;
+        TextEditingValue value = TextEditingValue(
+          text: _codeWithDoubleSpaces,
+          selection: const TextSelection.collapsed(offset: cursorPosition)
+              .copyWith(isDirectional: true),
+        );
+
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(
+          value.selection,
+          const TextSelection.collapsed(offset: cursorPosition)
+              .copyWith(isDirectional: true),
+        );
+      });
+
+      test('with non-empty normalized selection', () {
+        const selectionStart = 5;
+        const selectionEnd = 10;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithDoubleSpaces,
+          selection: TextSelection(
+            baseOffset: selectionStart,
+            extentOffset: selectionEnd,
+          ),
+        );
+
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection.baseOffset, selectionStart);
+        expect(value.selection.extentOffset, selectionEnd);
+      });
+
+      test('with non-enpty reversed selection', () {
+        const selectionStart = 10;
+        const selectionEnd = 5;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithDoubleSpaces,
+          selection: TextSelection(
+            baseOffset: selectionStart,
+            extentOffset: selectionEnd,
+          ),
+        );
+
+        value = value.tabsToSpaces(_spaceCount);
+
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection.baseOffset, selectionStart);
+        expect(value.selection.extentOffset, selectionEnd);
+      });
     });
 
-    test('Code row without tabs without selection', () {
-      TextEditingValue value = const TextEditingValue(text: _codeRowWithoutTabs);
-      
-      value = value.tabsToSpaces(_spaceCount);
-      
-      expect(value.text, _codeRowWithoutTabs);
-      expect(value.selection.baseOffset, -1);
-      expect(value.selection.extentOffset, -1);
-    });
+    group('Code with tabs', () {
+      test('without selection', () {
+        TextEditingValue value = const TextEditingValue(text: _codeWithTabs);
 
-    test('Code row without tabs with cursor at start', () {
-      TextEditingValue value = const TextEditingValue(
-        text: _codeRowWithoutTabs,
-        selection: TextSelection.collapsed(offset: 0),
-      );
-      
-      value = value.tabsToSpaces(_spaceCount);
-      
-      expect(value.text, _codeRowWithoutTabs);
-      expect(value.selection.baseOffset, 0);
-      expect(value.selection.extentOffset, 0);
-    });
+        value = value.tabsToSpaces(_spaceCount);
 
-    test('Code row without tabs with cursor at middle', () {
-      const cursorPosition = 5;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeRowWithoutTabs,
-        selection: TextSelection.collapsed(offset: cursorPosition),
-      );
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection, const TextSelection.collapsed(offset: -1));
+      });
 
-      value = value.tabsToSpaces(_spaceCount);
+      test('with cursor at the start', () {
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithTabs,
+          selection: TextSelection.collapsed(offset: 0),
+        );
 
-      expect(value.text, _codeRowWithoutTabs);
-      expect(value.selection.baseOffset, cursorPosition);
-      expect(value.selection.extentOffset, cursorPosition);
-    });
+        value = value.tabsToSpaces(_spaceCount);
 
-    test('Code row without tabs with cursor at end', () {
-      const cursorPosition = _codeRowWithoutTabs.length;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeRowWithoutTabs,
-        selection: TextSelection.collapsed(offset: cursorPosition),
-      );
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection.baseOffset, 0);
+        expect(value.selection.extentOffset, 0);
+      });
 
-      value = value.tabsToSpaces(_spaceCount);
+      test('with cursor at the middle', () {
+        const cursorPosition = 31;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithTabs,
+          selection: TextSelection.collapsed(offset: cursorPosition),
+        );
 
-      expect(value.text, _codeRowWithoutTabs);
-      expect(value.selection.baseOffset, cursorPosition);
-      expect(value.selection.extentOffset, cursorPosition);
-    });
+        value = value.tabsToSpaces(_spaceCount);
 
-    test('Code row without tabs with selection', () {
-      const selectionStart = 5;
-      const selectionEnd = 10;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeRowWithoutTabs,
-        selection: TextSelection(
-          baseOffset: selectionStart,
-          extentOffset: selectionEnd,
-        ),
-      );
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection, const TextSelection.collapsed(offset: 33));
+      });
 
-      value = value.tabsToSpaces(_spaceCount);
+      test('with cursor at the end', () {
+        const cursorPosition = _codeWithTabs.length;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithTabs,
+          selection: TextSelection.collapsed(offset: cursorPosition),
+        );
 
-      expect(value.text, _codeRowWithoutTabs);
-      expect(value.selection.baseOffset, selectionStart);
-      expect(value.selection.extentOffset, selectionEnd);
-    });
+        value = value.tabsToSpaces(_spaceCount);
 
-    test('Code row without tabs with reversed selection', () {
-      const selectionStart = 10;
-      const selectionEnd = 5;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeRowWithoutTabs,
-        selection: TextSelection(
-          baseOffset: selectionStart,
-          extentOffset: selectionEnd,
-        ),
-      );
+        final tabsCount = RegExp('\t').allMatches(_codeWithTabs).length;
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(
+          value.selection,
+          TextSelection.collapsed(
+            offset: cursorPosition + tabsCount,
+          ),
+        );
+      });
 
-      value = value.tabsToSpaces(_spaceCount);
+      test('with non-empty normalized selection', () {
+        const selectionStart = 24;
+        const selectionEnd = 59;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithTabs,
+          selection: TextSelection(
+            baseOffset: selectionStart,
+            extentOffset: selectionEnd,
+          ),
+        );
 
-      expect(value.text, _codeRowWithoutTabs);
-      expect(value.selection.baseOffset, selectionStart);
-      expect(value.selection.extentOffset, selectionEnd);
-    });
+        value = value.tabsToSpaces(_spaceCount);
 
-    test('Code with tabs without selection', () {
-      TextEditingValue value = const TextEditingValue(text: _codeWithTabs);
-      
-      value = value.tabsToSpaces(_spaceCount);
-      
-      expect(value.text, _codeWithDoubleSpaces);
-      expect(value.selection.baseOffset, -1);
-      expect(value.selection.extentOffset, -1);
-    });
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection.baseOffset, selectionStart + 1);
+        expect(value.selection.extentOffset, selectionEnd + 5);
+      });
 
-    test('Code with tabs with cursor at start', () {
-      TextEditingValue value = const TextEditingValue(
-        text: _codeWithTabs,
-        selection: TextSelection.collapsed(offset: 0),
-      );
-      
-      value = value.tabsToSpaces(_spaceCount);
-      
-      expect(value.text, _codeWithDoubleSpaces);
-      expect(value.selection.baseOffset, 0);
-      expect(value.selection.extentOffset, 0);
-    });
+      test('with non-empty reversed selection', () {
+        const selectionStart = 59;
+        const selectionEnd = 24;
+        TextEditingValue value = const TextEditingValue(
+          text: _codeWithTabs,
+          selection: TextSelection(
+            baseOffset: selectionStart,
+            extentOffset: selectionEnd,
+          ),
+        );
 
-    test('Code with tabs with cursor at middle', () {
-      const cursorPosition = _codeWithTabs.length ~/ 2;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeWithTabs,
-        selection: TextSelection.collapsed(offset: cursorPosition),
-      );
+        value = value.tabsToSpaces(_spaceCount);
 
-      value = value.tabsToSpaces(_spaceCount);
-
-      expect(value.text, _codeWithDoubleSpaces);
-      expect(value.selection.baseOffset, 33); //calculated manually
-      expect(value.selection.extentOffset, 33);
-    });
-
-    test('Code with tabs with cursor at end', () {
-      const cursorPosition = _codeWithTabs.length;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeWithTabs,
-        selection: TextSelection.collapsed(offset: cursorPosition),
-      );
-
-      value = value.tabsToSpaces(_spaceCount);
-
-      final tabsCount = RegExp('\t').allMatches(_codeWithTabs).length;
-      expect(value.text, _codeWithDoubleSpaces);
-      expect(value.selection.baseOffset, cursorPosition + tabsCount);
-      expect(value.selection.extentOffset, cursorPosition + tabsCount);
-    });
-
-    test('Code with tabs with selection', () {
-      const selectionStart = 24;
-      const selectionEnd = 59;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeWithTabs,
-        selection: TextSelection(
-          baseOffset: selectionStart,
-          extentOffset: selectionEnd,
-        ),
-      );
-
-      value = value.tabsToSpaces(_spaceCount);
-
-      expect(value.text, _codeWithDoubleSpaces);
-      expect(value.selection.baseOffset, selectionStart + 1);
-      expect(value.selection.extentOffset, selectionEnd + 5);
-    });
-
-    test('Code with tabs with reversed selection', () {
-      const selectionStart = 59;
-      const selectionEnd = 24;
-      TextEditingValue value = const TextEditingValue(
-        text: _codeWithTabs,
-        selection: TextSelection(
-          baseOffset: selectionStart,
-          extentOffset: selectionEnd,
-        ),
-      );
-
-      value = value.tabsToSpaces(_spaceCount);
-
-      expect(value.text, _codeWithDoubleSpaces);
-      expect(value.selection.baseOffset, selectionStart + 5);
-      expect(value.selection.extentOffset, selectionEnd + 1);
+        expect(value.text, _codeWithDoubleSpaces);
+        expect(value.selection.baseOffset, selectionStart + 5);
+        expect(value.selection.extentOffset, selectionEnd + 1);
+      });
     });
   });
 }

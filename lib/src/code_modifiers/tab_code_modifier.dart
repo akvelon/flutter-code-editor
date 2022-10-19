@@ -12,7 +12,6 @@ class TabModifier extends CodeModifier {
     TextSelection sel,
     EditorParams params,
   ) {
-    final tmp = replace(text, sel.start, sel.end, ' ' * params.tabSpaces);
-    return tmp;
+    return TextEditingValue(text: text, selection: sel);
   }
 }
