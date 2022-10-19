@@ -1,6 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/java.dart';
 
 void main() {
   const snippetWithTabs = '''
@@ -22,10 +24,6 @@ public class MyClass {
 }
 ''';
 
-  bool _areIdenticalTexts(String text1, String text2) {
-    return text1.compareTo(text2) == 0;
-  }
-
   group('Tab replacement', () {
     test(
       'applied if TabModifier is present',
@@ -35,10 +33,7 @@ public class MyClass {
           language: go,
           modifiers: [const TabModifier()],
         );
-        expect(
-          _areIdenticalTexts(controller.text, snippetWithDoubleSpaces),
-          true,
-        );
+        expect(controller.text, snippetWithDoubleSpaces);
       },
     );
 
@@ -50,10 +45,7 @@ public class MyClass {
           language: go,
           modifiers: [],
         );
-        expect(
-          _areIdenticalTexts(controller.text, snippetWithDoubleSpaces),
-          false,
-        );
+        expect(controller.text, snippetWithTabs);
       },
     );
 
@@ -67,11 +59,27 @@ public class MyClass {
           language: go,
           modifiers: [const TabModifier()],
         );
-        expect(
-          _areIdenticalTexts(controller.text, snippetWithTripleSpaces),
-          true,
-        );
+        expect(controller.text, snippetWithTripleSpaces);
       },
     );
+
+    test('works with several tab insertion', () {
+      final controller = CodeController(
+        text: snippetWithTabs,
+        language: java,
+        modifiers: [const TabModifier()],
+      );
+      const tabCount = 2;
+
+      controller.value = TextEditingValue(
+        text: snippetWithTabs + '\t' * tabCount,
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+
+      expect(
+        controller.text,
+        snippetWithDoubleSpaces + ' ' * controller.params.tabSpaces * tabCount,
+      );
+    });
   });
 }
