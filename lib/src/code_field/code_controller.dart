@@ -505,39 +505,39 @@ class CodeController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
-    // Retrieve pattern regexp
-    final patternList = <String>[];
+    // // Retrieve pattern regexp
+    // final patternList = <String>[];
 
-    if (_webSpaceFix) {
-      patternList.add('($_middleDot)');
-      styleList.add(const TextStyle(color: Colors.transparent));
-    }
+    // if (_webSpaceFix) {
+    //   patternList.add('($_middleDot)');
+    //   styleList.add(const TextStyle(color: Colors.transparent));
+    // }
 
-    if (stringMap != null) {
-      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
-      styleList.addAll(stringMap!.values);
-    }
+    // if (stringMap != null) {
+    //   patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
+    //   styleList.addAll(stringMap!.values);
+    // }
 
-    if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
-      styleList.addAll(patternMap!.values);
-    }
+    // if (patternMap != null) {
+    //   patternList.addAll(patternMap!.keys.map((e) => '($e)'));
+    //   styleList.addAll(patternMap!.values);
+    // }
 
-    styleRegExp = RegExp(patternList.join('|'), multiLine: true);
+    // styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
-    // Return parsing
-    if (_language != null) {
-      return const SpanBuilder().build(
-        code: _lastCode,
-        theme: _getTheme(context),
-        textStyle: style,
-      );
-      //return _processLanguage(text, CodeTheme.of(context), style);
-    }
+    // // Return parsing
+    // if (_language != null) {
+    //   return const SpanBuilder().build(
+    //     code: _lastCode,
+    //     theme: _getTheme(context),
+    //     textStyle: style,
+    //   );
+    //   //return _processLanguage(text, CodeTheme.of(context), style);
+    // }
 
-    if (styleRegExp != null) {
-      return _processPatterns(text, style);
-    }
+    // if (styleRegExp != null) {
+    //   return _processPatterns(text, style);
+    // }
 
     return TextSpan(text: text, style: style);
   }
