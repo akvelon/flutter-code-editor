@@ -23,8 +23,6 @@ class HiddenRange extends NormalizedTextRange with EquatableMixin {
 
   int get length => end - start;
 
-  bool get isSingleLine => lastLine == firstLine;
-
   /// Sorts by [start], then by [end].
   static int sort(HiddenRange a, HiddenRange b) {
     switch ((a.start - b.start).sign) {
