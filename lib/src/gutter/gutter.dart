@@ -33,11 +33,11 @@ class GutterWidget extends StatelessWidget {
     final code = codeController.code;
 
     final tableRows = [
-      for (int i = 1; i <= code.lines.length; i++)
+      for (final i in code.hiddenLineRanges.visibleLineNumbers)
         TableRow(
           children: [
             Text(
-              '$i',
+              '${i + 1}',
               style: style.textStyle,
               textAlign: style.textAlign,
             ),
@@ -49,11 +49,19 @@ class GutterWidget extends StatelessWidget {
 
     for (final issue in code.issues) {
       final lineIndex = _lineIndexToTableRowIndex(issue.line);
+      if (lineIndex == null) {
+        continue;
+      }
+
       tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
     }
 
     for (final block in code.foldableBlocks) {
       final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
+      if (lineIndex == null) {
+        continue;
+      }
+
       final isFolded = code.foldedBlocks.contains(block);
 
       tableRows[lineIndex].children![_foldingColumn] = FoldToggle(
@@ -80,8 +88,7 @@ class GutterWidget extends StatelessWidget {
     );
   }
 
-  int _lineIndexToTableRowIndex(int line) {
-    // TODO(alexeyinkin): Adjust for hidden lines if any, https://github.com/akvelon/flutter-code-editor/issues/58
-    return line;
+  int? _lineIndexToTableRowIndex(int line) {
+    return codeController.code.hiddenLineRanges.cutLineIndexIfVisible(line);
   }
 }

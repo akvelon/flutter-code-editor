@@ -34,8 +34,23 @@ void main() {
         code.hiddenRanges,
         HiddenRanges(
           ranges: const [
-            HiddenRange(start: 57, end: 76), // '// [START section1]'
-            HiddenRange(start: 81, end: 100), // '// comment readonly'
+            // '// [START section1]'
+            HiddenRange(
+              57,
+              76,
+              firstLine: 1,
+              lastLine: 1,
+              wholeFirstLine: false,
+            ),
+
+            // '// comment readonly'
+            HiddenRange(
+              81,
+              100,
+              firstLine: 2,
+              lastLine: 2,
+              wholeFirstLine: false,
+            ),
           ],
           textLength: _text.length,
         ),
@@ -57,9 +72,16 @@ void main() {
         code.foldableBlocks[1],
       );
 
+      // '\n} // comment readonly'
       expect(
         hiddenRange,
-        const HiddenRange(start: 76, end: 100), // '\n} // comment readonly'
+        const HiddenRange(
+          76,
+          100,
+          firstLine: 1,
+          lastLine: 2,
+          wholeFirstLine: false,
+        ),
       );
     });
   });

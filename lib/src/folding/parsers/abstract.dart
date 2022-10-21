@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
-import '../../code/code_line.dart';
+import '../../code/code_lines.dart';
 import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import '../invalid_foldable_block.dart';
@@ -30,7 +30,7 @@ abstract class AbstractFoldableBlockParser {
   void parse({
     required Result highlighted,
     required Set<Object?> serviceCommentsSources,
-    required List<CodeLine> lines,
+    required CodeLines lines,
   });
 
   /// Records that a block has started at [line].

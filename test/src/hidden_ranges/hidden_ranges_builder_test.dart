@@ -8,8 +8,20 @@ void main() {
       test('Overlapping', () {
         const ranges = {
           int: {
-            1: HiddenRange(start: 1, end: 3),
-            0: HiddenRange(start: 0, end: 2),
+            1: HiddenRange(
+              1,
+              3,
+              firstLine: 1,
+              lastLine: 2,
+              wholeFirstLine: false,
+            ),
+            0: HiddenRange(
+              0,
+              2,
+              firstLine: 0,
+              lastLine: 1,
+              wholeFirstLine: false,
+            ),
           },
         };
         final builder = HiddenRangesBuilder.fromMaps(ranges, textLength: 10);
@@ -17,7 +29,7 @@ void main() {
         expect(
           builder.ranges.ranges,
           const [
-            HiddenRange(start: 0, end: 3),
+            HiddenRange(0, 3, firstLine: 0, lastLine: 2, wholeFirstLine: false),
           ],
         );
       });
@@ -25,11 +37,29 @@ void main() {
       test('Touching', () {
         const ranges = {
           int: {
-            'a': HiddenRange(start: 4, end: 5),
-            'b': HiddenRange(start: 1, end: 2),
+            'a': HiddenRange(
+              4,
+              5,
+              firstLine: 8,
+              lastLine: 10,
+              wholeFirstLine: false,
+            ),
+            'b': HiddenRange(
+              1,
+              2,
+              firstLine: 1,
+              lastLine: 2,
+              wholeFirstLine: true,
+            ),
           },
           double: {
-            'c': HiddenRange(start: 2, end: 4),
+            'c': HiddenRange(
+              2,
+              4,
+              firstLine: 4,
+              lastLine: 5,
+              wholeFirstLine: false,
+            ),
           },
         };
         final builder = HiddenRangesBuilder.fromMaps(ranges, textLength: 10);
@@ -37,7 +67,7 @@ void main() {
         expect(
           builder.ranges.ranges,
           const [
-            HiddenRange(start: 1, end: 5),
+            HiddenRange(1, 5, firstLine: 1, lastLine: 10, wholeFirstLine: true),
           ],
         );
       });
@@ -45,11 +75,29 @@ void main() {
       test('Nesting', () {
         const ranges = {
           int: {
-            'a': HiddenRange(start: 6, end: 7),
-            'b': HiddenRange(start: 1, end: 2),
+            'a': HiddenRange(
+              6,
+              7,
+              firstLine: 10,
+              lastLine: 20,
+              wholeFirstLine: true,
+            ),
+            'b': HiddenRange(
+              1,
+              2,
+              firstLine: -10,
+              lastLine: -5,
+              wholeFirstLine: true,
+            ),
           },
           double: {
-            'c': HiddenRange(start: 5, end: 9),
+            'c': HiddenRange(
+              5,
+              9,
+              firstLine: 5,
+              lastLine: 15,
+              wholeFirstLine: false,
+            ),
           },
         };
         final builder = HiddenRangesBuilder.fromMaps(ranges, textLength: 10);
@@ -57,8 +105,20 @@ void main() {
         expect(
           builder.ranges.ranges,
           const [
-            HiddenRange(start: 1, end: 2),
-            HiddenRange(start: 5, end: 9),
+            HiddenRange(
+              1,
+              2,
+              firstLine: -10,
+              lastLine: -5,
+              wholeFirstLine: true,
+            ),
+            HiddenRange(
+              5,
+              9,
+              firstLine: 5,
+              lastLine: 15,
+              wholeFirstLine: false,
+            ),
           ],
         );
       });
@@ -66,11 +126,29 @@ void main() {
       test('Preserves separate', () {
         const ranges = {
           int: {
-            1: HiddenRange(start: 7, end: 9),
-            2: HiddenRange(start: 1, end: 2),
+            1: HiddenRange(
+              7,
+              9,
+              firstLine: 1,
+              lastLine: 2,
+              wholeFirstLine: true,
+            ),
+            2: HiddenRange(
+              1,
+              2,
+              firstLine: 3,
+              lastLine: 4,
+              wholeFirstLine: false,
+            ),
           },
           double: {
-            'a': HiddenRange(start: 4, end: 6),
+            'a': HiddenRange(
+              4,
+              6,
+              firstLine: 5,
+              lastLine: 6,
+              wholeFirstLine: true,
+            ),
           },
           String: <Object, HiddenRange>{},
         };
@@ -79,9 +157,9 @@ void main() {
         expect(
           builder.ranges.ranges,
           const [
-            HiddenRange(start: 1, end: 2),
-            HiddenRange(start: 4, end: 6),
-            HiddenRange(start: 7, end: 9),
+            HiddenRange(1, 2, firstLine: 3, lastLine: 4, wholeFirstLine: false),
+            HiddenRange(4, 6, firstLine: 5, lastLine: 6, wholeFirstLine: true),
+            HiddenRange(7, 9, firstLine: 1, lastLine: 2, wholeFirstLine: true),
           ],
         );
       });
@@ -90,30 +168,48 @@ void main() {
     test('copyWithRange, copyWithoutRange', () {
       const ranges = {
         int: {
-          'b': HiddenRange(start: 5, end: 7),
-          'a': HiddenRange(start: 1, end: 3),
+          'b': HiddenRange(
+            5,
+            7,
+            firstLine: 1,
+            lastLine: 2,
+            wholeFirstLine: true,
+          ),
+          'a': HiddenRange(
+            1,
+            3,
+            firstLine: 3,
+            lastLine: 4,
+            wholeFirstLine: false,
+          ),
         },
       };
       final builder = HiddenRangesBuilder.fromMaps(ranges, textLength: 10);
 
       final resultWith = builder.copyWithRange(
         'key',
-        const HiddenRange(start: 6, end: 9),
+        const HiddenRange(
+          6,
+          9,
+          firstLine: 5,
+          lastLine: 6,
+          wholeFirstLine: false,
+        ),
       );
       final resultWithout = builder.copyWithoutRange('key');
 
       expect(
         resultWith.ranges.ranges,
         const [
-          HiddenRange(start: 1, end: 3),
-          HiddenRange(start: 5, end: 9),
+          HiddenRange(1, 3, firstLine: 3, lastLine: 4, wholeFirstLine: false),
+          HiddenRange(5, 9, firstLine: 1, lastLine: 6, wholeFirstLine: true),
         ],
       );
       expect(
         resultWithout.ranges.ranges,
         const [
-          HiddenRange(start: 1, end: 3),
-          HiddenRange(start: 5, end: 7),
+          HiddenRange(1, 3, firstLine: 3, lastLine: 4, wholeFirstLine: false),
+          HiddenRange(5, 7, firstLine: 1, lastLine: 2, wholeFirstLine: true),
         ],
       );
     });

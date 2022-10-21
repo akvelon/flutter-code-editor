@@ -6,23 +6,36 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('HiddenText.', () {
     test('start >= 0', () {
-      HiddenRange(start: 0, end: 3);
+      HiddenRange(0, 3, firstLine: 0, lastLine: 0, wholeFirstLine: true);
 
       expect(
-        () => HiddenRange(start: -1, end: 3),
+        () =>
+            HiddenRange(-1, 3, firstLine: 0, lastLine: 0, wholeFirstLine: true),
         throwsAssertionError,
       );
     });
 
     test('end > start', () {
-      HiddenRange(start: 2, end: 3);
+      HiddenRange(2, 3, firstLine: 0, lastLine: 0, wholeFirstLine: true);
 
       expect(
-        () => HiddenRange(start: 2, end: 2),
+        () => HiddenRange(
+          2,
+          2,
+          firstLine: 0,
+          lastLine: 0,
+          wholeFirstLine: true,
+        ),
         throwsAssertionError,
       );
       expect(
-        () => HiddenRange(start: 3, end: 2),
+        () => HiddenRange(
+          3,
+          2,
+          firstLine: 0,
+          lastLine: 0,
+          wholeFirstLine: true,
+        ),
         throwsAssertionError,
       );
     });

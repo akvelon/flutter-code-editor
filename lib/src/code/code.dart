@@ -7,6 +7,8 @@ import 'package:highlight/highlight_core.dart';
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
 import '../folding/parsers/parser_factory.dart';
+import '../hidden_ranges/hidden_line_ranges.dart';
+import '../hidden_ranges/hidden_line_ranges_builder.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
 import '../hidden_ranges/hidden_ranges_builder.dart';
@@ -19,6 +21,7 @@ import '../single_line_comments/parser/single_line_comments.dart';
 import '../single_line_comments/single_line_comment.dart';
 import 'code_edit_result.dart';
 import 'code_line.dart';
+import 'code_lines.dart';
 import 'code_lines_builder.dart';
 import 'string.dart';
 import 'text_range.dart';
@@ -27,14 +30,16 @@ class Code {
   final String text;
   final List<FoldableBlock> foldableBlocks;
   final Set<FoldableBlock> foldedBlocks;
+  final HiddenLineRanges hiddenLineRanges;
   final HiddenRanges hiddenRanges;
-  final HiddenRangesBuilder hiddenRangesBuilder;
   final Result? highlighted;
   final List<Issue> issues;
-  final List<CodeLine> lines;
+  final CodeLines lines;
   final Map<String, NamedSection> namedSections;
   final Result? visibleHighlighted;
   final String visibleText;
+
+  final HiddenRangesBuilder _hiddenRangesBuilder;
 
   factory Code({
     required String text,
@@ -88,7 +93,7 @@ class Code {
     final sectionsMap = {for (final s in sections) s.name: s};
 
     _applyNamedSectionsToLines(
-      lines: lines,
+      lines: lines.lines,
       sections: sectionsMap,
       readOnlySectionNames: readOnlySectionNames,
     );
@@ -101,10 +106,16 @@ class Code {
     );
     final hiddenRanges = hiddenRangesBuilder.ranges;
 
+    final hiddenLineRangesBuilder = HiddenLineRangesBuilder(
+      codeLines: lines,
+      hiddenRanges: hiddenRanges,
+    );
+
     return Code._(
       text: text,
       foldableBlocks: foldableBlocks,
       foldedBlocks: {},
+      hiddenLineRanges: hiddenLineRangesBuilder.hiddenLineRanges,
       hiddenRanges: hiddenRanges,
       hiddenRangesBuilder: hiddenRangesBuilder,
       highlighted: highlighted,
@@ -120,25 +131,27 @@ class Code {
     required this.text,
     required this.foldableBlocks,
     required this.foldedBlocks,
+    required this.hiddenLineRanges,
     required this.hiddenRanges,
-    required this.hiddenRangesBuilder,
+    required HiddenRangesBuilder hiddenRangesBuilder,
     required this.highlighted,
     required this.issues,
     required this.lines,
     required this.namedSections,
     required this.visibleHighlighted,
     required this.visibleText,
-  });
+  }) : _hiddenRangesBuilder = hiddenRangesBuilder;
 
   static const empty = Code._(
     text: '',
     foldableBlocks: [],
     foldedBlocks: {},
+    hiddenLineRanges: HiddenLineRanges.empty,
     hiddenRanges: HiddenRanges.empty,
     hiddenRangesBuilder: HiddenRangesBuilder.empty,
     highlighted: null,
     issues: [],
-    lines: [],
+    lines: CodeLines.empty,
     namedSections: {},
     visibleHighlighted: null,
     visibleText: '',
@@ -169,59 +182,14 @@ class Code {
   ) {
     return <int, HiddenRange>{
       for (final comment in comments)
-        comment.characterIndex: HiddenRange.fromStartAndText(
-            comment.characterIndex, comment.outerContent),
+        comment.characterIndex: HiddenRange(
+          comment.characterIndex,
+          comment.characterIndex + comment.outerContent.length,
+          firstLine: comment.lineIndex,
+          lastLine: comment.lineIndex,
+          wholeFirstLine: false,
+        ),
     };
-  }
-
-  /// Returns the 0-based line number of the character at [characterIndex].
-  ///
-  /// [characterIndex] can be from 0 to length inclusive.
-  /// If it is equal to length, it means the cursor at the end of the text.
-  ///
-  /// Other values throw [RangeError].
-  int characterIndexToLineIndex(int characterIndex) {
-    int lowerLine = 0;
-    int upperLine = lines.length - 1;
-
-    while (true) {
-      final lowerCharacter = lines[lowerLine].textRange.start;
-      final upperCharacter = lines[upperLine].textRange.end;
-
-      if (upperCharacter == lowerCharacter) {
-        return lowerLine; // Empty line case, avoid division by zero.
-      }
-
-      // Linear interpolation search.
-      final lineIndex = lowerLine +
-          ((upperLine - lowerLine) *
-                  (characterIndex - lowerCharacter) /
-                  (upperCharacter - lowerCharacter))
-              .floor();
-
-      final line = lines[lineIndex];
-
-      if (characterIndex < line.textRange.start) {
-        // Character is before the current line. Next search before it.
-        upperLine = lineIndex - 1;
-        continue;
-      }
-
-      if (characterIndex > line.textRange.end) {
-        // Character is after this line. Next search after it.
-        lowerLine = lineIndex + 1;
-        continue;
-      }
-
-      if (characterIndex == line.textRange.end) {
-        if (line.text.characters.lastOrNull == '\n') {
-          // Character is just after this string's \n, it is the next line.
-          return lineIndex + 1;
-        }
-      }
-
-      return lineIndex;
-    }
   }
 
   /// Returns whether the current selection has any read-only part.
@@ -235,8 +203,8 @@ class Code {
 
     return isReadOnlyInLineRange(
       TextRange(
-        start: characterIndexToLineIndex(startChar),
-        end: characterIndexToLineIndex(endChar),
+        start: lines.characterIndexToLineIndex(startChar),
+        end: lines.characterIndexToLineIndex(endChar),
       ),
     );
   }
@@ -244,7 +212,7 @@ class Code {
   /// Returns whether any of the lines of this range is read-only.
   bool isReadOnlyInLineRange(TextRange lineRange) {
     for (int line = lineRange.start; line <= lineRange.end; line++) {
-      if (lines[line].isReadOnly) {
+      if (lines.lines[line].isReadOnly) {
         return true;
       }
     }
@@ -317,8 +285,8 @@ class Code {
             : 0);
 
     final linesChanged = TextRange(
-      start: characterIndexToLineIndex(rangeBefore.start),
-      end: characterIndexToLineIndex(max(lastChar, rangeBefore.start)),
+      start: lines.characterIndexToLineIndex(rangeBefore.start),
+      end: lines.characterIndexToLineIndex(max(lastChar, rangeBefore.start)),
     );
 
     return CodeEditResult(
@@ -334,24 +302,14 @@ class Code {
     }
 
     final hiddenRange = foldableBlockToHiddenRange(block);
-    final newHiddenRangesBuilder = hiddenRangesBuilder.copyWithRange(
+    final newHiddenRangesBuilder = _hiddenRangesBuilder.copyWithRange(
       block,
       hiddenRange,
     );
-    final newHiddenRanges = newHiddenRangesBuilder.ranges;
 
-    return Code._(
-      text: text,
-      foldableBlocks: foldableBlocks,
+    return _copyWithFolding(
       foldedBlocks: {...foldedBlocks, block},
-      hiddenRanges: newHiddenRanges,
       hiddenRangesBuilder: newHiddenRangesBuilder,
-      highlighted: highlighted,
-      issues: issues,
-      lines: lines,
-      namedSections: namedSections,
-      visibleHighlighted: newHiddenRanges.cutHighlighted(highlighted),
-      visibleText: newHiddenRanges.cutString(text),
     );
   }
 
@@ -361,21 +319,9 @@ class Code {
       return this;
     }
 
-    final newHiddenRangesBuilder = hiddenRangesBuilder.copyWithoutRange(block);
-    final newHiddenRanges = newHiddenRangesBuilder.ranges;
-
-    return Code._(
-      text: text,
-      foldableBlocks: foldableBlocks,
+    return _copyWithFolding(
       foldedBlocks: {...foldedBlocks}..remove(block),
-      hiddenRanges: newHiddenRanges,
-      hiddenRangesBuilder: newHiddenRangesBuilder,
-      highlighted: highlighted,
-      issues: issues,
-      lines: lines,
-      namedSections: namedSections,
-      visibleHighlighted: newHiddenRanges.cutHighlighted(highlighted),
-      visibleText: newHiddenRanges.cutString(text),
+      hiddenRangesBuilder: _hiddenRangesBuilder.copyWithoutRange(block),
     );
   }
 
@@ -386,12 +332,15 @@ class Code {
   }
 
   HiddenRange foldableBlockToHiddenRange(FoldableBlock block) {
-    final firstLine = lines[block.firstLine + 1]; // Keep the 1st line visible.
-    final lastLine = lines[block.lastLine];
+    final firstLine = lines.lines[block.firstLine + 1]; //Keep 1st line visible.
+    final lastLine = lines.lines[block.lastLine];
 
     return HiddenRange(
-      start: firstLine.textRange.start - 1, // Includes '\n' before.
-      end: lastLine.textRange.end - 1, // Excludes '\n' after.
+      firstLine.textRange.start - 1, // Includes '\n' before.
+      lastLine.textRange.end - 1, // Excludes '\n' after.
+      firstLine: block.firstLine,
+      lastLine: block.lastLine,
+      wholeFirstLine: false, // Some characters of the first line are visible.
     );
   }
 
@@ -399,32 +348,49 @@ class Code {
   Code foldedAs(Code oldCode) {
     final matcher = FoldableBlockMatcher(
       oldBlocks: oldCode.foldableBlocks,
-      oldLines: oldCode.lines,
+      oldLines: oldCode.lines.lines,
       newBlocks: foldableBlocks,
-      newLines: lines,
+      newLines: lines.lines,
       oldFoldedBlocks: oldCode.foldedBlocks,
     );
 
-    final newHiddenRangesBuilder = hiddenRangesBuilder.copyMergingSourceMap({
+    final newHiddenRangesBuilder = _hiddenRangesBuilder.copyMergingSourceMap({
       FoldableBlock: {
         for (final block in matcher.newFoldedBlocks)
           block: foldableBlockToHiddenRange(block),
       },
     });
-    final newHiddenRanges = newHiddenRangesBuilder.ranges;
+
+    return _copyWithFolding(
+      foldedBlocks: matcher.newFoldedBlocks,
+      hiddenRangesBuilder: newHiddenRangesBuilder,
+    );
+  }
+
+  Code _copyWithFolding({
+    required Set<FoldableBlock> foldedBlocks,
+    required HiddenRangesBuilder hiddenRangesBuilder,
+  }) {
+    final hiddenRanges = hiddenRangesBuilder.ranges;
+
+    final hiddenLineRangesBuilder = HiddenLineRangesBuilder(
+      codeLines: lines,
+      hiddenRanges: hiddenRanges,
+    );
 
     return Code._(
       text: text,
       foldableBlocks: foldableBlocks,
-      foldedBlocks: matcher.newFoldedBlocks,
-      hiddenRanges: newHiddenRanges,
-      hiddenRangesBuilder: newHiddenRangesBuilder,
+      foldedBlocks: foldedBlocks,
+      hiddenLineRanges: hiddenLineRangesBuilder.hiddenLineRanges,
+      hiddenRanges: hiddenRanges,
+      hiddenRangesBuilder: hiddenRangesBuilder,
       highlighted: highlighted,
       issues: issues,
       lines: lines,
       namedSections: namedSections,
-      visibleHighlighted: newHiddenRanges.cutHighlighted(highlighted),
-      visibleText: newHiddenRanges.cutString(text),
+      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
+      visibleText: hiddenRanges.cutString(text),
     );
   }
 }

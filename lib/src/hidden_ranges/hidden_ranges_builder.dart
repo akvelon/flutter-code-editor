@@ -51,9 +51,14 @@ class HiddenRangesBuilder {
       final previous = result[i - 1];
 
       if (previous.end >= current.start) {
+        final end = max(current.end, previous.end);
+
         result[i - 1] = HiddenRange(
-          start: previous.start,
-          end: max(current.end, previous.end),
+          previous.start,
+          end,
+          firstLine: previous.firstLine,
+          lastLine: end == current.end ? current.lastLine : previous.lastLine,
+          wholeFirstLine: previous.wholeFirstLine,
         );
 
         result.removeAt(i);

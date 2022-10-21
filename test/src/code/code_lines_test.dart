@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:collection/collection.dart';
 import 'package:flutter_code_editor/src/code/code.dart';
 import 'package:flutter_code_editor/src/code/code_line.dart';
+import 'package:flutter_code_editor/src/code/code_lines.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 
@@ -19,17 +19,14 @@ void main() {
         final code = Code(text: text, language: _language);
 
         expect(
-          const ListEquality().equals(
-            code.lines,
-            [
-              CodeLine(
-                text: text,
-                textRange: TextRange(start: 0, end: text.length),
-                isReadOnly: false, // ignore: avoid_redundant_argument_values
-              ),
-            ],
-          ),
-          true,
+          code.lines,
+          CodeLines([
+            CodeLine(
+              text: text,
+              textRange: TextRange(start: 0, end: text.length),
+              isReadOnly: false, // ignore: avoid_redundant_argument_values
+            ),
+          ]),
         );
       }
     });
@@ -39,7 +36,7 @@ void main() {
 
       expect(
         code.lines,
-        [
+        CodeLines([
           // 30
           CodeLine.fromTextAndStart(
             '1 Lorem ipsum dolor sit amet,\n',
@@ -129,9 +126,9 @@ void main() {
             '15 sunt in culpa qui officia deserunt mollit anim id est laborum.',
             415,
           ),
-        ],
+        ]),
       );
-      expect(code.lines.last.textRange.end, 480);
+      expect(code.lines.lines.last.textRange.end, 480);
     });
 
     test('characterIndexToLineIndex', () {
@@ -177,7 +174,7 @@ void main() {
         };
 
         for (final entry in map.entries) {
-          final line = code.characterIndexToLineIndex(entry.key);
+          final line = code.lines.characterIndexToLineIndex(entry.key);
 
           expect(
             line,
@@ -186,9 +183,12 @@ void main() {
           );
         }
 
-        expect(() => code.characterIndexToLineIndex(-1), throwsRangeError);
         expect(
-          () => code.characterIndexToLineIndex(textWithTail.length + 1),
+          () => code.lines.characterIndexToLineIndex(-1),
+          throwsRangeError,
+        );
+        expect(
+          () => code.lines.characterIndexToLineIndex(textWithTail.length + 1),
           throwsRangeError,
           reason: 'Tail: "$tail"',
         );
@@ -201,7 +201,11 @@ void main() {
         final code = Code(text: text, language: _language);
 
         for (int i = 0; i <= texts.length; i++) {
-          expect(code.characterIndexToLineIndex(i), 0, reason: '"$text" at $i');
+          expect(
+            code.lines.characterIndexToLineIndex(i),
+            0,
+            reason: '"$text" at $i',
+          );
         }
       }
     });

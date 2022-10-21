@@ -12,8 +12,11 @@ public class MyClass {
 
 final _hiddenRanges = HiddenRanges(
   ranges: const [
-    HiddenRange(start: 9, end: 11), // 'as'
-    HiddenRange(start: 40, end: 61), // 'n() { // comment\n  }\n'
+    // 'as'
+    HiddenRange(9, 11, firstLine: 0, lastLine: 0, wholeFirstLine: false),
+
+    // 'n() { // comment\n  }\n'
+    HiddenRange(40, 61, firstLine: 1, lastLine: 1, wholeFirstLine: false),
   ],
   textLength: _text.length,
 );
@@ -29,8 +32,8 @@ void main() {
       expect(
         () => HiddenRanges(
           ranges: const [
-            HiddenRange(start: 0, end: 3),
-            HiddenRange(start: 1, end: 4),
+            HiddenRange(0, 3, firstLine: 0, lastLine: 0, wholeFirstLine: false),
+            HiddenRange(1, 4, firstLine: 0, lastLine: 0, wholeFirstLine: false),
           ],
           textLength: _text.length,
         ),
@@ -56,9 +59,9 @@ void main() {
       test('Valid array if has ranges', () {
         final ranges = HiddenRanges(
           ranges: const [
-            HiddenRange(start: 2, end: 4),
-            HiddenRange(start: 7, end: 9),
-            HiddenRange(start: 10, end: 13),
+            HiddenRange(2, 4, firstLine: 0, lastLine: 0, wholeFirstLine: true),
+            HiddenRange(6, 8, firstLine: 0, lastLine: 0, wholeFirstLine: true),
+            HiddenRange(9, 12, firstLine: 0, lastLine: 0, wholeFirstLine: true),
           ],
           textLength: 777,
         );

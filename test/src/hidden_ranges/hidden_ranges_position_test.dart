@@ -6,19 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 final _hiddenRanges = HiddenRanges(
   ranges: const [
-    //                How many chars hidden by the beginning of this range:
-    HiddenRange(start: 20, end: 23), //    0
-    HiddenRange(start: 31, end: 38), //    3
-    HiddenRange(start: 38, end: 42), //   10
-    HiddenRange(start: 67, end: 91), //   14
-    HiddenRange(start: 100, end: 101), // 38
-    HiddenRange(start: 102, end: 103), // 39
-    HiddenRange(start: 104, end: 105), // 40
-    HiddenRange(start: 106, end: 107), // 41
-    HiddenRange(start: 108, end: 109), // 42
-    HiddenRange(start: 110, end: 111), // 43
-    HiddenRange(start: 113, end: 123), // 44
-    //                                    54
+    //                     How many chars hidden by the beginning of this range:
+    HiddenRange(20, 23, firstLine: 0, lastLine: 0, wholeFirstLine: true), //   0
+    HiddenRange(31, 38, firstLine: 0, lastLine: 0, wholeFirstLine: true), //   3
+    HiddenRange(38, 42, firstLine: 0, lastLine: 0, wholeFirstLine: true), //  10
+    HiddenRange(67, 91, firstLine: 0, lastLine: 0, wholeFirstLine: true), //  14
+    HiddenRange(100, 101, firstLine: 0, lastLine: 0, wholeFirstLine: true), //38
+    HiddenRange(102, 103, firstLine: 0, lastLine: 0, wholeFirstLine: true), //39
+    HiddenRange(104, 105, firstLine: 0, lastLine: 0, wholeFirstLine: true), //40
+    HiddenRange(106, 107, firstLine: 0, lastLine: 0, wholeFirstLine: true), //41
+    HiddenRange(108, 109, firstLine: 0, lastLine: 0, wholeFirstLine: true), //42
+    HiddenRange(110, 111, firstLine: 0, lastLine: 0, wholeFirstLine: true), //43
+    HiddenRange(113, 123, firstLine: 0, lastLine: 0, wholeFirstLine: true), //44
+    //                                                                        54
   ],
   textLength: 140,
 );
@@ -100,7 +100,7 @@ void main() {
     test('Recover with a single range', () {
       final hiddenRanges = HiddenRanges(
         ranges: const [
-          HiddenRange(start: 5, end: 10),
+          HiddenRange(5, 10, firstLine: 0, lastLine: 0, wholeFirstLine: true),
         ],
         textLength: 140,
       );
