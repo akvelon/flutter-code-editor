@@ -6,19 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 final _hiddenRanges = HiddenRanges(
   ranges: const [
-    //                How many chars hidden by the beginning of this range:
-    HiddenRange(start: 20, end: 23, text: '123'), //                      0
-    HiddenRange(start: 31, end: 38, text: '1234567'), //                  3
-    HiddenRange(start: 38, end: 42, text: '1234'), //                     10
-    HiddenRange(start: 67, end: 91, text: '123456789012345678901234'), // 14
-    HiddenRange(start: 100, end: 101, text: '1'), //                      38
-    HiddenRange(start: 102, end: 103, text: '1'), //                      39
-    HiddenRange(start: 104, end: 105, text: '1'), //                      40
-    HiddenRange(start: 106, end: 107, text: '1'), //                      41
-    HiddenRange(start: 108, end: 109, text: '1'), //                      42
-    HiddenRange(start: 110, end: 111, text: '1'), //                      43
-    HiddenRange(start: 113, end: 123, text: '1234567890'), //             44
-    //                                                                    54
+    //                     How many chars hidden by the beginning of this range:
+    HiddenRange(20, 23, firstLine: 0, lastLine: 0, wholeFirstLine: true), //   0
+    HiddenRange(31, 38, firstLine: 0, lastLine: 0, wholeFirstLine: true), //   3
+    HiddenRange(38, 42, firstLine: 0, lastLine: 0, wholeFirstLine: true), //  10
+    HiddenRange(67, 91, firstLine: 0, lastLine: 0, wholeFirstLine: true), //  14
+    HiddenRange(100, 101, firstLine: 0, lastLine: 0, wholeFirstLine: true), //38
+    HiddenRange(102, 103, firstLine: 0, lastLine: 0, wholeFirstLine: true), //39
+    HiddenRange(104, 105, firstLine: 0, lastLine: 0, wholeFirstLine: true), //40
+    HiddenRange(106, 107, firstLine: 0, lastLine: 0, wholeFirstLine: true), //41
+    HiddenRange(108, 109, firstLine: 0, lastLine: 0, wholeFirstLine: true), //42
+    HiddenRange(110, 111, firstLine: 0, lastLine: 0, wholeFirstLine: true), //43
+    HiddenRange(113, 123, firstLine: 0, lastLine: 0, wholeFirstLine: true), //44
+    //                                                                        54
   ],
   textLength: 140,
 );
@@ -81,7 +81,7 @@ void main() {
           final placeHiddenRanges = affinities[affinityIndex];
           final expected = example.value[affinityIndex];
 
-          int cutPosition() {
+          int recoverPosition() {
             return _hiddenRanges.recoverPosition(
               example.key,
               placeHiddenRanges: placeHiddenRanges,
@@ -89,8 +89,8 @@ void main() {
           }
 
           final reason = '#$i. $placeHiddenRanges: ${example.key} -> $expected';
-          expect(cutPosition, returnsNormally, reason: reason);
-          expect(cutPosition(), expected, reason: reason);
+          expect(recoverPosition, returnsNormally, reason: reason);
+          expect(recoverPosition(), expected, reason: reason);
         }
 
         i++;
@@ -100,7 +100,7 @@ void main() {
     test('Recover with a single range', () {
       final hiddenRanges = HiddenRanges(
         ranges: const [
-          HiddenRange(start: 5, end: 10, text: '12345'),
+          HiddenRange(5, 10, firstLine: 0, lastLine: 0, wholeFirstLine: true),
         ],
         textLength: 140,
       );
@@ -117,7 +117,7 @@ void main() {
           final placeHiddenRanges = affinities[affinityIndex];
           final expected = example.value[affinityIndex];
 
-          int cutPosition() {
+          int recoverPosition() {
             return hiddenRanges.recoverPosition(
               example.key,
               placeHiddenRanges: placeHiddenRanges,
@@ -125,8 +125,8 @@ void main() {
           }
 
           final reason = '#$i. $placeHiddenRanges: ${example.key} -> $expected';
-          expect(cutPosition, returnsNormally, reason: reason);
-          expect(cutPosition(), expected, reason: reason);
+          expect(recoverPosition, returnsNormally, reason: reason);
+          expect(recoverPosition(), expected, reason: reason);
         }
 
         i++;

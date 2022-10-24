@@ -12,9 +12,11 @@ public class MyClass {
 
 final _hiddenRanges = HiddenRanges(
   ranges: const [
-    HiddenRange(start: 1, end: 1, text: ''),
-    HiddenRange(start: 9, end: 11, text: 'as'),
-    HiddenRange(start: 40, end: 61, text: 'n() { // comment\n  }\n'),
+    // 'as'
+    HiddenRange(9, 11, firstLine: 0, lastLine: 0, wholeFirstLine: false),
+
+    // 'n() { // comment\n  }\n'
+    HiddenRange(40, 61, firstLine: 1, lastLine: 1, wholeFirstLine: false),
   ],
   textLength: _text.length,
 );
@@ -26,30 +28,12 @@ public cls MyClass {
 
 void main() {
   group('HiddenRanges.', () {
-    test('Empty ranges are not stored', () {
-      expect(
-        HiddenRanges(
-          ranges: const [
-            HiddenRange(start: 1, end: 4, text: '123'),
-            HiddenRange(start: 7, end: 7, text: ''),
-          ],
-          textLength: _text.length,
-        ),
-        HiddenRanges(
-          ranges: const [
-            HiddenRange(start: 1, end: 4, text: '123'),
-          ],
-          textLength: _text.length,
-        ),
-      );
-    });
-
     test('Ranges cannot overlap', () {
       expect(
         () => HiddenRanges(
           ranges: const [
-            HiddenRange(start: 0, end: 3, text: '012'),
-            HiddenRange(start: 1, end: 4, text: '123'),
+            HiddenRange(0, 3, firstLine: 0, lastLine: 0, wholeFirstLine: false),
+            HiddenRange(1, 4, firstLine: 0, lastLine: 0, wholeFirstLine: false),
           ],
           textLength: _text.length,
         ),
@@ -75,9 +59,9 @@ void main() {
       test('Valid array if has ranges', () {
         final ranges = HiddenRanges(
           ranges: const [
-            HiddenRange(start: 2, end: 4, text: '23'),
-            HiddenRange(start: 7, end: 9, text: '78'),
-            HiddenRange(start: 10, end: 13, text: 'ABC'),
+            HiddenRange(2, 4, firstLine: 0, lastLine: 0, wholeFirstLine: true),
+            HiddenRange(6, 8, firstLine: 0, lastLine: 0, wholeFirstLine: true),
+            HiddenRange(9, 12, firstLine: 0, lastLine: 0, wholeFirstLine: true),
           ],
           textLength: 777,
         );
@@ -145,11 +129,17 @@ void main() {
     });
 
     group('cutHighlighted.', () {
+      test('null -> null', () {
+        final result = _hiddenRanges.cutHighlighted(null);
+
+        expect(result, null);
+      });
+
       test('Cuts inner text for hidden parts, keeps the tags', () {
         final highlighted = highlight.parse(_text, language: 'java');
 
         final result = _hiddenRanges.cutHighlighted(highlighted);
-        final html = result.toHtml();
+        final html = result?.toHtml();
 
         expect(
           html,

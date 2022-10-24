@@ -1,35 +1,46 @@
-import 'package:meta/meta.dart';
+import 'package:equatable/equatable.dart';
 
 import '../code/text_range.dart';
 
-@immutable
-class HiddenRange extends NormalizedTextRange {
-  final String text;
+class HiddenRange extends NormalizedTextRange with EquatableMixin {
+  final int firstLine;
+  final int lastLine;
+  final bool wholeFirstLine;
 
-  const HiddenRange({
-    required super.start,
-    required super.end,
-    required this.text,
+  const HiddenRange(
+    int start,
+    int end, {
+    required this.firstLine,
+    required this.lastLine,
+    required this.wholeFirstLine,
   })  : assert(start >= 0, 'Start should be >= 0, $start given'),
+        assert(end > start, 'Range should not be empty, $start-$end given'),
         assert(
-          text.length == end - start,
-          'Length of $text is not equal to $end - $start',
-        );
+          lastLine >= firstLine,
+          'lastLine must be >= firstLine, $firstLine-$lastLine given',
+        ),
+        super(start: start, end: end);
 
-  const HiddenRange.fromStartAndText(int start, this.text)
-      : super(
-          start: start,
-          end: start + text.length,
-        );
+  int get length => end - start;
 
-  @override
-  int get hashCode => Object.hash(
-        super.hashCode,
-        text,
-      );
+  /// Sorts by [start], then by [end].
+  static int sort(HiddenRange a, HiddenRange b) {
+    switch ((a.start - b.start).sign) {
+      case -1:
+        return -1;
+      case 1:
+        return 1;
+    }
 
-  @override
-  bool operator ==(Object other) {
-    return super == other && other is HiddenRange && text == other.text;
+    return a.end - b.end;
   }
+
+  @override
+  List<Object> get props => [
+        start,
+        end,
+        firstLine,
+        lastLine,
+        wholeFirstLine,
+      ];
 }

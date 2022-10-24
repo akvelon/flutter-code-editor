@@ -27,8 +27,8 @@ class Mapping:
         self.items_list = []
         self.__update(iterable)''',
           expected: [
-            _FB(startLine: 0, endLine: 3, type: _T.indent),
-            _FB(startLine: 1, endLine: 3, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 3, type: _T.indent),
           ],
         ),
 
@@ -44,10 +44,10 @@ class Mapping:
   for item in iterable:
    self.items_list.append(item)''',
           expected: [
-            _FB(startLine: 0, endLine: 7, type: _T.indent),
-            _FB(startLine: 1, endLine: 3, type: _T.indent),
-            _FB(startLine: 5, endLine: 7, type: _T.indent),
-            _FB(startLine: 6, endLine: 7, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 5, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 6, lastLine: 7, type: _T.indent),
           ],
         ),
 
@@ -70,10 +70,10 @@ class Mapping:
 
             self.items_list.append(item)''',
           expected: [
-            _FB(startLine: 0, endLine: 14, type: _T.indent),
-            _FB(startLine: 2, endLine: 6, type: _T.indent),
-            _FB(startLine: 9, endLine: 14, type: _T.indent),
-            _FB(startLine: 12, endLine: 14, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 14, type: _T.indent),
+            _FB(firstLine: 2, lastLine: 6, type: _T.indent),
+            _FB(firstLine: 9, lastLine: 14, type: _T.indent),
+            _FB(firstLine: 12, lastLine: 14, type: _T.indent),
           ],
         ),
 
@@ -94,10 +94,10 @@ class Mapping:
             
 ''',
           expected: [
-            _FB(startLine: 2, endLine: 9, type: _T.indent),
-            _FB(startLine: 3, endLine: 5, type: _T.indent),
-            _FB(startLine: 7, endLine: 9, type: _T.indent),
-            _FB(startLine: 8, endLine: 9, type: _T.indent),
+            _FB(firstLine: 2, lastLine: 9, type: _T.indent),
+            _FB(firstLine: 3, lastLine: 5, type: _T.indent),
+            _FB(firstLine: 7, lastLine: 9, type: _T.indent),
+            _FB(firstLine: 8, lastLine: 9, type: _T.indent),
           ],
         ),
 
@@ -113,11 +113,11 @@ class Foo:
         for item in iterable:
             self.items_list.append(item)''',
           expected: [
-            _FB(startLine: 0, endLine: 3, type: _T.indent),
-            _FB(startLine: 1, endLine: 3, type: _T.indent),
-            _FB(startLine: 4, endLine: 7, type: _T.indent),
-            _FB(startLine: 5, endLine: 7, type: _T.indent),
-            _FB(startLine: 6, endLine: 7, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 4, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 5, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 6, lastLine: 7, type: _T.indent),
           ],
         ),
 
@@ -132,9 +132,9 @@ class Mapping:
          for item in iterable:
         self.items_list.append(item)''',
           expected: [
-            _FB(startLine: 0, endLine: 6, type: _T.indent),
-            _FB(startLine: 1, endLine: 6, type: _T.indent),
-            _FB(startLine: 4, endLine: 6, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 6, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 6, type: _T.indent),
+            _FB(firstLine: 4, lastLine: 6, type: _T.indent),
           ],
         ),
 
@@ -150,10 +150,10 @@ class Mapping:                                # 0
       for item in iterable:                   # 6
         self.items_list.append(item)          # 7''',
           expected: [
-            _FB(startLine: 0, endLine: 7, type: _T.indent),
-            _FB(startLine: 1, endLine: 3, type: _T.indent),
-            _FB(startLine: 5, endLine: 7, type: _T.indent),
-            _FB(startLine: 6, endLine: 7, type: _T.indent),
+            _FB(firstLine: 0, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 1, lastLine: 3, type: _T.indent),
+            _FB(firstLine: 5, lastLine: 7, type: _T.indent),
+            _FB(firstLine: 6, lastLine: 7, type: _T.indent),
           ],
         ),
 
@@ -166,7 +166,7 @@ numbers = [1,
     4, 
     5
 ]''',
-          expected: [_FB(startLine: 0, endLine: 4, type: _T.indent)],
+          expected: [_FB(firstLine: 0, lastLine: 4, type: _T.indent)],
         )
       ];
 

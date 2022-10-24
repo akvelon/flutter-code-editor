@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
 
 import 'code_line.dart';
+import 'code_lines.dart';
 
 class CodeLinesBuilder {
-  static List<CodeLine> textToCodeLines({
+  static CodeLines textToCodeLines({
     required String text,
     required Map<int, bool> readonlyCommentsByLine,
   }) {
@@ -27,7 +28,7 @@ class CodeLinesBuilder {
       charIndex += line.length;
     }
 
-    return result;
+    return CodeLines(result);
   }
 
   static List<String> _splitText(String text) {

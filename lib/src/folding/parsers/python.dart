@@ -1,6 +1,6 @@
 import 'package:highlight/highlight_core.dart';
 
-import '../../code/code_line.dart';
+import '../../code/code_lines.dart';
 import '../foldable_block.dart';
 import 'abstract.dart';
 import 'highlight.dart';
@@ -12,7 +12,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   List<FoldableBlock> parse({
     required Result highlighted,
     required Set<Object?> serviceCommentsSources,
-    required List<CodeLine> lines,
+    required CodeLines lines,
   }) {
     final highlightBlocks = _getBlocksFromParser(
       HighlightFoldableBlockParser(),
@@ -41,7 +41,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     AbstractFoldableBlockParser parser,
     Result highlighted,
     Set<Object?> serviceCommentsSources,
-    List<CodeLine> lines,
+    CodeLines lines,
   ) {
     parser.parse(
       highlighted: highlighted,
@@ -86,7 +86,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       indentBlockIndex = _addAllPossibleIndentBlocks(
         indentBlockIndex,
         indentBlocks,
-        highlightBlock.startLine,
+        highlightBlock.firstLine,
         result,
       );
 
@@ -129,7 +129,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     int result = 0;
     for (int i = startIndex; i < blocks.length; i++) {
       final indentBlock = blocks[i];
-      if (indentBlock.startLine < line) {
+      if (indentBlock.firstLine < line) {
         result++;
       } else {
         break;

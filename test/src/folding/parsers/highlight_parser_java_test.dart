@@ -21,8 +21,8 @@ public static void main(
   }
 }''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 5, type: FBT.braces),
-        FB(startLine: 1, endLine: 4, type: FBT.union),
+        FB(firstLine: 0, lastLine: 5, type: FBT.braces),
+        FB(firstLine: 1, lastLine: 4, type: FBT.union),
       ];
       _Tester.parseAndCheck(mode: java, code: code, expected: expectedBlocks);
     });
@@ -33,7 +33,7 @@ public class MyClass {
     public static void main(String[] args) {}
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 2, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 2, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: java, code: code, expected: expected);
     });
@@ -82,8 +82,8 @@ public class MyClass {
 /// {                    5
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 6, type: FBT.braces),
-        FB(startLine: 2, endLine: 4, type: FBT.multilineComment),
+        FB(firstLine: 0, lastLine: 6, type: FBT.braces),
+        FB(firstLine: 2, lastLine: 4, type: FBT.multilineComment),
       ];
       _Tester.parseAndCheck(mode: java, code: code, expected: expected);
     });
@@ -107,10 +107,10 @@ void method2 // Not the only thing in the line      10
 // Single                                             14
 // Single                                             15''';
       const expected = [
-        FB(startLine: 0, endLine: 1, type: FBT.singleLineComment),
-        FB(startLine: 2, endLine: 13, type: FBT.braces),
-        FB(startLine: 4, endLine: 6, type: FBT.singleLineComment),
-        FB(startLine: 14, endLine: 15, type: FBT.singleLineComment),
+        FB(firstLine: 0, lastLine: 1, type: FBT.singleLineComment),
+        FB(firstLine: 2, lastLine: 13, type: FBT.braces),
+        FB(firstLine: 4, lastLine: 6, type: FBT.singleLineComment),
+        FB(firstLine: 14, lastLine: 15, type: FBT.singleLineComment),
       ];
       _Tester.parseAndCheck(mode: java, code: code, expected: expected);
     });
@@ -131,9 +131,9 @@ import java.lang.Math;
 
 public class MyClass {}''';
       const expected = [
-        FB(startLine: 0, endLine: 6, type: FBT.imports),
-        FB(startLine: 4, endLine: 5, type: FBT.singleLineComment),
-        FB(startLine: 8, endLine: 9, type: FBT.multilineComment),
+        FB(firstLine: 0, lastLine: 6, type: FBT.imports),
+        FB(firstLine: 4, lastLine: 5, type: FBT.singleLineComment),
+        FB(firstLine: 8, lastLine: 9, type: FBT.multilineComment),
       ];
       _Tester.parseAndCheck(mode: java, code: code, expected: expected);
     });
@@ -148,8 +148,8 @@ public class MyClass {}
 import java.lang.Math;
 import java.lang.Exception;''';
       const expected = [
-        FB(startLine: 1, endLine: 2, type: FBT.imports),
-        FB(startLine: 4, endLine: 5, type: FBT.imports),
+        FB(firstLine: 1, lastLine: 2, type: FBT.imports),
+        FB(firstLine: 4, lastLine: 5, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: mode, code: code, expected: expected);
     });
@@ -162,8 +162,8 @@ void method() {
 // comment
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 4, type: FBT.braces),
-        FB(startLine: 1, endLine: 2, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 4, type: FBT.braces),
+        FB(firstLine: 1, lastLine: 2, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: java, code: code, expected: expected);
     });
@@ -176,7 +176,7 @@ class MyClass {
 // [END section2]
 }''';
       const expected = [
-        FB(startLine: 0, endLine: 3, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 3, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: mode, code: code, expected: expected);
     });

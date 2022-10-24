@@ -21,7 +21,7 @@ func (
 
 }''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 5, type: FBT.union),
+        FB(firstLine: 0, lastLine: 5, type: FBT.union),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -32,7 +32,7 @@ func main() {
 	type Life struct { a, b *Field;w, h int;}
 }''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 2, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 2, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -73,7 +73,7 @@ func main() {
 	b := `)]}`
 }''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 3, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 3, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -103,12 +103,12 @@ func main() {
 	fmt.Println("Hello, 世界" + a + b)
 }''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 1, type: FBT.singleLineComment),
-        FB(startLine: 3, endLine: 5, type: FBT.multilineComment),
-        FB(startLine: 6, endLine: 7, type: FBT.imports),
-        FB(startLine: 9, endLine: 21, type: FBT.braces),
-        FB(startLine: 10, endLine: 11, type: FBT.singleLineComment),
-        FB(startLine: 13, endLine: 17, type: FBT.multilineComment),
+        FB(firstLine: 0, lastLine: 1, type: FBT.singleLineComment),
+        FB(firstLine: 3, lastLine: 5, type: FBT.multilineComment),
+        FB(firstLine: 6, lastLine: 7, type: FBT.imports),
+        FB(firstLine: 9, lastLine: 21, type: FBT.braces),
+        FB(firstLine: 10, lastLine: 11, type: FBT.singleLineComment),
+        FB(firstLine: 13, lastLine: 17, type: FBT.multilineComment),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -129,7 +129,7 @@ import "strings" //  9
 
 func main() {}''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 9, type: FBT.imports),
+        FB(firstLine: 0, lastLine: 9, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -146,7 +146,7 @@ import (
 
 func main() {}''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 6, type: FBT.union),
+        FB(firstLine: 0, lastLine: 6, type: FBT.union),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -160,8 +160,8 @@ import "fmt"
 import "strings"
 func main() {}''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 1, type: FBT.imports),
-        FB(startLine: 3, endLine: 4, type: FBT.imports),
+        FB(firstLine: 0, lastLine: 1, type: FBT.imports),
+        FB(firstLine: 3, lastLine: 4, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -172,7 +172,7 @@ func main() {
 }//comment
 //comment''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 1, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 1, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
@@ -184,7 +184,7 @@ func main() {
 // [END section2]
 }''';
       const expectedBlocks = [
-        FB(startLine: 0, endLine: 3, type: FBT.braces),
+        FB(firstLine: 0, lastLine: 3, type: FBT.braces),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });

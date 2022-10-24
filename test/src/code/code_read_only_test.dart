@@ -44,8 +44,12 @@ void main() {
         );
 
         final readonly = data['readonly']! as List<bool>;
-        for (int i = code.lines.length; --i >= 0;) {
-          expect(code.lines[i].isReadOnly, readonly[i], reason: 'Line #$i');
+        for (int i = code.lines.lines.length; --i >= 0;) {
+          expect(
+            code.lines.lines[i].isReadOnly,
+            readonly[i],
+            reason: 'Line #$i',
+          );
         }
       }
     });
@@ -57,7 +61,7 @@ void main() {
 
         final code = Code(text: textWithReadonly, language: angelscript);
 
-        expect(code.lines.first.isReadOnly, false);
+        expect(code.lines.lines.first.isReadOnly, false);
       },
     );
 
@@ -94,7 +98,7 @@ public class MyClass {
       );
 
       expect(
-        code.lines.map((line) => line.isReadOnly),
+        code.lines.lines.map((line) => line.isReadOnly),
         expected,
       );
     });
