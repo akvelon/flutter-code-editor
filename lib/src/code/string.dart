@@ -69,4 +69,8 @@ extension MyString on String {
 
     return TextRange(start: start, end: last + 1);
   }
+
+  String tabsToSpaces(int spaceCount) {
+    return replaceAll('\t', ' ' * spaceCount);
+  }
 }
