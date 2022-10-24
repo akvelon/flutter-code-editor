@@ -33,6 +33,7 @@ class HiddenLineRangesBuilder {
       //   3  XXXij
       //   4  klmno
       // maps as 0 -> 0, 1 -> 1, 4 -> 2
+      //                           ^- this is the only breakpoint here.
       //
       // Example 2 (the hidden range starts at the beginning of the line):
       //   0  abcde      0  abcde
@@ -41,6 +42,7 @@ class HiddenLineRangesBuilder {
       //   3  XXXij
       //   4  klmno
       // maps as 0 -> 0, 3 -> 1, 4 -> 2
+      //                   ^- this is the only breakpoint here.
       final add = range.wholeFirstLine ? 0 : 1;
 
       breakpoints.add(
