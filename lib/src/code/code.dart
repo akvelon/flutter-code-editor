@@ -222,6 +222,11 @@ class Code {
 
   /// Returns the resulting full text if a given visible text edit is applied.
   ///
+  /// The text in [visibleAfter] should be different from the [visibleText]
+  /// otherwise the selected text is still considered to change.
+  /// This is for the purpose of speed because this method is only supposed
+  /// to be called during a change.
+  ///
   /// [oldSelection] is the [TextSelection] before the edit.
   /// It is considered in a few special cases if the edit is around
   /// the selection. This is required to disambiguate
