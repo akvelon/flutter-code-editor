@@ -47,6 +47,27 @@ class GutterWidget extends StatelessWidget {
         ),
     ];
 
+    _fillIssues(tableRows);
+    _fillFoldToggles(tableRows);
+
+    return Container(
+      padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
+      width: style.width,
+      child: Table(
+        columnWidths: const {
+          _lineNumberColumn: FlexColumnWidth(),
+          _issueColumn: FixedColumnWidth(_issueColumnWidth),
+          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
+        },
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        children: tableRows,
+      ),
+    );
+  }
+
+  void _fillIssues(List<TableRow> tableRows) {
+    final code = codeController.code;
+
     for (final issue in code.issues) {
       final lineIndex = _lineIndexToTableRowIndex(issue.line);
       if (lineIndex == null) {
@@ -55,6 +76,10 @@ class GutterWidget extends StatelessWidget {
 
       tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
     }
+  }
+
+  void _fillFoldToggles(List<TableRow> tableRows) {
+    final code = codeController.code;
 
     for (final block in code.foldableBlocks) {
       final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
@@ -72,20 +97,6 @@ class GutterWidget extends StatelessWidget {
             : () => codeController.foldAt(block.firstLine),
       );
     }
-
-    return Container(
-      padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
-      width: style.width,
-      child: Table(
-        columnWidths: const {
-          _lineNumberColumn: FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(_issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
-        },
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-        children: tableRows,
-      ),
-    );
   }
 
   int? _lineIndexToTableRowIndex(int line) {
