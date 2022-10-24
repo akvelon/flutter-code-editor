@@ -32,18 +32,35 @@ private class MyClass {
 }
 ''';
 
+const _commentsCode = '''
+private class MyClass {
+  //comment1
+  //comment2
+  void method() {}
+}
+''';
+
 void main() {
-  late CodeController controller;
   late FocusNode focusNode;
 
   setUp(() {
-    controller = CodeController(
-      text: _code,
+    focusNode = FocusNode();
+  });
+
+  CodeController createController(String text) {
+    return CodeController(
+      text: text,
       language: java,
       namedSectionParser: const BracketsStartEndNamedSectionParser(),
     );
-    focusNode = FocusNode();
-  });
+  }
+
+  Future<CodeController> pumpController(WidgetTester wt, String text) async {
+    final controller = createController(text);
+    await wt.pumpWidget(createApp(controller, focusNode));
+    focusNode.requestFocus();
+    return controller;
+  }
 
   group('CodeController. Folding.', () {
     group('Trivial.', () {
@@ -53,20 +70,16 @@ int a;
 int b;
 int c;
 ''';
-
-        controller = CodeController(
-          text: text,
-          language: java,
-          namedSectionParser: const BracketsStartEndNamedSectionParser(),
-        );
+        final controller = createController(text);
 
         controller.foldAt(1);
-        controller.unfoldAt(1);
+        controller.unfoldAt(2);
 
         expect(controller.code.visibleText, text);
       });
 
       test('Folding does nothing if no foldable block on the line', () {
+        final controller = createController(_code);
         final oldCode = controller.code;
 
         controller.foldAt(3);
@@ -75,6 +88,7 @@ int c;
       });
 
       test('Double folding changes nothing', () {
+        final controller = createController(_code);
         controller.foldAt(1);
         final oldCode = controller.code;
 
@@ -84,6 +98,7 @@ int c;
       });
 
       test('Unfolding does nothing if no foldable block on the line', () {
+        final controller = createController(_code);
         final oldCode = controller.code;
 
         controller.unfoldAt(3);
@@ -92,6 +107,7 @@ int c;
       });
 
       test('Unfolding non-folded changes nothing', () {
+        final controller = createController(_code);
         final oldCode = controller.code;
 
         controller.unfoldAt(1);
@@ -102,6 +118,7 @@ int c;
 
     group('Hides text.', () {
       test('Hides highlighted', () {
+        final controller = createController(_code);
         final originalHtml = controller.code.visibleHighlighted?.toHtml();
 
         controller.foldAt(1);
@@ -125,12 +142,10 @@ int c;
       });
 
       testWidgets('Cursor before', (WidgetTester wt) async {
+        final controller = await pumpController(wt, _code);
         final textBefore = controller.rawText;
-
-        await wt.pumpWidget(createApp(controller, focusNode));
-        focusNode.requestFocus();
-
         await wt.selectFromHome(1, offset: 1);
+
         controller.foldAt(1);
 
         expect(
@@ -157,11 +172,10 @@ int c;
 
     group('Editing', () {
       testWidgets('above a folded block', (WidgetTester wt) async {
-        await wt.pumpWidget(createApp(controller, focusNode));
-        focusNode.requestFocus();
-
+        final controller = await pumpController(wt, _code);
         controller.foldAt(1);
         await wt.selectFromHome(0, offset: 7);
+
         controller.value = controller.value.replacedSelection('public');
 
         expect(
@@ -205,11 +219,10 @@ public class MyClass {
       });
 
       testWidgets('the first line of a folded block', (WidgetTester wt) async {
-        await wt.pumpWidget(createApp(controller, focusNode));
-        focusNode.requestFocus();
-
+        final controller = await pumpController(wt, _code);
         controller.foldAt(0);
         await wt.selectFromHome(0, offset: 7);
+
         controller.value = controller.value.replacedSelection('public');
 
         expect(
@@ -247,17 +260,12 @@ public class MyClass {
       });
 
       testWidgets('between folded blocks', (WidgetTester wt) async {
-        await wt.pumpWidget(createApp(controller, focusNode));
-        focusNode.requestFocus();
-
+        final controller = await pumpController(wt, _code);
         controller.foldAt(1);
         controller.foldAt(7);
 
-        // TODO(alexeyinkin): Allow this edit as one pasting, https://github.com/akvelon/flutter-code-editor/issues/82
         await wt.selectFromHome(43);
-        controller.value = controller.value.replacedSelection('int n;');
-        await wt.selectFromHome(49);
-        controller.value = controller.value.replacedSelection('\n');
+        controller.value = controller.value.replacedSelection('int n;\n');
 
         expect(
           controller.value,
@@ -303,9 +311,7 @@ int n;
 
     group('Deleting folded blocks.', () {
       testWidgets('First block of the same length', (WidgetTester wt) async {
-        await wt.pumpWidget(createApp(controller, focusNode));
-        focusNode.requestFocus();
-
+        final controller = await pumpController(wt, _code);
         controller.foldAt(1);
 
         await wt.selectFromHome(41, offset: 2);
@@ -331,14 +337,12 @@ private class MyClass {
       });
 
       testWidgets('Second block of the same length', (WidgetTester wt) async {
-        await wt.pumpWidget(createApp(controller, focusNode));
-        focusNode.requestFocus();
-
+        final controller = await pumpController(wt, _code);
         controller.foldAt(7);
-
         await wt.selectFromHome(102, offset: 2);
         // ...void method2() {
         //                   \ cursor
+
         controller.value = controller.value.replacedSelection(';');
 
         expect(
@@ -364,27 +368,19 @@ private class MyClass {
       testWidgets(
         'When deleting 2nd identical folded block, 1st one incorrectly folds',
         (WidgetTester wt) async {
-          controller = CodeController(
-            text: '''
+          final controller = await pumpController(wt, '''
 {
 if (true) {
 }
 if (true) {
 }
 }
-''',
-            language: java,
-            namedSectionParser: const BracketsStartEndNamedSectionParser(),
-          );
-
-          await wt.pumpWidget(createApp(controller, focusNode));
-          focusNode.requestFocus();
-
+''');
           controller.foldAt(3);
-
           await wt.selectFromHome(26, offset: 2);
           // {\nif (true) {\n}\nif (true) {}\n\n
           //                              \ cursor
+
           controller.value = controller.value.replacedSelection(';');
 
           expect(
@@ -401,6 +397,52 @@ if (true) ;}
           );
         },
       );
+
+      testWidgets('Deleting folded comments', (WidgetTester wt) async {
+        final controller = await pumpController(wt, _commentsCode);
+        controller.foldAt(1);
+        await wt.selectFromHome(26, offset: 13);
+        // private class MyClass {\n  //comment1\n  void method...
+        //                            \--selected-->
+
+        controller.value = controller.value.replacedSelection('');
+
+        expect(
+          controller.value,
+          const TextEditingValue(
+            text: '''
+private class MyClass {
+  void method() {}
+}
+''',
+            selection: TextSelection.collapsed(offset: 26),
+          ),
+        );
+      });
+
+      testWidgets('Inserting after folded comments', (WidgetTester wt) async {
+        final controller = await pumpController(wt, _commentsCode);
+        controller.foldAt(1);
+        await wt.selectFromHome(37);
+        // private class MyClass {\n  //comment1\n  void method...
+        //                                        \ cursor
+
+        controller.value = controller.value.replacedSelection('  int n;\n');
+
+        expect(
+          controller.value,
+          const TextEditingValue(
+            text: '''
+private class MyClass {
+  //comment1
+  int n;
+  void method() {}
+}
+''',
+            selection: TextSelection.collapsed(offset: 46),
+          ),
+        );
+      });
     });
   });
 }

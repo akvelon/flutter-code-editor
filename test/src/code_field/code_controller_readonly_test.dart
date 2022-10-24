@@ -270,16 +270,16 @@ void main() {
         expect(
           controller.value,
           const TextEditingValue(
-            text: 'abc\n\nro\nro\nabc\n',
-            //            \ cursor
-            selection: TextSelection.collapsed(offset: 5),
+            text: 'abc\nro\nro\nabc\n',
+            //          \ cursor
+            selection: TextSelection.collapsed(offset: 4),
           ),
-          reason: 'Newline at start of readonly - OK',
+          reason: 'Newline at start of readonly - No effect',
         );
         expect(
           controller.fullText,
-          'abc\n\nro//readonly\nro//readonly\nabc\n',
-          reason: 'Newline at start of readonly - OK',
+          'abc\nro//readonly\nro//readonly\nabc\n',
+          reason: 'Newline at start of readonly - No effect',
         );
       },
     );
@@ -349,19 +349,20 @@ void main() {
         expect(
           controller.value,
           const TextEditingValue(
-            text: 'abc\nro\nro\nabc\n',
-            //          cursor /
-            selection: TextSelection.collapsed(offset: 10),
+            text: 'abc\nro\nro\n\nabc\n',
+            //            cursor /
+            selection: TextSelection.collapsed(offset: 11),
           ),
-          reason: 'Type at start of first editable line - OK, Newline - No eff',
+          reason: 'Type at start of first editable line - OK',
         );
         expect(
           controller.fullText,
-          'abc\nro//readonly\nro//readonly\nabc\n',
-          reason: 'Type at start of first editable line - OK, Newline - No eff',
+          'abc\nro//readonly\nro//readonly\n\nabc\n',
+          reason: 'Type at start of first editable line - OK',
         );
 
         // To the end of the last readonly line.
+        await wt.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
         await wt.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
 
         await wt.sendKeyEvent(LogicalKeyboardKey.delete);
@@ -371,7 +372,7 @@ void main() {
         expect(
           controller.value,
           const TextEditingValue(
-            text: 'abc\nro\nro\nabc\n',
+            text: 'abc\nro\nro\n\nabc\n',
             //        cursor /
             selection: TextSelection.collapsed(offset: 9),
           ),
@@ -379,7 +380,7 @@ void main() {
         );
         expect(
           controller.fullText,
-          'abc\nro//readonly\nro//readonly\nabc\n',
+          'abc\nro//readonly\nro//readonly\n\nabc\n',
           reason: 'Delete, Backspace, Type at last RO EOL - No effect',
         );
       },

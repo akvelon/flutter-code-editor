@@ -220,11 +220,28 @@ class Code {
     return false;
   }
 
-  CodeEditResult getEditResult(TextEditingValue visibleAfter) {
-    final visibleRangeAfter = visibleAfter.text.getChangedRange(
-      visibleText,
-      attributeChangeTo: TextAffinity.upstream,
-    );
+  /// Returns the resulting full text if a given visible text edit is applied.
+  ///
+  /// [oldSelection] is the [TextSelection] before the edit.
+  /// It is considered in a few special cases if the edit is around
+  /// the selection. This is required to disambiguate
+  /// edits that can otherwise lead to erroneous actions on hidden ranges.
+  ///
+  /// Outside of those special cases the [visibleAfter] is just diffed
+  /// against [visibleText]. This changed region may be ambiguous.
+  /// In this case the change is attributed upstream meaning the first
+  /// possible region is considered to hold the change.
+  CodeEditResult getEditResult(
+    TextSelection oldSelection,
+    TextEditingValue visibleAfter,
+  ) {
+    final visibleRangeAfter = visibleAfter.text.getChangedRangeAroundSelection(
+          TextEditingValue(text: visibleText, selection: oldSelection),
+        ) ??
+        visibleAfter.text.getChangedRange(
+          visibleText,
+          attributeChangeTo: TextAffinity.upstream,
+        );
 
     if (visibleRangeAfter.start == -1 && visibleRangeAfter.end == -1) {
       return CodeEditResult(
