@@ -1,12 +1,11 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_code_editor/src/code/code.dart';
-import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 
+import '../code/code.dart';
 import '../code/code_edit_result.dart';
 import '../code/reg_exp.dart';
 import '../code/string.dart';
 import '../code/text_range.dart';
+import '../single_line_comments/single_line_comment.dart';
 import 'text_selection.dart';
 
 extension TextEditingValueExtension on TextEditingValue {
@@ -104,13 +103,13 @@ extension TextEditingValueExtension on TextEditingValue {
         selection: TextSelection.collapsed(offset: rangeAfter.start),
       );
     } else {
-      final rangeAfter = code.visibleText.getChangedRange(
-        oldCode.visibleText,
-        attributeChangeTo: TextAffinity.downstream,
-      );
+      final insertedServiceCommentsLength =
+          text.length - code.visibleText.length;
       return TextEditingValue(
         text: code.visibleText,
-        selection: TextSelection.collapsed(offset: rangeAfter.end),
+        selection: TextSelection.collapsed(
+          offset: selection.end - insertedServiceCommentsLength,
+        ),
       );
     }
   }
