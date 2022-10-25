@@ -359,7 +359,7 @@ class CodeController extends TextEditingController {
   Code get code => _code;
 
   CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
-    final editResult = _code.getEditResult(newValue);
+    final editResult = _code.getEditResult(value.selection, newValue);
     if (!_code.isReadOnlyInLineRange(editResult.linesChanged)) {
       return editResult;
     }

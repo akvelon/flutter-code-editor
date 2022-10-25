@@ -1,3 +1,9 @@
+## 0.1.1
+
+* Added code folding.
+* Fixed editing around hidden text ranges.
+* Updated dependencies.
+
 ## 0.1.0
 
 * Highlights unterminated blocks for Java and Python.
