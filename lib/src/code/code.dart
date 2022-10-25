@@ -256,7 +256,6 @@ class Code {
       return CodeEditResult(
         fullTextAfter: text,
         linesChanged: TextRange.empty,
-        charactersChanged: visibleRangeAfter,
       );
     }
 
@@ -319,7 +318,6 @@ class Code {
     return CodeEditResult(
       fullTextAfter: fullTextAfter,
       linesChanged: linesChanged,
-      charactersChanged: visibleRangeAfter,
     );
   }
 

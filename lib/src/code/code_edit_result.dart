@@ -4,12 +4,10 @@ import 'package:flutter/widgets.dart';
 class CodeEditResult {
   final String fullTextAfter;
   final TextRange linesChanged;
-  final TextRange charactersChanged;
 
   const CodeEditResult({
     required this.fullTextAfter,
     required this.linesChanged,
-    required this.charactersChanged,
   });
 
   @override

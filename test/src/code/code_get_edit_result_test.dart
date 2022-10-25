@@ -45,7 +45,6 @@ void main() {
         expected: CodeEditResult(
           fullTextAfter: _visibleText1,
           linesChanged: TextRange(start: 0, end: 0),
-          charactersChanged: TextRange(start: 0, end: 84),
         ),
       ),
 
@@ -56,7 +55,6 @@ void main() {
         expected: CodeEditResult(
           fullTextAfter: '',
           linesChanged: TextRange(start: 0, end: 8), // Empty line 9 is intact.
-          charactersChanged: TextRange(start: 0, end: 0),
         ),
       ),
 
@@ -90,7 +88,6 @@ public class MyClass {
 }
 ''',
           linesChanged: TextRange(start: 5, end: 6),
-          charactersChanged: TextRange(start: 59, end: 79),
         ),
       ),
 
@@ -124,7 +121,6 @@ public class MyClass {
 }
 ''',
           linesChanged: TextRange.collapsed(7),
-          charactersChanged: TextRange(start: 81, end: 82),
         ),
       ),
 
@@ -148,7 +144,6 @@ public class MyClass {
 }
 ''',
           linesChanged: TextRange(start: 0, end: 1),
-          charactersChanged: TextRange(start: 1, end: 1),
         ),
       ),
 
@@ -172,7 +167,6 @@ public class MyClass {
 }
 ''',
           linesChanged: TextRange(start: 0, end: 1),
-          charactersChanged: TextRange(start: 1, end: 3),
         ),
       ),
 
@@ -185,7 +179,6 @@ public class MyClass {
         expected: CodeEditResult(
           fullTextAfter: ';//[START section1]',
           linesChanged: TextRange(start: 0, end: 0),
-          charactersChanged: TextRange(start: 0, end: 1),
         ),
       ),
     ];
