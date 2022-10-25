@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:flutter/widgets.dart';
 import 'package:flutter_code_editor/src/code/code.dart';
 import 'package:flutter_code_editor/src/code/code_edit_result.dart';
 import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_end.dart';
@@ -40,32 +39,12 @@ void main() {
     const examples = [
       //
       _Example(
-        'Empty -> Empty',
-        fullTextBefore: '',
-        visibleValueAfter: TextEditingValue.empty,
-        expected: CodeEditResult(
-          fullTextAfter: '',
-          linesChanged: TextRange.empty,
-        ),
-      ),
-
-      _Example(
         'Empty -> Something',
         fullTextBefore: '',
         visibleValueAfter: TextEditingValue(text: _visibleText1),
         expected: CodeEditResult(
           fullTextAfter: _visibleText1,
           linesChanged: TextRange(start: 0, end: 0),
-        ),
-      ),
-
-      _Example(
-        'Same',
-        fullTextBefore: _fullText1,
-        visibleValueAfter: TextEditingValue(text: _visibleText1),
-        expected: CodeEditResult(
-          fullTextAfter: _fullText1,
-          linesChanged: TextRange.empty,
         ),
       ),
 
@@ -192,16 +171,6 @@ public class MyClass {
       ),
 
       _Example(
-        'All text is a single hidden range -> Empty -> No change',
-        fullTextBefore: '//[START section1]',
-        visibleValueAfter: TextEditingValue.empty,
-        expected: CodeEditResult(
-          fullTextAfter: '//[START section1]',
-          linesChanged: TextRange.empty,
-        ),
-      ),
-
-      _Example(
         'If all text is a single hidden range, insert before it',
         fullTextBefore: '//[START section1]',
         visibleValueAfter: TextEditingValue(
@@ -227,18 +196,25 @@ public class MyClass {
         namedSectionParser: const BracketsStartEndNamedSectionParser(),
       );
 
-      expect(
-        () => code.getEditResult(example.visibleValueAfter),
-        returnsNormally,
-        reason: example.name,
-      );
+      final selections = [
+        for (int n = code.visibleText.length; --n >= -1;)
+          TextSelection.collapsed(offset: n),
+      ];
 
-      final result = code.getEditResult(example.visibleValueAfter);
-      expect(
-        result,
-        example.expected,
-        reason: example.name,
-      );
+      for (final selection in selections) {
+        expect(
+          () => code.getEditResult(selection, example.visibleValueAfter),
+          returnsNormally,
+          reason: example.name,
+        );
+
+        final result = code.getEditResult(selection, example.visibleValueAfter);
+        expect(
+          result,
+          example.expected,
+          reason: example.name,
+        );
+      }
     }
   });
 }
