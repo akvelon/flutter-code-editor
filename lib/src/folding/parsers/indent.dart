@@ -1,6 +1,7 @@
 import 'package:highlight/highlight_core.dart';
 
 import '../../code/code_line.dart';
+import '../../code/code_lines.dart';
 import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import 'abstract.dart';
@@ -14,9 +15,9 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   void parse({
     Result? highlighted,
     Set<Object?> serviceCommentsSources = const {},
-    required List<CodeLine> lines,
+    required CodeLines lines,
   }) {
-    _parse(lines);
+    _parse(lines.lines);
     finalize();
   }
 
@@ -97,8 +98,8 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     blocks.add(
       FoldableBlock(
         type: FoldableBlockType.indent,
-        startLine: startLine,
-        endLine: endLine,
+        firstLine: startLine,
+        lastLine: endLine,
       ),
     );
   }
@@ -134,9 +135,9 @@ class _SignificantIndentIndexes {
   }
 
   static int? _getNextSignificantIndentIndex(
-      List<int?> indents, {
-        int startIndex = 0,
-      }) {
+    List<int?> indents, {
+    int startIndex = 0,
+  }) {
     for (int i = startIndex; i < indents.length; i++) {
       if (!_isSeparatorLine(indents[i])) {
         return i;

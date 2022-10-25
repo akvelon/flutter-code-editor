@@ -135,22 +135,6 @@ extension TextEditingValueExtension on TextEditingValue {
     return true;
   }
 
-  //   TextEditingValue replacedText(String newText) {
-  //   if (newText == text) {
-  //     return this;
-  //   }
-
-  //   final rangeAfter = newText.getChangedRange(
-  //     text,
-  //     attributeChangeTo: TextAffinity.upstream,
-  //   );
-
-  //   return TextEditingValue(
-  //     text: newText,
-  //     selection: TextSelection.collapsed(offset: rangeAfter.start),
-  //   );
-  // }
-
   TextEditingValue tabsToSpaces(int spaceCount) {
     final replacedBefore = beforeSelection.tabsToSpaces(spaceCount);
     final replacedSelected = selected.tabsToSpaces(spaceCount);

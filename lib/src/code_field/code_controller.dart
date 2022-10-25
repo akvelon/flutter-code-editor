@@ -1,3 +1,5 @@
+// ignore_for_file: parameter_assignments
+
 import 'dart:math';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -21,8 +23,6 @@ import 'editor_params.dart';
 import 'span_builder.dart';
 
 const _middleDot = '·';
-const _tab = '\t';
-const _space = ' ';
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -93,7 +93,7 @@ class CodeController extends TextEditingController {
 
   String get languageId => _languageId;
 
-  Code _lastCode;
+  Code _code;
 
   final styleList = <TextStyle>[];
   final modifierMap = <String, CodeModifier>{};
@@ -121,10 +121,10 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
-        _lastCode = Code.empty,
+        _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
-    _updateLastCode(text ?? '');
+    _code = _createCode(text ?? '');
     fullText = text ?? '';
 
     // Create modifier map
@@ -262,11 +262,11 @@ class CodeController extends TextEditingController {
     return _middleDotsToSpaces(super.text);
   }
 
-  String get fullText => _lastCode.text;
+  String get fullText => _code.text;
 
   set fullText(String fullText) {
-    _updateLastCodeIfChanged(_replaceTabsWithSpacesIfNeeded(fullText));
-    super.value = TextEditingValue(text: _lastCode.visibleText);
+    _updateCodeIfChanged(_replaceTabsWithSpacesIfNeeded(fullText));
+    super.value = TextEditingValue(text: _code.visibleText);
   }
 
   // Private methods
@@ -322,15 +322,15 @@ class CodeController extends TextEditingController {
         return;
       }
 
-      final lastCode = _lastCode;
+      final lastCode = _code;
 
-      _updateLastCodeIfChanged(editResult.fullTextAfter);
+      _updateCodeIfChanged(editResult.fullTextAfter);
 
-      newValue = newValue.replacedText(_lastCode, lastCode, editResult);
+      newValue = newValue.replacedText(_code, lastCode, editResult);
 
       // Uncomment this to see the hidden text in the console
       // as you change the visible text.
-      //print('\n\n${_lastCode.text}');
+      //print('\n\n${_code.text}');
     }
 
     bool hasTextChanged = newValue.text != super.value.text;
@@ -356,27 +356,32 @@ class CodeController extends TextEditingController {
     }
   }
 
-  Code get code => _lastCode;
+  Code get code => _code;
 
   CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
-    final editResult = _lastCode.getEditResult(newValue);
-    if (!_lastCode.isReadOnlyInLineRange(editResult.linesChanged)) {
+    final editResult = _code.getEditResult(newValue);
+    if (!_code.isReadOnlyInLineRange(editResult.linesChanged)) {
       return editResult;
     }
 
     return null;
   }
 
-  void _updateLastCodeIfChanged(String text) {
-    if (text != _lastCode.text) {
-      _updateLastCode(text);
+  void _updateCodeIfChanged(String text) {
+    if (text != _code.text) {
+      _updateCode(text);
     }
   }
 
-  void _updateLastCode(String text) {
+  void _updateCode(String text) {
+    final newCode = _createCode(text);
+    _code = newCode.foldedAs(_code);
+  }
+
+  Code _createCode(String text) {
     final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
 
-    _lastCode = Code(
+    return Code(
       text: rawText,
       language: language,
       highlighted: highlight.parse(rawText, language: _languageId),
@@ -387,7 +392,7 @@ class CodeController extends TextEditingController {
 
   String _replaceTabsWithSpacesIfNeeded(String text) {
     if (modifiers.contains(const TabModifier())) {
-      return text.replaceAll(_tab, _space * params.tabSpaces);
+      return text.replaceAll('\t', ' ' * params.tabSpaces);
     }
     return text;
   }
@@ -481,7 +486,7 @@ class CodeController extends TextEditingController {
     return TextSpan(style: style, children: children);
   }
 
-  void generateSuggestions() async {
+  Future<void> generateSuggestions() async {
     final prefix = value.wordToCursor;
     if (prefix == null) {
       popupController.hide();
@@ -496,6 +501,22 @@ class CodeController extends TextEditingController {
     } else {
       popupController.hide();
     }
+  }
+
+  void foldAt(int line) {
+    _code = _code.foldedAt(line);
+    super.value = TextEditingValue(
+      text: _code.visibleText,
+      // TODO(alexeyinkin): Preserve selection, https://github.com/akvelon/flutter-code-editor/issues/81
+    );
+  }
+
+  void unfoldAt(int line) {
+    _code = _code.unfoldedAt(line);
+    super.value = TextEditingValue(
+      text: _code.visibleText,
+      // TODO(alexeyinkin): Preserve selection, https://github.com/akvelon/flutter-code-editor/issues/81
+    );
   }
 
   @override
@@ -527,7 +548,7 @@ class CodeController extends TextEditingController {
     // Return parsing
     if (_language != null) {
       return const SpanBuilder().build(
-        code: _lastCode,
+        code: _code,
         theme: _getTheme(context),
         textStyle: style,
       );

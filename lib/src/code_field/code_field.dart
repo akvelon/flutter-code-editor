@@ -253,7 +253,7 @@ class CodeFieldState extends State<CodeField> {
 
     if (widget.lineNumbers) {
       numberCol = GutterWidget(
-        code: widget.controller.code,
+        codeController: widget.controller,
         style: lineNumberStyle,
       );
     }

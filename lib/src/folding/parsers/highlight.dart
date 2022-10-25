@@ -2,7 +2,7 @@ import 'package:charcode/ascii.dart';
 import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 
-import '../../code/code_line.dart';
+import '../../code/code_lines.dart';
 import '../../highlight/keyword_semantics.dart';
 import '../../highlight/node.dart';
 import '../../highlight/node_classes.dart';
@@ -36,7 +36,7 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
   void parse({
     required Result highlighted,
     required Set<Object?> serviceCommentsSources,
-    List<CodeLine> lines = const [],
+    CodeLines lines = CodeLines.empty,
   }) {
     if (highlighted.nodes != null) {
       _processNodes(highlighted.nodes!, serviceCommentsSources);

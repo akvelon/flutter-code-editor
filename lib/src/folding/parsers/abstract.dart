@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
-import '../../code/code_line.dart';
+import '../../code/code_lines.dart';
 import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import '../invalid_foldable_block.dart';
@@ -30,7 +30,7 @@ abstract class AbstractFoldableBlockParser {
   void parse({
     required Result highlighted,
     required Set<Object?> serviceCommentsSources,
-    required List<CodeLine> lines,
+    required CodeLines lines,
   });
 
   /// Records that a block has started at [line].
@@ -60,8 +60,8 @@ abstract class AbstractFoldableBlockParser {
     if (line != started.line) {
       blocks.add(
         FoldableBlock(
-          startLine: started.line,
-          endLine: line,
+          firstLine: started.line,
+          lastLine: line,
           type: type,
         ),
       );
@@ -108,8 +108,8 @@ abstract class AbstractFoldableBlockParser {
 
       blocks.add(
         FoldableBlock(
-          startLine: first,
-          endLine: last!,
+          firstLine: first,
+          lastLine: last!,
           type: FoldableBlockType.imports,
         ),
       );
@@ -173,8 +173,8 @@ abstract class AbstractFoldableBlockParser {
 
       blocks.add(
         FoldableBlock(
-          startLine: first,
-          endLine: last!,
+          firstLine: first,
+          lastLine: last!,
           type: FoldableBlockType.singleLineComment,
         ),
       );

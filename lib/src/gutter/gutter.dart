@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../code/code.dart';
+import '../code_field/code_controller.dart';
 import '../line_numbers/line_number_style.dart';
 import 'error.dart';
+import 'fold_toggle.dart';
 
 const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;
@@ -13,21 +14,30 @@ const _foldingColumn = 2;
 
 class GutterWidget extends StatelessWidget {
   const GutterWidget({
-    required this.code,
+    required this.codeController,
     required this.style,
   });
 
-  final Code code;
+  final CodeController codeController;
   final LineNumberStyle style;
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: codeController,
+      builder: _buildOnChange,
+    );
+  }
+
+  Widget _buildOnChange(BuildContext context, Widget? child) {
+    final code = codeController.code;
+
     final tableRows = [
-      for (int i = 1; i <= code.lines.length; i++)
+      for (final i in code.hiddenLineRanges.visibleLineNumbers)
         TableRow(
           children: [
             Text(
-              '$i',
+              '${i + 1}',
               style: style.textStyle,
               textAlign: style.textAlign,
             ),
@@ -37,10 +47,8 @@ class GutterWidget extends StatelessWidget {
         ),
     ];
 
-    for (final issue in code.issues) {
-      final lineIndex = _lineIndexToTableRowIndex(issue.line);
-      tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
-    }
+    _fillIssues(tableRows);
+    _fillFoldToggles(tableRows);
 
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
@@ -57,8 +65,41 @@ class GutterWidget extends StatelessWidget {
     );
   }
 
-  int _lineIndexToTableRowIndex(int line) {
-    // TODO(alexeyinkin): Adjust for hidden lines if any.
-    return line;
+  void _fillIssues(List<TableRow> tableRows) {
+    final code = codeController.code;
+
+    for (final issue in code.issues) {
+      final lineIndex = _lineIndexToTableRowIndex(issue.line);
+      if (lineIndex == null) {
+        continue;
+      }
+
+      tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
+    }
+  }
+
+  void _fillFoldToggles(List<TableRow> tableRows) {
+    final code = codeController.code;
+
+    for (final block in code.foldableBlocks) {
+      final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
+      if (lineIndex == null) {
+        continue;
+      }
+
+      final isFolded = code.foldedBlocks.contains(block);
+
+      tableRows[lineIndex].children![_foldingColumn] = FoldToggle(
+        color: style.textStyle?.color,
+        isFolded: isFolded,
+        onTap: isFolded
+            ? () => codeController.unfoldAt(block.firstLine)
+            : () => codeController.foldAt(block.firstLine),
+      );
+    }
+  }
+
+  int? _lineIndexToTableRowIndex(int line) {
+    return codeController.code.hiddenLineRanges.cutLineIndexIfVisible(line);
   }
 }
