@@ -28,6 +28,7 @@ class Code {
   final Result? highlighted;
   final List<Issue> issues;
   final List<CodeLine> lines;
+  final Iterable<SingleLineComment> serviceComments;
   final Map<String, NamedSection> namedSections;
   final Result? visibleHighlighted;
   final String visibleText;
@@ -105,6 +106,7 @@ class Code {
       visibleHighlighted:
           highlighted == null ? null : hiddenRanges.cutHighlighted(highlighted),
       visibleText: hiddenRanges.cutString(text, start: 0),
+      serviceComments: serviceComments,
     );
   }
 
@@ -118,6 +120,7 @@ class Code {
     required this.namedSections,
     required this.visibleHighlighted,
     required this.visibleText,
+    required this.serviceComments,
   });
 
   static const empty = Code._(
@@ -130,6 +133,7 @@ class Code {
     namedSections: {},
     visibleHighlighted: null,
     visibleText: '',
+    serviceComments: [],
   );
 
   static void _applyNamedSectionsToLines({
@@ -250,6 +254,7 @@ class Code {
       return CodeEditResult(
         fullTextAfter: text,
         linesChanged: TextRange.empty,
+        charactersChanged: visibleRangeAfter,
       );
     }
 
@@ -312,6 +317,7 @@ class Code {
     return CodeEditResult(
       fullTextAfter: fullTextAfter,
       linesChanged: linesChanged,
+      charactersChanged: visibleRangeAfter,
     );
   }
 }

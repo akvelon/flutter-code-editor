@@ -322,12 +322,11 @@ class CodeController extends TextEditingController {
         return;
       }
 
+      final lastCode = _lastCode;
+
       _updateLastCodeIfChanged(editResult.fullTextAfter);
 
-      if (newValue.text != _lastCode.visibleText) {
-        // Manually typed in a text that has become a hidden range.
-        newValue = newValue.replacedText(_lastCode.visibleText);
-      }
+      newValue = newValue.replacedText(_lastCode, lastCode, editResult);
 
       // Uncomment this to see the hidden text in the console
       // as you change the visible text.

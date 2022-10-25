@@ -1,5 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_code_editor/src/code/code.dart';
+import 'package:flutter_code_editor/src/single_line_comments/single_line_comment.dart';
 
+import '../code/code_edit_result.dart';
 import '../code/reg_exp.dart';
 import '../code/string.dart';
 import '../code/text_range.dart';
@@ -74,21 +78,78 @@ extension TextEditingValueExtension on TextEditingValue {
     return replaced(selection, value);
   }
 
-  TextEditingValue replacedText(String newText) {
-    if (newText == text) {
+  TextEditingValue replacedText(
+    Code code,
+    Code oldCode,
+    CodeEditResult editResult,
+  ) {
+    final areVisibleTextsEqual = code.visibleText == oldCode.visibleText;
+    final areServiceCommentsEqual = _areServiceCommentsEqual(
+      code.serviceComments,
+      oldCode.serviceComments,
+    );
+
+    if (areServiceCommentsEqual) {
       return this;
     }
 
-    final rangeAfter = newText.getChangedRange(
-      text,
-      attributeChangeTo: TextAffinity.upstream,
-    );
+    if (areVisibleTextsEqual) {
+      final rangeAfter = code.visibleText.getChangedRange(
+        text,
+        attributeChangeTo: TextAffinity.upstream,
+      );
 
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: rangeAfter.start),
-    );
+      return TextEditingValue(
+        text: code.visibleText,
+        selection: TextSelection.collapsed(offset: rangeAfter.start),
+      );
+    } else {
+      final rangeAfter = code.visibleText.getChangedRange(
+        oldCode.visibleText,
+        attributeChangeTo: TextAffinity.downstream,
+      );
+      return TextEditingValue(
+        text: code.visibleText,
+        selection: TextSelection.collapsed(offset: rangeAfter.end),
+      );
+    }
   }
+
+  bool _areServiceCommentsEqual(
+    Iterable<SingleLineComment> comments,
+    Iterable<SingleLineComment> oldComments,
+  ) {
+    if (comments.length != oldComments.length) {
+      return false;
+    }
+
+    final list = comments.toList();
+    final oldList = oldComments.toList();
+
+    for (int i = 0; i < comments.length; i++) {
+      if (list[i] != oldList[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  //   TextEditingValue replacedText(String newText) {
+  //   if (newText == text) {
+  //     return this;
+  //   }
+
+  //   final rangeAfter = newText.getChangedRange(
+  //     text,
+  //     attributeChangeTo: TextAffinity.upstream,
+  //   );
+
+  //   return TextEditingValue(
+  //     text: newText,
+  //     selection: TextSelection.collapsed(offset: rangeAfter.start),
+  //   );
+  // }
 
   TextEditingValue tabsToSpaces(int spaceCount) {
     final replacedBefore = beforeSelection.tabsToSpaces(spaceCount);
