@@ -34,7 +34,6 @@ class Code {
   final HiddenRanges hiddenRanges;
   final Result? highlighted;
   final List<Issue> issues;
-  final Iterable<SingleLineComment> serviceComments;
   final CodeLines lines;
   final Map<String, NamedSection> namedSections;
   final Result? visibleHighlighted;
@@ -123,7 +122,6 @@ class Code {
       issues: issues,
       lines: lines,
       namedSections: sectionsMap,
-      serviceComments: serviceComments,
       visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
       visibleText: hiddenRanges.cutString(text),
     );
@@ -142,7 +140,6 @@ class Code {
     required this.namedSections,
     required this.visibleHighlighted,
     required this.visibleText,
-    required this.serviceComments,
   }) : _hiddenRangesBuilder = hiddenRangesBuilder;
 
   static const empty = Code._(
@@ -158,7 +155,6 @@ class Code {
     namedSections: {},
     visibleHighlighted: null,
     visibleText: '',
-    serviceComments: [],
   );
 
   static void _applyNamedSectionsToLines({
@@ -417,7 +413,6 @@ class Code {
       namedSections: namedSections,
       visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
       visibleText: hiddenRanges.cutString(text),
-      serviceComments: serviceComments,
     );
   }
 }

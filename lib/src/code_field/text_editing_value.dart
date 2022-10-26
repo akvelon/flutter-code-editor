@@ -6,7 +6,6 @@ import '../code/reg_exp.dart';
 import '../code/string.dart';
 import '../code/text_range.dart';
 import '../hidden_ranges/hidden_range.dart';
-import '../single_line_comments/single_line_comment.dart';
 import 'text_selection.dart';
 
 extension TextEditingValueExtension on TextEditingValue {
