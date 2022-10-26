@@ -505,18 +505,26 @@ class CodeController extends TextEditingController {
   }
 
   void foldAt(int line) {
+    final oldCode = _code;
     _code = _code.foldedAt(line);
+
     super.value = TextEditingValue(
       text: _code.visibleText,
-      // TODO(alexeyinkin): Preserve selection, https://github.com/akvelon/flutter-code-editor/issues/81
+      selection: _code.hiddenRanges.cutSelection(
+        oldCode.hiddenRanges.recoverSelection(value.selection),
+      ),
     );
   }
 
   void unfoldAt(int line) {
+    final oldCode = _code;
     _code = _code.unfoldedAt(line);
+
     super.value = TextEditingValue(
       text: _code.visibleText,
-      // TODO(alexeyinkin): Preserve selection, https://github.com/akvelon/flutter-code-editor/issues/81
+      selection: _code.hiddenRanges.cutSelection(
+        oldCode.hiddenRanges.recoverSelection(value.selection),
+      ),
     );
   }
 

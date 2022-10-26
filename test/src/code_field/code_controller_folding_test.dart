@@ -152,8 +152,7 @@ int c;
           controller.value,
           const TextEditingValue(
             text: _codeFolded1,
-            // TODO(alexeyinkin): Selection.
-            //selection: TextSelection(baseOffset: 1, extentOffset: 2),
+            selection: TextSelection(baseOffset: 1, extentOffset: 2),
           ),
         );
 
@@ -163,8 +162,7 @@ int c;
           controller.value,
           TextEditingValue(
             text: textBefore,
-            // TODO(alexeyinkin): Selection.
-            //selection: TextSelection(baseOffset: 1, extentOffset: 2),
+            selection: const TextSelection(baseOffset: 1, extentOffset: 2),
           ),
         );
       });
@@ -212,8 +210,7 @@ public class MyClass {
   }
 }
 ''',
-            // TODO(alexeyinkin): Selection.
-            //selection: TextSelection(baseOffset: 1, extentOffset: 2),
+            selection: TextSelection(baseOffset: 0, extentOffset: 6),
           ),
         );
       });
@@ -253,8 +250,7 @@ public class MyClass {
   }
 }
 ''',
-            // TODO(alexeyinkin): Selection.
-            //selection: TextSelection(baseOffset: 1, extentOffset: 2),
+            selection: TextSelection(baseOffset: 0, extentOffset: 6),
           ),
         );
       });
@@ -302,8 +298,7 @@ int n;
   }
 }
 ''',
-            // TODO(alexeyinkin): Selection.
-            //selection: TextSelection(baseOffset: 1, extentOffset: 2),
+            selection: TextSelection.collapsed(offset: 91),
           ),
         );
       });
