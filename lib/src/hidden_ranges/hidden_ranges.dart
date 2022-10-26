@@ -160,6 +160,67 @@ class HiddenRanges {
     );
   }
 
+  /// Translates the [position] in the full text to the position in
+  /// the visible text.
+  ///
+  /// If [position] is hidden, returns the last visible position before it.
+  int cutPosition(int position) {
+    if (ranges.isEmpty || position < ranges.first.start) {
+      return position;
+    }
+
+    if (position >= ranges.last.end) {
+      return position - hiddenCharactersBeforeRanges.last;
+    }
+
+    int lowerRange = 0;
+    int upperRange = ranges.length - 1;
+
+    // Linear interpolation search.
+    while (upperRange > lowerRange) {
+      // Full characters at the lower range start and at the upper range end.
+      final lowerChar = ranges[lowerRange].start;
+      final upperChar = ranges[upperRange].end;
+
+      final rangeIndex = lowerRange +
+          ((position - lowerChar) /
+                  (upperChar - lowerChar) *
+                  (upperRange - lowerRange))
+              .floor();
+
+      if (rangeIndex < lowerRange) {
+        return position - hiddenCharactersBeforeRanges[lowerRange];
+      }
+      if (rangeIndex > upperRange) {
+        return position - hiddenCharactersBeforeRanges[upperRange + 1];
+      }
+
+      final range = ranges[rangeIndex];
+
+      switch (range.compareToPosition(position)) {
+        case 0:
+          return range.start - hiddenCharactersBeforeRanges[rangeIndex];
+        case -1:
+          lowerRange = rangeIndex + 1;
+          break;
+        case 1:
+          upperRange = rangeIndex - 1;
+          break;
+      }
+    }
+
+    // upper == lower - 1, or lower, or lower + 1
+    final range = ranges[upperRange];
+    switch (range.compareToPosition(position)) {
+      case -1:
+        return position - hiddenCharactersBeforeRanges[upperRange + 1];
+      case 1:
+        return position - hiddenCharactersBeforeRanges[upperRange];
+    }
+
+    return range.start - hiddenCharactersBeforeRanges[upperRange];
+  }
+
   /// Translates the [position] in the visible text to the position in
   /// the full text.
   ///
@@ -178,8 +239,9 @@ class HiddenRanges {
     int lowerRange = 0;
     int upperRange = ranges.length - 1;
 
+    // Linear interpolation search.
     while (upperRange > lowerRange) {
-      // Visible characters if the range collapse positions.
+      // Visible characters at the ranges' collapse positions.
       final lowerChar =
           ranges[lowerRange].end - hiddenCharactersBeforeRanges[lowerRange + 1];
       final upperChar =
@@ -243,6 +305,46 @@ class HiddenRanges {
       case TextAffinity.upstream:
         return ranges[0].end;
     }
+  }
+
+  TextSelection cutSelection(TextSelection selection) {
+    if (selection.isCollapsed) {
+      final position = cutPosition(selection.start);
+      return selection.copyWith(
+        baseOffset: position,
+        extentOffset: position,
+      );
+    }
+
+    return selection.copyWith(
+      baseOffset: cutPosition(selection.baseOffset),
+      extentOffset: cutPosition(selection.extentOffset),
+    );
+  }
+
+  TextSelection recoverSelection(TextSelection selection) {
+    if (selection.isCollapsed) {
+      final position = recoverPosition(
+        selection.start,
+        placeHiddenRanges: TextAffinity.downstream,
+      );
+
+      return selection.copyWith(
+        baseOffset: position,
+        extentOffset: position,
+      );
+    }
+
+    return selection.copyWith(
+      baseOffset: recoverPosition(
+        selection.baseOffset,
+        placeHiddenRanges: TextAffinity.downstream,
+      ),
+      extentOffset: recoverPosition(
+        selection.extentOffset,
+        placeHiddenRanges: TextAffinity.downstream,
+      ),
+    );
   }
 
   @override
