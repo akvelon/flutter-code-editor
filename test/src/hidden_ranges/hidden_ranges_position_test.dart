@@ -17,6 +17,25 @@ void main() {
       );
     });
 
+    void testCut(HiddenRanges hiddenRanges, Map<int, int> examples) {
+      int i = 0;
+
+      for (final example in examples.entries) {
+        final input = example.key;
+        final expected = example.value;
+
+        int cutPosition() {
+          return hiddenRanges.cutPosition(input);
+        }
+
+        final reason = '#$i. $input -> $expected';
+        expect(cutPosition, returnsNormally, reason: reason);
+        expect(cutPosition(), expected, reason: reason);
+
+        i++;
+      }
+    }
+
     test('Cut with visible beginning and end', () {
       final examples = <int, int>{
         -1: -1, //    No selection does not change
@@ -63,22 +82,7 @@ void main() {
         224: 170, //  Way after all ranges
       };
 
-      int i = 0;
-
-      for (final example in examples.entries) {
-        final input = example.key;
-        final expected = example.value;
-
-        int cutPosition() {
-          return hiddenRanges.cutPosition(input);
-        }
-
-        final reason = '#$i. $input -> $expected';
-        expect(cutPosition, returnsNormally, reason: reason);
-        expect(cutPosition(), expected, reason: reason);
-
-        i++;
-      }
+      testCut(hiddenRanges, examples);
     });
 
     test('Cut with a single range', () {
@@ -99,22 +103,8 @@ void main() {
         10: 5,
         11: 6,
       };
-      int i = 0;
 
-      for (final example in examples.entries) {
-        final input = example.key;
-        final expected = example.value;
-
-        int cutPosition() {
-          return hiddenRanges.cutPosition(input);
-        }
-
-        final reason = '#$i. $input -> $expected';
-        expect(cutPosition, returnsNormally, reason: reason);
-        expect(cutPosition(), expected, reason: reason);
-      }
-
-      i++;
+      testCut(hiddenRanges, examples);
     });
   });
 

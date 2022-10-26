@@ -178,7 +178,7 @@ class HiddenRanges {
 
     // Linear interpolation search.
     while (upperRange > lowerRange) {
-      // Full characters at the lower ange start and at the upper range end.
+      // Full characters at the lower range start and at the upper range end.
       final lowerChar = ranges[lowerRange].start;
       final upperChar = ranges[upperRange].end;
 

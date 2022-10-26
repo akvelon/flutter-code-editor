@@ -63,75 +63,60 @@ void main() {
       }
     });
 
-    group('Collapsed', () {
-      test('before ranges', () {
-        expect(
-          hiddenRanges.cutSelection(TextSelection.collapsed(offset: -1)),
-          const TextSelection.collapsed(offset: -1),
-        );
-        expect(
-          hiddenRanges.recoverSelection(TextSelection.collapsed(offset: -1)),
-          const TextSelection.collapsed(offset: -1),
-        );
-      });
-
-      test('at a range collapse point', () {
-        expect(
-          hiddenRanges.cutSelection(TextSelection.collapsed(offset: 31)),
-          const TextSelection.collapsed(offset: 28),
-        );
-        expect(
-          hiddenRanges.recoverSelection(TextSelection.collapsed(offset: 28)),
-          const TextSelection.collapsed(offset: 31),
-        );
-      });
-
-      test('within a range', () {
-        expect(
-          hiddenRanges.cutSelection(TextSelection.collapsed(offset: 32)),
-          const TextSelection.collapsed(offset: 28),
-        );
-        expect(
-          hiddenRanges.recoverSelection(TextSelection.collapsed(offset: 28)),
-          const TextSelection.collapsed(offset: 31),
-        );
-      });
-
-      test('after ranges', () {
-        expect(
-          hiddenRanges.cutSelection(TextSelection.collapsed(offset: 124)),
-          const TextSelection.collapsed(offset: 70),
-        );
-        expect(
-          hiddenRanges.recoverSelection(TextSelection.collapsed(offset: 70)),
-          const TextSelection.collapsed(offset: 124),
-        );
-      });
-    });
-
-    test('Spanning', () {
+    test('With visible beginning and end', () {
       const examples = [
         //
         _Example.nonDestructive(
-          'Before ranges',
+          'Collapsed before ranges',
+          full: TextRange.empty,
+          cut: TextRange.empty,
+        ),
+
+        _Example.nonDestructive(
+          'Collapsed before ranges',
+          full: TextRange.collapsed(7),
+          cut: TextRange.collapsed(7),
+        ),
+
+        _Example.nonDestructive(
+          'Collapsed at a hidden range collapse point',
+          full: TextRange.collapsed(7),
+          cut: TextRange.collapsed(7),
+        ),
+
+        _Example.transit(
+          'Collapsed at a hidden range collapse point',
+          full: TextRange.collapsed(32),
+          cut: TextRange.collapsed(28),
+          recovered: TextRange.collapsed(31),
+        ),
+
+        _Example.nonDestructive(
+          'Collapsed after ranges',
+          full: TextRange.collapsed(124),
+          cut: TextRange.collapsed(70),
+        ),
+
+        _Example.nonDestructive(
+          'Spanning. Before ranges',
           full: TextRange(start: 5, end: 10),
           cut: TextRange(start: 5, end: 10),
         ),
 
         _Example.nonDestructive(
-          'After ranges',
+          'Spanning. After ranges',
           full: TextRange(start: 124, end: 134),
           cut: TextRange(start: 70, end: 80),
         ),
 
         _Example.nonDestructive(
-          'Across 2 ranges',
+          'Spanning across 2 ranges',
           full: TextRange(start: 15, end: 60),
           cut: TextRange(start: 15, end: 46),
         ),
 
         _Example.transit(
-          'Visible to hidden',
+          'Spanning between visible and hidden',
           full: TextRange(start: 50, end: 70),
           cut: TextRange(start: 36, end: 53),
           recovered: TextRange(start: 50, end: 67),
