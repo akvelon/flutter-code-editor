@@ -209,7 +209,7 @@ class HiddenRanges {
       }
     }
 
-    // upper == lower
+    // upper == lower - 1, or lower, or lower + 1
     final range = ranges[upperRange];
     switch (range.compareToPosition(position)) {
       case -1:

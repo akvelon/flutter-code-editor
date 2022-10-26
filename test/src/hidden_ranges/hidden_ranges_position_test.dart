@@ -99,7 +99,7 @@ void main() {
         10: 5,
         11: 6,
       };
-      int i = 1;
+      int i = 0;
 
       for (final example in examples.entries) {
         final input = example.key;
@@ -202,7 +202,7 @@ void main() {
         5: [10, 5],
         6: [11, 11],
       };
-      int i = 1;
+      int i = 0;
 
       for (final example in examples.entries) {
         for (int affinityIndex = 0; affinityIndex < 2; affinityIndex++) {
