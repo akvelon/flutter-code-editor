@@ -5,6 +5,7 @@ import '../code/code_edit_result.dart';
 import '../code/reg_exp.dart';
 import '../code/string.dart';
 import '../code/text_range.dart';
+import '../hidden_ranges/hidden_range.dart';
 import '../single_line_comments/single_line_comment.dart';
 import 'text_selection.dart';
 
@@ -83,49 +84,47 @@ extension TextEditingValueExtension on TextEditingValue {
     CodeEditResult editResult,
   ) {
     final areVisibleTextsEqual = code.visibleText == oldCode.visibleText;
-    final areServiceCommentsEqual = _areServiceCommentsEqual(
-      code.serviceComments,
-      oldCode.serviceComments,
+    final areHiddenRangesEqual = _areHiddenRangesEqual(
+      code.hiddenRanges.ranges,
+      oldCode.hiddenRanges.ranges,
     );
 
-    if (areServiceCommentsEqual) {
+    if (areHiddenRangesEqual) {
       return this;
     }
 
-    if (areVisibleTextsEqual) {
+    int? offset;
+    if (areVisibleTextsEqual || text.contains('//readonly ')) {
       final rangeAfter = code.visibleText.getChangedRange(
         text,
         attributeChangeTo: TextAffinity.upstream,
       );
 
-      return TextEditingValue(
-        text: code.visibleText,
-        selection: TextSelection.collapsed(offset: rangeAfter.start),
-      );
+      offset = rangeAfter.start;
     } else {
-      final insertedServiceCommentsLength =
-          text.length - code.visibleText.length;
-      return TextEditingValue(
+      final insertedHiddenRangesLength = text.length - code.visibleText.length;
+      offset = selection.end - insertedHiddenRangesLength;
+    }
+    return TextEditingValue(
         text: code.visibleText,
         selection: TextSelection.collapsed(
-          offset: selection.end - insertedServiceCommentsLength,
+          offset: offset,
         ),
       );
-    }
   }
 
-  bool _areServiceCommentsEqual(
-    Iterable<SingleLineComment> comments,
-    Iterable<SingleLineComment> oldComments,
+  bool _areHiddenRangesEqual(
+    Iterable<HiddenRange> hiddenRanges,
+    Iterable<HiddenRange> oldHiddenRanges,
   ) {
-    if (comments.length != oldComments.length) {
+    if (hiddenRanges.length != oldHiddenRanges.length) {
       return false;
     }
 
-    final list = comments.toList();
-    final oldList = oldComments.toList();
+    final list = hiddenRanges.toList();
+    final oldList = oldHiddenRanges.toList();
 
-    for (int i = 0; i < comments.length; i++) {
+    for (int i = 0; i < hiddenRanges.length; i++) {
       if (list[i] != oldList[i]) {
         return false;
       }

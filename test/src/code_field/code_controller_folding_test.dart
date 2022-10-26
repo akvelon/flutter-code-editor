@@ -190,7 +190,7 @@ public class MyClass {
   }
 }
 ''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
+            selection: TextSelection.collapsed(offset: 6),
           ),
         );
 
@@ -231,7 +231,7 @@ public class MyClass {
             text: '''
 public class MyClass {
 ''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
+            selection: TextSelection.collapsed(offset: 6),
           ),
         );
 
@@ -331,7 +331,7 @@ private class MyClass {
 }
 ''',
             // TODO(alexeyinkin): Selection.
-            selection: TextSelection(baseOffset: 41, extentOffset: 42),
+            selection: TextSelection.collapsed(offset: 42),
           ),
         );
       });
@@ -359,7 +359,7 @@ private class MyClass {
   void method2() ;}
 ''',
             // TODO(alexeyinkin): Selection.
-            selection: TextSelection(baseOffset: 102, extentOffset: 103),
+            selection: TextSelection.collapsed(offset: 103),
           ),
         );
       });
@@ -391,8 +391,7 @@ if (true) {
 if (true) {
 if (true) ;}
 ''',
-              // TODO(alexeyinkin): Selection.
-              selection: TextSelection.collapsed(offset: 13),
+              selection: TextSelection.collapsed(offset: 25),
             ),
           );
         },

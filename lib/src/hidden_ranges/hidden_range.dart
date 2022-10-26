@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import '../code/text_range.dart';
 
+@immutable
 class HiddenRange extends NormalizedTextRange with EquatableMixin {
   final int firstLine;
   final int lastLine;
@@ -34,6 +36,26 @@ class HiddenRange extends NormalizedTextRange with EquatableMixin {
 
     return a.end - b.end;
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is HiddenRange &&
+        start == other.start &&
+        end == other.end &&
+        firstLine == other.firstLine &&
+        lastLine == other.lastLine &&
+        wholeFirstLine == other.wholeFirstLine;
+  }
+
+  //override hashCode
+  @override
+  int get hashCode => Object.hash(
+        start,
+        end,
+        firstLine,
+        lastLine,
+        wholeFirstLine,
+      );
 
   @override
   List<Object> get props => [
