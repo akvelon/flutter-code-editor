@@ -8,6 +8,7 @@ import '../code/text_range.dart';
 import '../hidden_ranges/hidden_range.dart';
 import 'text_selection.dart';
 
+const _readonlyString = '//readonly ';
 extension TextEditingValueExtension on TextEditingValue {
   /// The position where the word at the cursor starts.
   /// `null` for a non-collapsed selection.
@@ -93,7 +94,7 @@ extension TextEditingValueExtension on TextEditingValue {
     }
 
     int? offset;
-    if (areVisibleTextsEqual || text.contains('//readonly ')) {
+    if (areVisibleTextsEqual) {
       final rangeAfter = code.visibleText.getChangedRange(
         text,
         attributeChangeTo: TextAffinity.upstream,
@@ -101,7 +102,10 @@ extension TextEditingValueExtension on TextEditingValue {
 
       offset = rangeAfter.start;
     } else {
-      final insertedHiddenRangesLength = text.length - code.visibleText.length;
+      var insertedHiddenRangesLength = text.length - code.visibleText.length;
+      if (text.contains(_readonlyString)) {
+        insertedHiddenRangesLength -= _getCharacterCountAfterReadonlyString(text);
+      }
       offset = selection.end - insertedHiddenRangesLength;
     }
     return TextEditingValue(
@@ -130,6 +134,19 @@ extension TextEditingValueExtension on TextEditingValue {
     }
 
     return true;
+  }
+
+  int _getCharacterCountAfterReadonlyString(String text) {
+    var result = 0;
+    final readonlyString = _readonlyString.allMatches(text);
+    for (final match in readonlyString) {
+      var index = match.end;
+      while(text[index] != '\n') {
+        result++;
+        index++;
+      }
+    }
+    return result;
   }
 
   TextEditingValue tabsToSpaces(int spaceCount) {
