@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../code_theme/code_theme.dart';
@@ -10,6 +11,28 @@ import '../line_numbers/line_number_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'code_controller.dart';
+
+final _shortcuts = {
+  // Copy
+  LogicalKeySet(
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.keyC,
+  ): CopySelectionTextIntent.copy,
+  LogicalKeySet(
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.insert,
+  ): CopySelectionTextIntent.copy,
+
+  // Cut
+  LogicalKeySet(
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.keyX,
+  ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
+  LogicalKeySet(
+    LogicalKeyboardKey.shift,
+    LogicalKeyboardKey.delete,
+  ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
+};
 
 class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.minLines}
@@ -294,33 +317,37 @@ class CodeFieldState extends State<CodeField> {
       ),
     );
 
-    return Container(
-      decoration: widget.decoration,
-      color: backgroundCol,
-      key: _codeFieldKey,
-      padding: !widget.lineNumbers ? const EdgeInsets.only(left: 8) : null,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.lineNumbers && numberCol != null) numberCol,
-          Expanded(
-            child: Stack(
-              children: [
-                editingField,
-                if (widget.controller.popupController.isPopupShown)
-                  Popup(
-                    normalOffset: _normalPopupOffset,
-                    flippedOffset: _flippedPopupOffset,
-                    controller: widget.controller.popupController,
-                    editingWindowSize: windowSize,
-                    style: textStyle,
-                    backgroundColor: backgroundCol,
-                    parentFocusNode: _focusNode!,
-                  ),
-              ],
+    return FocusableActionDetector(
+      actions: widget.controller.actions,
+      shortcuts: _shortcuts,
+      child: Container(
+        decoration: widget.decoration,
+        color: backgroundCol,
+        key: _codeFieldKey,
+        padding: !widget.lineNumbers ? const EdgeInsets.only(left: 8) : null,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.lineNumbers && numberCol != null) numberCol,
+            Expanded(
+              child: Stack(
+                children: [
+                  editingField,
+                  if (widget.controller.popupController.isPopupShown)
+                    Popup(
+                      normalOffset: _normalPopupOffset,
+                      flippedOffset: _flippedPopupOffset,
+                      controller: widget.controller.popupController,
+                      editingWindowSize: windowSize,
+                      style: textStyle,
+                      backgroundColor: backgroundCol,
+                      parentFocusNode: _focusNode!,
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

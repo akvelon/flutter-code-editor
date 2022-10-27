@@ -19,6 +19,7 @@ import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
 import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
+import 'actions/copy.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
@@ -101,6 +102,10 @@ class CodeController extends TextEditingController {
   RegExp? styleRegExp;
   late PopupController popupController;
   final autocompleter = Autocompleter();
+
+  late final actions = {
+    CopySelectionTextIntent: CopyAction(controller: this),
+  };
 
   CodeController({
     String? text,
