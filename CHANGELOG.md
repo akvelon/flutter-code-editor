@@ -1,3 +1,7 @@
+## 0.1.2
+
+* Preserve selection when folding and unfolding ([Issue 81](https://github.com/akvelon/flutter-code-editor/issues/81))
+
 ## 0.1.1
 
 * Added code folding.
