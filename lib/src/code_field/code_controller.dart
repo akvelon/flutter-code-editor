@@ -17,9 +17,13 @@ import '../code_modifiers/indent_code_modifier.dart';
 import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
+import '../history/code_history_controller.dart';
+import '../history/code_history_record.dart';
 import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/copy.dart';
+import 'actions/redo.dart';
+import 'actions/undo.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
@@ -102,9 +106,12 @@ class CodeController extends TextEditingController {
   RegExp? styleRegExp;
   late PopupController popupController;
   final autocompleter = Autocompleter();
+  late final historyController = CodeHistoryController(codeController: this);
 
-  late final actions = {
+  late final actions = <Type, Action<Intent>>{
     CopySelectionTextIntent: CopyAction(controller: this),
+    RedoTextIntent: RedoAction(controller: this),
+    UndoTextIntent: UndoAction(controller: this),
   };
 
   CodeController({
@@ -301,7 +308,14 @@ class CodeController extends TextEditingController {
 
   @override
   set value(TextEditingValue newValue) {
-    if (newValue.text != super.value.text) {
+    final hasTextChanged = newValue.text != super.value.text;
+    final hasSelectionChanged = newValue.selection != super.value.selection;
+
+    if (!hasTextChanged && !hasSelectionChanged) {
+      return;
+    }
+
+    if (hasTextChanged) {
       final loc = _insertedLoc(text, newValue.text);
 
       if (loc != null) {
@@ -339,9 +353,6 @@ class CodeController extends TextEditingController {
       //print('\n\n${_code.text}');
     }
 
-    bool hasTextChanged = newValue.text != super.value.text;
-    bool hasSelectionChanged = newValue.selection != super.value.selection;
-
     //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
     // Now fix the textfield for web
     // if (_webSpaceFix) {
@@ -352,7 +363,9 @@ class CodeController extends TextEditingController {
       _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text,
     );
 
+    historyController.beforeChanged(_code, newValue.selection);
     super.value = newValue;
+
     if (hasTextChanged) {
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
@@ -360,6 +373,15 @@ class CodeController extends TextEditingController {
     } else if (hasSelectionChanged) {
       popupController.hide();
     }
+  }
+
+  void applyHistoryRecord(CodeHistoryRecord record) {
+    _code = record.code;
+
+    super.value = TextEditingValue(
+      text: code.visibleText,
+      selection: record.selection,
+    );
   }
 
   Code get code => _code;

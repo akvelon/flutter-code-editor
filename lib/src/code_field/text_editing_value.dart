@@ -74,8 +74,8 @@ extension TextEditingValueExtension on TextEditingValue {
     return replaced(selection, '');
   }
 
-  TextEditingValue replacedSelection(String value) {
-    return replaced(selection, value);
+  TextEditingValue replacedSelection(String text) {
+    return replaced(selection, text);
   }
 
   TextEditingValue replacedText(String newText) {
@@ -91,6 +91,14 @@ extension TextEditingValueExtension on TextEditingValue {
     return TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: rangeAfter.start),
+    );
+  }
+
+  TextEditingValue typed(String text) {
+    final lengthDiff = text.length - selected.length;
+
+    return replaced(selection, text).copyWith(
+      selection: TextSelection.collapsed(offset: selection.end + lengthDiff),
     );
   }
 

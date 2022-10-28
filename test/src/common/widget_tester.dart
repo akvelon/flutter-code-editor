@@ -39,4 +39,18 @@ extension WidgetTesterExtension on WidgetTester {
       }
     }
   }
+
+  Future<void> sendUndo() async {
+    await sendKeyDownEvent(LogicalKeyboardKey.control);
+    await sendKeyEvent(LogicalKeyboardKey.keyZ);
+    await sendKeyUpEvent(LogicalKeyboardKey.control);
+  }
+
+  Future<void> sendRedo() async {
+    await sendKeyDownEvent(LogicalKeyboardKey.shift);
+    await sendKeyDownEvent(LogicalKeyboardKey.control);
+    await sendKeyEvent(LogicalKeyboardKey.keyZ);
+    await sendKeyUpEvent(LogicalKeyboardKey.control);
+    await sendKeyUpEvent(LogicalKeyboardKey.shift);
+  }
 }
