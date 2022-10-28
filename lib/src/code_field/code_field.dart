@@ -19,6 +19,10 @@ final _shortcuts = {
     LogicalKeyboardKey.keyC,
   ): CopySelectionTextIntent.copy,
   LogicalKeySet(
+    LogicalKeyboardKey.meta,
+    LogicalKeyboardKey.keyC,
+  ): CopySelectionTextIntent.copy,
+  LogicalKeySet(
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.insert,
   ): CopySelectionTextIntent.copy,
@@ -26,6 +30,10 @@ final _shortcuts = {
   // Cut
   LogicalKeySet(
     LogicalKeyboardKey.control,
+    LogicalKeyboardKey.keyX,
+  ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
+    LogicalKeySet(
+    LogicalKeyboardKey.meta,
     LogicalKeyboardKey.keyX,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
   LogicalKeySet(
