@@ -1,9 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_code_editor/src/code_field/code_controller.dart';
 import 'package:flutter_code_editor/src/code_field/text_editing_value.dart';
-import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_end.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/languages/java.dart';
 
 import '../common/create_app.dart';
 import '../common/widget_tester.dart';
@@ -41,26 +38,9 @@ private class MyClass {
 ''';
 
 void main() {
-  late FocusNode focusNode;
-
   setUp(() {
     focusNode = FocusNode();
   });
-
-  CodeController createController(String text) {
-    return CodeController(
-      text: text,
-      language: java,
-      namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    );
-  }
-
-  Future<CodeController> pumpController(WidgetTester wt, String text) async {
-    final controller = createController(text);
-    await wt.pumpWidget(createApp(controller, focusNode));
-    focusNode.requestFocus();
-    return controller;
-  }
 
   group('CodeController. Folding.', () {
     group('Trivial.', () {
