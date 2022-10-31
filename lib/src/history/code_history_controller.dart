@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
+import 'package:meta/meta.dart';
 
 import '../code/code.dart';
 import '../code_field/code_controller.dart';
 import '../code_field/text_selection.dart';
 import 'code_history_record.dart';
+import 'limit_stack.dart';
 
 /// A custom undo/redo implementation for [CodeController].
 ///
@@ -27,7 +29,7 @@ class CodeHistoryController {
   Timer? _debounceTimer;
 
   @visibleForTesting
-  final stack = <CodeHistoryRecord>[];
+  final stack = LimitStack<CodeHistoryRecord>(maxLength: limit);
 
   static const idle = Duration(seconds: 5);
   static const limit = 100;
@@ -74,7 +76,7 @@ class CodeHistoryController {
   }
 
   void _dropRedoIfNeed() {
-    stack.removeRange(_currentRecordIndex + 1, stack.length);
+    stack.removeAfter(_currentRecordIndex + 1);
   }
 
   void undo() {
@@ -123,13 +125,8 @@ class CodeHistoryController {
   }
 
   void _pushRecord(CodeHistoryRecord record) {
-    stack.add(record);
+    stack.push(record);
     _currentRecordIndex = stack.length - 1;
-
-    if (stack.length > limit) {
-      stack.removeRange(0, stack.length - limit);
-      _currentRecordIndex = limit - 1;
-    }
   }
 
   void deleteHistory() {
