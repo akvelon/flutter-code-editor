@@ -44,9 +44,14 @@ extension FoldableBlockList on List<FoldableBlock> {
     for (int i = 1; i < length; i++) {
       final currentBlock = this[i];
       final previousBlock = this[i - 1];
+
       final areIntersected = previousBlock.lastLine >= currentBlock.firstLine &&
           previousBlock.lastLine < currentBlock.lastLine;
-      if (areIntersected) {
+
+      final isDuplicate = previousBlock.firstLine == currentBlock.firstLine &&
+          previousBlock.lastLine == currentBlock.lastLine;
+
+      if (areIntersected || isDuplicate) {
         this[i - 1] = FoldableBlock(
           firstLine: previousBlock.firstLine,
           lastLine: currentBlock.lastLine,
