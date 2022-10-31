@@ -41,13 +41,13 @@ class CodeHistoryController {
 
   void beforeChanged(Code code, TextSelection selection) {
     _dropRedoIfNeed();
-    bool save = false;
+    bool shouldSave = false;
 
     if (_isTextChanged) {
-      save = code.lines.lines.length != lastCode.lines.lines.length;
+      shouldSave = code.lines.lines.length != lastCode.lines.lines.length;
     }
 
-    if (!save) {
+    if (!shouldSave) {
       if (lastCode.text != code.text) {
         _isTextChanged = true;
       }
@@ -60,12 +60,12 @@ class CodeHistoryController {
         if (isTypingContinuous) {
           _setTimer();
         } else {
-          save = true;
+          shouldSave = true;
         }
       }
     }
 
-    if (save) {
+    if (shouldSave) {
       _push();
     }
 
