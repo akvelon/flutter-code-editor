@@ -1,3 +1,9 @@
+## 0.1.3
+
+* Custom undo/redo implementation ([Issue 97](https://github.com/akvelon/flutter-code-editor/issues/97))
+* Remove `FoldableBlock` duplicates ([Issue 99](https://github.com/akvelon/flutter-code-editor/issues/99))
+* Copy folded text ([Issue 24](https://github.com/akvelon/flutter-code-editor/issues/24))
+
 ## 0.1.2
 
 * Preserve selection when folding and unfolding ([Issue 81](https://github.com/akvelon/flutter-code-editor/issues/81))
