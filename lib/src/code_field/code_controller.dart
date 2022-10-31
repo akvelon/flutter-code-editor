@@ -457,63 +457,6 @@ class CodeController extends TextEditingController {
     return TextSpan(style: style, children: children);
   }
 
-  TextSpan _processLanguage(
-    String text,
-    CodeThemeData? widgetTheme,
-    TextStyle? style,
-  ) {
-    final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
-    final result = highlight.parse(rawText, language: _languageId);
-
-    final nodes = result.nodes;
-
-    final children = <TextSpan>[];
-    var currentSpans = children;
-    final stack = <List<TextSpan>>[];
-
-    void _traverse(Node node) {
-      var val = node.value;
-      final nodeChildren = node.children;
-      final nodeStyle =
-          widgetTheme?.styles[node.className] ?? _theme?[node.className];
-
-      if (val != null) {
-        if (_webSpaceFix) {
-          val = _spacesToMiddleDots(val);
-        }
-
-        var child = TextSpan(text: val, style: nodeStyle);
-
-        if (styleRegExp != null) {
-          child = _processPatterns(val, nodeStyle);
-        }
-
-        currentSpans.add(child);
-      } else if (nodeChildren != null) {
-        List<TextSpan> tmp = [];
-
-        currentSpans.add(TextSpan(
-          children: tmp,
-          style: nodeStyle,
-        ));
-
-        stack.add(currentSpans);
-        currentSpans = tmp;
-
-        for (final n in nodeChildren) {
-          _traverse(n);
-          if (n == nodeChildren.last) {
-            currentSpans = stack.isEmpty ? children : stack.removeLast();
-          }
-        }
-      }
-    }
-
-    nodes?.forEach(_traverse);
-
-    return TextSpan(style: style, children: children);
-  }
-
   Future<void> generateSuggestions() async {
     final prefix = value.wordToCursor;
     if (prefix == null) {
@@ -588,7 +531,6 @@ class CodeController extends TextEditingController {
         theme: _getTheme(context),
         textStyle: style,
       );
-      //return _processLanguage(text, CodeTheme.of(context), style);
     }
 
     if (styleRegExp != null) {
