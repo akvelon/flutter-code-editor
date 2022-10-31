@@ -152,18 +152,4 @@ extension TextEditingValueExtension on TextEditingValue {
     }
     return text.substring(selection.end);
   }
-
-  // These are used in tests only.
-
-  TextEditingValue replacedSelection(String text) {
-    return replaced(selection, text);
-  }
-
-  TextEditingValue typed(String text) {
-    final lengthDiff = text.length - selected.length;
-
-    return replaced(selection, text).copyWith(
-      selection: TextSelection.collapsed(offset: selection.end + lengthDiff),
-    );
-  }
 }
