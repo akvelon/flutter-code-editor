@@ -298,6 +298,8 @@ void main() {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
+        // 1. Fill the limit.
+
         for (int i = 0; i < CodeHistoryController.limit - 1; i++) {
           controller.value = controller.value.typed('a');
           await wt.moveCursor(-1); // Creates.
@@ -308,6 +310,8 @@ void main() {
           CodeHistoryController.limit,
         );
 
+        // 2. Overflow drops the oldest record.
+
         controller.value = controller.value.typed('a');
         await wt.moveCursor(-1); // Creates, drops the oldest.
 
@@ -315,6 +319,8 @@ void main() {
           controller.historyController.stack.length,
           CodeHistoryController.limit,
         );
+
+        // 3. Can undo to bottom.
 
         // One too many.
         for (int i = 0; i < CodeHistoryController.limit; i++) {
@@ -328,6 +334,8 @@ void main() {
             offset: MethodSnippet.visible.length + 1,
           ),
         );
+
+        // 4. Can redo.
 
         // One too many.
         for (int i = 0; i < CodeHistoryController.limit; i++) {

@@ -52,15 +52,15 @@ class CodeHistoryController {
         _isTextChanged = true;
       }
 
-      final isTextOneCharLonger = code.text.length == lastCode.text.length + 1;
-      final isSelectionChangeImportant = !isTextOneCharLonger ||
-          !selection.hasMovedOneCharacterRight(lastSelection);
-
       if (_isTextChanged) {
-        if (isSelectionChangeImportant) {
-          save = true;
-        } else {
+        final isText1CharLonger = code.text.length == lastCode.text.length + 1;
+        final isTypingContinuous = isText1CharLonger &&
+            selection.hasMovedOneCharacterRight(lastSelection);
+
+        if (isTypingContinuous) {
           _setTimer();
+        } else {
+          save = true;
         }
       }
     }
