@@ -74,10 +74,6 @@ extension TextEditingValueExtension on TextEditingValue {
     return replaced(selection, '');
   }
 
-  TextEditingValue replacedSelection(String value) {
-    return replaced(selection, value);
-  }
-
   TextEditingValue replacedText(String newText) {
     if (newText == text) {
       return this;

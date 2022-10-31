@@ -2,20 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
+import '../common/snippets.dart';
 import '../common/widget_tester.dart';
-
-const _text = '''
-class MyClass {
-  void method() {// [START section1]
-  }// [END section1]
-}
-''';
-
-const _visibleText = '''
-class MyClass {
-  void method() {
-}
-''';
 
 const _copiedText = '''
 void method() {// [START section1]
@@ -40,7 +28,7 @@ void main() {
 
   group('CodeController. Shortcuts.', () {
     testWidgets('Select all', (WidgetTester wt) async {
-      final controller = await pumpController(wt, _text);
+      final controller = await pumpController(wt, MethodSnippet.full);
       controller.foldAt(1);
 
       await wt.sendKeyDownEvent(LogicalKeyboardKey.control);
@@ -50,10 +38,10 @@ void main() {
       expect(
         controller.value,
         const TextEditingValue(
-          text: _visibleText,
+          text: MethodSnippet.visibleFolded1,
           selection: TextSelection(
             baseOffset: 0,
-            extentOffset: _visibleText.length,
+            extentOffset: MethodSnippet.visibleFolded1.length,
           ),
         ),
       );
@@ -69,7 +57,7 @@ void main() {
             await wt.sendKeyEvent(LogicalKeyboardKey.keyC);
             await wt.sendKeyUpEvent(LogicalKeyboardKey.control);
           },
-          visibleTextAfter: _visibleText,
+          visibleTextAfter: MethodSnippet.visibleFolded1,
         ),
 
         _CopyExample(
@@ -79,7 +67,7 @@ void main() {
             await wt.sendKeyEvent(LogicalKeyboardKey.insert);
             await wt.sendKeyUpEvent(LogicalKeyboardKey.control);
           },
-          visibleTextAfter: _visibleText,
+          visibleTextAfter: MethodSnippet.visibleFolded1,
         ),
 
         _CopyExample(
@@ -106,7 +94,7 @@ void main() {
       final controller = await pumpController(wt, '');
 
       for (final example in examples) {
-        controller.value = const TextEditingValue(text: _text);
+        controller.value = const TextEditingValue(text: MethodSnippet.full);
         controller.foldAt(1);
         await wt.selectFromHome(18, offset: 16);
         mockClipboardHandler();

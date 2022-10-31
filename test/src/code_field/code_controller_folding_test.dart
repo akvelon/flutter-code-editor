@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_code_editor/src/code_field/text_editing_value.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
+import '../common/text_editing_value.dart';
 import '../common/widget_tester.dart';
 
 const _code = '''

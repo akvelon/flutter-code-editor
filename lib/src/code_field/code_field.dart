@@ -32,7 +32,7 @@ final _shortcuts = {
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyX,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
-    LogicalKeySet(
+  LogicalKeySet(
     LogicalKeyboardKey.meta,
     LogicalKeyboardKey.keyX,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
@@ -40,6 +40,28 @@ final _shortcuts = {
     LogicalKeyboardKey.shift,
     LogicalKeyboardKey.delete,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
+
+  // Undo
+  LogicalKeySet(
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.keyZ,
+  ): const UndoTextIntent(SelectionChangedCause.keyboard),
+  LogicalKeySet(
+    LogicalKeyboardKey.meta,
+    LogicalKeyboardKey.keyZ,
+  ): const UndoTextIntent(SelectionChangedCause.keyboard),
+
+  // Redo
+  LogicalKeySet(
+    LogicalKeyboardKey.shift,
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.keyZ,
+  ): const RedoTextIntent(SelectionChangedCause.keyboard),
+  LogicalKeySet(
+    LogicalKeyboardKey.shift,
+    LogicalKeyboardKey.meta,
+    LogicalKeyboardKey.keyZ,
+  ): const RedoTextIntent(SelectionChangedCause.keyboard),
 };
 
 class CodeField extends StatefulWidget {
