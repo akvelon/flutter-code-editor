@@ -53,8 +53,4 @@ class HiddenRange extends NormalizedTextRange with EquatableMixin {
         lastLine,
         wholeFirstLine,
       ];
-
-  bool containsComment(SingleLineComment other) {
-    return start <= other.characterIndex && end >= other.lastCharacterIndex;
-  }
 }

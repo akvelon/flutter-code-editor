@@ -14,8 +14,10 @@ class MyClass {
 ''';
 
 const _section2Text = '''
+  
   void method() {
-  }''';
+  }
+''';
 
 const _justOpenTextSeparate = '''
 void method1() {
@@ -67,7 +69,7 @@ void main() {
       expect(controller.value.text, _section2Text);
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [0, 1],
+        [3, 4, 5],
       );
     });
 
@@ -87,6 +89,7 @@ class MyClass {
       );
 
       expect(controller.value.text, '''
+
 class MyClass {
   void readOnlyMethod() {
   }
@@ -96,7 +99,7 @@ class MyClass {
 }''');
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [0, 1, 2, 3, 4, 5, 6],
+        [0, 1, 2, 3, 4, 5, 6, 7],
       );
     });
 
@@ -135,10 +138,10 @@ class MyClass {
         visibleSectionNames: {'anotherMethods'},
       );
 
-      expect(controller.value.text, _method2n3);
+      expect(controller.value.text, '\n$_method2n3');
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [0, 1, 2, 3, 4, 5, 6, 7],
+        [4, 5, 6, 7, 8, 9, 10, 11, 12],
       );
     });
 
@@ -151,7 +154,7 @@ class MyClass {
       expect(controller.value.text, _method2n3);
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [0, 1, 2, 3, 4, 5, 6, 7],
+        [4, 5, 6, 7, 8, 9, 10, 11],
       );
     });
 
@@ -171,7 +174,7 @@ void method3() {
 ''');
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [0, 3, 4, 5, 6, 7],
+        [4, 7, 8, 9, 10, 11],
       );
     });
 
@@ -185,7 +188,7 @@ void method3() {
       expect(controller.value.text, _method2n3);
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [0, 1, 2, 3, 4, 5, 6, 7],
+        [4, 5, 6, 7, 8, 9, 10, 11],
       );
     });
   });

@@ -9,7 +9,6 @@ class HiddenLineRangesBuilder {
   factory HiddenLineRangesBuilder({
     required CodeLines codeLines,
     required HiddenRanges hiddenRanges,
-    bool shouldReduceStartToOne = false,
   }) {
     final breakpoints = <LineNumberingBreakpoint>[];
     int spread = 0;
@@ -62,7 +61,6 @@ class HiddenLineRangesBuilder {
         breakpoints: breakpoints,
         fullLineCount: codeLines.lines.length,
         visibleLineCount: codeLines.lines.length - spread,
-        shouldReduceStartToOne: shouldReduceStartToOne,
       ),
     );
   }
