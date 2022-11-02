@@ -82,6 +82,22 @@ void main() {
       expect(actual, expected);
     });
 
+    test('Duplicates are removed', () {
+      const blocks = [
+        FB(firstLine: 0, lastLine: 1, type: FBT.singleLineComment),
+        FB(firstLine: 3, lastLine: 5, type: FBT.parentheses),
+        FB(firstLine: 3, lastLine: 5, type: FBT.braces),
+      ];
+      const expected = [
+        FB(firstLine: 0, lastLine: 1, type: FBT.singleLineComment),
+        FB(firstLine: 3, lastLine: 5, type: FBT.union),
+      ];
+
+      final actual = [...blocks]..joinIntersecting();
+
+      expect(actual, expected);
+    });
+
     // TODO(Malarg): fix this. It's not desired behavior
     // This test represents situation, shown on diagram below:
     //    0 1 2 3 4 5

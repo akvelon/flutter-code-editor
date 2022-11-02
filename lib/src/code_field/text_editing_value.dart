@@ -70,8 +70,8 @@ extension TextEditingValueExtension on TextEditingValue {
         : null;
   }
 
-  TextEditingValue replacedSelection(String value) {
-    return replaced(selection, value);
+  TextEditingValue deleteSelection() {
+    return replaced(selection, '');
   }
 
   TextEditingValue replacedText(String newText) {

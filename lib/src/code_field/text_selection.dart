@@ -13,4 +13,12 @@ extension TextSelectionExtension on TextSelection {
   bool get isSelectionNormalized {
     return baseOffset <= extentOffset;
   }
+
+  bool hasMovedOneCharacterRight(TextSelection old) {
+    if (!old.isCollapsed || !isCollapsed) {
+      return false;
+    }
+
+    return start == old.start + 1;
+  }
 }
