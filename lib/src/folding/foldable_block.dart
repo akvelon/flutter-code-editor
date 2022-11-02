@@ -2,12 +2,19 @@ import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 
+import '../util/inclusive_range.dart';
 import 'foldable_block_type.dart';
 
-class FoldableBlock with EquatableMixin {
+class FoldableBlock extends InclusiveRange with EquatableMixin {
   final int firstLine;
   final int lastLine;
   final FoldableBlockType type;
+
+  @override
+  int get first => firstLine;
+
+  @override
+  int get last => lastLine;
 
   const FoldableBlock({
     required this.firstLine,
@@ -27,6 +34,27 @@ class FoldableBlock with EquatableMixin {
   }
 
   int get lineCount => lastLine - firstLine + 1;
+
+  bool get isComment {
+    // ignore: missing_enum_constant_in_switch
+    switch (type) {
+      case FoldableBlockType.singleLineComment:
+      case FoldableBlockType.multilineComment:
+        return true;
+    }
+
+    return false;
+  }
+
+  bool get isImports {
+    // ignore: missing_enum_constant_in_switch
+    switch (type) {
+      case FoldableBlockType.imports:
+        return true;
+    }
+
+    return false;
+  }
 }
 
 extension FoldableBlockList on List<FoldableBlock> {
