@@ -23,7 +23,7 @@ abstract class AbstractNamedSectionParser {
     );
 
     return unsorted.where(_isValid).toList(growable: false)
-      ..sort((a, b) => a.startLine - b.startLine);
+      ..sort((a, b) => a.firstLine - b.firstLine);
   }
 
   List<NamedSection> parseUnsorted({
@@ -31,8 +31,8 @@ abstract class AbstractNamedSectionParser {
   });
 
   bool _isValid(NamedSection section) {
-    final endLine = section.endLine;
-    return section.startLine >= 0 &&
-        (endLine == null || section.startLine <= endLine);
+    final lastLine = section.lastLine;
+    return section.firstLine >= 0 &&
+        (lastLine == null || section.firstLine <= lastLine);
   }
 }

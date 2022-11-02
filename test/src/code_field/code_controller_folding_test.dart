@@ -1,23 +1,11 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
-import '../common/text_editing_value.dart';
+import '../common/snippets.dart';
 import '../common/widget_tester.dart';
-
-const _code = '''
-private class MyClass {
-  void method1() {
-    if (false) {// [START section1]
-      return;
-    }// [END section1]
-  }
-
-  void method2() {// [START section2]
-    return;
-  }// [END section2]
-}
-''';
 
 const _codeFolded1 = '''
 private class MyClass {
@@ -26,14 +14,6 @@ private class MyClass {
   void method2() {
     return;
   }
-}
-''';
-
-const _commentsCode = '''
-private class MyClass {
-  //comment1
-  //comment2
-  void method() {}
 }
 ''';
 
@@ -59,7 +39,7 @@ int c;
       });
 
       test('Folding does nothing if no foldable block on the line', () {
-        final controller = createController(_code);
+        final controller = createController(TwoMethodsSnippet.full);
         final oldCode = controller.code;
 
         controller.foldAt(3);
@@ -68,7 +48,7 @@ int c;
       });
 
       test('Double folding changes nothing', () {
-        final controller = createController(_code);
+        final controller = createController(TwoMethodsSnippet.full);
         controller.foldAt(1);
         final oldCode = controller.code;
 
@@ -78,7 +58,7 @@ int c;
       });
 
       test('Unfolding does nothing if no foldable block on the line', () {
-        final controller = createController(_code);
+        final controller = createController(TwoMethodsSnippet.full);
         final oldCode = controller.code;
 
         controller.unfoldAt(3);
@@ -87,7 +67,7 @@ int c;
       });
 
       test('Unfolding non-folded changes nothing', () {
-        final controller = createController(_code);
+        final controller = createController(TwoMethodsSnippet.full);
         final oldCode = controller.code;
 
         controller.unfoldAt(1);
@@ -98,7 +78,7 @@ int c;
 
     group('Hides text.', () {
       test('Hides highlighted', () {
-        final controller = createController(_code);
+        final controller = createController(TwoMethodsSnippet.full);
         final originalHtml = controller.code.visibleHighlighted?.toHtml();
 
         controller.foldAt(1);
@@ -122,7 +102,7 @@ int c;
       });
 
       testWidgets('Cursor before', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _code);
+        final controller = await pumpController(wt, TwoMethodsSnippet.full);
         final textBefore = controller.rawText;
         await wt.selectFromHome(1, offset: 1);
 
@@ -148,274 +128,243 @@ int c;
       });
     });
 
-    group('Editing', () {
-      testWidgets('above a folded block', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _code);
-        controller.foldAt(1);
-        await wt.selectFromHome(0, offset: 7);
+    group('foldCommentAtLineZero', () {
+      test('folds single line comments at line 0', () {
+        final controller = createController(CommentImportSnippet.full);
 
-        controller.value = controller.value.replacedSelection('public');
+        controller.foldCommentAtLineZero();
 
         expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-public class MyClass {
-  void method1() {
+          controller.text,
+          '''
+// comment1
 
-  void method2() {
-    return;
-  }
+package mypackage;
+import java.util.Arrays;
+
+{
 }
 ''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
-        );
-
-        controller.unfoldAt(1);
-
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-public class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-
-  void method2() {
-    return;
-  }
-}
-''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
         );
       });
 
-      testWidgets('the first line of a folded block', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _code);
-        controller.foldAt(0);
-        await wt.selectFromHome(0, offset: 7);
-
-        controller.value = controller.value.replacedSelection('public');
-
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-public class MyClass {
-''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
+      test('folds multiline comments at line 0', () {
+        final controller = createController(
+          '/*\n*/\n' + CommentImportSnippet.full,
         );
 
-        controller.unfoldAt(0);
+        controller.foldCommentAtLineZero();
 
         expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-public class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-
-  void method2() {
-    return;
-  }
-}
-''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
+          controller.text,
+          '/*\n' + CommentImportSnippet.visible,
         );
       });
 
-      testWidgets('between folded blocks', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _code);
-        controller.foldAt(1);
-        controller.foldAt(7);
+      test('does not fold if the comment is not on line 0', () {
+        const prefixes = [
+          '\n',
+          '{\n}\n',
+        ];
 
-        await wt.selectFromHome(43);
-        controller.value = controller.value.replacedSelection('int n;\n');
+        for (final prefix in prefixes) {
+          final controller = createController(
+            prefix + CommentImportSnippet.full,
+          );
 
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-private class MyClass {
-  void method1() {
-int n;
+          controller.foldCommentAtLineZero();
 
-  void method2() {
-}
-''',
-            selection: TextSelection.collapsed(offset: 50),
-          ),
-        );
+          expect(
+            controller.text,
+            prefix + CommentImportSnippet.visible,
+            reason: prefix,
+          );
+        }
+      });
 
-        controller.unfoldAt(1);
-        controller.unfoldAt(8);
+      test('does nothing if no foldable comment blocks', () {
+        const texts = [
+          '',
+          'int n;\nint m;',
+          '{\n}\n',
+        ];
 
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-private class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-int n;
+        for (final text in texts) {
+          final controller = createController(text);
 
-  void method2() {
-    return;
-  }
-}
-''',
-            selection: TextSelection.collapsed(offset: 91),
-          ),
-        );
+          controller.foldCommentAtLineZero();
+
+          expect(controller.text, text, reason: text);
+        }
       });
     });
 
-    group('Deleting folded blocks.', () {
-      testWidgets('First block of the same length', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _code);
-        controller.foldAt(1);
+    group('foldImports', () {
+      test('folds single line comments at line 0', () {
+        final controller = createController(CommentImportSnippet.full);
 
-        await wt.selectFromHome(41, offset: 2);
-        // private class MyClass {\n  void method1() {
-        //                                           \ cursor
-        controller.value = controller.value.replacedSelection(';');
+        controller.foldImports();
 
         expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-private class MyClass {
-  void method1() ;
-  void method2() {
-    return;
-  }
-}
-''',
-            // TODO(alexeyinkin): Selection.
-            selection: TextSelection(baseOffset: 41, extentOffset: 42),
-          ),
-        );
-      });
+          controller.text,
+          '''
+// comment1
+///comment2
 
-      testWidgets('Second block of the same length', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _code);
-        controller.foldAt(7);
-        await wt.selectFromHome(102, offset: 2);
-        // ...void method2() {
-        //                   \ cursor
+package mypackage;
 
-        controller.value = controller.value.replacedSelection(';');
-
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-private class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-
-  void method2() ;}
-''',
-            // TODO(alexeyinkin): Selection.
-            selection: TextSelection(baseOffset: 102, extentOffset: 103),
-          ),
-        );
-      });
-
-      // TODO(alexeyinkin): Fix, https://github.com/akvelon/flutter-code-editor/issues/83
-      testWidgets(
-        'When deleting 2nd identical folded block, 1st one incorrectly folds',
-        (WidgetTester wt) async {
-          final controller = await pumpController(wt, '''
 {
-if (true) {
-}
-if (true) {
-}
-}
-''');
-          controller.foldAt(3);
-          await wt.selectFromHome(26, offset: 2);
-          // {\nif (true) {\n}\nif (true) {}\n\n
-          //                              \ cursor
-
-          controller.value = controller.value.replacedSelection(';');
-
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
-{
-if (true) {
-if (true) ;}
-''',
-              // TODO(alexeyinkin): Selection.
-              selection: TextSelection.collapsed(offset: 13),
-            ),
-          );
-        },
-      );
-
-      testWidgets('Deleting folded comments', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _commentsCode);
-        controller.foldAt(1);
-        await wt.selectFromHome(26, offset: 13);
-        // private class MyClass {\n  //comment1\n  void method...
-        //                            \--selected-->
-
-        controller.value = controller.value.replacedSelection('');
-
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-private class MyClass {
-  void method() {}
 }
 ''',
-            selection: TextSelection.collapsed(offset: 26),
-          ),
         );
       });
 
-      testWidgets('Inserting after folded comments', (WidgetTester wt) async {
-        final controller = await pumpController(wt, _commentsCode);
-        controller.foldAt(1);
-        await wt.selectFromHome(37);
-        // private class MyClass {\n  //comment1\n  void method...
-        //                                        \ cursor
+      test('does nothing if no import blocks', () {
+        const texts = [
+          '',
+          'int n;\nint m;',
+          '{\n}\n',
+          '//\n//\n',
+        ];
 
-        controller.value = controller.value.replacedSelection('  int n;\n');
+        for (final text in texts) {
+          final controller = createController(text);
+
+          controller.foldImports();
+
+          expect(controller.text, text, reason: text);
+        }
+      });
+    });
+
+    group('foldOutsideSections.', () {
+      test('No blocks -> Do nothing', () {
+        const texts = [
+          '',
+          'int n;',
+        ];
+
+        const sectionLists = <List<String>>[
+          [],
+          ['nonexistent'],
+        ];
+
+        for (final text in texts) {
+          for (final sections in sectionLists) {
+            final controller = createController(text);
+
+            controller.foldOutsideSections(sections);
+
+            expect(
+              controller.code.visibleText,
+              text,
+              reason: '$text $sections',
+            );
+          }
+        }
+      });
+
+      test('No sections -> Fold everything', () {
+        const text = '''
+{{
+}
+}
+{
+}
+''';
+        const expected = '''
+{{
+{
+''';
+        final controller = createController(text);
+
+        controller.foldOutsideSections([]);
 
         expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-private class MyClass {
-  //comment1
-  int n;
-  void method() {}
-}
-''',
-            selection: TextSelection.collapsed(offset: 46),
-          ),
+          controller.code.visibleText,
+          expected,
+        );
+      });
+
+      test('Folds specific sections', () {
+        const text = '''
+{                                     //  0
+  {                                   //  1
+  }                                   //  2
+                                      //  3
+  {//[START matches_block]                4
+  }//[END matches_block]                  5
+                                      //  6
+  {//[START matches_block_fold]           7
+  }//[END matches_block_fold]             8
+                                      //  9
+  {                                   //  10
+//[START outlives_block]                  11
+  }                                   //  12
+//[END outlives_block]                    13
+                                      //  14
+//[START outlived_by_block]               15
+  {                                   //  16
+//[END outlived_by_block]                 17
+  }                                   //  18
+                                      //  19
+//[START contains_blocks]                 20
+  {                                   //  21
+  }                                   //  22
+                                      //  23
+  {                                   //  24
+  }                                   //  25
+//[END contains_blocks]                   26
+                                      //  27
+  {                                   //  28
+  }                                   //  29
+}                                     //  30
+''';
+
+        const foldedVisible = '''
+{                                     //  0
+  {                                   //  1
+                                      //  3
+  {
+  }
+                                      //  6
+  {
+                                      //  9
+  {                                   //  10
+
+  }                                   //  12
+
+                                      //  14
+
+  {                                   //  16
+
+  }                                   //  18
+                                      //  19
+
+  {                                   //  21
+  }                                   //  22
+                                      //  23
+  {                                   //  24
+  }                                   //  25
+
+                                      //  27
+  {                                   //  28
+}                                     //  30
+''';
+
+        final controller = createController(text);
+
+        controller.foldOutsideSections([
+          'matches_block',
+          'outlives_block',
+          'outlived_by_block',
+          'contains_blocks',
+          'nonexistent',
+        ]);
+
+        expect(
+          controller.code.visibleText,
+          foldedVisible,
         );
       });
     });

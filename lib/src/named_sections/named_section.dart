@@ -1,33 +1,36 @@
-import 'package:meta/meta.dart';
+import 'package:equatable/equatable.dart';
 
-@immutable
-class NamedSection {
+import '../util/inclusive_range.dart';
+
+class NamedSection extends InclusiveRange with EquatableMixin {
   /// Zero-based index of the line with the starting tag.
-  final int startLine;
+  final int firstLine;
 
   /// Zero-based index of the line with the ending tag.
   /// `null` if the section spans till the end of the document.
-  final int? endLine;
+  final int? lastLine;
 
   final String name;
 
+  @override
+  int get first => firstLine;
+
+  @override
+  int? get last => lastLine;
+
   const NamedSection({
-    required this.startLine,
-    required this.endLine,
+    required this.firstLine,
+    required this.lastLine,
     required this.name,
   });
 
   @override
-  int get hashCode => Object.hash(startLine, endLine, name);
+  List<Object?> get props => [
+        firstLine,
+        lastLine,
+        name,
+      ];
 
   @override
-  bool operator ==(Object other) {
-    return other is NamedSection &&
-        startLine == other.startLine &&
-        endLine == other.endLine &&
-        name == other.name;
-  }
-
-  @override
-  String toString() => '$startLine-$endLine: "$name"';
+  String toString() => '$firstLine-$lastLine: "$name"';
 }

@@ -169,9 +169,9 @@ class Code {
         continue;
       }
 
-      final lastLineIndex = section.endLine ?? lines.length - 1;
+      final lastLineIndex = section.lastLine ?? lines.length - 1;
 
-      for (int i = section.startLine; i <= lastLineIndex; i++) {
+      for (int i = section.firstLine; i <= lastLineIndex; i++) {
         lines[i] = lines[i].copyWith(isReadOnly: true);
       }
     }

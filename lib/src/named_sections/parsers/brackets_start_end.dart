@@ -16,7 +16,7 @@ import 'abstract.dart';
 /// different comments.
 ///
 /// If a section is never started, it starts at the line 0.
-/// If a section is never ended, its `endLine` is `null`.
+/// If a section is never ended, its `lastLine` is `null`.
 ///
 /// If a section is started multiple times, the min line number takes effect.
 /// If a section is ended multiple times, the max line number takes effect.
@@ -32,56 +32,56 @@ class BracketsStartEndNamedSectionParser extends AbstractNamedSectionParser {
   List<NamedSection> parseUnsorted({
     required List<SingleLineComment> singleLineComments,
   }) {
-    final starts = <String, int>{};
-    final ends = <String, int>{};
+    final firsts = <String, int>{};
+    final lasts = <String, int>{};
 
     for (final comment in singleLineComments) {
       for (final match in _startRe.allMatches(comment.innerContent)) {
         final name = match.group(3) ?? '';
-        final oldStart = starts[name];
-        starts[name] = oldStart == null
+        final oldFirst = firsts[name];
+        firsts[name] = oldFirst == null
             ? comment.lineIndex
-            : min(comment.lineIndex, oldStart);
+            : min(comment.lineIndex, oldFirst);
       }
 
       for (final match in _endRe.allMatches(comment.innerContent)) {
         final name = match.group(3) ?? '';
-        ends[name] = max(comment.lineIndex, ends[name] ?? 0);
+        lasts[name] = max(comment.lineIndex, lasts[name] ?? 0);
       }
     }
 
-    return _combineStartsAndEnds(starts, ends);
+    return _combineFirstsAndLasts(firsts, lasts);
   }
 
-  List<NamedSection> _combineStartsAndEnds(
-    Map<String, int> starts,
-    Map<String, int> ends,
+  List<NamedSection> _combineFirstsAndLasts(
+    Map<String, int> firsts,
+    Map<String, int> lasts,
   ) {
     final sections = <NamedSection>[];
 
-    for (final entry in ends.entries) {
+    for (final entry in lasts.entries) {
       final name = entry.key;
-      final end = entry.value;
+      final last = entry.value;
 
       sections.add(
         NamedSection(
-          startLine: starts[name] ?? 0,
-          endLine: end,
+          firstLine: firsts[name] ?? 0,
+          lastLine: last,
           name: name,
         ),
       );
 
-      starts.remove(name);
+      firsts.remove(name);
     }
 
-    for (final entry in starts.entries) {
+    for (final entry in firsts.entries) {
       final name = entry.key;
-      final start = entry.value;
+      final first = entry.value;
 
       sections.add(
         NamedSection(
-          startLine: start,
-          endLine: ends[name],
+          firstLine: first,
+          lastLine: lasts[name],
           name: name,
         ),
       );
