@@ -148,7 +148,7 @@ import java.util.Arrays;
         );
       });
 
-      test('folds multiline line comments at line 0', () {
+      test('folds multiline comments at line 0', () {
         final controller = createController(
           '/*\n*/\n' + CommentImportSnippet.full,
         );

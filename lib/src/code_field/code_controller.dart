@@ -510,6 +510,7 @@ class CodeController extends TextEditingController {
   }
 
   void foldImports() {
+    // TODO(alexeyinkin): An optimized method to fold multiple blocks, https://github.com/akvelon/flutter-code-editor/issues/106
     for (final block in _code.foldableBlocks) {
       if (block.isImports) {
         foldAt(block.firstLine);
@@ -534,6 +535,7 @@ class CodeController extends TextEditingController {
       }
     }
 
+    // TODO(alexeyinkin): An optimized method to fold multiple blocks, https://github.com/akvelon/flutter-code-editor/issues/106
     foldLines.forEach(foldAt);
   }
 

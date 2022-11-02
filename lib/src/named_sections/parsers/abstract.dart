@@ -31,8 +31,8 @@ abstract class AbstractNamedSectionParser {
   });
 
   bool _isValid(NamedSection section) {
-    final endLine = section.lastLine;
+    final lastLine = section.lastLine;
     return section.firstLine >= 0 &&
-        (endLine == null || section.firstLine <= endLine);
+        (lastLine == null || section.firstLine <= lastLine);
   }
 }
