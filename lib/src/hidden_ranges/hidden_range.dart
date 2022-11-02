@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../code/text_range.dart';
+import '../single_line_comments/single_line_comment.dart';
 
 class HiddenRange extends NormalizedTextRange with EquatableMixin {
   final int firstLine;
@@ -20,6 +21,15 @@ class HiddenRange extends NormalizedTextRange with EquatableMixin {
           'lastLine must be >= firstLine, $firstLine-$lastLine given',
         ),
         super(start: start, end: end);
+
+  HiddenRange.fromComment(SingleLineComment comment)
+      : this(
+          comment.characterIndex,
+          comment.characterIndex + comment.outerContent.length,
+          firstLine: comment.lineIndex,
+          lastLine: comment.lineIndex,
+          wholeFirstLine: false,
+        );
 
   int get length => end - start;
 
@@ -43,4 +53,8 @@ class HiddenRange extends NormalizedTextRange with EquatableMixin {
         lastLine,
         wholeFirstLine,
       ];
+
+  bool containsComment(SingleLineComment other) {
+    return start <= other.characterIndex && end >= other.lastCharacterIndex;
+  }
 }

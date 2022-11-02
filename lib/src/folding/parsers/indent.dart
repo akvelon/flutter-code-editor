@@ -158,7 +158,7 @@ class _SignificantIndentIndexes {
   static bool _isSeparatorLine(int? indent) => indent == null;
 }
 
-extension _MyMap<K, V> on Map<K, V> {
+extension MyMap<K, V> on Map<K, V> {
   /// Iterates over the map in reverse order while [executeWhile] returns true.
   void forEachInvertedWhile(
     void Function(K key, V value) f, {
@@ -173,5 +173,15 @@ extension _MyMap<K, V> on Map<K, V> {
       final value = this[key];
       f(key, value!);
     }
+  }
+
+  List<V> getByKeys(Iterable<K> keys) {
+    final result = <V>[];
+    for (final key in keys) {
+      if (containsKey(key)) {
+        result.add(this[key]!);
+      }
+    }
+    return result;
   }
 }

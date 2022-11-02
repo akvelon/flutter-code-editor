@@ -12,6 +12,7 @@ import '../hidden_ranges/hidden_line_ranges_builder.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
 import '../hidden_ranges/hidden_ranges_builder.dart';
+import '../hidden_ranges/visible_section.dart';
 import '../issues/issue.dart';
 import '../named_sections/named_section.dart';
 import '../named_sections/parsers/abstract.dart';
@@ -38,6 +39,7 @@ class Code {
   final Map<String, NamedSection> namedSections;
   final Result? visibleHighlighted;
   final String visibleText;
+  final Set<String> visibleSectionNames;
 
   final HiddenRangesBuilder _hiddenRangesBuilder;
 
@@ -47,6 +49,7 @@ class Code {
     Mode? language,
     AbstractNamedSectionParser? namedSectionParser,
     Set<String> readOnlySectionNames = const {},
+    Set<String> visibleSectionsNames = const {},
   }) {
     final sequences = SingleLineComments.byMode[language] ?? [];
 
@@ -92,15 +95,32 @@ class Code {
         const [];
     final sectionsMap = {for (final s in sections) s.name: s};
 
-    _applyNamedSectionsToLines(
-      lines: lines.lines,
-      sections: sectionsMap,
-      readOnlySectionNames: readOnlySectionNames,
+    final isCodeReadonly = visibleSectionsNames.isNotEmpty;
+    if (isCodeReadonly) {
+      _makeCodeReadonly(lines: lines.lines);
+    } else {
+      _applyReadonlySectionsToLines(
+        lines: lines.lines,
+        sections: sectionsMap,
+        readOnlySectionNames: readOnlySectionNames,
+      );
+    }
+
+    final visibleSectionsHiddenRanges = _visibleSectionsToHiddenRanges(
+      visibleSectionsNames,
+      sectionsMap,
+      lines,
+    );
+
+    final commentsHiddenRanges = _commentsToHiddenRanges(
+      serviceComments,
+      visibleSectionsHiddenRanges,
     );
 
     final hiddenRangesBuilder = HiddenRangesBuilder.fromMaps(
       {
-        int: _commentsToHiddenRanges(serviceComments),
+        String: visibleSectionsHiddenRanges,
+        int: commentsHiddenRanges,
       },
       textLength: text.length,
     );
@@ -109,6 +129,7 @@ class Code {
     final hiddenLineRangesBuilder = HiddenLineRangesBuilder(
       codeLines: lines,
       hiddenRanges: hiddenRanges,
+      shouldReduceStartToOne: isCodeReadonly,
     );
 
     return Code._(
@@ -124,6 +145,7 @@ class Code {
       namedSections: sectionsMap,
       visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
       visibleText: hiddenRanges.cutString(text),
+      visibleSectionNames: visibleSectionsNames,
     );
   }
 
@@ -140,6 +162,7 @@ class Code {
     required this.namedSections,
     required this.visibleHighlighted,
     required this.visibleText,
+    required this.visibleSectionNames,
   }) : _hiddenRangesBuilder = hiddenRangesBuilder;
 
   static const empty = Code._(
@@ -155,9 +178,18 @@ class Code {
     namedSections: {},
     visibleHighlighted: null,
     visibleText: '',
+    visibleSectionNames: {},
   );
 
-  static void _applyNamedSectionsToLines({
+  static void _makeCodeReadonly({
+    required List<CodeLine> lines,
+  }) {
+    for (int i = 0; i < lines.length; i++) {
+      lines[i] = lines[i].copyWith(isReadOnly: true);
+    }
+  }
+
+  static void _applyReadonlySectionsToLines({
     required List<CodeLine> lines,
     required Map<String, NamedSection> sections,
     required Set<String> readOnlySectionNames,
@@ -177,19 +209,96 @@ class Code {
     }
   }
 
+  ///Assumes that there are only one visible section.
+  static Map<String, HiddenRange> _visibleSectionsToHiddenRanges(
+    Set<String> names,
+    Map<String, NamedSection> namedSections,
+    CodeLines lines,
+  ) {
+    final section = namedSections
+        .toVisibleSections(
+          lines: lines.lines,
+          visibleSectionsNames: names,
+        )
+        .firstOrNull;
+
+    final result = <String, HiddenRange>{};
+
+    if (section == null) {
+      return result;
+    }
+
+    late int beginnigEnd;
+    late int beginnigLastLine;
+    final startLine = lines.lines[section.startLine];
+    if (startLine.text.substring(startLine.indent).startsWith('// [START')) {
+      beginnigEnd = lines.lines[section.startLine + 1].textRange.start;
+      beginnigLastLine = section.startLine + 1;
+    } else {
+      beginnigEnd = startLine.textRange.start;
+      beginnigLastLine = section.startLine;
+    }
+    if (beginnigEnd > 0) {
+      result['beginning'] = HiddenRange(
+        0,
+        beginnigEnd,
+        firstLine: 0,
+        lastLine: beginnigLastLine,
+        wholeFirstLine: true,
+      );
+    }
+    if (section.endLine != null) {
+      result['ending'] = HiddenRange(
+        section.lastCharacterIndex! - 1,
+        lines.lines.last.textRange.end,
+        firstLine: section.endLine!,
+        lastLine: section.endLine!,
+        wholeFirstLine: false,
+      );
+    }
+    return result;
+  }
+
   static Map<int, HiddenRange> _commentsToHiddenRanges(
     Iterable<SingleLineComment> comments,
+    Map<String, HiddenRange> namedSectionsHiddenRanges,
   ) {
-    return <int, HiddenRange>{
-      for (final comment in comments)
-        comment.characterIndex: HiddenRange(
-          comment.characterIndex,
-          comment.characterIndex + comment.outerContent.length,
-          firstLine: comment.lineIndex,
-          lastLine: comment.lineIndex,
-          wholeFirstLine: false,
-        ),
-    };
+    if (namedSectionsHiddenRanges.isEmpty) {
+      return <int, HiddenRange>{
+        for (final comment in comments)
+          comment.characterIndex: HiddenRange(
+            comment.characterIndex,
+            comment.characterIndex + comment.outerContent.length,
+            firstLine: comment.lineIndex,
+            lastLine: comment.lineIndex,
+            wholeFirstLine: false,
+          ),
+      };
+    }
+
+    final result = <int, HiddenRange>{};
+    final visibleSectionsRanges = namedSectionsHiddenRanges.values.sorted(
+      (a, b) => a.start - b.start,
+    );
+    int commentsIndex = 0;
+    int sectionsIndex = 0;
+    final commentsList = comments.toList();
+    while (commentsIndex < commentsList.length) {
+      final commentRange = commentsList[commentsIndex];
+      var sectionRange = visibleSectionsRanges[sectionsIndex];
+      if (commentRange.characterIndex > sectionRange.end &&
+          sectionsIndex < visibleSectionsRanges.length - 1) {
+        sectionsIndex++;
+        sectionRange = visibleSectionsRanges[sectionsIndex];
+      }
+
+      if (!sectionRange.containsComment(commentRange)) {
+        result[commentRange.characterIndex] =
+            HiddenRange.fromComment(commentRange);
+      }
+      commentsIndex++;
+    }
+    return result;
   }
 
   /// Returns whether the current selection has any read-only part.
@@ -398,6 +507,7 @@ class Code {
     final hiddenLineRangesBuilder = HiddenLineRangesBuilder(
       codeLines: lines,
       hiddenRanges: hiddenRanges,
+      shouldReduceStartToOne: visibleSectionNames.isNotEmpty,
     );
 
     return Code._(
@@ -413,6 +523,7 @@ class Code {
       namedSections: namedSections,
       visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
       visibleText: hiddenRanges.cutString(text),
+      visibleSectionNames: visibleSectionNames,
     );
   }
 }

@@ -91,6 +91,10 @@ class CodeController extends TextEditingController {
   /* Computed members */
   String _languageId = _genId();
 
+  ///Contains names of named sections, those will be visible for user.
+  ///If it is not empty, all another code except specified will be hidden.
+  final Set<String> _visibleSectionNames;
+
   String get languageId => _languageId;
 
   Code _code;
@@ -107,6 +111,7 @@ class CodeController extends TextEditingController {
     Mode? language,
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
+    Set<String> visibleSectionsNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,
@@ -121,6 +126,7 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
+        _visibleSectionNames = visibleSectionsNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
@@ -388,6 +394,7 @@ class CodeController extends TextEditingController {
       highlighted: highlight.parse(rawText, language: _languageId),
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
+      visibleSectionsNames: _visibleSectionNames,
     );
   }
 

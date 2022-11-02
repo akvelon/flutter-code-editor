@@ -23,6 +23,8 @@ class SingleLineComment {
 
   late final isReadonly = _checkIfReadonly();
 
+  int get lastCharacterIndex => characterIndex + outerContent.length;
+
   SingleLineComment({
     required this.innerContent,
     required this.lineIndex,

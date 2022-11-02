@@ -6,11 +6,13 @@ class HiddenLineRanges with EquatableMixin {
   final List<LineNumberingBreakpoint> breakpoints;
   final int fullLineCount;
   final int visibleLineCount;
+  final bool shouldReduceStartToOne;
 
   const HiddenLineRanges({
     required this.breakpoints,
     required this.fullLineCount,
     required this.visibleLineCount,
+    this.shouldReduceStartToOne = false,
   });
 
   static const empty = HiddenLineRanges(
@@ -77,19 +79,24 @@ class HiddenLineRanges with EquatableMixin {
 
   Iterable<int> get visibleLineNumbers sync* {
     int n = 0;
+    int? firstReturnedValue;
 
     for (final breakpoint in breakpoints) {
       final to = breakpoint.fullBefore;
 
       while (n < to) {
-        yield n++;
+        firstReturnedValue ??= n + 1;
+        final offset = shouldReduceStartToOne ? -firstReturnedValue + 1 : 0;
+        yield n++ + offset;
       }
 
       n = breakpoint.full;
     }
 
     while (n < fullLineCount) {
-      yield n++;
+      firstReturnedValue ??= n + 1;
+      final offset = shouldReduceStartToOne ? -firstReturnedValue + 1 : 0;
+      yield n++ + offset;
     }
   }
 
