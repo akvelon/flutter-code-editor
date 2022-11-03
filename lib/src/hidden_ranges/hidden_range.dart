@@ -22,15 +22,6 @@ class HiddenRange extends NormalizedTextRange with EquatableMixin {
         ),
         super(start: start, end: end);
 
-  HiddenRange.fromComment(SingleLineComment comment)
-      : this(
-          comment.characterIndex,
-          comment.characterIndex + comment.outerContent.length,
-          firstLine: comment.lineIndex,
-          lastLine: comment.lineIndex,
-          wholeFirstLine: false,
-        );
-
   int get length => end - start;
 
   /// Sorts by [start], then by [end].

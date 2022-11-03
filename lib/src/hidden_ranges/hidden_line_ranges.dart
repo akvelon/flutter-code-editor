@@ -77,7 +77,6 @@ class HiddenLineRanges with EquatableMixin {
 
   Iterable<int> get visibleLineNumbers sync* {
     int n = 0;
-    int? firstReturnedValue;
 
     for (final breakpoint in breakpoints) {
       final to = breakpoint.fullBefore;
