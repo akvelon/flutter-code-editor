@@ -117,8 +117,8 @@ class MyClass {// [START section1]
 \t}
 }// [END section1]''',
         language: dart,
-        visibleSectionNames: {'section1'},
       );
+      controller.visibleSectionNames = {'section1'};
 
       expect(controller.value.text, '''
 class MyClass {
@@ -197,6 +197,33 @@ void method3() {
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
         [4, 5, 6, 7, 8, 9, 10, 11],
       );
+    });
+
+    test('Code folding works with changing visible sections', () {
+      final controller = createController(
+        '''
+void method1() {// [START method1]
+  print('method1');
+}// [END method1]
+
+void method2() {// [START method2]
+  print('method2');
+}// [END method2]''',
+        language: dart,
+      );
+
+      //Fold and set visible section
+      controller.foldAt(4);
+      controller.visibleSectionNames = {'method2'};
+      expect(controller.value.text, 'void method2() {');
+
+      controller.visibleSectionNames = {};
+      expect(controller.value.text, '''
+void method1() {
+  print('method1');
+}
+
+void method2() {''');
     });
   });
 }

@@ -98,7 +98,7 @@ class CodeController extends TextEditingController {
 
   ///Contains names of named sections, those will be visible for user.
   ///If it is not empty, all another code except specified will be hidden.
-  final Set<String> _visibleSectionNames;
+  Set<String> _visibleSectionNames = {};
 
   String get languageId => _languageId;
 
@@ -138,10 +138,10 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
-        _visibleSectionNames = visibleSectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
+    this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
@@ -497,6 +497,22 @@ class CodeController extends TextEditingController {
     final oldCode = _code;
     _code = _code.unfoldedAt(line);
 
+    super.value = TextEditingValue(
+      text: _code.visibleText,
+      selection: _code.hiddenRanges.cutSelection(
+        oldCode.hiddenRanges.recoverSelection(value.selection),
+      ),
+    );
+  }
+
+  Set<String> get visibleSectionNames => _visibleSectionNames;
+
+  set visibleSectionNames(Set<String> sectionNames) {
+    _visibleSectionNames = sectionNames;
+    final oldCode = _code;
+    _updateCode(_code.text);
+    code.foldedAs(oldCode);
+    
     super.value = TextEditingValue(
       text: _code.visibleText,
       selection: _code.hiddenRanges.cutSelection(
