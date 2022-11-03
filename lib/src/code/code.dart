@@ -246,16 +246,16 @@ class Code {
   static Map<int, HiddenRange> _commentsToHiddenRanges(
     Iterable<SingleLineComment> comments,
   ) {
-      return <int, HiddenRange>{
-        for (final comment in comments)
-          comment.characterIndex: HiddenRange(
-            comment.characterIndex,
-            comment.characterIndex + comment.outerContent.length,
-            firstLine: comment.lineIndex,
-            lastLine: comment.lineIndex,
-            wholeFirstLine: false,
-          ),
-      };
+    return <int, HiddenRange>{
+      for (final comment in comments)
+        comment.characterIndex: HiddenRange(
+          comment.characterIndex,
+          comment.characterIndex + comment.outerContent.length,
+          firstLine: comment.lineIndex,
+          lastLine: comment.lineIndex,
+          wholeFirstLine: false,
+        ),
+    };
   }
 
   /// Returns whether the current selection has any read-only part.

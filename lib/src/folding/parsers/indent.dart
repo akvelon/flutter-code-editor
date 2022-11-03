@@ -178,8 +178,9 @@ extension MyMap<K, V> on Map<K, V> {
   List<V> getByKeys(Iterable<K> keys) {
     final result = <V>[];
     for (final key in keys) {
-      if (containsKey(key)) {
-        result.add(this[key]!);
+      final value = this[key];
+      if (value != null) {
+        result.add(value);
       }
     }
     return result;

@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 import '../code/text_range.dart';
-import '../single_line_comments/single_line_comment.dart';
 
 class HiddenRange extends NormalizedTextRange with EquatableMixin {
   final int firstLine;
