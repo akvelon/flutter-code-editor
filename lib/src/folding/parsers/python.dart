@@ -9,7 +9,7 @@ import 'indent.dart';
 ///A parser for foldable blocks for python
 class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   @override
-  List<FoldableBlock> parse({
+  void parse({
     required Result highlighted,
     required Set<Object?> serviceCommentsSources,
     required CodeLines lines,
@@ -27,14 +27,15 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       lines,
     );
 
-    if (indentBlocks.isEmpty) {
-      return highlightBlocks;
+    if (indentBlocks.isEmpty && highlightBlocks.isEmpty) {
+      return;
     }
 
-    return _combineBlocks(
+    final combinedBlocks = _combineBlocks(
       highlightBlocks: highlightBlocks,
       indentBlocks: indentBlocks,
     );
+    blocks.addAll(combinedBlocks);
   }
 
   List<FoldableBlock> _getBlocksFromParser(
