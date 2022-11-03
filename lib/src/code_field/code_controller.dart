@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -512,13 +513,53 @@ class CodeController extends TextEditingController {
     final oldCode = _code;
     _updateCode(_code.text);
     code.foldedAs(oldCode);
-    
+
     super.value = TextEditingValue(
       text: _code.visibleText,
       selection: _code.hiddenRanges.cutSelection(
         oldCode.hiddenRanges.recoverSelection(value.selection),
       ),
     );
+  }
+
+  void foldCommentAtLineZero() {
+    final block = _code.foldableBlocks.firstOrNull;
+
+    if (block == null || !block.isComment || block.firstLine != 0) {
+      return;
+    }
+
+    foldAt(0);
+  }
+
+  void foldImports() {
+    // TODO(alexeyinkin): An optimized method to fold multiple blocks, https://github.com/akvelon/flutter-code-editor/issues/106
+    for (final block in _code.foldableBlocks) {
+      if (block.isImports) {
+        foldAt(block.firstLine);
+      }
+    }
+  }
+
+  /// Folds blocks that are outside all of the [names] sections.
+  ///
+  /// For a block to be not folded, it must overlap any of the given sections
+  /// in any way.
+  void foldOutsideSections(Iterable<String> names) {
+    final foldLines = {..._code.foldableBlocks.map((b) => b.firstLine)};
+    final sections = names.map((s) => _code.namedSections[s]).whereNotNull();
+
+    for (final block in _code.foldableBlocks) {
+      for (final section in sections) {
+        if (block.overlaps(section)) {
+          foldLines.remove(block.firstLine);
+          break;
+        }
+      }
+    }
+
+    // TODO(alexeyinkin): An optimized method to fold multiple blocks, https://github.com/akvelon/flutter-code-editor/issues/106
+    foldLines.forEach(foldAt);
   }
 
   @override

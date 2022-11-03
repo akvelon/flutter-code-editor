@@ -199,9 +199,9 @@ class Code {
         continue;
       }
 
-      final lastLineIndex = section.endLine ?? lines.length - 1;
+      final lastLineIndex = section.lastLine ?? lines.length - 1;
 
-      for (int i = section.startLine; i <= lastLineIndex; i++) {
+      for (int i = section.firstLine; i <= lastLineIndex; i++) {
         lines[i] = lines[i].copyWith(isReadOnly: true);
       }
     }
@@ -223,22 +223,22 @@ class Code {
       return result;
     }
 
-    final startLine = lines.lines[section.startLine];
+    final startLine = lines.lines[section.firstLine];
     if (startLine.textRange.start > 0) {
       result['beginning'] = HiddenRange(
         0,
         startLine.textRange.start,
         firstLine: 0,
-        lastLine: section.startLine,
+        lastLine: section.firstLine,
         wholeFirstLine: true,
       );
     }
-    if (section.endLine != null && section.endLine! < lines.lines.length - 1) {
+    if (section.lastLine != null && section.lastLine! < lines.lines.length - 1) {
       result['ending'] = HiddenRange(
-        lines.lines[section.endLine!].textRange.end,
+        lines.lines[section.lastLine!].textRange.end,
         lines.lines.last.textRange.end,
-        firstLine: section.endLine!,
-        lastLine: section.endLine!,
+        firstLine: section.lastLine!,
+        lastLine: section.lastLine!,
         wholeFirstLine: false,
       );
     }

@@ -101,10 +101,10 @@ void main() {
 
         await example.act();
 
-        expect(calls.length, 1);
-        expect(calls[0].method, 'Clipboard.setData');
-        expect(calls[0].arguments, {'text': _copiedText});
-        expect(controller.text, example.visibleTextAfter);
+        expect(calls.length, 1, reason: example.name);
+        expect(calls[0].method, 'Clipboard.setData', reason: example.name);
+        expect(calls[0].arguments, {'text': _copiedText}, reason: example.name);
+        expect(controller.text, example.visibleTextAfter, reason: example.name);
       }
     });
   });
