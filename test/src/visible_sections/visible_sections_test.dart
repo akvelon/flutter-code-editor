@@ -1,7 +1,7 @@
-import 'package:flutter_code_editor/src/code_field/code_controller.dart';
-import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_end.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/dart.dart';
+
+import '../common/create_app.dart';
 
 const _twoSectionText = '''
 class MyClass {
@@ -61,8 +61,9 @@ void method3() {
 void main() {
   group('Visible sections', () {
     test('One function in class shows correctly', () {
-      final controller = _buildController(
-        text: _twoSectionText,
+      final controller = createController(
+        _twoSectionText,
+        language: dart,
         visibleSectionNames: {'section2'},
       );
 
@@ -75,8 +76,8 @@ void main() {
 
     test('Whole class as named section shows correctly. Start at separate line',
         () {
-      final controller = _buildController(
-        text: '''
+      final controller = createController(
+        '''
 // [START section1]
 class MyClass {
 \tvoid readOnlyMethod() {
@@ -85,6 +86,7 @@ class MyClass {
 \tvoid method() {
 \t}
 }// [END section1]''',
+        language: dart,
         visibleSectionNames: {'section1'},
       );
 
@@ -105,8 +107,8 @@ class MyClass {
 
     test('Whole class as named section shows correctly. Start at the same line',
         () {
-      final controller = _buildController(
-        text: '''
+      final controller = createController(
+        '''
 class MyClass {// [START section1]
 \tvoid readOnlyMethod() {
 \t}
@@ -114,6 +116,7 @@ class MyClass {// [START section1]
 \tvoid method() {
 \t}
 }// [END section1]''',
+        language: dart,
         visibleSectionNames: {'section1'},
       );
 
@@ -133,8 +136,9 @@ class MyClass {
 
     test('When section opens at separate line and dont closes works correctly',
         () {
-      final controller = _buildController(
-        text: _justOpenTextSeparate,
+      final controller = createController(
+        _justOpenTextSeparate,
+        language: dart,
         visibleSectionNames: {'anotherMethods'},
       );
 
@@ -146,8 +150,9 @@ class MyClass {
     });
 
     test('When section opens inline and dont closes works correctly', () {
-      final controller = _buildController(
-        text: _justOpenTextInline,
+      final controller = createController(
+        _justOpenTextInline,
+        language: dart,
         visibleSectionNames: {'anotherMethods'},
       );
 
@@ -159,8 +164,9 @@ class MyClass {
     });
 
     test('Block folding works correctly', () {
-      final controller = _buildController(
-        text: _justOpenTextInline,
+      final controller = createController(
+        _justOpenTextInline,
+        language: dart,
         visibleSectionNames: {'anotherMethods'},
       );
       controller.foldAt(4);
@@ -179,8 +185,9 @@ void method3() {
     });
 
     test('Code containing visible sections is readonly', () {
-      final controller = _buildController(
-        text: _justOpenTextInline,
+      final controller = createController(
+        _justOpenTextInline,
+        language: dart,
         visibleSectionNames: {'anotherMethods'},
       );
       controller.value = TextEditingValue.empty;
@@ -192,16 +199,4 @@ void method3() {
       );
     });
   });
-}
-
-CodeController _buildController({
-  required String text,
-  required Set<String> visibleSectionNames,
-}) {
-  return CodeController(
-    language: dart,
-    text: text,
-    namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    visibleSectionsNames: visibleSectionNames,
-  );
 }

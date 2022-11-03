@@ -6,7 +6,6 @@ import 'package:highlight/highlight_core.dart';
 
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
-import '../folding/parsers/indent.dart';
 import '../folding/parsers/parser_factory.dart';
 import '../hidden_ranges/hidden_line_ranges.dart';
 import '../hidden_ranges/hidden_line_ranges_builder.dart';
@@ -24,6 +23,7 @@ import 'code_edit_result.dart';
 import 'code_line.dart';
 import 'code_lines.dart';
 import 'code_lines_builder.dart';
+import 'map.dart';
 import 'string.dart';
 import 'text_range.dart';
 
@@ -49,7 +49,7 @@ class Code {
     Mode? language,
     AbstractNamedSectionParser? namedSectionParser,
     Set<String> readOnlySectionNames = const {},
-    Set<String> visibleSectionsNames = const {},
+    Set<String> visibleSectionNames = const {},
   }) {
     final sequences = SingleLineComments.byMode[language] ?? [];
 
@@ -95,7 +95,7 @@ class Code {
         const [];
     final sectionsMap = {for (final s in sections) s.name: s};
 
-    final isCodeReadonly = visibleSectionsNames.isNotEmpty;
+    final isCodeReadonly = visibleSectionNames.isNotEmpty;
     if (isCodeReadonly) {
       _makeCodeReadonly(lines: lines.lines);
     } else {
@@ -107,7 +107,7 @@ class Code {
     }
 
     final visibleSectionsHiddenRanges = _visibleSectionsToHiddenRanges(
-      visibleSectionsNames,
+      visibleSectionNames,
       sectionsMap,
       lines,
     );
@@ -143,7 +143,7 @@ class Code {
       namedSections: sectionsMap,
       visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
       visibleText: hiddenRanges.cutString(text),
-      visibleSectionNames: visibleSectionsNames,
+      visibleSectionNames: visibleSectionNames,
     );
   }
 
@@ -208,6 +208,8 @@ class Code {
   }
 
   ///Assumes that there is only one visible section.
+  ///If there are more than one, the first one will be used, 
+  ///and the rest will be ignored.
   static Map<String, HiddenRange> _visibleSectionsToHiddenRanges(
     Set<String> names,
     Map<String, NamedSection> namedSections,

@@ -123,7 +123,7 @@ class CodeController extends TextEditingController {
     Mode? language,
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
-    Set<String> visibleSectionsNames = const {},
+    Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,
@@ -138,7 +138,7 @@ class CodeController extends TextEditingController {
     this.onChange,
   })  : _theme = theme,
         _readOnlySectionNames = readOnlySectionNames,
-        _visibleSectionNames = visibleSectionsNames,
+        _visibleSectionNames = visibleSectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
@@ -421,7 +421,7 @@ class CodeController extends TextEditingController {
       highlighted: highlight.parse(rawText, language: _languageId),
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
-      visibleSectionsNames: _visibleSectionNames,
+      visibleSectionNames: _visibleSectionNames,
     );
   }
 

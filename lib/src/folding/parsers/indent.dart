@@ -2,6 +2,7 @@ import 'package:highlight/highlight_core.dart';
 
 import '../../code/code_line.dart';
 import '../../code/code_lines.dart';
+import '../../code/map.dart';
 import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import 'abstract.dart';
@@ -156,33 +157,4 @@ class _SignificantIndentIndexes {
   }
 
   static bool _isSeparatorLine(int? indent) => indent == null;
-}
-
-extension MyMap<K, V> on Map<K, V> {
-  /// Iterates over the map in reverse order while [executeWhile] returns true.
-  void forEachInvertedWhile(
-    void Function(K key, V value) f, {
-    required bool Function(K key, V value) executeWhile,
-  }) {
-    final keys = this.keys.toList();
-    for (int i = keys.length - 1; i >= 0; i--) {
-      if (!executeWhile(keys[i], this[keys[i]]!)) {
-        break;
-      }
-      final key = keys[i];
-      final value = this[key];
-      f(key, value!);
-    }
-  }
-
-  List<V> getByKeys(Iterable<K> keys) {
-    final result = <V>[];
-    for (final key in keys) {
-      final value = this[key];
-      if (value != null) {
-        result.add(value);
-      }
-    }
-    return result;
-  }
 }
