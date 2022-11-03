@@ -265,14 +265,16 @@ a = [[
           readonlyCommentsByLine: commentParser.getIfReadonlyCommentByLine(),
         );
 
-        final pythonParser = PythonFoldableBlockParser().parse(
-          highlighted: highlighted,
-          serviceCommentsSources: serviceComments.map((e) => e.source).toSet(),
-          lines: codeLines,
-        );
+        final pythonParser = PythonFoldableBlockParser()
+          ..parse(
+            highlighted: highlighted,
+            serviceCommentsSources:
+                serviceComments.map((e) => e.source).toSet(),
+            lines: codeLines,
+          );
 
         expect(
-          pythonParser,
+          pythonParser.blocks,
           example.expected,
           reason: '${example.name}, valid blocks',
         );
