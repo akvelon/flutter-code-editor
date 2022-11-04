@@ -486,24 +486,14 @@ class CodeController extends TextEditingController {
     final oldCode = _code;
     _code = _code.foldedAt(line);
 
-    super.value = TextEditingValue(
-      text: _code.visibleText,
-      selection: _code.hiddenRanges.cutSelection(
-        oldCode.hiddenRanges.recoverSelection(value.selection),
-      ),
-    );
+    _updateValueWithSelection(oldCode);
   }
 
   void unfoldAt(int line) {
     final oldCode = _code;
     _code = _code.unfoldedAt(line);
 
-    super.value = TextEditingValue(
-      text: _code.visibleText,
-      selection: _code.hiddenRanges.cutSelection(
-        oldCode.hiddenRanges.recoverSelection(value.selection),
-      ),
-    );
+    _updateValueWithSelection(oldCode);
   }
 
   Set<String> get visibleSectionNames => _visibleSectionNames;
@@ -512,8 +502,11 @@ class CodeController extends TextEditingController {
     _visibleSectionNames = sectionNames;
     final oldCode = _code;
     _updateCode(_code.text);
-    code.foldedAs(oldCode);
 
+    _updateValueWithSelection(oldCode);
+  }
+
+  void _updateValueWithSelection(Code oldCode) {
     super.value = TextEditingValue(
       text: _code.visibleText,
       selection: _code.hiddenRanges.cutSelection(

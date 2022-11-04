@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/dart.dart';
 
@@ -5,11 +6,11 @@ import '../common/create_app.dart';
 
 const _twoSectionText = '''
 class MyClass {
-\tvoid readOnlyMethod() {// [START section1]
-\t}// [END section1]
-\t// [START section2]
-\tvoid method() {
-\t}// [END section2]
+  void someMethod() {// [START section1]
+  }// [END section1]
+  // [START section2]
+  void method() {
+  }// [END section2]
 }
 ''';
 
@@ -34,6 +35,21 @@ void method3() {
 }
 ''';
 
+const _justEndTextSeparate = '''
+void method1() {
+  print('method1');
+}
+
+void method2() {
+  print('method2');
+}
+// [END anotherMethods]
+
+void method3() {
+  print('method3');
+}
+''';
+
 const _justOpenTextInline = '''
 void method1() {
   print('method1');
@@ -42,6 +58,20 @@ void method1() {
 void method2() {// [START anotherMethods]
   print('method2');
 }
+
+void method3() {
+  print('method3');
+}
+''';
+
+const _justEndTextInline = '''
+void method1() {
+  print('method1');
+}
+
+void method2() {
+  print('method2');
+}// [END anotherMethods]
 
 void method3() {
   print('method3');
@@ -60,31 +90,16 @@ void method3() {
 
 void main() {
   group('Visible sections', () {
-    test('One function in class shows correctly', () {
-      final controller = createController(
-        _twoSectionText,
-        language: dart,
-        visibleSectionNames: {'section2'},
-      );
-
-      expect(controller.value.text, _section2Text);
-      expect(
-        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [3, 4, 5],
-      );
-    });
-
-    test('Whole class as named section shows correctly. Start at separate line',
-        () {
+    test('Whole text as a named section. Separate line', () {
       final controller = createController(
         '''
 // [START section1]
 class MyClass {
-\tvoid readOnlyMethod() {
-\t}
-\t
-\tvoid method() {
-\t}
+  void readOnlyMethod() {
+  }
+
+  void method() {
+  }
 }// [END section1]''',
         language: dart,
         visibleSectionNames: {'section1'},
@@ -95,7 +110,7 @@ class MyClass {
 class MyClass {
   void readOnlyMethod() {
   }
-  
+
   void method() {
   }
 }''');
@@ -105,16 +120,15 @@ class MyClass {
       );
     });
 
-    test('Whole class as named section shows correctly. Start at the same line',
-        () {
+    test('Whole class as named section shows correctly. The same line', () {
       final controller = createController(
         '''
 class MyClass {// [START section1]
-\tvoid readOnlyMethod() {
-\t}
-\t
-\tvoid method() {
-\t}
+  void readOnlyMethod() {
+  }
+
+  void method() {
+  }
 }// [END section1]''',
         language: dart,
       );
@@ -124,7 +138,7 @@ class MyClass {// [START section1]
 class MyClass {
   void readOnlyMethod() {
   }
-  
+
   void method() {
   }
 }''');
@@ -134,8 +148,21 @@ class MyClass {
       );
     });
 
-    test('When section opens at separate line and dont closes works correctly',
-        () {
+    test('Non-existent named section -> Empty text', () {
+      final controller = createController(
+        _twoSectionText,
+        language: dart,
+        visibleSectionNames: {'section3'},
+      );
+
+      expect(controller.value.text, '');
+      expect(
+        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
+        [7],
+      );
+    });
+
+    test('Start at separate line, no end', () {
       final controller = createController(
         _justOpenTextSeparate,
         language: dart,
@@ -149,7 +176,7 @@ class MyClass {
       );
     });
 
-    test('When section opens inline and dont closes works correctly', () {
+    test('Start at the same line, no end', () {
       final controller = createController(
         _justOpenTextInline,
         language: dart,
@@ -160,6 +187,98 @@ class MyClass {
       expect(
         controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
         [4, 5, 6, 7, 8, 9, 10, 11],
+      );
+    });
+
+    test('End on a separate line, no start', () {
+      final controller = createController(
+        _justEndTextSeparate,
+        language: dart,
+        visibleSectionNames: {'anotherMethods'},
+      );
+
+      expect(controller.value.text, '''
+void method1() {
+  print('method1');
+}
+
+void method2() {
+  print('method2');
+}
+
+''');
+      expect(
+        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
+        [0, 1, 2, 3, 4, 5, 6, 7],
+      );
+    });
+
+    test('End on the same line, no start', () {
+      final controller = createController(
+        _justEndTextInline,
+        language: dart,
+        visibleSectionNames: {'anotherMethods'},
+      );
+
+      expect(controller.value.text, '''
+void method1() {
+  print('method1');
+}
+
+void method2() {
+  print('method2');
+}
+''');
+      expect(
+        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
+        [0, 1, 2, 3, 4, 5, 6],
+      );
+    });
+
+    test('Start at separate line, end at the same', () {
+      final controller = createController(
+        _twoSectionText,
+        language: dart,
+        visibleSectionNames: {'section2'},
+      );
+
+      expect(controller.value.text, _section2Text);
+      expect(
+        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
+        [3, 4, 5],
+      );
+    });
+
+    test('Start and end on a separate line', () {
+      final controller = createController(
+        '''
+void method1() {
+  print('method1');
+}
+
+// [START section2]
+void method2() {
+  print('method2');
+}
+// [END section2]
+
+void method3() {
+  print('method3');
+}''',
+        language: dart,
+        visibleSectionNames: {'section2'},
+      );
+
+      expect(controller.value.text, '''
+
+void method2() {
+  print('method2');
+}
+
+''');
+      expect(
+        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
+        [4, 5, 6, 7, 8],
       );
     });
 
@@ -190,13 +309,25 @@ void method3() {
         language: dart,
         visibleSectionNames: {'anotherMethods'},
       );
-      controller.value = TextEditingValue.empty;
 
-      expect(controller.value.text, _method2n3);
-      expect(
-        controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
-        [4, 5, 6, 7, 8, 9, 10, 11],
-      );
+      final newLineIndexes = '\n'.allMatches(_method2n3).toList();
+      for (int i = 0; i < newLineIndexes.length; i++) {
+        final index = newLineIndexes[i].start;
+        // ignore: prefer_interpolation_to_compose_strings
+        final newText = _method2n3.substring(0, index) +
+            'some text' +
+            _method2n3.substring(index);
+        controller.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: index),
+        );
+
+        expect(controller.value.text, _method2n3);
+        expect(
+          controller.code.hiddenLineRanges.visibleLineNumbers.toList(),
+          [4, 5, 6, 7, 8, 9, 10, 11],
+        );
+      }
     });
 
     test('Code folding works with changing visible sections', () {
@@ -212,7 +343,6 @@ void method2() {// [START method2]
         language: dart,
       );
 
-      //Fold and set visible section
       controller.foldAt(4);
       controller.visibleSectionNames = {'method2'};
       expect(controller.value.text, 'void method2() {');

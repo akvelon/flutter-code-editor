@@ -208,7 +208,7 @@ class Code {
   }
 
   ///Assumes that there is only one visible section.
-  ///If there are more than one, the first one will be used, 
+  ///If there are more than one, the first one will be used,
   ///and the rest will be ignored.
   static Map<String, HiddenRange> _visibleSectionsToHiddenRanges(
     Set<String> names,
@@ -220,6 +220,15 @@ class Code {
     final result = <String, HiddenRange>{};
 
     if (section == null) {
+      if (lines.lines.last.textRange.end > 0 && names.isNotEmpty) {
+        result['beginning'] = HiddenRange(
+          0,
+          lines.lines.last.textRange.end,
+          firstLine: 0,
+          lastLine: lines.lines.length - 1,
+          wholeFirstLine: true,
+        );
+      }
       return result;
     }
 
@@ -229,17 +238,18 @@ class Code {
         0,
         startLine.textRange.start,
         firstLine: 0,
-        lastLine: section.firstLine,
+        lastLine: section.firstLine - 1,
         wholeFirstLine: true,
       );
     }
-    if (section.lastLine != null && section.lastLine! < lines.lines.length - 1) {
+    final lastLine = section.lastLine;
+    if (lastLine != null && lastLine < lines.lines.length - 1) {
       result['ending'] = HiddenRange(
-        lines.lines[section.lastLine!].textRange.end,
+        lines.lines[lastLine].textRange.end,
         lines.lines.last.textRange.end,
-        firstLine: section.lastLine!,
-        lastLine: section.lastLine!,
-        wholeFirstLine: false,
+        firstLine: lastLine,
+        lastLine: lines.lines.length - 1,
+        wholeFirstLine: true,
       );
     }
     return result;
