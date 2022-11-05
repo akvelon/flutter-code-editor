@@ -249,7 +249,7 @@ class Code {
         lines.lines.last.textRange.end,
         firstLine: lastLine,
         lastLine: lines.lines.length - 1,
-        wholeFirstLine: true,
+        wholeFirstLine: false,
       );
     }
     return result;

@@ -307,6 +307,8 @@ class HiddenRanges {
     }
   }
 
+  /// Translates the [selection] of the full text 
+  /// to selection of the visible text.
   TextSelection cutSelection(TextSelection selection) {
     if (selection.isCollapsed) {
       final position = cutPosition(selection.start);
@@ -322,6 +324,8 @@ class HiddenRanges {
     );
   }
 
+  /// Translates the [selection] of the visible text
+  /// to selection of the full text.
   TextSelection recoverSelection(TextSelection selection) {
     if (selection.isCollapsed) {
       final position = recoverPosition(
