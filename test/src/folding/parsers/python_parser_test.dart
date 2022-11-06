@@ -44,7 +44,7 @@ class Mapping:                      # 0
             _FB(firstLine: 1, lastLine: 3, type: _T.indent),
             _FB(firstLine: 5, lastLine: 14, type: _T.indent),
             _FB(firstLine: 6, lastLine: 7, type: _T.indent),
-            _FB(firstLine: 9, lastLine: 14, type: _T.brackets),
+            _FB(firstLine: 9, lastLine: 14, type: _T.union),
           ],
         ),
 
@@ -71,7 +71,7 @@ class Mapping:                                   # 0
             _FB(firstLine: 1, lastLine: 3, type: _T.indent),
             _FB(firstLine: 5, lastLine: 14, type: _T.indent),
             _FB(firstLine: 6, lastLine: 7, type: _T.indent),
-            _FB(firstLine: 9, lastLine: 14, type: _T.brackets),
+            _FB(firstLine: 9, lastLine: 14, type: _T.union),
           ],
         ),
 
@@ -93,7 +93,7 @@ class Mapping:                               # 0
           expected: [
             _FB(firstLine: 0, lastLine: 11, type: _T.indent),
             _FB(firstLine: 1, lastLine: 11, type: _T.indent),
-            _FB(firstLine: 2, lastLine: 11, type: _T.brackets),
+            _FB(firstLine: 2, lastLine: 11, type: _T.union),
             _FB(firstLine: 3, lastLine: 6, type: _T.brackets),
             _FB(firstLine: 7, lastLine: 10, type: _T.brackets),
           ],
@@ -127,7 +127,7 @@ class Mapping:                               # 0
           expected: [
             _FB(firstLine: 0, lastLine: 21, type: _T.indent),
             _FB(firstLine: 1, lastLine: 21, type: _T.indent),
-            _FB(firstLine: 2, lastLine: 21, type: _T.brackets),
+            _FB(firstLine: 2, lastLine: 21, type: _T.union),
             _FB(firstLine: 3, lastLine: 9, type: _T.brackets),
             _FB(firstLine: 4, lastLine: 6, type: _T.singleLineComment),
             _FB(firstLine: 10, lastLine: 13, type: _T.brackets),
@@ -237,6 +237,19 @@ a = [[
   5
   ]
 ]''',
+          expected: [
+            _FB(firstLine: 0, lastLine: 3, type: _T.union),
+          ],
+        ),
+
+        _Example(
+          'Python. Blocks with the same start joined to union',
+          code: '''
+if (not hasattr(result, 'has_job')  # direct runner
+      or result.has_job):  # not just a template creation
+    empty_lines_filter = MetricsFilter().with_name('empty_lines')
+    query_result = result.metrics().query(empty_lines_filter)
+''',
           expected: [
             _FB(firstLine: 0, lastLine: 3, type: _T.union),
           ],

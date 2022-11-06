@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:highlight/highlight_core.dart';
 
 import '../../code/code_lines.dart';
 import '../foldable_block.dart';
+import '../foldable_block_type.dart';
 import 'abstract.dart';
 import 'highlight.dart';
 import 'indent.dart';
@@ -73,10 +76,11 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     int highlightBlockIndex = 0;
     int indentBlockIndex = 0;
 
+    bool isIndentInRange() => indentBlockIndex < indentBlocks.length;
+
     final result = <FoldableBlock>[];
 
-    while (highlightBlockIndex < highlightBlocks.length ||
-        indentBlockIndex < indentBlocks.length) {
+    while (highlightBlockIndex < highlightBlocks.length || isIndentInRange()) {
       if (highlightBlockIndex >= highlightBlocks.length) {
         result.addAll(indentBlocks.skip(indentBlockIndex));
         break;
@@ -84,42 +88,63 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
 
       final highlightBlock = highlightBlocks[highlightBlockIndex];
 
-      indentBlockIndex = _addAllPossibleIndentBlocks(
+      final indentBlocksToAdd = _getAllBlocksBeforeLine(
         indentBlockIndex,
         indentBlocks,
         highlightBlock.firstLine,
-        result,
       );
+      result.addAll(indentBlocksToAdd);
+      indentBlockIndex += indentBlocksToAdd.length;
 
-      while (indentBlockIndex < indentBlocks.length &&
-          highlightBlock.includes(indentBlocks[indentBlockIndex])) {
+      bool areBlocksMayBeInEachOther() =>
+          highlightBlock.includes(indentBlocks[indentBlockIndex]) ||
+          indentBlocks[indentBlockIndex].includes(highlightBlock);
+
+      bool unionHasBeenAdded = false;
+      if (isIndentInRange() &&
+          areBlocksMayBeInEachOther() &&
+          indentBlocks[indentBlockIndex].first == highlightBlock.first) {
+        final indentBlock = indentBlocks[indentBlockIndex];
+        result.add(
+          FoldableBlock(
+            firstLine: indentBlock.first,
+            lastLine: max(indentBlock.last, highlightBlock.last),
+            type: FoldableBlockType.union,
+          ),
+        );
+        unionHasBeenAdded = true;
         indentBlockIndex++;
       }
 
-      result.add(highlightBlock);
+      while (isIndentInRange() && areBlocksMayBeInEachOther()) {
+        indentBlockIndex++;
+      }
+
+      if (!unionHasBeenAdded) {
+        result.add(highlightBlock);
+      }
       highlightBlockIndex++;
     }
 
     return result;
   }
 
-  int _addAllPossibleIndentBlocks(
-    int indentBlockIndex,
-    List<FoldableBlock> indentBlocks,
-    int highlightBlockStartLine,
-    List<FoldableBlock> result,
+  /// Returns [blocks] from [startIndex]
+  /// while their first lines less than [maxLine].
+  List<FoldableBlock> _getAllBlocksBeforeLine(
+    int startIndex,
+    List<FoldableBlock> blocks,
+    int maxLine,
   ) {
-    final indentBlocksBeforeHighlight = _getBlocksCountBeforeLineFrom(
-      startIndex: indentBlockIndex,
-      line: highlightBlockStartLine,
-      blocks: indentBlocks,
+    final blocksToAddCount = _getBlocksCountBeforeLineFrom(
+      startIndex: startIndex,
+      line: maxLine,
+      blocks: blocks,
     );
-    final possibleToAddBlocks = indentBlocks.sublist(
-      indentBlockIndex,
-      indentBlockIndex + indentBlocksBeforeHighlight,
+    return blocks.sublist(
+      startIndex,
+      startIndex + blocksToAddCount,
     );
-    result.addAll(possibleToAddBlocks);
-    return indentBlockIndex + indentBlocksBeforeHighlight;
   }
 
   int _getBlocksCountBeforeLineFrom({
@@ -129,8 +154,8 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   }) {
     int result = 0;
     for (int i = startIndex; i < blocks.length; i++) {
-      final indentBlock = blocks[i];
-      if (indentBlock.firstLine < line) {
+      final block = blocks[i];
+      if (block.firstLine < line) {
         result++;
       } else {
         break;
