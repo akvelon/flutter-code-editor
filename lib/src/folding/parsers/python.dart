@@ -36,6 +36,7 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
       indentBlocks: indentBlocks,
     );
     blocks.addAll(combinedBlocks);
+    finalize();
   }
 
   List<FoldableBlock> _getBlocksFromParser(
@@ -84,12 +85,13 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
 
       final highlightBlock = highlightBlocks[highlightBlockIndex];
 
-      indentBlockIndex = _addAllPossibleIndentBlocks(
-        indentBlockIndex,
-        indentBlocks,
-        highlightBlock.firstLine,
-        result,
+      final indentBlocksToAdd = _getAllBlocksBeforeLine(
+        startIndex: indentBlockIndex,
+        blocks: indentBlocks,
+        maxFirstLine: highlightBlock.firstLine,
       );
+      result.addAll(indentBlocksToAdd);
+      indentBlockIndex += indentBlocksToAdd.length;
 
       while (indentBlockIndex < indentBlocks.length &&
           highlightBlock.includes(indentBlocks[indentBlockIndex])) {
@@ -103,23 +105,22 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     return result;
   }
 
-  int _addAllPossibleIndentBlocks(
-    int indentBlockIndex,
-    List<FoldableBlock> indentBlocks,
-    int highlightBlockStartLine,
-    List<FoldableBlock> result,
-  ) {
-    final indentBlocksBeforeHighlight = _getBlocksCountBeforeLineFrom(
-      startIndex: indentBlockIndex,
-      line: highlightBlockStartLine,
-      blocks: indentBlocks,
+  /// Returns [blocks] from [startIndex]
+  /// while their first lines less than [maxFirstLine].
+  List<FoldableBlock> _getAllBlocksBeforeLine({
+    required int startIndex,
+    required List<FoldableBlock> blocks,
+    required int maxFirstLine,
+  }) {
+    final blockCount = _getBlocksCountBeforeLineFrom(
+      startIndex: startIndex,
+      line: maxFirstLine,
+      blocks: blocks,
     );
-    final possibleToAddBlocks = indentBlocks.sublist(
-      indentBlockIndex,
-      indentBlockIndex + indentBlocksBeforeHighlight,
+    return blocks.sublist(
+      startIndex,
+      startIndex + blockCount,
     );
-    result.addAll(possibleToAddBlocks);
-    return indentBlockIndex + indentBlocksBeforeHighlight;
   }
 
   int _getBlocksCountBeforeLineFrom({
@@ -129,8 +130,8 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   }) {
     int result = 0;
     for (int i = startIndex; i < blocks.length; i++) {
-      final indentBlock = blocks[i];
-      if (indentBlock.firstLine < line) {
+      final block = blocks[i];
+      if (block.firstLine < line) {
         result++;
       } else {
         break;

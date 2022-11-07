@@ -241,6 +241,19 @@ a = [[
             _FB(firstLine: 0, lastLine: 3, type: _T.union),
           ],
         ),
+
+        _Example(
+          'Python. Blocks with the same start joined to union',
+          code: '''
+if (isFlutterCodeEditor 
+      == True): 
+    print("I like Flutter code editor!")
+    print("I will like it at pub.dev!")
+''',
+          expected: [
+            _FB(firstLine: 0, lastLine: 3, type: _T.union),
+          ],
+        ),
       ];
 
       for (final example in examples) {

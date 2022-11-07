@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/highlight.dart';
 import 'package:highlight/languages/java.dart';
 
 FocusNode focusNode = FocusNode();
@@ -26,10 +27,15 @@ Future<CodeController> pumpController(WidgetTester wt, String text) async {
   return controller;
 }
 
-CodeController createController(String text) {
+CodeController createController(
+  String text, {
+  Mode? language,
+  Set<String> visibleSectionNames = const {},
+}) {
   return CodeController(
     text: text,
-    language: java,
+    language: language ?? java,
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
+    visibleSectionNames: visibleSectionNames,
   );
 }

@@ -5,6 +5,8 @@ import '../code/text_range.dart';
 class HiddenRange extends NormalizedTextRange with EquatableMixin {
   final int firstLine;
   final int lastLine;
+
+  ///Whether this range contains its first line entirely.
   final bool wholeFirstLine;
 
   const HiddenRange(
