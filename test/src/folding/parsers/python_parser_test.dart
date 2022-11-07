@@ -241,6 +241,19 @@ a = [[
             _FB(firstLine: 0, lastLine: 3, type: _T.union),
           ],
         ),
+
+        _Example(
+          'Python. Blocks with the same start joined to union',
+          code: '''
+if (not hasattr(result, 'has_job')  # direct runner
+      or result.has_job):  # not just a template creation
+    empty_lines_filter = MetricsFilter().with_name('empty_lines')
+    query_result = result.metrics().query(empty_lines_filter)
+''',
+          expected: [
+            _FB(firstLine: 0, lastLine: 3, type: _T.union),
+          ],
+        ),
       ];
 
       for (final example in examples) {
