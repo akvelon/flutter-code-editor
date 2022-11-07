@@ -182,8 +182,8 @@ public class MyClass {
           language: mode,
         );
 
-        const builder = SpanBuilder();
-        final result = builder.build(code: code, theme: _themeData);
+        final builder = SpanBuilder(code: code, theme: _themeData);
+        final result = builder.build();
 
         expect(
           result,
