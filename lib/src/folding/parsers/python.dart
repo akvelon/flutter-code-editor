@@ -112,14 +112,14 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     required List<FoldableBlock> blocks,
     required int maxFirstLine,
   }) {
-    final blocksBount = _getBlocksCountBeforeLineFrom(
+    final blockCount = _getBlocksCountBeforeLineFrom(
       startIndex: startIndex,
       line: maxFirstLine,
       blocks: blocks,
     );
     return blocks.sublist(
       startIndex,
-      startIndex + blocksBount,
+      startIndex + blockCount,
     );
   }
 
