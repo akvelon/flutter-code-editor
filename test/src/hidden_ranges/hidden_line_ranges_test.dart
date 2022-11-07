@@ -6,7 +6,6 @@ void main() {
   const noBreakpointsRanges = HiddenLineRanges(
     breakpoints: [],
     fullLineCount: 10,
-    visibleLineCount: 10,
   );
 
   const midBreakpointsRanges = HiddenLineRanges(
@@ -14,9 +13,11 @@ void main() {
       LineNumberingBreakpoint(full: 4, visible: 2, spreadBefore: 0),
       LineNumberingBreakpoint(full: 9, visible: 5, spreadBefore: 2),
       LineNumberingBreakpoint(full: 100, visible: 12, spreadBefore: 4),
+      LineNumberingBreakpoint(full: 210, visible: 113, spreadBefore: 88),
+      LineNumberingBreakpoint(full: 220, visible: 115, spreadBefore: 97),
+      LineNumberingBreakpoint(full: 230, visible: 118, spreadBefore: 105),
     ],
-    fullLineCount: 110,
-    visibleLineCount: 22,
+    fullLineCount: 231,
   );
 
   const startEndHiddenRanges = HiddenLineRanges(
@@ -25,7 +26,6 @@ void main() {
       LineNumberingBreakpoint(full: 10, visible: 5, spreadBefore: 3),
     ],
     fullLineCount: 10,
-    visibleLineCount: 5,
   );
 
   group('HiddenLineRanges.', () {
@@ -56,6 +56,9 @@ void main() {
         expect(midBreakpointsRanges.cutLineIndexIfVisible(100), 12);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(101), 13);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(200), 112);
+        expect(midBreakpointsRanges.cutLineIndexIfVisible(209), null);
+        expect(midBreakpointsRanges.cutLineIndexIfVisible(219), null);
+        expect(midBreakpointsRanges.cutLineIndexIfVisible(229), null);
       });
     });
 
@@ -75,7 +78,10 @@ void main() {
             0, 1,
             4, 5, 6,
             9, 10, 11, 12, 13, 14, 15,
-            100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+            ...List<int>.generate(200 - 100 + 1, (i) => i + 100), // 100-200
+            210, 211,
+            220, 221, 222,
+            230,
           ],
         );
       });

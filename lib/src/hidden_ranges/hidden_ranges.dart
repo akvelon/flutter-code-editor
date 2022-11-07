@@ -307,7 +307,7 @@ class HiddenRanges {
     }
   }
 
-  /// Translates the [selection] of the full text 
+  /// Translates the [selection] of the full text
   /// to selection of the visible text.
   TextSelection cutSelection(TextSelection selection) {
     if (selection.isCollapsed) {
