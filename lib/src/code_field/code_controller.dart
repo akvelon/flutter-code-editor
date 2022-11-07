@@ -97,6 +97,10 @@ class CodeController extends TextEditingController {
   /* Computed members */
   String _languageId = _genId();
 
+  ///Contains names of named sections, those will be visible for user.
+  ///If it is not empty, all another code except specified will be hidden.
+  Set<String> _visibleSectionNames = {};
+
   String get languageId => _languageId;
 
   Code _code;
@@ -120,6 +124,7 @@ class CodeController extends TextEditingController {
     Mode? language,
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
+    Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
     this.patternMap,
@@ -137,6 +142,7 @@ class CodeController extends TextEditingController {
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
+    this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
@@ -416,6 +422,7 @@ class CodeController extends TextEditingController {
       highlighted: highlight.parse(rawText, language: _languageId),
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
+      visibleSectionNames: _visibleSectionNames,
     );
   }
 
@@ -476,25 +483,36 @@ class CodeController extends TextEditingController {
   }
 
   void foldAt(int line) {
-    final oldCode = _code;
-    _code = _code.foldedAt(line);
+    final newCode = _code.foldedAt(line);
+    super.value = _getValueWithCode(newCode);
 
-    super.value = TextEditingValue(
-      text: _code.visibleText,
-      selection: _code.hiddenRanges.cutSelection(
-        oldCode.hiddenRanges.recoverSelection(value.selection),
-      ),
-    );
+    _code = newCode;
   }
 
   void unfoldAt(int line) {
-    final oldCode = _code;
-    _code = _code.unfoldedAt(line);
+    final newCode = _code.unfoldedAt(line);
+    super.value = _getValueWithCode(newCode);
 
-    super.value = TextEditingValue(
-      text: _code.visibleText,
-      selection: _code.hiddenRanges.cutSelection(
-        oldCode.hiddenRanges.recoverSelection(value.selection),
+    _code = newCode;
+  }
+
+  Set<String> get visibleSectionNames => _visibleSectionNames;
+
+  set visibleSectionNames(Set<String> sectionNames) {
+    _visibleSectionNames = sectionNames;
+    _updateCode(_code.text);
+
+    super.value = _getValueWithCode(_code);
+  }
+
+
+
+  /// The value with [newCode] preserving the current selection.
+  TextEditingValue _getValueWithCode(Code newCode) {
+    return TextEditingValue(
+      text: newCode.visibleText,
+      selection: newCode.hiddenRanges.cutSelection(
+        _code.hiddenRanges.recoverSelection(value.selection),
       ),
     );
   }
