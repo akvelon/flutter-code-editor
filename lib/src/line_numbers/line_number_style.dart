@@ -25,7 +25,7 @@ class LineNumberStyle {
   final double margin;
 
   const LineNumberStyle({
-    this.width = 70.0,
+    this.width = 80.0,
     this.textAlign = TextAlign.right,
     this.margin = 10.0,
     this.textStyle,
