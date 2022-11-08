@@ -1,3 +1,6 @@
+import 'package:highlight/highlight_core.dart';
+import 'package:highlight/languages/java.dart';
+
 class MethodSnippet {
   static const full = '''
 class MyClass {
@@ -21,6 +24,8 @@ class MyClass {
 }
 
 class TwoMethodsSnippet {
+  static Mode get mode => java;
+
   static const full = '''
 private class MyClass {
   void method1() {

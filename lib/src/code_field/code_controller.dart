@@ -496,6 +496,15 @@ class CodeController extends TextEditingController {
     _code = newCode;
   }
 
+  Set<String> get readOnlySectionNames => _readOnlySectionNames;
+
+  set readOnlySectionNames(Set<String> newValue) {
+    _readOnlySectionNames = newValue;
+    _updateCode(_code.text);
+
+    notifyListeners();
+  }
+
   Set<String> get visibleSectionNames => _visibleSectionNames;
 
   set visibleSectionNames(Set<String> sectionNames) {
