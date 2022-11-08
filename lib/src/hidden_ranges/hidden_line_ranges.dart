@@ -79,7 +79,9 @@ class HiddenLineRanges with EquatableMixin {
       return breakpoint.visible;
     }
 
-    throw Exception('Never get here');
+    throw Exception(
+      'Never get here. upper == lower without finding a breakpoint',
+    );
   }
 
   Iterable<int> get visibleLineNumbers sync* {
