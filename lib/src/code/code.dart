@@ -52,7 +52,6 @@ class Code {
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
   }) {
-    print('New code instance created');
     final sequences = SingleLineComments.byMode[language] ?? [];
 
     final commentParser = SingleLineCommentParser.parseHighlighted(
@@ -143,7 +142,8 @@ class Code {
       issues: issues,
       lines: lines,
       namedSections: sectionsMap,
-      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
+      visibleHighlighted:
+          hiddenRanges.cutHighlighted(highlighted)?.splitNewLines(),
       visibleText: hiddenRanges.cutString(text),
       visibleSectionNames: visibleSectionNames,
     );

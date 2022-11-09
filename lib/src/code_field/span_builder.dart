@@ -11,7 +11,6 @@ class SpanBuilder {
   final TextStyle? textStyle;
 
   int _lineIndex = 0;
-  int _characterIndex = 0;
 
   SpanBuilder({
     required this.code,
@@ -23,7 +22,7 @@ class SpanBuilder {
     return TextSpan(
       style: textStyle,
       children: _buildList(
-        nodes: code.visibleHighlighted?.nodes?.splitNewLines() ?? [],
+        nodes: code.visibleHighlighted?.nodes ?? [],
         theme: theme,
       ),
     );
@@ -53,7 +52,7 @@ class SpanBuilder {
   }) {
     final style = theme?.styles[node.className];
 
-    _updatePositionIndexes(node);
+    _updateLineIndex(node);
 
     return TextSpan(
       text: node.value,
@@ -65,29 +64,11 @@ class SpanBuilder {
     );
   }
 
-  void _updatePositionIndexes(Node node) {
-    int getNodeIndex() => code.lines.lines[_lineIndex].text
-        .indexOf(node.value!.trim(), _characterIndex);
+  void _updateLineIndex(Node node) {
+    _lineIndex += node.getNewlineCount();
 
-    bool isLineIndexInRange() => _lineIndex < code.lines.lines.length;
-
-    if (node.value != null && node.value != '' && isLineIndexInRange()) {
-      final nodeIndex = getNodeIndex();
-      if (nodeIndex >= 0) {
-        _characterIndex = nodeIndex;
-      } else {
-        _characterIndex = 0;
-        var nodeIndex = -1;
-        while (nodeIndex < 0) {
-          if (_lineIndex < code.lines.lines.length - 1) {
-            _lineIndex++;
-          }
-          nodeIndex = getNodeIndex();
-          if (nodeIndex >= 0) {
-            _characterIndex = nodeIndex;
-          }
-        }
-      }
+    if (_lineIndex >= code.lines.lines.length) {
+      _lineIndex = code.lines.lines.length - 1;
     }
   }
 
