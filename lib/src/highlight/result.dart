@@ -40,4 +40,9 @@ extension MyResult on Result {
       characterIndex += node.getCharacterCount();
     }
   }
+
+  Result splitNewLines() {
+    nodes = nodes?.splitNewLines();
+    return this;
+  }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_code_editor/src/code_field/span_builder.dart';
@@ -5,12 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/java.dart';
 
-const _comment = TextStyle(color: Color(0x00000001));
-const _keyword = TextStyle(color: Color(0x00000002));
-const _class = TextStyle(color: Color(0x00000003));
-const _title = TextStyle(color: Color(0x00000004));
-const _function = TextStyle(color: Color(0x00000005));
-const _params = TextStyle(color: Color(0x00000006));
+const _comment = TextStyle(color: Color(0xFF000001));
+const _keyword = TextStyle(color: Color(0xFF000002));
+const _class = TextStyle(color: Color(0xFF000003));
+const _title = TextStyle(color: Color(0xFF000004));
+const _function = TextStyle(color: Color(0xFF000005));
+const _params = TextStyle(color: Color(0xFF000006));
 
 final _themeData = CodeThemeData(
   classStyle: _class,
@@ -59,7 +61,8 @@ public class MyClass {
                   TextSpan(text: ' '),
                 ],
               ),
-              TextSpan(text: '{\n  '),
+              TextSpan(text: '{\n'),
+              TextSpan(text: '  '),
               TextSpan(
                 style: _function,
                 children: [
@@ -91,7 +94,10 @@ public class MyClass {
                 style: _comment,
                 children: [TextSpan(text: '// comment')],
               ),
-              TextSpan(text: '\n  }\n}\n'),
+              TextSpan(text: '\n'),
+              TextSpan(text: '  }\n'),
+              TextSpan(text: '}\n'),
+              TextSpan(text: ''),
             ],
           ),
         ),
@@ -105,7 +111,7 @@ public class MyClass {
 }
 ''',
           mode: java,
-          expected: const TextSpan(
+          expected: TextSpan(
             children: [
               TextSpan(text: ''),
               TextSpan(
@@ -129,28 +135,29 @@ public class MyClass {
                   TextSpan(text: ' '),
                 ],
               ),
-              TextSpan(text: '{\n  '),
+              TextSpan(text: '{\n'),
+              TextSpan(text: '  '),
               TextSpan(
-                style: _function,
+                style: _function.paled(),
                 children: [
                   TextSpan(text: ''),
                   TextSpan(
-                    style: _keyword,
+                    style: _keyword.paled(),
                     children: [TextSpan(text: 'public')],
                   ),
                   TextSpan(text: ' '),
                   TextSpan(
-                    style: _keyword,
+                    style: _keyword.paled(),
                     children: [TextSpan(text: 'void')],
                   ),
                   TextSpan(text: ' '),
                   TextSpan(
-                    style: _title,
+                    style: _title.paled(),
                     children: [TextSpan(text: 'main')],
                   ),
                   TextSpan(text: ''),
                   TextSpan(
-                    style: _params,
+                    style: _params.paled(),
                     children: [TextSpan(text: '()')],
                   ),
                   TextSpan(text: ' '),
@@ -158,10 +165,13 @@ public class MyClass {
               ),
               TextSpan(text: '{ '),
               TextSpan(
-                style: _comment,
+                style: _comment.paled(),
                 children: [TextSpan(text: '')],
               ),
-              TextSpan(text: '\n  }\n}\n'),
+              TextSpan(text: '\n'),
+              TextSpan(text: '  }\n'),
+              TextSpan(text: '}\n'),
+              TextSpan(text: ''),
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../src/highlight/node.dart';
 import '../code/code.dart';
 import '../code_theme/code_theme_data.dart';
 
@@ -22,7 +23,7 @@ class SpanBuilder {
     return TextSpan(
       style: textStyle,
       children: _buildList(
-        nodes: code.visibleHighlighted?.nodes ?? [],
+        nodes: code.visibleHighlighted?.nodes?.splitNewLines() ?? [],
         theme: theme,
       ),
     );
@@ -31,7 +32,6 @@ class SpanBuilder {
   List<TextSpan>? _buildList({
     required List<Node>? nodes,
     required CodeThemeData? theme,
-    TextStyle? parentStyle,
   }) {
     if (nodes == null) {
       return null;
@@ -42,7 +42,6 @@ class SpanBuilder {
           (node) => _buildNode(
             node: node,
             theme: theme,
-            parentStyle: parentStyle,
           ),
         )
         .toList(growable: false);
@@ -51,28 +50,22 @@ class SpanBuilder {
   TextSpan _buildNode({
     required Node node,
     required CodeThemeData? theme,
-    required TextStyle? parentStyle,
   }) {
-    final baseStyle = theme?.styles[node.className];
+    final style = theme?.styles[node.className];
 
-    final fixedStyle = _applyStyleChanges(node, baseStyle, parentStyle);
+    _updatePositionIndexes(node);
 
     return TextSpan(
       text: node.value,
       children: _buildList(
         nodes: node.children,
         theme: theme,
-        parentStyle: baseStyle,
       ),
-      style: fixedStyle,
+      style: _applyReadonlyIfRequired(style),
     );
   }
 
-  TextStyle? _applyStyleChanges(
-    Node node,
-    TextStyle? style,
-    TextStyle? parentStyle,
-  ) {
+  void _updatePositionIndexes(Node node) {
     int getNodeIndex() => code.lines.lines[_lineIndex].text
         .indexOf(node.value!.trim(), _characterIndex);
 
@@ -82,44 +75,31 @@ class SpanBuilder {
       final nodeIndex = getNodeIndex();
       if (nodeIndex >= 0) {
         _characterIndex = nodeIndex;
-        return _applyReadonlyIfRequired(style, parentStyle);
       } else {
         _characterIndex = 0;
         var nodeIndex = -1;
         while (nodeIndex < 0) {
-          _lineIndex++;
-          if (!isLineIndexInRange()) {
-            break;
+          if (_lineIndex < code.lines.lines.length - 1) {
+            _lineIndex++;
           }
           nodeIndex = getNodeIndex();
           if (nodeIndex >= 0) {
             _characterIndex = nodeIndex;
-            return _applyReadonlyIfRequired(style, parentStyle);
           }
         }
       }
     }
-
-    return style;
   }
 
-  TextStyle? _applyReadonlyIfRequired(
-    TextStyle? style,
-    TextStyle? parentStyle,
-  ) {
-    TextStyle? result;
+  TextStyle? _applyReadonlyIfRequired(TextStyle? style) {
     if (code.lines.lines[_lineIndex].isReadOnly) {
       if (style == null) {
-        if (parentStyle == null) {
-          result = textStyle?.paled();
-        } else {
-          result = parentStyle.paled();
-        }
+        return textStyle?.paled();
       } else {
-        result = style.paled();
+        return style.paled();
       }
     }
-    return result;
+    return style;
   }
 }
 

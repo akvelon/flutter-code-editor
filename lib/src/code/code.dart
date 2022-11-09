@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../src/highlight/result.dart';
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
 import '../folding/parsers/parser_factory.dart';
@@ -51,6 +52,7 @@ class Code {
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
   }) {
+    print('New code instance created');
     final sequences = SingleLineComments.byMode[language] ?? [];
 
     final commentParser = SingleLineCommentParser.parseHighlighted(

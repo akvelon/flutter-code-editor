@@ -51,4 +51,42 @@ extension MyNode on Node {
 
     return null;
   }
+
+  Node splitNewLines() {
+    children = children?.splitNewLines();
+    return this;
+  }
+}
+
+extension NodeList on List<Node> {
+  List<Node> splitNewLines() {
+    print('splitNewLines called');
+    final result = <Node>[];
+
+    for (int i = 0; i < length; i++) {
+      final splittedValue = this[i].value?.split('\n');
+      if ((splittedValue?.length ?? 0) > 1) {
+        final node = this[i];
+        for (int j = 0; j < splittedValue!.length; j++) {
+          result.add(
+            Node(
+              children: node.children,
+              value: splittedValue[j] +
+                  (j == splittedValue.length - 1 ? '' : '\n'),
+              className: node.className,
+              noPrefix: node.noPrefix,
+            ),
+          );
+        }
+      } else {
+        result.add(this[i]);
+      }
+    }
+
+    for (int i = 0; i < result.length; i++) {
+      result[i] = result[i].splitNewLines();
+    }
+
+    return result;
+  }
 }
