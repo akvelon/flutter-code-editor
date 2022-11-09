@@ -1,3 +1,6 @@
+## 0.1.5
+* Updated license formatting to match pub.dev requirements.
+
 ## 0.1.4
 * Added `CodeController.readOnlySectionNames` getter and setter ([Issue 110](https://github.com/akvelon/flutter-code-editor/issues/110)).
 * Added `CodeController.foldCommentAtLineZero`, `foldImports`, `foldOutsideSections` ([Issue 89](https://github.com/akvelon/flutter-code-editor/issues/89)).
