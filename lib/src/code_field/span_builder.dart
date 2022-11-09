@@ -19,6 +19,7 @@ class SpanBuilder {
   });
 
   TextSpan build() {
+    _lineIndex = 0;
     return TextSpan(
       style: textStyle,
       children: _buildList(
@@ -37,12 +38,7 @@ class SpanBuilder {
     }
 
     return nodes
-        .map(
-          (node) => _buildNode(
-            node: node,
-            theme: theme,
-          ),
-        )
+        .map((node) => _buildNode(node: node, theme: theme))
         .toList(growable: false);
   }
 
@@ -50,9 +46,9 @@ class SpanBuilder {
     required Node node,
     required CodeThemeData? theme,
   }) {
-    final style = theme?.styles[node.className];
-
     _updateLineIndex(node);
+
+    final style = theme?.styles[node.className];
 
     return TextSpan(
       text: node.value,
@@ -86,12 +82,18 @@ class SpanBuilder {
 
 extension TextStyleExtension on TextStyle {
   TextStyle paled() {
+    final clr = color;
+    
+    if (clr == null) {
+      return this;
+    }
+    
     return copyWith(
       color: Color.fromARGB(
-        color!.alpha ~/ 2,
-        color!.red,
-        color!.green,
-        color!.blue,
+        clr.alpha ~/ 2,
+        clr.red,
+        clr.green,
+        clr.blue,
       ),
     );
   }
