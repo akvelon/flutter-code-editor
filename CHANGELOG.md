@@ -1,3 +1,7 @@
+## 0.1.7
+
+* Fixed README errors.
+
 ## 0.1.6
 
 * Improved README.

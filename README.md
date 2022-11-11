@@ -41,7 +41,7 @@ class CodeEditor extends StatelessWidget {
 }
 ```
 
-See the full runnable example [here](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/lib/02.code_field.dart).
+See the full runnable example [here](https://github.com/akvelon/flutter-code-editor/blob/main/example/lib/02.code_field.dart).
 
 ## Languages
 
@@ -152,7 +152,8 @@ final controller = CodeController(
 This creates a section named `section1`.
 The built-in `BracketsStartEndNamedSectionParser` class is designed to parse sections
 from the code comments using the above syntax.
-It also hides the given comments although they are still present in the editor
+It also hides any single-line comment that has a section label with the above syntax,
+although such comments are still present in the editor's hidden state
 and will be revealed when copying the text.
 
 If you need to parse sections using any other syntax, subclass `AbstractNamedSectionParser`.
@@ -172,7 +173,7 @@ When using this feature, `text` and `value` properties cannot be used to change 
 programmatically because they have the same effect as the user input,
 and so locking affects them as well.
 
-To change a partially locked controller, use `fullText` property.
+To change a partially locked controller, set the `fullText` property.
 
 ## Advanced Folding
 
@@ -188,7 +189,7 @@ This method has no effect if there is no comment starting at the first line.
 
 ### Imports
 
-In many languages, editor recognizes sequential import lines
+In many languages, the editor recognizes sequential import lines
 and an optional package line as one foldable block.
 To fold such blocks:
 
@@ -222,7 +223,7 @@ the widget displays them starting at `1`.
 
 ### Accessing Folded Blocks
 
-To get the currently folded blocks, read: `controller.code.foldedBlocks`
+To get the currently folded blocks, read `controller.code.foldedBlocks`
 
 ## Hiding Text
 
@@ -231,6 +232,8 @@ You can hide all the code except a given named section:
 ```dart
 controller.visibleSectionNames = {'section1'};
 ```
+
+![visibleSectionNames](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/visible-section-names.png)
 
 This way the full text is still preserved and is available via `fullText` property.
 

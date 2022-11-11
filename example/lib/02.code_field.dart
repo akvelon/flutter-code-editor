@@ -14,9 +14,10 @@ void main() {
 }
 
 final controller = CodeController(
-  text: javaFactorialSnippet,
+  text: javaFactorialSectionsSnippet,
   language: java,
   namedSectionParser: const BracketsStartEndNamedSectionParser(),
+  visibleSectionNames: {'section1'},
 );
 
 class CodeEditor extends StatelessWidget {
@@ -24,8 +25,7 @@ class CodeEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.code.foldedBlocks
-    controller.readOnlySectionNames = {'section1'};
+    //controller.visibleSectionNames = {'section1'};
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
