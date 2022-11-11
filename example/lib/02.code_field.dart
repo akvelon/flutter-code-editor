@@ -14,10 +14,8 @@ void main() {
 }
 
 final controller = CodeController(
-  text: javaFactorialSectionsSnippet,
+  text: javaFactorialSnippet,
   language: java,
-  namedSectionParser: const BracketsStartEndNamedSectionParser(),
-  visibleSectionNames: {'section1'},
 );
 
 class CodeEditor extends StatelessWidget {
