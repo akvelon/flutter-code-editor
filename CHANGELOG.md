@@ -1,3 +1,7 @@
+## 0.1.8
+
+* Fixed linter issues.
+
 ## 0.1.7
 
 * Fixed README errors.

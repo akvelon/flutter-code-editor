@@ -262,11 +262,6 @@ class CodeController extends TextEditingController {
   }
 
   /// See webSpaceFix
-  static String _spacesToMiddleDots(String str) {
-    return str.replaceAll(' ', _middleDot);
-  }
-
-  /// See webSpaceFix
   static String _middleDotsToSpaces(String str) {
     return str.replaceAll(_middleDot, ' ');
   }
