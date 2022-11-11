@@ -1,4 +1,9 @@
+## 0.1.6
+
+* Improved README.
+
 ## 0.1.5
+
 * Updated license formatting to match pub.dev requirements.
 
 ## 0.1.4
