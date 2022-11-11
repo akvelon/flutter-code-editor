@@ -13,6 +13,10 @@ class CodeLines with EquatableMixin {
 
   static const empty = CodeLines([]);
 
+  CodeLine operator [](int i) => lines[i];
+
+  int get length => lines.length;
+
   /// Returns the 0-based line number of the character at [characterIndex].
   ///
   /// [characterIndex] can be from 0 to length inclusive.

@@ -7,17 +7,80 @@ class HiddenLineRanges with EquatableMixin {
   final int fullLineCount;
   final int visibleLineCount;
 
-  const HiddenLineRanges({
+  final List<int> _recoveredLines;
+  final Map<int, int> _cutLines;
+
+  factory HiddenLineRanges({
+    required List<LineNumberingBreakpoint> breakpoints,
+    required int fullLineCount,
+    required int visibleLineCount,
+  }) {
+    final recoveredLines = <int>[];
+    final cutLines = <int, int>{};
+    for (var i = 0; i <= fullLineCount; i++) {
+      final visibleLine = _mapLineToVisible(i, breakpoints);
+      if (visibleLine != null) {
+        recoveredLines.add(i);
+        cutLines[i] = visibleLine;
+      }
+    }
+    return HiddenLineRanges._(
+      fullLineCount: fullLineCount,
+      visibleLineCount: visibleLineCount,
+      breakpoints: breakpoints,
+      recoveredLines: recoveredLines,
+      cutLines: cutLines,
+    );
+  }
+
+  const HiddenLineRanges._({
     required this.breakpoints,
     required this.fullLineCount,
     required this.visibleLineCount,
-  });
+    required List<int> recoveredLines,
+    required Map<int, int> cutLines,
+  }) : _recoveredLines = recoveredLines,
+       _cutLines = cutLines;
 
-  static const empty = HiddenLineRanges(
+  static const empty = HiddenLineRanges._(
     breakpoints: [],
     fullLineCount: 1,
     visibleLineCount: 1,
+    recoveredLines: [0],
+    cutLines: {},
   );
+
+  int? cutLineIndexIfVisible(int lineIndex) {
+    if (lineIndex < 0) {
+      return lineIndex;
+    }
+    return _cutLines[lineIndex];
+  }
+
+  int revoverLineIndex(int visibleLineIndex) {
+    if (visibleLineIndex < 0) {
+      return visibleLineIndex;
+    }
+    return _recoveredLines[visibleLineIndex];
+  }
+
+  Iterable<int> get visibleLineNumbers sync* {
+    int n = 0;
+
+    for (final breakpoint in breakpoints) {
+      final to = breakpoint.fullBefore;
+
+      while (n < to) {
+        yield n++;
+      }
+
+      n = breakpoint.full;
+    }
+
+    while (n < fullLineCount) {
+      yield n++;
+    }
+  }
 
   /// Returns the visible line index to which the full [lineIndex] maps
   /// and null if the line is hidden.
@@ -30,7 +93,10 @@ class HiddenLineRanges with EquatableMixin {
   /// its spread from [lineIndex].
   ///
   /// [lineIndex] can be any integer including negative or >= [fullLineCount].
-  int? cutLineIndexIfVisible(int lineIndex) {
+  static int? _mapLineToVisible(
+    int lineIndex,
+    List<LineNumberingBreakpoint> breakpoints,
+  ) {
     if (breakpoints.isEmpty) {
       return lineIndex;
     }
@@ -73,24 +139,6 @@ class HiddenLineRanges with EquatableMixin {
     // upper == lower
     final breakpoint = breakpoints[upper];
     return breakpoint.cutLineIndexIfVisible(lineIndex);
-  }
-
-  Iterable<int> get visibleLineNumbers sync* {
-    int n = 0;
-
-    for (final breakpoint in breakpoints) {
-      final to = breakpoint.fullBefore;
-
-      while (n < to) {
-        yield n++;
-      }
-
-      n = breakpoint.full;
-    }
-
-    while (n < fullLineCount) {
-      yield n++;
-    }
   }
 
   @override

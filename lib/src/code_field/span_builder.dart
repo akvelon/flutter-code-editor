@@ -56,25 +56,25 @@ class SpanBuilder {
         nodes: node.children,
         theme: theme,
       ),
-      style: _applyReadonlyIfRequired(style),
+      style: _paleIfRequired(style),
     );
   }
 
   void _updateLineIndex(Node node) {
     _lineIndex += node.getNewlineCount();
 
-    if (_lineIndex >= code.lines.lines.length) {
-      _lineIndex = code.lines.lines.length - 1;
+    if (_lineIndex >= code.lines.length) {
+      _lineIndex = code.lines.length - 1;
     }
   }
 
-  TextStyle? _applyReadonlyIfRequired(TextStyle? style) {
-    if (code.lines.lines[_lineIndex].isReadOnly) {
+  TextStyle? _paleIfRequired(TextStyle? style) {
+    if (code
+        .lines[code.hiddenLineRanges.revoverLineIndex(_lineIndex)].isReadOnly) {
       if (style == null) {
         return textStyle?.paled();
-      } else {
-        return style.paled();
       }
+      return style.paled();
     }
     return style;
   }

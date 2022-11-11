@@ -143,7 +143,7 @@ class Code {
       lines: lines,
       namedSections: sectionsMap,
       visibleHighlighted:
-          hiddenRanges.cutHighlighted(highlighted)?.splitNewLines(),
+          hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
       visibleText: hiddenRanges.cutString(text),
       visibleSectionNames: visibleSectionNames,
     );
@@ -491,7 +491,7 @@ class Code {
       issues: issues,
       lines: lines,
       namedSections: namedSections,
-      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
+      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
       visibleText: hiddenRanges.cutString(text),
       visibleSectionNames: visibleSectionNames,
     );

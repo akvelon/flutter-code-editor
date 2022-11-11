@@ -41,8 +41,28 @@ extension MyResult on Result {
     }
   }
 
-  Result splitNewLines() {
-    nodes = nodes?.splitNewLines();
-    return this;
+  Result splitLines() {
+    return copyWith(
+      nodes: nodes
+          ?.map((n) => n.splitLines())
+          .expand((e) => e)
+          .toList(growable: false),
+    );
+  }
+
+  Result copyWith({
+    int? relevance,
+    List<Node>? nodes,
+    String? language,
+    Mode? top,
+    Result? secondBest,
+  }) {
+    return Result(
+      relevance: relevance ?? this.relevance,
+      nodes: nodes ?? this.nodes,
+      language: language ?? this.language,
+      top: top ?? this.top,
+      secondBest: secondBest ?? this.secondBest,
+    );
   }
 }

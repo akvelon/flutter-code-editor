@@ -52,36 +52,41 @@ extension MyNode on Node {
     return null;
   }
 
-  Node splitNewLines() {
-    children = children?.splitNewLines();
-    return this;
-  }
-}
+  List<Node> splitLines() {
+    Node createNode([String? val]) => copyWith(
+          value: val ?? value,
+          children: children
+              ?.map((c) => c.splitLines())
+              .expand((e) => e)
+              .toList(growable: false),
+        );
 
-extension NodeList on List<Node> {
-  List<Node> splitNewLines() {
     final result = <Node>[];
 
-    for (int i = 0; i < length; i++) {
-      final node = this[i];
-      final splittedValue = this[i].value?.split('\n');
-      if ((splittedValue?.length ?? 0) <= 1) {
-        result.add(node.splitNewLines());
-      } else {
-        for (int j = 0; j < splittedValue!.length; j++) {
-          result.add(
-            Node(
-              children: node.children,
-              value: splittedValue[j] +
-                  (j == splittedValue.length - 1 ? '' : '\n'),
-              className: node.className,
-              noPrefix: node.noPrefix,
-            ).splitNewLines(),
-          );
-        }
+    final splitValue = value?.split('\n');
+    if (splitValue == null || (splitValue.length) <= 1) {
+      result.add(createNode());
+    } else {
+      for (int i = 0; i < splitValue.length; i++) {
+        result.add(
+          createNode(splitValue[i] + (i == splitValue.length - 1 ? '' : '\n')),
+        );
       }
     }
 
     return result;
   }
+
+  Node copyWith({
+    String? className,
+    String? value,
+    bool? noPrefix,
+    List<Node>? children,
+  }) =>
+      Node(
+        className: className ?? this.className,
+        value: value ?? this.value,
+        noPrefix: noPrefix ?? this.noPrefix,
+        children: children ?? this.children,
+      );
 }

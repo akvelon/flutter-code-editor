@@ -3,14 +3,14 @@ import 'package:flutter_code_editor/src/hidden_ranges/line_numbering_breakpoint.
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const noBreakpointsRanges = HiddenLineRanges(
+  final noBreakpointsRanges = HiddenLineRanges(
     breakpoints: [],
     fullLineCount: 10,
     visibleLineCount: 10,
   );
 
-  const midBreakpointsRanges = HiddenLineRanges(
-    breakpoints: [
+  final midBreakpointsRanges = HiddenLineRanges(
+    breakpoints: const [
       LineNumberingBreakpoint(full: 4, visible: 2, spreadBefore: 0),
       LineNumberingBreakpoint(full: 9, visible: 5, spreadBefore: 2),
       LineNumberingBreakpoint(full: 100, visible: 12, spreadBefore: 4),
@@ -19,8 +19,8 @@ void main() {
     visibleLineCount: 22,
   );
 
-  const startEndHiddenRanges = HiddenLineRanges(
-    breakpoints: [
+  final startEndHiddenRanges = HiddenLineRanges(
+    breakpoints: const [
       LineNumberingBreakpoint(full: 3, visible: 0, spreadBefore: 0),
       LineNumberingBreakpoint(full: 10, visible: 5, spreadBefore: 3),
     ],
@@ -55,7 +55,6 @@ void main() {
         expect(midBreakpointsRanges.cutLineIndexIfVisible(99), null);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(100), 12);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(101), 13);
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(200), 112);
       });
     });
 

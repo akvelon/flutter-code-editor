@@ -26,7 +26,7 @@ void main() {
 
       expect(
         builder.hiddenLineRanges,
-        const HiddenLineRanges(
+        HiddenLineRanges(
           breakpoints: [],
           fullLineCount: 1,
           visibleLineCount: 1,
@@ -42,7 +42,7 @@ void main() {
 
       expect(
         builder.hiddenLineRanges,
-        const HiddenLineRanges(
+        HiddenLineRanges(
           breakpoints: [],
           fullLineCount: 15,
           visibleLineCount: 15,
@@ -83,7 +83,7 @@ void main() {
 
       expect(
         builder.hiddenLineRanges,
-        const HiddenLineRanges(
+        HiddenLineRanges(
           breakpoints: [],
           fullLineCount: 15,
           visibleLineCount: 15,
@@ -124,8 +124,8 @@ void main() {
 
       expect(
         builder.hiddenLineRanges,
-        const HiddenLineRanges(
-          breakpoints: [
+        HiddenLineRanges(
+          breakpoints: const [
             LineNumberingBreakpoint(full: 6, visible: 4, spreadBefore: 0),
             LineNumberingBreakpoint(full: 14, visible: 10, spreadBefore: 2),
           ],
@@ -168,8 +168,8 @@ void main() {
 
       expect(
         builder.hiddenLineRanges,
-        const HiddenLineRanges(
-          breakpoints: [
+        HiddenLineRanges(
+          breakpoints: const [
             LineNumberingBreakpoint(full: 2, visible: 0, spreadBefore: 0),
             LineNumberingBreakpoint(full: 15, visible: 10, spreadBefore: 2),
           ],
