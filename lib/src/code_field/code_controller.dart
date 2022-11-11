@@ -473,8 +473,6 @@ class CodeController extends TextEditingController {
     super.value = _getValueWithCode(_code);
   }
 
-
-
   /// The value with [newCode] preserving the current selection.
   TextEditingValue _getValueWithCode(Code newCode) {
     return TextEditingValue(

@@ -39,8 +39,8 @@ class HiddenLineRanges with EquatableMixin {
     required this.visibleLineCount,
     required List<int> recoveredLines,
     required Map<int, int> cutLines,
-  }) : _recoveredLines = recoveredLines,
-       _cutLines = cutLines;
+  })  : _recoveredLines = recoveredLines,
+        _cutLines = cutLines;
 
   static const empty = HiddenLineRanges._(
     breakpoints: [],

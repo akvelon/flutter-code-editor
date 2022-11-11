@@ -10,7 +10,7 @@ class SpanBuilder {
   final CodeThemeData? theme;
   final TextStyle? textStyle;
 
-  int _lineIndex = 0;
+  int _visibleLineIndex = 0;
 
   SpanBuilder({
     required this.code,
@@ -19,7 +19,7 @@ class SpanBuilder {
   });
 
   TextSpan build() {
-    _lineIndex = 0;
+    _visibleLineIndex = 0;
     return TextSpan(
       style: textStyle,
       children: _buildList(
@@ -61,16 +61,17 @@ class SpanBuilder {
   }
 
   void _updateLineIndex(Node node) {
-    _lineIndex += node.getNewlineCount();
+    _visibleLineIndex += node.getNewlineCount();
 
-    if (_lineIndex >= code.lines.length) {
-      _lineIndex = code.lines.length - 1;
+    if (_visibleLineIndex >= code.lines.length) {
+      _visibleLineIndex = code.lines.length - 1;
     }
   }
 
   TextStyle? _paleIfRequired(TextStyle? style) {
-    if (code
-        .lines[code.hiddenLineRanges.revoverLineIndex(_lineIndex)].isReadOnly) {
+    final revoverLineIndex =
+        code.hiddenLineRanges.revoverLineIndex(_visibleLineIndex);
+    if (code.lines[revoverLineIndex].isReadOnly) {
       if (style == null) {
         return textStyle?.paled();
       }
@@ -83,11 +84,11 @@ class SpanBuilder {
 extension TextStyleExtension on TextStyle {
   TextStyle paled() {
     final clr = color;
-    
+
     if (clr == null) {
       return this;
     }
-    
+
     return copyWith(
       color: Color.fromARGB(
         clr.alpha ~/ 2,
