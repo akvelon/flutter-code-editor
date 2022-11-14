@@ -7,29 +7,43 @@ class HiddenLineRanges with EquatableMixin {
   final int fullLineCount;
   final int visibleLineCount;
 
-  final List<int> _recoveredLines;
-  final Map<int, int> _cutLines;
+  final List<int?> _fullToVisible;
+  final List<int> _visibleToFull;
 
   factory HiddenLineRanges({
     required List<LineNumberingBreakpoint> breakpoints,
     required int fullLineCount,
     required int visibleLineCount,
   }) {
-    final recoveredLines = <int>[];
-    final cutLines = <int, int>{};
-    for (var i = 0; i <= fullLineCount; i++) {
-      final visibleLine = _mapLineToVisible(i, breakpoints);
-      if (visibleLine != null) {
-        recoveredLines.add(i);
-        cutLines[i] = visibleLine;
+    final fullToVisible = <int?>[];
+    final visibleToFull = <int>[];
+
+    int n = 0;
+
+    for (final breakpoint in breakpoints) {
+      final to = breakpoint.fullBefore;
+
+      while (n < to) {
+        visibleToFull.add(n++);
+        fullToVisible.add(visibleToFull.length - 1);
       }
+
+      fullToVisible.addAll(List.generate(breakpoint.full - n, (index) => null));
+
+      n = breakpoint.full;
     }
+
+    while (n <= fullLineCount) {
+      visibleToFull.add(n++);
+      fullToVisible.add(visibleToFull.length - 1);
+    }
+
     return HiddenLineRanges._(
       fullLineCount: fullLineCount,
       visibleLineCount: visibleLineCount,
       breakpoints: breakpoints,
-      recoveredLines: recoveredLines,
-      cutLines: cutLines,
+      fullToVisible: fullToVisible,
+      visibleToFull: visibleToFull,
     );
   }
 
@@ -37,31 +51,31 @@ class HiddenLineRanges with EquatableMixin {
     required this.breakpoints,
     required this.fullLineCount,
     required this.visibleLineCount,
-    required List<int> recoveredLines,
-    required Map<int, int> cutLines,
-  })  : _recoveredLines = recoveredLines,
-        _cutLines = cutLines;
+    required List<int?> fullToVisible,
+    required List<int> visibleToFull,
+  })  : _fullToVisible = fullToVisible,
+        _visibleToFull = visibleToFull;
 
   static const empty = HiddenLineRanges._(
     breakpoints: [],
     fullLineCount: 1,
     visibleLineCount: 1,
-    recoveredLines: [0],
-    cutLines: {},
+    fullToVisible: [0],
+    visibleToFull: [],
   );
 
   int? cutLineIndexIfVisible(int lineIndex) {
     if (lineIndex < 0) {
       return lineIndex;
     }
-    return _cutLines[lineIndex];
+    return _fullToVisible[lineIndex];
   }
 
-  int revoverLineIndex(int visibleLineIndex) {
+  int recoverLineIndex(int visibleLineIndex) {
     if (visibleLineIndex < 0) {
       return visibleLineIndex;
     }
-    return _recoveredLines[visibleLineIndex];
+    return _visibleToFull[visibleLineIndex];
   }
 
   Iterable<int> get visibleLineNumbers sync* {
@@ -80,65 +94,6 @@ class HiddenLineRanges with EquatableMixin {
     while (n < fullLineCount) {
       yield n++;
     }
-  }
-
-  /// Returns the visible line index to which the full [lineIndex] maps
-  /// and null if the line is hidden.
-  ///
-  /// Without breakpoints, returns [lineIndex] unchanged.
-  /// At a breakpoint, returns its `visibleLineIndex`.
-  /// Otherwise finds a next or previous breakpoint
-  /// Before the first breakpoint, returns [lineIndex] unchanged.
-  /// Otherwise finds the first preceding breakpoint and uses subtracts
-  /// its spread from [lineIndex].
-  ///
-  /// [lineIndex] can be any integer including negative or >= [fullLineCount].
-  static int? _mapLineToVisible(
-    int lineIndex,
-    List<LineNumberingBreakpoint> breakpoints,
-  ) {
-    if (breakpoints.isEmpty) {
-      return lineIndex;
-    }
-
-    int lower = 0;
-    int upper = breakpoints.length - 1;
-
-    // Linear interpolation search.
-    while (upper > lower) {
-      final lowerLineIndex = breakpoints[lower].full;
-      final upperLineIndex = breakpoints[upper].full;
-
-      final index = (lower +
-              (lineIndex - lowerLineIndex) /
-                  (upperLineIndex - lowerLineIndex) *
-                  (upper - lower))
-          .floor();
-
-      if (index < lower) {
-        return breakpoints[lower].cutLineIndexIfVisible(lineIndex);
-      }
-      if (index > upper) {
-        return breakpoints[upper].cutLineIndexIfVisible(lineIndex);
-      }
-
-      final breakpoint = breakpoints[index];
-
-      switch ((breakpoint.full - lineIndex).sign) {
-        case -1:
-          lower = index + 1;
-          continue;
-        case 1:
-          upper = index - 1;
-          continue;
-      }
-
-      return breakpoint.visible;
-    }
-
-    // upper == lower
-    final breakpoint = breakpoints[upper];
-    return breakpoint.cutLineIndexIfVisible(lineIndex);
   }
 
   @override

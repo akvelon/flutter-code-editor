@@ -69,13 +69,10 @@ class SpanBuilder {
   }
 
   TextStyle? _paleIfRequired(TextStyle? style) {
-    final revoverLineIndex =
-        code.hiddenLineRanges.revoverLineIndex(_visibleLineIndex);
-    if (code.lines[revoverLineIndex].isReadOnly) {
-      if (style == null) {
-        return textStyle?.paled();
-      }
-      return style.paled();
+    final fullLineIndex =
+        code.hiddenLineRanges.recoverLineIndex(_visibleLineIndex);
+    if (code.lines[fullLineIndex].isReadOnly) {
+      return (style ?? textStyle)?.paled();
     }
     return style;
   }

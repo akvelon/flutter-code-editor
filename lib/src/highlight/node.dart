@@ -53,28 +53,30 @@ extension MyNode on Node {
   }
 
   List<Node> splitLines() {
-    Node createNode([String? val]) => copyWith(
-          value: val ?? value,
-          children: children
-              ?.map((c) => c.splitLines())
-              .expand((e) => e)
-              .toList(growable: false),
-        );
-
-    final result = <Node>[];
-
     final splitValue = value?.split('\n');
     if (splitValue == null || (splitValue.length) <= 1) {
-      result.add(createNode());
-    } else {
-      for (int i = 0; i < splitValue.length; i++) {
-        result.add(
-          createNode(splitValue[i] + (i == splitValue.length - 1 ? '' : '\n')),
-        );
-      }
+      return [this];
     }
-
+    final result = <Node>[];
+    for (int i = 0; i < splitValue.length; i++) {
+      result.add(
+        copyWith(
+          value: splitValue[i] + (i == splitValue.length - 1 ? '' : '\n'),
+        ),
+      );
+    }
     return result;
+  }
+
+  String toStringRecursive() {
+    final result = {};
+
+    result['className'] = className;
+    result['value'] = '\'$value\'';
+    result['children'] = children?.map((e) => e.toStringRecursive());
+
+    result.removeWhere((key, value) => value == null || value == '\'null\'');
+    return result.toString();
   }
 
   Node copyWith({

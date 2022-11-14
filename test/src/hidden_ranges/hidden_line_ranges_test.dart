@@ -33,6 +33,7 @@ void main() {
       test('No breakpoints -> Continuous', () {
         for (int i = -1; i <= noBreakpointsRanges.fullLineCount; i++) {
           expect(noBreakpointsRanges.cutLineIndexIfVisible(i), i);
+          expect(noBreakpointsRanges.recoverLineIndex(i), i);
         }
       });
 
@@ -55,6 +56,18 @@ void main() {
         expect(midBreakpointsRanges.cutLineIndexIfVisible(99), null);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(100), 12);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(101), 13);
+
+        expect(midBreakpointsRanges.recoverLineIndex(0), 0);
+        expect(midBreakpointsRanges.recoverLineIndex(1), 1);
+        expect(midBreakpointsRanges.recoverLineIndex(2), 4);
+        expect(midBreakpointsRanges.recoverLineIndex(3), 5);
+        expect(midBreakpointsRanges.recoverLineIndex(4), 6);
+        expect(midBreakpointsRanges.recoverLineIndex(5), 9);
+        expect(midBreakpointsRanges.recoverLineIndex(6), 10);
+        expect(midBreakpointsRanges.recoverLineIndex(7), 11);
+        expect(midBreakpointsRanges.recoverLineIndex(11), 15);
+        expect(midBreakpointsRanges.recoverLineIndex(12), 100);
+        expect(midBreakpointsRanges.recoverLineIndex(13), 101);
       });
     });
 
