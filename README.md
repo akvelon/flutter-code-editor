@@ -252,7 +252,7 @@ one section is undefined.
 
 ## Migration Guides
 
-- [Migrating from code_text_field to 0.1](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/docs/migrating/0.1.md)
+- [Migrating from code_text_field to 0.1](https://github.com/akvelon/flutter-code-editor/blob/main/docs/migrating/0.1.md)
 
 ## Contribution Guide
 
