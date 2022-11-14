@@ -43,10 +43,7 @@ extension MyResult on Result {
 
   Result splitLines() {
     return copyWith(
-      nodes: nodes
-          ?.map((n) => n.splitLines())
-          .expand((e) => e)
-          .toList(growable: false),
+      nodes: nodes?.splitLines(),
     );
   }
 

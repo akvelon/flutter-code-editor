@@ -92,3 +92,9 @@ extension MyNode on Node {
         children: children ?? this.children,
       );
 }
+
+extension NodeListExtension on List<Node> {
+  List<Node> splitLines() {
+    return map((n) => n.splitLines()).expand((e) => e).toList(growable: false);
+  }
+}

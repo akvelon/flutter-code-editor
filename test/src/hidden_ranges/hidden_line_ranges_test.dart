@@ -31,14 +31,13 @@ void main() {
   group('HiddenLineRanges.', () {
     group('cutLineIndexIfVisible', () {
       test('No breakpoints -> Continuous', () {
-        for (int i = -1; i <= noBreakpointsRanges.fullLineCount; i++) {
+        for (int i = 0; i < noBreakpointsRanges.fullLineCount; i++) {
           expect(noBreakpointsRanges.cutLineIndexIfVisible(i), i);
           expect(noBreakpointsRanges.recoverLineIndex(i), i);
         }
       });
 
       test('Mid breakpoints', () {
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(-1), -1);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(0), 0);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(1), 1);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(2), null);

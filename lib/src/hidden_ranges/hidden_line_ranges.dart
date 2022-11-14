@@ -33,7 +33,7 @@ class HiddenLineRanges with EquatableMixin {
       n = breakpoint.full;
     }
 
-    while (n <= fullLineCount) {
+    while (n < fullLineCount) {
       visibleToFull.add(n++);
       fullToVisible.add(visibleToFull.length - 1);
     }
@@ -65,16 +65,10 @@ class HiddenLineRanges with EquatableMixin {
   );
 
   int? cutLineIndexIfVisible(int lineIndex) {
-    if (lineIndex < 0) {
-      return lineIndex;
-    }
     return _fullToVisible[lineIndex];
   }
 
   int recoverLineIndex(int visibleLineIndex) {
-    if (visibleLineIndex < 0) {
-      return visibleLineIndex;
-    }
     return _visibleToFull[visibleLineIndex];
   }
 
