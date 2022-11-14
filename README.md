@@ -250,19 +250,9 @@ which will conflict with the hidden parts.
 Only one visible section at a time is currently supported. The behavior of passing more than
 one section is undefined.
 
-## Migration Guide
+## Migration Guides
 
-This code editor was forked from [code_text_field](https://pub.dev/packages/code_text_field)
-by BertrandBev, and then many features were added to it.
-
-The first versions preserve much of compatibility for your convenience.
-
-### Migrating from code_text_field
-
-1. Replace `code_text_field` package with this one.
-2. Do not use `CodeField.expands` because otherwise the code scrolls but line numbers freeze.
-   Instead put the entire widget to `Expnaded`.
-3. Use `CodeTheme` widget instead of passing a theme to `CodeController`.
+- [Migrating from code_text_field to 0.1](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/docs/migrating/0.1.md)
 
 ## Contribution Guide
 
