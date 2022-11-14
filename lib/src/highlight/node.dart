@@ -55,28 +55,40 @@ extension MyNode on Node {
   List<Node> splitLines() {
     final splitValue = value?.split('\n');
     if (splitValue == null || (splitValue.length) <= 1) {
-      return [this];
+      return [copyWith(children: children?.splitLines())];
     }
     final result = <Node>[];
     for (int i = 0; i < splitValue.length; i++) {
       result.add(
         copyWith(
           value: splitValue[i] + (i == splitValue.length - 1 ? '' : '\n'),
+          children: i == 0 ? children?.splitLines() : null,
         ),
       );
     }
     return result;
   }
 
-  String toStringRecursive() {
+  String toStringRecursive([String accumulatedResult = '', int indent = 0]) {
     final result = {};
 
     result['className'] = className;
-    result['value'] = '\'$value\'';
-    result['children'] = children?.map((e) => e.toStringRecursive());
+    result['value'] = value == null ? null : '\'$value\'';
+    result['children'] = children == null ? 'empty' : null;
+    result.removeWhere((key, value) => value == null);
+    // ignore: parameter_assignments
+    accumulatedResult +=
+        '${' ' * indent * 2}${result.isEmpty ? 'Empty' : result}\n';
 
-    result.removeWhere((key, value) => value == null || value == '\'null\'');
-    return result.toString();
+    // ignore: parameter_assignments
+    if (children != null) {
+      for (final child in children!) {
+        // ignore: parameter_assignments
+        accumulatedResult =
+            child.toStringRecursive(accumulatedResult, indent + 1);
+      }
+    }
+    return accumulatedResult;
   }
 
   Node copyWith({

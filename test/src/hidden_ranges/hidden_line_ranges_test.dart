@@ -3,6 +3,12 @@ import 'package:flutter_code_editor/src/hidden_ranges/line_numbering_breakpoint.
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final emptyTextBreakpointRanges = HiddenLineRanges(
+    breakpoints: [],
+    fullLineCount: 1,
+    visibleLineCount: 1,
+  );
+
   final noBreakpointsRanges = HiddenLineRanges(
     breakpoints: [],
     fullLineCount: 10,
@@ -29,7 +35,12 @@ void main() {
   );
 
   group('HiddenLineRanges.', () {
-    group('cutLineIndexIfVisible', () {
+    group('cutLineIndexIfVisible, recoverLineIndex', () {
+      test('Empty text', () {
+        expect(emptyTextBreakpointRanges.cutLineIndexIfVisible(0), 0);
+        expect(emptyTextBreakpointRanges.recoverLineIndex(0), 0);
+      });
+
       test('No breakpoints -> Continuous', () {
         for (int i = 0; i < noBreakpointsRanges.fullLineCount; i++) {
           expect(noBreakpointsRanges.cutLineIndexIfVisible(i), i);
