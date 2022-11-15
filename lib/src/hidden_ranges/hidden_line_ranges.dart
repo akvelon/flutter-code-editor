@@ -13,8 +13,8 @@ class HiddenLineRanges with EquatableMixin {
     required List<LineNumberingBreakpoint> breakpoints,
     required int fullLineCount,
   }) {
-    final fullToVisible = List<int?>.filled(fullLineCount + 1, null);
-    final visibleToFull = List<int>.filled(fullLineCount + 1, 0);
+    final fullToVisible = List<int?>.filled(fullLineCount, null);
+    final visibleToFull = List<int>.filled(fullLineCount, 0);
 
     int n = 0;
 
@@ -43,7 +43,7 @@ class HiddenLineRanges with EquatableMixin {
       fullLineCount: fullLineCount,
       breakpoints: breakpoints,
       fullToVisible: fullToVisible,
-      visibleToFull: visibleToFull,
+      visibleToFull: visibleToFull.sublist(0, visibleToFullIndex),
     );
   }
 
