@@ -75,23 +75,7 @@ class HiddenLineRanges with EquatableMixin {
     return _visibleToFull[visibleLineIndex];
   }
 
-  Iterable<int> get visibleLineNumbers sync* {
-    int n = 0;
-
-    for (final breakpoint in breakpoints) {
-      final to = breakpoint.fullBefore;
-
-      while (n < to) {
-        yield n++;
-      }
-
-      n = breakpoint.full;
-    }
-
-    while (n < fullLineCount) {
-      yield n++;
-    }
-  }
+  Iterable<int> get visibleLineNumbers => _visibleToFull;
 
   @override
   List<Object> get props => [
