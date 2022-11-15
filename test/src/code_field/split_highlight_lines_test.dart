@@ -8,10 +8,10 @@ const examples = {
   //
   'Empty': _Example(text: '', expected: '{value: \'\', children: empty}\n'),
 
-  'Readonly comment': _Example(
+  'Contains comment': _Example(
     text: '''
 public class MyClass {
-  public void main() { // readonly
+  public void main() { // comment
   }
 }''',
     expected: '''
@@ -30,7 +30,7 @@ public class MyClass {
   {value: 'void', children: empty}
 {value: ' main() { ', children: empty}
 {className: comment}
-  {value: '// readonly', children: empty}
+  {value: '// comment', children: empty}
 {value: '\n', children: empty}
 {value: '  }\n', children: empty}
 {value: '}', children: empty}
@@ -40,10 +40,10 @@ public class MyClass {
   'Named sections': _Example(
     text: '''
 class MyClass {
-  void someMethod() {// [START section1]
+  void method1() {// [START section1]
   }// [END section1]
   // [START section2]
-  void method() {
+  void method2() {
   }// [END section2]
 }''',
     expected: '''
@@ -60,7 +60,7 @@ class MyClass {
 {value: '  ', children: empty}
 {className: keyword}
   {value: 'void', children: empty}
-{value: ' someMethod() {', children: empty}
+{value: ' method1() {', children: empty}
 {className: comment}
   {value: '// [START section1]', children: empty}
 {value: '\n', children: empty}
@@ -75,7 +75,7 @@ class MyClass {
 {value: '  ', children: empty}
 {className: keyword}
   {value: 'void', children: empty}
-{value: ' method() {\n', children: empty}
+{value: ' method2() {\n', children: empty}
 {value: '  }', children: empty}
 {className: comment}
   {value: '// [END section2]', children: empty}

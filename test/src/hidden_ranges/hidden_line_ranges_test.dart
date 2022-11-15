@@ -1,6 +1,8 @@
+import 'package:flutter_code_editor/src/code/code.dart';
 import 'package:flutter_code_editor/src/hidden_ranges/hidden_line_ranges.dart';
 import 'package:flutter_code_editor/src/hidden_ranges/line_numbering_breakpoint.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/languages/dart.dart';
 
 void main() {
   final emptyTextBreakpointRanges = HiddenLineRanges(
@@ -34,6 +36,11 @@ void main() {
   );
 
   group('HiddenLineRanges.', () {
+    test('Empty code generates correct line ranges', () {
+      final code = Code(text: '', language: dart);
+      expect(code.hiddenLineRanges.fullLineCount, 1);
+    });
+
     group('cutLineIndexIfVisible, recoverLineIndex', () {
       test('Empty text', () {
         expect(emptyTextBreakpointRanges.cutLineIndexIfVisible(0), 0);

@@ -21,7 +21,7 @@ void main() {
         expect(
           code.lines,
           CodeLines([
-            CodeLine(
+            CodeLine.fromTextAndRange(
               text: text,
               textRange: TextRange(start: 0, end: text.length),
               isReadOnly: false, // ignore: avoid_redundant_argument_values

@@ -69,26 +69,22 @@ extension MyNode on Node {
     return result;
   }
 
-  String toStringRecursive([String accumulatedResult = '', int indent = 0]) {
-    final result = {};
-
-    result['className'] = className;
-    result['value'] = value == null ? null : '\'$value\'';
-    result['children'] = children == null ? 'empty' : null;
-    result.removeWhere((key, value) => value == null);
-    // ignore: parameter_assignments
-    accumulatedResult +=
-        '${' ' * indent * 2}${result.isEmpty ? 'Empty' : result}\n';
-
-    // ignore: parameter_assignments
-    if (children != null) {
-      for (final child in children!) {
-        // ignore: parameter_assignments
-        accumulatedResult =
-            child.toStringRecursive(accumulatedResult, indent + 1);
-      }
+  String toStringRecursive([int indent = 0]) {
+    final sb = StringBuffer();
+    sb.write('${' ' * 2 * indent}${toMapString()}\n');
+    for (final child in children ?? const <Node>[]) {
+      sb.write(child.toStringRecursive(indent + 1));
     }
-    return accumulatedResult;
+    return sb.toString();
+  }
+
+  String toMapString() {
+    final map = {
+      'value': value == null ? null : '\'$value\'',
+      'className': className,
+      'children': children == null ? 'empty' : null,
+    }..removeWhere((key, value) => value == null);
+    return map.toString();
   }
 
   Node copyWith({

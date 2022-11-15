@@ -1,7 +1,6 @@
-import 'package:characters/characters.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart';
 
 import 'code_line.dart';
 
@@ -11,7 +10,13 @@ class CodeLines with EquatableMixin {
 
   const CodeLines(this.lines);
 
-  static const empty = CodeLines([]);
+  static const empty = CodeLines([
+    CodeLine(
+      text: '',
+      textRange: TextRange.collapsed(0),
+      indent: 0,
+    ),
+  ]);
 
   CodeLine operator [](int i) => lines[i];
 

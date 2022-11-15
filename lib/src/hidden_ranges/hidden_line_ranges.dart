@@ -16,34 +16,34 @@ class HiddenLineRanges with EquatableMixin {
     final fullToVisible = List<int?>.filled(fullLineCount, null);
     final visibleToFull = List<int>.filled(fullLineCount, 0);
 
-    int n = 0;
-
-    var fullToVisibleIndex = 0;
-    var visibleToFullIndex = 0;
+    var fullIndex = 0;
+    var visibleIndex = 0;
 
     for (final breakpoint in breakpoints) {
       final to = breakpoint.fullBefore;
 
-      while (n < to) {
-        visibleToFull[visibleToFullIndex] = n++;
-        fullToVisible[fullToVisibleIndex++] = visibleToFullIndex++;
+      while (fullIndex < to) {
+        visibleToFull[visibleIndex] = fullIndex;
+        fullToVisible[fullIndex] = visibleIndex;
+        fullIndex++;
+        visibleIndex++;
       }
 
-      fullToVisibleIndex = breakpoint.full;
-
-      n = breakpoint.full;
+      fullIndex = breakpoint.full;
     }
 
-    while (n < fullLineCount) {
-      visibleToFull[visibleToFullIndex] = n++;
-      fullToVisible[fullToVisibleIndex++] = visibleToFullIndex++;
+    while (fullIndex < fullLineCount) {
+      visibleToFull[visibleIndex] = fullIndex;
+      fullToVisible[fullIndex] = visibleIndex;
+      fullIndex++;
+      visibleIndex++;
     }
 
     return HiddenLineRanges._(
       fullLineCount: fullLineCount,
       breakpoints: breakpoints,
       fullToVisible: fullToVisible,
-      visibleToFull: visibleToFull.sublist(0, visibleToFullIndex),
+      visibleToFull: visibleToFull.sublist(0, visibleIndex),
     );
   }
 
