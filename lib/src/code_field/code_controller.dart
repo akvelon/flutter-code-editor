@@ -428,38 +428,6 @@ class CodeController extends TextEditingController {
     return text;
   }
 
-  TextSpan _processPatterns(String text, TextStyle? style) {
-    final children = <TextSpan>[];
-
-    text.splitMapJoin(
-      styleRegExp!,
-      onMatch: (Match m) {
-        if (styleList.isEmpty) {
-          return '';
-        }
-
-        int idx;
-        for (idx = 1;
-            idx < m.groupCount &&
-                idx <= styleList.length &&
-                m.group(idx) == null;
-            idx++) {}
-
-        children.add(TextSpan(
-          text: m[0],
-          style: styleList[idx - 1],
-        ));
-        return '';
-      },
-      onNonMatch: (String span) {
-        children.add(TextSpan(text: span, style: style));
-        return '';
-      },
-    );
-
-    return TextSpan(style: style, children: children);
-  }
-
   Future<void> generateSuggestions() async {
     final prefix = value.wordToCursor;
     if (prefix == null) {
@@ -587,11 +555,11 @@ class CodeController extends TextEditingController {
 
     // Return parsing
     if (_language != null) {
-      return const SpanBuilder().build(
+      return SpanBuilder(
         code: _code,
         theme: _getTheme(context),
         textStyle: style,
-      );
+      ).build();
     }
 
     if (styleRegExp != null) {
@@ -599,6 +567,38 @@ class CodeController extends TextEditingController {
     }
 
     return TextSpan(text: text, style: style);
+  }
+
+  TextSpan _processPatterns(String text, TextStyle? style) {
+    final children = <TextSpan>[];
+
+    text.splitMapJoin(
+      styleRegExp!,
+      onMatch: (Match m) {
+        if (styleList.isEmpty) {
+          return '';
+        }
+
+        int idx;
+        for (idx = 1;
+            idx < m.groupCount &&
+                idx <= styleList.length &&
+                m.group(idx) == null;
+            idx++) {}
+
+        children.add(TextSpan(
+          text: m[0],
+          style: styleList[idx - 1],
+        ));
+        return '';
+      },
+      onNonMatch: (String span) {
+        children.add(TextSpan(text: span, style: style));
+        return '';
+      },
+    );
+
+    return TextSpan(style: style, children: children);
   }
 
   CodeThemeData _getTheme(BuildContext context) {

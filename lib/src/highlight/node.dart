@@ -51,4 +51,58 @@ extension MyNode on Node {
 
     return null;
   }
+
+  List<Node> splitLines() {
+    final splitValue = value?.split('\n');
+    if (splitValue == null || (splitValue.length) <= 1) {
+      return [copyWith(children: children?.splitLines())];
+    }
+    final result = <Node>[];
+    for (int i = 0; i < splitValue.length; i++) {
+      result.add(
+        copyWith(
+          value: splitValue[i] + (i == splitValue.length - 1 ? '' : '\n'),
+          children: i == 0 ? children?.splitLines() : null,
+        ),
+      );
+    }
+    return result;
+  }
+
+  String toStringRecursive([int indent = 0]) {
+    final sb = StringBuffer();
+    sb.writeln(' ' * 2 * indent + toMapString());
+    for (final child in children ?? const <Node>[]) {
+      sb.write(child.toStringRecursive(indent + 1));
+    }
+    return sb.toString();
+  }
+
+  String toMapString() {
+    final map = {
+      'value': value == null ? null : '\'$value\'',
+      'className': className,
+      'children': children == null ? 'empty' : null,
+    }..removeWhere((key, value) => value == null);
+    return map.toString();
+  }
+
+  Node copyWith({
+    String? className,
+    String? value,
+    bool? noPrefix,
+    List<Node>? children,
+  }) =>
+      Node(
+        className: className ?? this.className,
+        value: value ?? this.value,
+        noPrefix: noPrefix ?? this.noPrefix,
+        children: children ?? this.children,
+      );
+}
+
+extension NodeListExtension on List<Node> {
+  List<Node> splitLines() {
+    return map((n) => n.splitLines()).expand((e) => e).toList(growable: false);
+  }
 }

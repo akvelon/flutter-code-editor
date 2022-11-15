@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:characters/characters.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -11,7 +13,17 @@ class CodeLines with EquatableMixin {
 
   const CodeLines(this.lines);
 
-  static const empty = CodeLines([]);
+  static const empty = CodeLines([
+    CodeLine(
+      text: '',
+      textRange: TextRange.collapsed(0),
+      indent: 0,
+    ),
+  ]);
+
+  CodeLine operator [](int i) => lines[i];
+
+  int get length => lines.length;
 
   /// Returns the 0-based line number of the character at [characterIndex].
   ///

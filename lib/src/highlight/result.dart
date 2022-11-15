@@ -40,4 +40,26 @@ extension MyResult on Result {
       characterIndex += node.getCharacterCount();
     }
   }
+
+  Result splitLines() {
+    return copyWith(
+      nodes: nodes?.splitLines(),
+    );
+  }
+
+  Result copyWith({
+    int? relevance,
+    List<Node>? nodes,
+    String? language,
+    Mode? top,
+    Result? secondBest,
+  }) {
+    return Result(
+      relevance: relevance ?? this.relevance,
+      nodes: nodes ?? this.nodes,
+      language: language ?? this.language,
+      top: top ?? this.top,
+      secondBest: secondBest ?? this.secondBest,
+    );
+  }
 }

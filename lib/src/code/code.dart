@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../src/highlight/result.dart';
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
 import '../folding/parsers/parser_factory.dart';
@@ -141,7 +142,8 @@ class Code {
       issues: issues,
       lines: lines,
       namedSections: sectionsMap,
-      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
+      visibleHighlighted:
+          hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
       visibleText: hiddenRanges.cutString(text),
       visibleSectionNames: visibleSectionNames,
     );
@@ -489,7 +491,7 @@ class Code {
       issues: issues,
       lines: lines,
       namedSections: namedSections,
-      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted),
+      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
       visibleText: hiddenRanges.cutString(text),
       visibleSectionNames: visibleSectionNames,
     );

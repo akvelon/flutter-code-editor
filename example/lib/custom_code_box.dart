@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_code_editor/src/wip/autoRefactorService.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/go.dart';
 import 'package:highlight/languages/java.dart';
@@ -337,19 +336,6 @@ private class MyClass {
                     fontSize: 30, // Ignored
                   ),
                 ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: FloatingActionButton(
-                backgroundColor: Colors.indigo[800],
-                onPressed: () {
-                  setState(() {
-                    _codeController!.text =
-                        autoRefactor(_codeController!.text, widget.language);
-                  });
-                },
-                child: const Icon(Icons.format_align_left_outlined),
               ),
             ),
           ],

@@ -1,15 +1,22 @@
+import 'package:flutter_code_editor/src/code/code.dart';
 import 'package:flutter_code_editor/src/hidden_ranges/hidden_line_ranges.dart';
 import 'package:flutter_code_editor/src/hidden_ranges/line_numbering_breakpoint.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/languages/dart.dart';
 
 void main() {
-  const noBreakpointsRanges = HiddenLineRanges(
+  final emptyTextBreakpointRanges = HiddenLineRanges(
+    breakpoints: [],
+    fullLineCount: 1,
+  );
+
+  final noBreakpointsRanges = HiddenLineRanges(
     breakpoints: [],
     fullLineCount: 10,
   );
 
-  const midBreakpointsRanges = HiddenLineRanges(
-    breakpoints: [
+  final midBreakpointsRanges = HiddenLineRanges(
+    breakpoints: const [
       LineNumberingBreakpoint(full: 4, visible: 2, spreadBefore: 0),
       LineNumberingBreakpoint(full: 9, visible: 5, spreadBefore: 2),
       LineNumberingBreakpoint(full: 100, visible: 12, spreadBefore: 4),
@@ -20,8 +27,8 @@ void main() {
     fullLineCount: 231,
   );
 
-  const startEndHiddenRanges = HiddenLineRanges(
-    breakpoints: [
+  final startEndHiddenRanges = HiddenLineRanges(
+    breakpoints: const [
       LineNumberingBreakpoint(full: 3, visible: 0, spreadBefore: 0),
       LineNumberingBreakpoint(full: 10, visible: 5, spreadBefore: 3),
     ],
@@ -29,15 +36,25 @@ void main() {
   );
 
   group('HiddenLineRanges.', () {
-    group('cutLineIndexIfVisible', () {
+    test('Empty code generates correct line ranges', () {
+      final code = Code(text: '', language: dart);
+      expect(code.hiddenLineRanges.fullLineCount, 1);
+    });
+
+    group('cutLineIndexIfVisible, recoverLineIndex', () {
+      test('Empty text', () {
+        expect(emptyTextBreakpointRanges.cutLineIndexIfVisible(0), 0);
+        expect(emptyTextBreakpointRanges.recoverLineIndex(0), 0);
+      });
+
       test('No breakpoints -> Continuous', () {
-        for (int i = -1; i <= noBreakpointsRanges.fullLineCount; i++) {
+        for (int i = 0; i < noBreakpointsRanges.fullLineCount; i++) {
           expect(noBreakpointsRanges.cutLineIndexIfVisible(i), i);
+          expect(noBreakpointsRanges.recoverLineIndex(i), i);
         }
       });
 
       test('Mid breakpoints', () {
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(-1), -1);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(0), 0);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(1), 1);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(2), null);
@@ -55,10 +72,18 @@ void main() {
         expect(midBreakpointsRanges.cutLineIndexIfVisible(99), null);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(100), 12);
         expect(midBreakpointsRanges.cutLineIndexIfVisible(101), 13);
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(200), 112);
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(209), null);
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(219), null);
-        expect(midBreakpointsRanges.cutLineIndexIfVisible(229), null);
+
+        expect(midBreakpointsRanges.recoverLineIndex(0), 0);
+        expect(midBreakpointsRanges.recoverLineIndex(1), 1);
+        expect(midBreakpointsRanges.recoverLineIndex(2), 4);
+        expect(midBreakpointsRanges.recoverLineIndex(3), 5);
+        expect(midBreakpointsRanges.recoverLineIndex(4), 6);
+        expect(midBreakpointsRanges.recoverLineIndex(5), 9);
+        expect(midBreakpointsRanges.recoverLineIndex(6), 10);
+        expect(midBreakpointsRanges.recoverLineIndex(7), 11);
+        expect(midBreakpointsRanges.recoverLineIndex(11), 15);
+        expect(midBreakpointsRanges.recoverLineIndex(12), 100);
+        expect(midBreakpointsRanges.recoverLineIndex(13), 101);
       });
     });
 

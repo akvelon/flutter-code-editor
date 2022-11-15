@@ -9,31 +9,43 @@ class CodeLine {
 
   final TextRange textRange;
   final bool isReadOnly;
-  late final indent = _calculateIndent();
+  final int indent;
 
-  CodeLine({
+  const CodeLine({
+    required this.text,
+    required this.textRange,
+    required this.indent,
+    this.isReadOnly = false,
+  });
+
+  CodeLine.fromTextAndRange({
     required this.text,
     required this.textRange,
     this.isReadOnly = false,
-  });
+  }) : indent = _calculateIndent(text);
 
   CodeLine.fromTextAndStart(
     this.text,
     int start, {
     this.isReadOnly = false,
-  }) : textRange = TextRange(start: start, end: start + text.length);
+  })  : textRange = TextRange(start: start, end: start + text.length),
+        indent = _calculateIndent(text);
 
   @override
   String toString() =>
       'CodeLine(ro: $isReadOnly, textRange: $textRange, text: "$text")';
 
-  CodeLine copyWith({bool? isReadOnly}) {
-    return CodeLine(
-      text: text,
-      textRange: textRange,
-      isReadOnly: isReadOnly ?? this.isReadOnly,
-    );
-  }
+  CodeLine copyWith({
+    String? text,
+    TextRange? textRange,
+    bool? isReadOnly,
+  }) =>
+      CodeLine(
+        text: text ?? this.text,
+        textRange: textRange ?? this.textRange,
+        isReadOnly: isReadOnly ?? this.isReadOnly,
+        indent: text == null ? 0 : _calculateIndent(text),
+      );
 
   @override
   bool operator ==(Object other) {
@@ -50,7 +62,7 @@ class CodeLine {
         isReadOnly,
       );
 
-  int _calculateIndent() {
+  static int _calculateIndent(String text) {
     int indentation = 0;
     for (final character in text.runes) {
       if (character == $space || character == $tab || character == $lf) {
