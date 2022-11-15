@@ -5,7 +5,6 @@ import 'line_numbering_breakpoint.dart';
 class HiddenLineRanges with EquatableMixin {
   final List<LineNumberingBreakpoint> breakpoints;
   final int fullLineCount;
-  final int visibleLineCount;
 
   final List<int?> _fullToVisible;
   final List<int> _visibleToFull;
@@ -13,10 +12,9 @@ class HiddenLineRanges with EquatableMixin {
   factory HiddenLineRanges({
     required List<LineNumberingBreakpoint> breakpoints,
     required int fullLineCount,
-    required int visibleLineCount,
   }) {
     final fullToVisible = List<int?>.filled(fullLineCount + 1, null);
-    final visibleToFull = List<int>.filled(visibleLineCount + 1, 0);
+    final visibleToFull = List<int>.filled(fullLineCount + 1, 0);
 
     int n = 0;
 
@@ -43,7 +41,6 @@ class HiddenLineRanges with EquatableMixin {
 
     return HiddenLineRanges._(
       fullLineCount: fullLineCount,
-      visibleLineCount: visibleLineCount,
       breakpoints: breakpoints,
       fullToVisible: fullToVisible,
       visibleToFull: visibleToFull,
@@ -53,7 +50,6 @@ class HiddenLineRanges with EquatableMixin {
   const HiddenLineRanges._({
     required this.breakpoints,
     required this.fullLineCount,
-    required this.visibleLineCount,
     required List<int?> fullToVisible,
     required List<int> visibleToFull,
   })  : _fullToVisible = fullToVisible,
@@ -62,7 +58,6 @@ class HiddenLineRanges with EquatableMixin {
   static const empty = HiddenLineRanges._(
     breakpoints: [],
     fullLineCount: 1,
-    visibleLineCount: 1,
     fullToVisible: [0],
     visibleToFull: [0],
   );

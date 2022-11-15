@@ -6,13 +6,11 @@ void main() {
   final emptyTextBreakpointRanges = HiddenLineRanges(
     breakpoints: [],
     fullLineCount: 1,
-    visibleLineCount: 1,
   );
 
   final noBreakpointsRanges = HiddenLineRanges(
     breakpoints: [],
     fullLineCount: 10,
-    visibleLineCount: 10,
   );
 
   final midBreakpointsRanges = HiddenLineRanges(
@@ -20,9 +18,11 @@ void main() {
       LineNumberingBreakpoint(full: 4, visible: 2, spreadBefore: 0),
       LineNumberingBreakpoint(full: 9, visible: 5, spreadBefore: 2),
       LineNumberingBreakpoint(full: 100, visible: 12, spreadBefore: 4),
+      LineNumberingBreakpoint(full: 210, visible: 113, spreadBefore: 88),
+      LineNumberingBreakpoint(full: 220, visible: 115, spreadBefore: 97),
+      LineNumberingBreakpoint(full: 230, visible: 118, spreadBefore: 105),
     ],
-    fullLineCount: 110,
-    visibleLineCount: 22,
+    fullLineCount: 231,
   );
 
   final startEndHiddenRanges = HiddenLineRanges(
@@ -31,7 +31,6 @@ void main() {
       LineNumberingBreakpoint(full: 10, visible: 5, spreadBefore: 3),
     ],
     fullLineCount: 10,
-    visibleLineCount: 5,
   );
 
   group('HiddenLineRanges.', () {
@@ -97,7 +96,10 @@ void main() {
             0, 1,
             4, 5, 6,
             9, 10, 11, 12, 13, 14, 15,
-            100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+            ...List<int>.generate(200 - 100 + 1, (i) => i + 100), // 100-200
+            210, 211,
+            220, 221, 222,
+            230,
           ],
         );
       });

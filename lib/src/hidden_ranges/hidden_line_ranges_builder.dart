@@ -60,7 +60,6 @@ class HiddenLineRangesBuilder {
       hiddenLineRanges: HiddenLineRanges(
         breakpoints: breakpoints,
         fullLineCount: codeLines.lines.length,
-        visibleLineCount: codeLines.lines.length - spread,
       ),
     );
   }

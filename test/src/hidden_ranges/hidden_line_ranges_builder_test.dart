@@ -29,7 +29,6 @@ void main() {
         HiddenLineRanges(
           breakpoints: [],
           fullLineCount: 1,
-          visibleLineCount: 1,
         ),
       );
     });
@@ -45,7 +44,6 @@ void main() {
         HiddenLineRanges(
           breakpoints: [],
           fullLineCount: 15,
-          visibleLineCount: 15,
         ),
       );
     });
@@ -86,7 +84,6 @@ void main() {
         HiddenLineRanges(
           breakpoints: [],
           fullLineCount: 15,
-          visibleLineCount: 15,
         ),
       );
     });
@@ -130,7 +127,6 @@ void main() {
             LineNumberingBreakpoint(full: 14, visible: 10, spreadBefore: 2),
           ],
           fullLineCount: 15,
-          visibleLineCount: 11,
         ),
       );
     });
@@ -174,7 +170,6 @@ void main() {
             LineNumberingBreakpoint(full: 15, visible: 10, spreadBefore: 2),
           ],
           fullLineCount: 15,
-          visibleLineCount: 9,
         ),
       );
     });

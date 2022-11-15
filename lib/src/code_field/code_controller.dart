@@ -262,11 +262,6 @@ class CodeController extends TextEditingController {
   }
 
   /// See webSpaceFix
-  static String _spacesToMiddleDots(String str) {
-    return str.replaceAll(' ', _middleDot);
-  }
-
-  /// See webSpaceFix
   static String _middleDotsToSpaces(String str) {
     return str.replaceAll(_middleDot, ' ');
   }
@@ -462,6 +457,15 @@ class CodeController extends TextEditingController {
     super.value = _getValueWithCode(newCode);
 
     _code = newCode;
+  }
+
+  Set<String> get readOnlySectionNames => _readOnlySectionNames;
+
+  set readOnlySectionNames(Set<String> newValue) {
+    _readOnlySectionNames = newValue;
+    _updateCode(_code.text);
+
+    notifyListeners();
   }
 
   Set<String> get visibleSectionNames => _visibleSectionNames;
