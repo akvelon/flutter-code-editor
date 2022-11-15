@@ -71,7 +71,7 @@ extension MyNode on Node {
 
   String toStringRecursive([int indent = 0]) {
     final sb = StringBuffer();
-    sb.write('${' ' * 2 * indent}${toMapString()}\n');
+    sb.writeln(' ' * 2 * indent + toMapString());
     for (final child in children ?? const <Node>[]) {
       sb.write(child.toStringRecursive(indent + 1));
     }

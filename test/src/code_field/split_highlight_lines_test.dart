@@ -87,9 +87,9 @@ class MyClass {
   'Invalid code (Folded)': _Example(
     text: '''
 class MyClass {
-  void readOnlyMethod() {
+  void method1() {
 
-  void method() {
+  void method2() {
 }''',
     expected: '''
 {value: '', children: empty}
@@ -105,12 +105,12 @@ class MyClass {
 {value: '  ', children: empty}
 {className: keyword}
   {value: 'void', children: empty}
-{value: ' readOnlyMethod() {\n', children: empty}
+{value: ' method1() {\n', children: empty}
 {value: '\n', children: empty}
 {value: '  ', children: empty}
 {className: keyword}
   {value: 'void', children: empty}
-{value: ' method() {\n', children: empty}
+{value: ' method2() {\n', children: empty}
 {value: '}', children: empty}
 ''',
   ),
