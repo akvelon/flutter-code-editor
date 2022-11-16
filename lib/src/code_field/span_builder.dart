@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:highlight/highlight_core.dart';
 import '/src/code/text_style.dart';
 
+import '../../src/highlight/node.dart';
 import '../code/code.dart';
 import '../code_theme/code_theme_data.dart';
 
