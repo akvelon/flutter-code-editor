@@ -19,7 +19,7 @@ extension TextStyleExtension on TextStyle {
 
     return copyWith(
       color: Color.fromARGB(
-        clr.alpha ~/ 2,
+        127,
         clr.red,
         clr.green,
         clr.blue,
