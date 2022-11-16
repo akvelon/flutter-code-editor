@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:highlight/highlight_core.dart';
+import '/src/code/text_style.dart';
 
-import '../../src/highlight/node.dart';
 import '../code/code.dart';
 import '../code_theme/code_theme_data.dart';
 
@@ -32,67 +32,58 @@ class SpanBuilder {
   List<TextSpan>? _buildList({
     required List<Node>? nodes,
     required CodeThemeData? theme,
+    TextStyle? parentStyle,
   }) {
     if (nodes == null) {
       return null;
     }
 
     return nodes
-        .map((node) => _buildNode(node: node, theme: theme))
+        .map(
+          (node) => _buildNode(
+            node: node,
+            theme: theme,
+            parentStyle: parentStyle,
+          ),
+        )
         .toList(growable: false);
   }
 
   TextSpan _buildNode({
     required Node node,
     required CodeThemeData? theme,
+    TextStyle? parentStyle,
   }) {
-    _updateLineIndex(node);
-
     final style = theme?.styles[node.className];
+    final paledStyle = _paleIfRequired(style, parentStyle);
+
+    _updateLineIndex(node);
 
     return TextSpan(
       text: node.value,
       children: _buildList(
         nodes: node.children,
         theme: theme,
+        parentStyle: style ?? parentStyle,
       ),
-      style: _paleIfRequired(style),
+      style: paledStyle,
     );
   }
 
   void _updateLineIndex(Node node) {
-    _visibleLineIndex += node.getNewlineCount();
+    _visibleLineIndex += '\n'.allMatches(node.value ?? '').length;
 
     if (_visibleLineIndex >= code.lines.length) {
       _visibleLineIndex = code.lines.length - 1;
     }
   }
 
-  TextStyle? _paleIfRequired(TextStyle? style) {
+  TextStyle? _paleIfRequired(TextStyle? style, TextStyle? parentStyle) {
     final fullLineIndex =
         code.hiddenLineRanges.recoverLineIndex(_visibleLineIndex);
     if (code.lines[fullLineIndex].isReadOnly) {
-      return (style ?? textStyle)?.paled();
+      return (style ?? parentStyle ?? textStyle)?.paled();
     }
     return style;
-  }
-}
-
-extension TextStyleExtension on TextStyle {
-  TextStyle paled() {
-    final clr = color;
-
-    if (clr == null) {
-      return this;
-    }
-
-    return copyWith(
-      color: Color.fromARGB(
-        clr.alpha ~/ 2,
-        clr.red,
-        clr.green,
-        clr.blue,
-      ),
-    );
   }
 }
