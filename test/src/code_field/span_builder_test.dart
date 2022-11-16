@@ -251,7 +251,7 @@ void main() {
         final builder = SpanBuilder(
           code: code,
           theme: _themeData,
-          textStyle: _default,
+          rootStyle: _default,
         );
         final result = builder.build();
 
@@ -272,7 +272,7 @@ class _Example {
   final String text;
   final Mode? mode;
   final TextSpan expected;
-  Set<String> readonlySectionNames;
+  final Set<String> readonlySectionNames;
 
   _Example({
     required this.text,

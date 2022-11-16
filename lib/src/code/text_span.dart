@@ -1,4 +1,5 @@
 import 'package:flutter/painting.dart';
+
 import 'text_style.dart';
 
 extension TextSpanExtension on TextSpan {
