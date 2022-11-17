@@ -558,7 +558,7 @@ class CodeController extends TextEditingController {
       return SpanBuilder(
         code: _code,
         theme: _getTheme(context),
-        textStyle: style,
+        rootStyle: style,
       ).build();
     }
 
