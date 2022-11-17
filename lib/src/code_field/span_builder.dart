@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:highlight/highlight_core.dart';
 
-import '/src/code/text_style.dart';
 import '../code/code.dart';
+import '../code/text_style.dart';
 import '../code_theme/code_theme_data.dart';
 import '../highlight/node.dart';
 
@@ -56,8 +56,8 @@ class SpanBuilder {
     required CodeThemeData? theme,
     TextStyle? ancestorStyle,
   }) {
-    final classStyle = theme?.styles[node.className];
-    final paledStyle = _paleIfRequired(classStyle ?? ancestorStyle);
+    final style = theme?.styles[node.className] ?? ancestorStyle;
+    final processedStyle = _paleIfRequired(style);
 
     _updateLineIndex(node);
 
@@ -66,9 +66,9 @@ class SpanBuilder {
       children: _buildList(
         nodes: node.children,
         theme: theme,
-        ancestorStyle: classStyle ?? ancestorStyle,
+        ancestorStyle: style,
       ),
-      style: paledStyle,
+      style: processedStyle,
     );
   }
 
