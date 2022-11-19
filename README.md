@@ -2,7 +2,7 @@
 
 Flutter Code Editor is a multi-platform code editor supporting syntax highlighting, code blocks folding, autocompletion, named sections, read-only code blocks, hiding text to create code snippets, themes and many other features.
 
-![Pub Version](https://img.shields.io/pub/v/flutter_code_editor)
+[![Pub Version](https://img.shields.io/pub/v/flutter_code_editor)](https://pub.dev/packages/flutter_code_editor)
 
 ![Basic Example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/factorial.png)
 
