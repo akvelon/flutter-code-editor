@@ -287,6 +287,22 @@ Only one visible section at a time is currently supported. The behavior of passi
 one section is undefined.
 
 
+## Autocompletion
+
+The editor suggests words as they are typed. Suggested words are:
+
+- All keywords of the current language.
+- All words already in the text.
+- Words set with `controller.autocompleter.setCustomWords(['word1', 'word2'])`
+
+All those words are merged into an unstructured dictionary.
+The editor performs no syntax analysis and so cannot tell if a given class really has
+the method the user is typing. This feature is meant to simplify typing but not to be relied on
+when exploring classes and methods.
+
+Autocompletion currently cannot be disabled.
+
+
 ## Migration Guides
 
 - [Migrating from code_text_field to 0.1](https://github.com/akvelon/flutter-code-editor/blob/main/docs/migrating/0.1.md)
