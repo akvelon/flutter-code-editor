@@ -143,7 +143,7 @@ usable as one. However, code folding and other features have impact on built-in 
 To manipulate parts of the source code, Flutter Code Editor supports *named sections*.
 They are defined in the code by adding tags that Flutter Code Editor recognizes.
 
-To define a named section in your source code, add comments to tag the start and end of the section:
+To define a named section in your source code, add comments to tag the start and the end of the section:
 1. Add comment `[START <section_name>]` to tag the beginning of the section.
 2. Add comment `[END <section_name>]` to tag the end of the section.
 
@@ -178,14 +178,14 @@ It also hides any single-line comment that has a section tag with the above synt
 although such comments are still present in the editor's hidden state
 and will be revealed when copying the text.
 
-To customize parsing sections using any other syntax, subclass `AbstractNamedSectionParser`.
+To customize section parsing using any other syntax, subclass `AbstractNamedSectionParser`.
 
 
 ## Read-Only Code Blocks
 
 Flutter Code Editor allows to define read-only code blocks.
 This may be useful for learning use cases when users are guided to modify certain code blocks
-while other code is meant to be protected from modification. 
+while other code is meant to be protected from changes. 
 
 To make a named section read-only, pass a set of named sections to the `controller.readOnlySectionNames`:
 
@@ -208,7 +208,7 @@ To change a partially locked controller, set the `fullText` property.
 
 ### Folding The First Comment/License
 
-Many code snippets contain license as their first comment, that might be desired to be folded.
+Many code snippets contain license as their first comment, and it can distract readers.
 To fold the first comment, use:
 
 ```dart
@@ -229,18 +229,15 @@ controller.foldImports();
 
 ### Named Sections
 
-Folding all blocks except the specific named sections is useful to create *code snippets*
-that help a user focus on the specific sections.
-The benefit of folding all blocks except some named sections is that
+The editor supports folding all blocks except specific named sections.
+This helps the user focus on those sections while
 all source code is still there, can be expanded and copied by the user.
 
-To fold all blocks, except blocks overlapping with given named sections:
+To fold all blocks except those overlapping with the given named sections:
 
 ```dart
 controller.foldOutsideSections(['section1']);
 ```
-
-This way your users can be focused on the most important lines of a snippet.
 
 ### Folding Specific Blocks
 
@@ -263,13 +260,8 @@ To get the currently folded blocks, read `controller.code.foldedBlocks`.
 
 ## Hiding Text
 
-Hiding all blocks except the specific named sections is useful to create *code snippets*
-that help a user focus on the specific code.
-
-Hiding text makes a user more focused than folding code blocks.
-
-The benefit of hiding blocks this way is that
-full text is preserved and available via `fullText` property in the Flutter Code Editor.
+The editor allows to completely hide all code except the specific named section.
+This is useful for even more focus than with folding.
 
 To hide all the code except the given named sections:
 
@@ -279,8 +271,11 @@ controller.visibleSectionNames = {'section1'};
 
 ![visibleSectionNames](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/visible-section-names.png)
 
-Hiding text preserves line numbering that's not easy to achieve by just showing a cropped snippet.
-Preserving hidden blocks is also useful if you later need to send
+When hiding text, the full text is still preserved
+and available via `fullText` property in the Flutter Code Editor.
+
+Hiding text preserves line numbering which is not possible by just showing a cropped snippet.
+Preserving hidden text is also useful if you later need to send
 the full code for further processing but still want to hide
 non-informative parts.
 
