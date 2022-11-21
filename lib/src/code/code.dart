@@ -491,7 +491,8 @@ class Code {
       issues: issues,
       lines: lines,
       namedSections: namedSections,
-      visibleHighlighted: hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
+      visibleHighlighted:
+          hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
       visibleText: hiddenRanges.cutString(text),
       visibleSectionNames: visibleSectionNames,
     );

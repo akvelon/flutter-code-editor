@@ -26,7 +26,7 @@ class SpanBuilder {
       children: _buildList(
         nodes: code.visibleHighlighted?.nodes ?? [],
         theme: theme,
-        ancestorStyle: rootStyle
+        ancestorStyle: rootStyle,
       ),
     );
   }

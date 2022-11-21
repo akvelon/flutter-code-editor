@@ -1,3 +1,7 @@
+## 0.1.10
+
+* Fixed formatting.
+
 ## 0.1.9
 
 * Read-only blocks are now pale ([Issue 103](https://github.com/akvelon/flutter-code-editor/issues/103)).
