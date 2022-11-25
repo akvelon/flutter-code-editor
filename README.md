@@ -1,16 +1,28 @@
-# flutter-code-editor
+# Flutter Code Editor
 
-A multi-platform code editor supporting
-syntax highlighting,
-code folding,
-autocompletion,
-and partial locking.
+Flutter Code Editor is a multi-platform code editor supporting:
+
+- Syntax highlighting,
+- Code blocks folding,
+- Autocompletion,
+- Read-only code blocks,
+- Hiding specific code blocks,
+- Themes,
+- And many other features.
+
+[![Pub Version](https://img.shields.io/pub/v/flutter_code_editor)](https://pub.dev/packages/flutter_code_editor)
 
 ![Basic Example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/factorial.png)
+
 
 ## Basic Usage
 
 ```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:highlight/languages/java.dart';
+
 void main() {
   runApp(const CodeEditor());
 }
@@ -43,15 +55,17 @@ class CodeEditor extends StatelessWidget {
 
 See the full runnable example [here](https://github.com/akvelon/flutter-code-editor/blob/main/example/lib/02.code_field.dart).
 
+
 ## Languages
 
-### Highlighting
+### Syntax Highlighting
 
-This package relies on the [highlight](https://pub.dev/packages/highlight) package for parsing code.
-That package supports
+Flutter Code Editor supports
 [over a hundred languages](https://github.com/git-touch/highlight.dart/tree/master/highlight/lib/languages)
-and has a pre-defined variable to refer to each one.
-To use another language:
+relying on the [highlight](https://pub.dev/packages/highlight) package for parsing code.
+
+To select a language, use a
+[corresponding variable](https://github.com/git-touch/highlight.dart/tree/master/highlight/lib/languages):
 
 ```dart
 import 'package:highlight/languages/python.dart'; // Each language is defined in its file.
@@ -68,26 +82,25 @@ Language can be dynamically changed on a controller:
 controller.language = go;
 ```
 
-### Folding
 
-Of all languages that are supported for highlighting only some are tested with code folding:
+### Code Blocks Folding 
 
+Flutter Code Editor can detect and fold code blocks. Code blocks folding is supported for the following languages:
 - Dart
 - Go
 - Java
 - Python
 - Scala
 
-This is because the folding engine relies on some additional parsing to group imports and comments.
-The engine is likely to work with some other languages but in edge cases bugs may show.
-Please [report them here](https://github.com/akvelon/flutter-code-editor/issues).
+Code blocks folding may support other languages in experimental mode.
+
 
 ## Themes
 
-### Pre-defined
+### Pre-defined Themes
 
-The themes from the [highlight](https://pub.dev/packages/flutter_highlight) package are used,
-see the full list of pre-defined themes
+Flutter Code Editor supports themes from the [highlight](https://pub.dev/packages/flutter_highlight) package,
+see the full list of the pre-defined themes
 [here](https://github.com/git-touch/highlight.dart/tree/master/flutter_highlight/lib/themes).
 
 Use `CodeTheme` widget to set the theme for underlying editors:
@@ -107,10 +120,11 @@ return MaterialApp(
 );
 ```
 
-### Custom
+### Custom Themes
 
-To use custom theme, create a map of styles under the pre-defined class names.
-See [this](https://github.com/git-touch/highlight.dart/blob/master/flutter_highlight/lib/themes/monokai-sublime.dart) for example.
+To use a custom theme, create a map of styles under the pre-defined class names.
+See [an example](https://github.com/git-touch/highlight.dart/blob/master/flutter_highlight/lib/themes/monokai-sublime.dart).
+
 
 ## Accessing the Text
 
@@ -123,10 +137,17 @@ usable as one. However, code folding and other features have impact on built-in 
 - `fullText` returns and sets the entire text including any folded blocks and hidden
   service comments (see below).
 
+
 ## Named Sections
 
-Many features rely on so-called named sections in the code.
-You define named sections with service comments like this:
+To manipulate parts of the source code, Flutter Code Editor supports *named sections*.
+They are defined in the code by adding tags that Flutter Code Editor recognizes.
+
+To define a named section in your source code, add comments to tag the start and the end of the section:
+1. Add comment `[START <section_name>]` to tag the beginning of the section.
+2. Add comment `[END <section_name>]` to tag the end of the section.
+
+Here is an example to define a named section `section1`:
 
 ```dart
 final text = '''
@@ -139,7 +160,8 @@ class MyClass {
 ''';
 ```
 
-Then pass the section parser to the controller:
+To process named sections in the Flutter Code Editor,
+pass the named section parser to the controller:
 
 ```dart
 final controller = CodeController(
@@ -149,25 +171,31 @@ final controller = CodeController(
 );
 ```
 
-This creates a section named `section1`.
+The example above creates a section named `section1`.
 The built-in `BracketsStartEndNamedSectionParser` class is designed to parse sections
 from the code comments using the above syntax.
-It also hides any single-line comment that has a section label with the above syntax,
+It also hides any single-line comment that has a section tag with the above syntax,
 although such comments are still present in the editor's hidden state
 and will be revealed when copying the text.
 
-If you need to parse sections using any other syntax, subclass `AbstractNamedSectionParser`.
+To customize section parsing using any other syntax, subclass `AbstractNamedSectionParser`.
 
-## Partial Locking
 
-This is how you make parts of the code read-only:
+## Read-Only Code Blocks
+
+Flutter Code Editor allows to define read-only code blocks.
+This may be useful for learning use cases when users are guided to modify certain code blocks
+while other code is meant to be protected from changes. 
+
+To make a named section read-only, pass a set of named sections to the `controller.readOnlySectionNames`:
 
 ```dart
 controller.readOnlySectionNames = {'section1'};
 ```
 
-This locks the given sections. Any non-existent section names in this set are ignored.
-To make the code editable again, pass an updated set.
+This locks the given sections from modifications in the Flutter Code Editor.
+Any non-existent section names in this set are ignored.
+To make the code editable again, pass an updated set to `controller.readOnlySectionNames`.
 
 When using this feature, `text` and `value` properties cannot be used to change the text
 programmatically because they have the same effect as the user input,
@@ -175,11 +203,13 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
-## Advanced Folding
 
-### First Comment
+## Advanced Code Blocks Folding
 
-Many code snippets contain license as their first comment. You can fold that:
+### Folding The First Comment/License
+
+Many code snippets contain license as their first comment, and it can distract readers.
+To fold the first comment, use:
 
 ```dart
 controller.foldCommentAtLineZero();
@@ -187,7 +217,7 @@ controller.foldCommentAtLineZero();
 
 This method has no effect if there is no comment starting at the first line.
 
-### Imports
+### Folding Imports
 
 In many languages, the editor recognizes sequential import lines
 and an optional package line as one foldable block.
@@ -199,21 +229,23 @@ controller.foldImports();
 
 ### Named Sections
 
-You can fold all blocks except those overlapping with given named sections:
+The editor supports folding all blocks except specific named sections.
+This helps the user focus on those sections while
+all source code is still there, can be expanded and copied by the user.
+
+To fold all blocks except those overlapping with the given named sections:
 
 ```dart
 controller.foldOutsideSections(['section1']);
 ```
 
-This way your users can be focused on the most important lines of a snippet.
-
 ### Folding Specific Blocks
 
-You can fold and unfold blocks at a given line number:
+To fold and unfold blocks at a given line number:
 
 ```dart
-controller.foldAt(3);
-controller.unfoldAt(3);
+controller.foldAt(1);
+controller.unfoldAt(1);
 ```
 
 If there is no block at a given line, this has no effect.
@@ -223,11 +255,15 @@ the widget displays them starting at `1`.
 
 ### Accessing Folded Blocks
 
-To get the currently folded blocks, read `controller.code.foldedBlocks`
+To get the currently folded blocks, read `controller.code.foldedBlocks`.
+
 
 ## Hiding Text
 
-You can hide all the code except a given named section:
+The editor allows to completely hide all code except the specific named section.
+This is useful for even more focus than with folding.
+
+To hide all the code except the given named sections:
 
 ```dart
 controller.visibleSectionNames = {'section1'};
@@ -235,27 +271,54 @@ controller.visibleSectionNames = {'section1'};
 
 ![visibleSectionNames](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/visible-section-names.png)
 
-This way the full text is still preserved and is available via `fullText` property.
+When hiding text, the full text is still preserved
+and available via `fullText` property in the Flutter Code Editor.
 
-This is good for giving your user even more focus than with folding.
-It preserves line numbering which you cannot achieve by just showing a cropped snippet.
-
-This is also useful if you later need to send the code for further processing but still want to hide
+Hiding text preserves line numbering which is not possible by just showing a cropped snippet.
+Preserving hidden text is also useful if you later need to send
+the full code for further processing but still want to hide
 non-informative parts.
 
-Hiding text like that also makes the entire editor read-only.
-This is because otherwise users get confused and may try fixing the syntax by adding some imports
-which will conflict with the hidden parts.
+Hiding text also makes the entire editor read-only
+to prevent users from modifying the code, adding imports, etc.
+which may conflict with the hidden parts.
 
 Only one visible section at a time is currently supported. The behavior of passing more than
 one section is undefined.
+
+
+## Autocompletion
+
+The editor suggests words as they are typed. Suggested words are:
+
+- All keywords of the current language.
+- All words already in the text.
+- Words set with `controller.autocompleter.setCustomWords(['word1', 'word2'])`
+
+All those words are merged into an unstructured dictionary.
+The editor performs no syntax analysis and so cannot tell if a given class really has
+the method the user is typing. This feature is meant to simplify typing but not to be relied on
+when exploring classes and methods.
+
+Autocompletion currently cannot be disabled.
+
 
 ## Migration Guides
 
 - [Migrating from code_text_field to 0.1](https://github.com/akvelon/flutter-code-editor/blob/main/doc/migrating/0.1.md)
 
+
+## Contact Us
+
+* [Get in touch with us](https://akvelon.com/contact-us/).
+* [Request a custom feature](https://akvelon.com/contact-us/).
+* [Request custom Flutter, Web, Mobile application development](https://akvelon.com/contact-us/).
+* [Share about your use case for the Flutter Code Editor](https://akvelon.com/contact-us/).
+* [Report an issue](https://github.com/akvelon/flutter-code-editor/issues).
+
+
 ## Contribution Guide
 
-We appreciate your help and PRs.
-If you have an idea, please file an issue
-[here](https://github.com/akvelon/flutter-code-editor/issues). And we will get in touch.
+To get involved with Flutter Code Editor, submit your contribution as a PR,
+[contact us](https://akvelon.com/contact-us/) with a feature request or question,
+or [report an issue](https://github.com/akvelon/flutter-code-editor/issues).
