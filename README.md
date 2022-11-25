@@ -144,8 +144,8 @@ To manipulate parts of the source code, Flutter Code Editor supports *named sect
 They are defined in the code by adding tags that Flutter Code Editor recognizes.
 
 To define a named section in your source code, add comments to tag the start and the end of the section:
-1. Add comment `[START <section_name>]` to tag the beginning of the section.
-2. Add comment `[END <section_name>]` to tag the end of the section.
+1. Add comment `[START section_name]` to tag the beginning of the section.
+2. Add comment `[END section_name]` to tag the end of the section.
 
 Here is an example to define a named section `section1`:
 
@@ -263,7 +263,7 @@ To get the currently folded blocks, read `controller.code.foldedBlocks`.
 The editor allows to completely hide all code except the specific named section.
 This is useful for even more focus than with folding.
 
-To hide all the code except the given named sections:
+To hide all the code except the given named section:
 
 ```dart
 controller.visibleSectionNames = {'section1'};
