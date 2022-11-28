@@ -103,7 +103,7 @@ int c;
 
       testWidgets('Cursor before', (WidgetTester wt) async {
         final controller = await pumpController(wt, TwoMethodsSnippet.full);
-        final textBefore = controller.rawText;
+        final textBefore = controller.text;
         await wt.selectFromHome(1, offset: 1);
 
         controller.foldAt(1);
