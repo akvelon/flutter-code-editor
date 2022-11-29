@@ -1,3 +1,7 @@
+## 0.1.12
+
+* Reformatted the license, updated README.
+
 ## 0.1.11
 
 * Updated README.

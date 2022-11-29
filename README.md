@@ -1,5 +1,8 @@
 # Flutter Code Editor
 
+[![Pub Version](https://img.shields.io/pub/v/flutter_code_editor)](https://pub.dev/packages/flutter_code_editor)
+[![CodeFactor](https://img.shields.io/codefactor/grade/github/akvelon/flutter-code-editor?style=flat-square)](https://www.codefactor.io/repository/github/akvelon/flutter-code-editor)
+
 Flutter Code Editor is a multi-platform code editor supporting:
 
 - Syntax highlighting,
@@ -9,9 +12,6 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Hiding specific code blocks,
 - Themes,
 - And many other features.
-
-[![Pub Version](https://img.shields.io/pub/v/flutter_code_editor)](https://pub.dev/packages/flutter_code_editor)
-[![CodeFactor](https://img.shields.io/codefactor/grade/github/akvelon/flutter-code-editor?style=flat-square)](https://www.codefactor.io/repository/github/akvelon/flutter-code-editor)
 
 ![Basic Example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/factorial.png)
 
