@@ -5,8 +5,9 @@ import '../foldable_block.dart';
 import 'abstract.dart';
 import 'highlight.dart';
 import 'indent.dart';
+import 'python_fallback.dart';
 
-///A parser for foldable blocks for python
+/// A parser for foldable blocks for Python.
 class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
   @override
   void parse({
@@ -14,8 +15,12 @@ class PythonFoldableBlockParser extends AbstractFoldableBlockParser {
     required Set<Object?> serviceCommentsSources,
     required CodeLines lines,
   }) {
+    final textParser = highlighted.language == null
+        ? PythonFallbackFoldableBlockParser()
+        : HighlightFoldableBlockParser();
+
     final highlightBlocks = _getBlocksFromParser(
-      HighlightFoldableBlockParser(),
+      textParser,
       highlighted,
       serviceCommentsSources,
       lines,

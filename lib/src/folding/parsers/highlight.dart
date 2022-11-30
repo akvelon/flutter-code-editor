@@ -7,31 +7,10 @@ import '../../highlight/keyword_semantics.dart';
 import '../../highlight/node.dart';
 import '../../highlight/node_classes.dart';
 import '../foldable_block_type.dart';
-import 'abstract.dart';
-import 'line_semantics.dart';
+import 'text.dart';
 
 /// A parser for foldable blocks from highlight's [Result].
-class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
-  int _lineIndex = 0;
-
-  /// If in the current line we found any keyword with import semantics.
-  bool _foundImport = false;
-
-  /// If in the current line we found any keyword that may or may not
-  /// have import semantics depending on the context.
-  bool _foundPossibleImport = false;
-
-  /// If in the current line we found anything that terminates
-  /// an import sequence.
-  bool _foundImportTerminator = false;
-
-  /// If in the current line we found a single-line comment.
-  bool _foundSingleLineComment = false;
-
-  /// If in the current line we found a non-whitespace character that is
-  /// not a comment.
-  bool _foundNonWhitespace = false;
-
+class HighlightFoldableBlockParser extends TextFoldableBlockParser {
   @override
   void parse({
     required Result highlighted,
@@ -42,7 +21,7 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
       _processNodes(highlighted.nodes!, serviceCommentsSources);
     }
 
-    _submitLine(); // In case the last one did not end with '\n'.
+    submitCurrentLine(); // In case the last one did not end with '\n'.
     finalize();
   }
 
@@ -71,29 +50,29 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
     }
   }
 
-  void _processComment(Node node, Set<Object?> serviceComments) {
+  void _processComment(Node node, Set<Object?> serviceCommentsSources) {
     final newlineCount = node.getNewlineCount();
 
-    if (_foundNonWhitespace) {
+    if (foundNonWhitespace) {
       return;
     }
 
-    if (serviceComments.contains(node)) {
+    if (serviceCommentsSources.contains(node)) {
       return;
     }
 
     if (newlineCount == 0) {
-      _foundSingleLineComment = true;
+      setFoundSingleLineComment();
       return;
     }
 
-    _foundImportTerminator = true;
-    _submitLine();
+    setFoundImportTerminator();
+    submitCurrentLine();
 
-    startBlock(_lineIndex, FoldableBlockType.multilineComment);
+    startBlock(lineIndex, FoldableBlockType.multilineComment);
 
-    _lineIndex += newlineCount;
-    endBlock(_lineIndex, FoldableBlockType.multilineComment);
+    addToLineIndex(newlineCount);
+    endBlock(lineIndex, FoldableBlockType.multilineComment);
   }
 
   void _processKeyword(Node node) {
@@ -106,13 +85,13 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
 
     switch (semantics) {
       case KeywordSemantics.import:
-        _foundImport = true;
+        setFoundImport();
         break;
       case KeywordSemantics.possibleImport:
-        _foundPossibleImport = true;
+        setFoundPossibleImport();
         break;
       case null:
-        _foundImportTerminator = true;
+        setFoundImportTerminator();
         break;
     }
   }
@@ -120,14 +99,14 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
   void _processString(Node node) {
     final newlineCount = node.getNewlineCount();
 
-    _foundNonWhitespace = true;
+    setFoundNonWhitespace();
     if (newlineCount > 0) {
-      _foundImportTerminator = true;
-      _submitLine();
-      _clearLineFlags();
+      setFoundImportTerminator();
+      submitCurrentLine();
+      clearLineFlags();
     }
 
-    _lineIndex += newlineCount;
+    addToLineIndex(newlineCount);
   }
 
   void _processDefault(Node node, Set<Object?> serviceCommentsSources) {
@@ -153,88 +132,40 @@ class HighlightFoldableBlockParser extends AbstractFoldableBlockParser {
         case $lf:
           break;
         default:
-          _foundNonWhitespace = true;
+          setFoundNonWhitespace();
       }
 
       switch (code) {
         case $lf: // Newline
-          _submitLine();
-          _clearLineFlags();
-          _lineIndex++;
+          submitCurrentLine();
+          clearLineFlags();
+          addToLineIndex(1);
           break;
 
         case $openParenthesis: // (
-          startBlock(_lineIndex, FoldableBlockType.parentheses);
+          startBlock(lineIndex, FoldableBlockType.parentheses);
           break;
 
         case $closeParenthesis: // )
-          endBlock(_lineIndex, FoldableBlockType.parentheses);
+          endBlock(lineIndex, FoldableBlockType.parentheses);
           break;
 
         case $openBracket: // [
-          startBlock(_lineIndex, FoldableBlockType.brackets);
+          startBlock(lineIndex, FoldableBlockType.brackets);
           break;
 
         case $closeBracket: // ]
-          endBlock(_lineIndex, FoldableBlockType.brackets);
+          endBlock(lineIndex, FoldableBlockType.brackets);
           break;
 
         case $openBrace: // {
-          startBlock(_lineIndex, FoldableBlockType.braces);
+          startBlock(lineIndex, FoldableBlockType.braces);
           break;
 
         case $closeBrace: // }
-          endBlock(_lineIndex, FoldableBlockType.braces);
+          endBlock(lineIndex, FoldableBlockType.braces);
           break;
       }
     }
-  }
-
-  void _submitLine() {
-    if (_foundImport) {
-      _endCommentSequence();
-      _submitLineSemantics(LineSemantics.import);
-      return;
-    }
-
-    if (_foundImportTerminator) {
-      _endCommentSequence();
-      endImportSequenceIfAny(_lineIndex);
-      _submitLineSemantics(LineSemantics.singleLineCommentAndImportTerminator);
-      return;
-    }
-
-    if (_foundPossibleImport) {
-      _endCommentSequence();
-      _submitLineSemantics(LineSemantics.possibleImport);
-      return;
-    }
-
-    if (_foundSingleLineComment) {
-      _submitLineSemantics(LineSemantics.singleLineComment);
-      return;
-    }
-
-    if (_foundNonWhitespace) {
-      _endCommentSequence();
-      _submitLineSemantics(LineSemantics.singleLineCommentTerminator);
-      return;
-    }
-
-    _submitLineSemantics(LineSemantics.blank);
-  }
-
-  void _clearLineFlags() {
-    _foundImport = false;
-    _foundPossibleImport = false;
-    _foundImportTerminator = false;
-    _foundSingleLineComment = false;
-    _foundNonWhitespace = false;
-  }
-
-  void _endCommentSequence() => endCommentSequenceIfAny(_lineIndex);
-
-  void _submitLineSemantics(LineSemantics semantics) {
-    submitLine(_lineIndex, semantics);
   }
 }
