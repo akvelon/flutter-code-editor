@@ -8,6 +8,7 @@ import '../../code/code_lines.dart';
 import '../foldable_block_type.dart';
 import 'text.dart';
 
+/// A parser for foldable blocks from raw text.
 class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   final List<String> singleLineCommentSequences;
   final List<String> importPrefixes;
