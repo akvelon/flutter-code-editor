@@ -102,7 +102,7 @@ class CodeController extends TextEditingController {
     this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const [
-      IntentModifier(),
+      IndentModifier(),
       CloseBlockModifier(),
       TabModifier(),
     ],
@@ -304,12 +304,6 @@ class CodeController extends TextEditingController {
       // as you change the visible text.
       //print('\n\n${_code.text}');
     }
-
-    //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
-    // Now fix the textfield for web
-    // if (_webSpaceFix) {
-    //   newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
-    // }
 
     historyController.beforeChanged(_code, newValue.selection);
     super.value = newValue;

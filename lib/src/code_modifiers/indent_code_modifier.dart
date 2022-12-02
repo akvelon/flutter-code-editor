@@ -5,10 +5,10 @@ import 'package:flutter/widgets.dart';
 import '../code_field/editor_params.dart';
 import 'code_modifier.dart';
 
-class IntentModifier extends CodeModifier {
+class IndentModifier extends CodeModifier {
   final bool handleBrackets;
 
-  const IntentModifier({
+  const IndentModifier({
     this.handleBrackets = true,
   }) : super('\n');
 

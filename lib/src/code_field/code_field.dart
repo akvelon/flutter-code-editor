@@ -133,6 +133,7 @@ class CodeField extends StatefulWidget {
   @override
   State<CodeField> createState() => _CodeFieldState();
 }
+
 class _CodeFieldState extends State<CodeField> {
   // Add a controller
   LinkedScrollControllerGroup? _controllers;
@@ -226,7 +227,7 @@ class _CodeFieldState extends State<CodeField> {
     rebuild();
   }
 
-// Wrap the codeField in a horizontal scrollView
+  // Wrap the codeField in a horizontal scrollView
   Widget _wrapInScrollView(
     Widget codeField,
     TextStyle textStyle,
