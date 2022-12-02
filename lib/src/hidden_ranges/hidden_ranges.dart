@@ -125,7 +125,7 @@ class HiddenRanges {
 
     int fullChar = 0;
 
-    String? _cutString(String? nodeValue) {
+    String? cutHighlightedString(String? nodeValue) {
       if (nodeValue == null) {
         return null;
       }
@@ -135,10 +135,10 @@ class HiddenRanges {
       return result;
     }
 
-    Node _cutHighlightedNode(Node node) {
-      final value = _cutString(node.value);
+    Node cutHighlightedNode(Node node) {
+      final value = cutHighlightedString(node.value);
       final children =
-          node.children?.map(_cutHighlightedNode).toList(growable: false);
+          node.children?.map(cutHighlightedNode).toList(growable: false);
 
       return Node(
         className: node.className,
@@ -149,7 +149,7 @@ class HiddenRanges {
     }
 
     final nodes =
-        highlighted.nodes?.map(_cutHighlightedNode).toList(growable: false) ??
+        highlighted.nodes?.map(cutHighlightedNode).toList(growable: false) ??
             const <Node>[];
 
     return Result(

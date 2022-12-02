@@ -1,3 +1,7 @@
+## 0.1.14
+
+* Python fallback parser preserves foldable blocks if `highlight` fails ([Issue 49](https://github.com/akvelon/flutter-code-editor/issues/49)).
+
 ## 0.1.13
 
 * Remove an accidentally published temp file.

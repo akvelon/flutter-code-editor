@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/widgets.dart';
 
 import '../code/code.dart';
 import '../code_field/code_controller.dart';
