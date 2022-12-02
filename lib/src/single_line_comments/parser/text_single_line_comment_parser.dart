@@ -32,7 +32,7 @@ class TextSingleLineCommentParser extends AbstractSingleLineCommentParser {
             lineIndex: lineIndex,
             characterIndex: characterIndex + column,
             sequences: singleLineCommentSequences,
-            source: line,
+            source: lineIndex,
           ),
         );
       }
