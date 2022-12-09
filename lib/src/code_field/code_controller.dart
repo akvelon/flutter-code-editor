@@ -1,9 +1,6 @@
 // ignore_for_file: parameter_assignments
 
-import 'dart:math';
-
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
@@ -28,8 +25,6 @@ import 'actions/undo.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
-const _middleDot = '·';
-
 class CodeController extends TextEditingController {
   Mode? _language;
 
@@ -42,7 +37,7 @@ class CodeController extends TextEditingController {
     }
 
     if (language != null) {
-      _languageId = _genId();
+      _languageId = language.hashCode.toString();
       highlight.registerLanguage(_languageId, language);
     }
 
@@ -53,22 +48,6 @@ class CodeController extends TextEditingController {
 
   final AbstractNamedSectionParser? namedSectionParser;
   Set<String> _readOnlySectionNames;
-
-  Map<String, TextStyle>? _theme;
-
-  /// The theme to apply to the [language] parsing result
-  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-  Map<String, TextStyle>? get theme => _theme;
-
-  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-  set theme(Map<String, TextStyle>? theme) {
-    if (theme == _theme) {
-      return;
-    }
-
-    _theme = theme;
-    notifyListeners();
-  }
 
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
@@ -86,16 +65,8 @@ class CodeController extends TextEditingController {
 
   final bool _isTabReplacementEnabled;
 
-  /// On web, replace spaces with invisible dots “·” to fix the current issue with spaces
-  ///
-  /// https://github.com/flutter/flutter/issues/77929
-  final bool webSpaceFix;
-
-  /// onChange callback, called whenever the content is changed
-  final void Function(String)? onChange;
-
   /* Computed members */
-  String _languageId = _genId();
+  String _languageId = '';
 
   ///Contains names of named sections, those will be visible for user.
   ///If it is not empty, all another code except specified will be hidden.
@@ -105,10 +76,10 @@ class CodeController extends TextEditingController {
 
   Code _code;
 
-  final styleList = <TextStyle>[];
-  final modifierMap = <String, CodeModifier>{};
+  final _styleList = <TextStyle>[];
+  final _modifierMap = <String, CodeModifier>{};
   bool isPopupShown = false;
-  RegExp? styleRegExp;
+  RegExp? _styleRegExp;
   late PopupController popupController;
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
@@ -131,14 +102,11 @@ class CodeController extends TextEditingController {
     this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const [
-      IntendModifier(),
+      IndentModifier(),
       CloseBlockModifier(),
       TabModifier(),
     ],
-    this.webSpaceFix = true,
-    this.onChange,
-  })  : _theme = theme,
-        _readOnlySectionNames = readOnlySectionNames,
+  })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
@@ -148,8 +116,20 @@ class CodeController extends TextEditingController {
 
     // Create modifier map
     for (final el in modifiers) {
-      modifierMap[el.char] = el;
+      _modifierMap[el.char] = el;
     }
+
+    // Build styleRegExp
+    final patternList = <String>[];
+    if (stringMap != null) {
+      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
+      _styleList.addAll(stringMap!.values);
+    }
+    if (patternMap != null) {
+      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
+      _styleList.addAll(patternMap!.values);
+    }
+    _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
@@ -242,7 +222,7 @@ class CodeController extends TextEditingController {
   /// Inserts the word selected from the list of completions
   void insertSelectedWord() {
     final previousSelection = selection;
-    String selectedWord = popupController.getSelectedWord();
+    final selectedWord = popupController.getSelectedWord();
     final startPosition = value.wordAtCursorStart;
 
     if (startPosition != null) {
@@ -261,41 +241,11 @@ class CodeController extends TextEditingController {
     popupController.hide();
   }
 
-  /// See webSpaceFix
-  static String _middleDotsToSpaces(String str) {
-    return str.replaceAll(_middleDot, ' ');
-  }
-
-  /// Get untransformed text
-  /// See webSpaceFix
-  String get rawText {
-    if (!_webSpaceFix) {
-      return super.text;
-    }
-
-    return _middleDotsToSpaces(super.text);
-  }
-
   String get fullText => _code.text;
 
   set fullText(String fullText) {
     _updateCodeIfChanged(_replaceTabsWithSpacesIfNeeded(fullText));
     super.value = TextEditingValue(text: _code.visibleText);
-  }
-
-  // Private methods
-  bool get _webSpaceFix => kIsWeb && webSpaceFix;
-
-  static String _genId() {
-    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
-    final rnd = Random();
-
-    return String.fromCharCodes(
-      Iterable.generate(
-        10,
-        (_) => chars.codeUnitAt(rnd.nextInt(chars.length)),
-      ),
-    );
   }
 
   int? _insertedLoc(String a, String b) {
@@ -322,8 +272,8 @@ class CodeController extends TextEditingController {
 
       if (loc != null) {
         final char = newValue.text[loc];
-        final modifier = modifierMap[char];
-        final val = modifier?.updateString(rawText, selection, params);
+        final modifier = _modifierMap[char];
+        final val = modifier?.updateString(text, selection, params);
 
         if (val != null) {
           // Update newValue
@@ -354,16 +304,6 @@ class CodeController extends TextEditingController {
       // as you change the visible text.
       //print('\n\n${_code.text}');
     }
-
-    //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
-    // Now fix the textfield for web
-    // if (_webSpaceFix) {
-    //   newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
-    // }
-
-    onChange?.call(
-      _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text,
-    );
 
     historyController.beforeChanged(_code, newValue.selection);
     super.value = newValue;
@@ -409,12 +349,10 @@ class CodeController extends TextEditingController {
   }
 
   Code _createCode(String text) {
-    final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
-
     return Code(
-      text: rawText,
+      text: text,
       language: language,
-      highlighted: highlight.parse(rawText, language: _languageId),
+      highlighted: highlight.parse(text, language: _languageId),
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
       visibleSectionNames: _visibleSectionNames,
@@ -533,26 +471,6 @@ class CodeController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
-    // Retrieve pattern regexp
-    final patternList = <String>[];
-
-    if (_webSpaceFix) {
-      patternList.add('($_middleDot)');
-      styleList.add(const TextStyle(color: Colors.transparent));
-    }
-
-    if (stringMap != null) {
-      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
-      styleList.addAll(stringMap!.values);
-    }
-
-    if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
-      styleList.addAll(patternMap!.values);
-    }
-
-    styleRegExp = RegExp(patternList.join('|'), multiLine: true);
-
     // Return parsing
     if (_language != null) {
       return SpanBuilder(
@@ -562,7 +480,7 @@ class CodeController extends TextEditingController {
       ).build();
     }
 
-    if (styleRegExp != null) {
+    if (_styleRegExp != null) {
       return _processPatterns(text, style);
     }
 
@@ -573,22 +491,22 @@ class CodeController extends TextEditingController {
     final children = <TextSpan>[];
 
     text.splitMapJoin(
-      styleRegExp!,
+      _styleRegExp!,
       onMatch: (Match m) {
-        if (styleList.isEmpty) {
+        if (_styleList.isEmpty) {
           return '';
         }
 
         int idx;
         for (idx = 1;
             idx < m.groupCount &&
-                idx <= styleList.length &&
+                idx <= _styleList.length &&
                 m.group(idx) == null;
             idx++) {}
 
         children.add(TextSpan(
           text: m[0],
-          style: styleList[idx - 1],
+          style: _styleList[idx - 1],
         ));
         return '';
       },
@@ -602,6 +520,6 @@ class CodeController extends TextEditingController {
   }
 
   CodeThemeData _getTheme(BuildContext context) {
-    return CodeTheme.of(context) ?? CodeThemeData(styles: _theme ?? {});
+    return CodeTheme.of(context) ?? CodeThemeData();
   }
 }

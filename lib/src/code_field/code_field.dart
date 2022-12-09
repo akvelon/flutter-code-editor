@@ -109,7 +109,7 @@ class CodeField extends StatefulWidget {
   final bool lineNumbers;
 
   const CodeField({
-    Key? key,
+    super.key,
     required this.controller,
     this.minLines,
     this.maxLines,
@@ -128,14 +128,13 @@ class CodeField extends StatefulWidget {
     this.focusNode,
     this.onChanged,
     this.lineNumbers = true,
-  }) : super(key: key);
+  });
 
   @override
-  CodeFieldState createState() => CodeFieldState();
+  State<CodeField> createState() => _CodeFieldState();
 }
 
-// TODO: Make private in next breaking release.
-class CodeFieldState extends State<CodeField> {
+class _CodeFieldState extends State<CodeField> {
   // Add a controller
   LinkedScrollControllerGroup? _controllers;
   ScrollController? _numberScroll;
@@ -228,7 +227,7 @@ class CodeFieldState extends State<CodeField> {
     rebuild();
   }
 
-// Wrap the codeField in a horizontal scrollView
+  // Wrap the codeField in a horizontal scrollView
   Widget _wrapInScrollView(
     Widget codeField,
     TextStyle textStyle,
