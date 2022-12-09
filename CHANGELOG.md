@@ -1,3 +1,14 @@
+## 0.2.0
+
+* **BREAKING:** Removed theme from `CodeController`. Use `CodeTheme` widget instead.
+* **BREAKING:** Removed `webSpaceFix`, https://github.com/flutter/flutter/issues/77929
+* **BREAKING:** Fixed typo `IntendModifier` → `IndentModifier`.
+* **BREAKING:** `CodeFieldState` is now private.
+
+## 0.1.15
+
+* Add a missing code file.
+
 ## 0.1.14
 
 * Python fallback parser preserves foldable blocks if `highlight` fails ([Issue 49](https://github.com/akvelon/flutter-code-editor/issues/49)).
