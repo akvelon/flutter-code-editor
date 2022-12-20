@@ -307,6 +307,7 @@ Autocompletion currently cannot be disabled.
 ## Migration Guides
 
 - [Migrating from code_text_field to 0.1](https://github.com/akvelon/flutter-code-editor/blob/main/doc/migrating/0.1.md)
+- [Migrating from 0.1 to 0.2](https://github.com/akvelon/flutter-code-editor/blob/main/doc/migrating/0.2.md)
 
 
 ## Contact Us

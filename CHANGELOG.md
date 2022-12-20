@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Added the migration guide for 0.2 to README.
+
 ## 0.2.0
 
 * **BREAKING:** Removed theme from `CodeController`. Use `CodeTheme` widget instead.
@@ -7,7 +11,7 @@
 
 ## 0.1.15
 
-* Add a missing code file.
+* Added a missing code file.
 
 ## 0.1.14
 
