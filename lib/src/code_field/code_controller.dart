@@ -84,6 +84,13 @@ class CodeController extends TextEditingController {
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
 
+  /// The last [TextSpan] returned from [buildTextSpan].
+  ///
+  /// This can be used in tests to make sure that the updated text  was actually
+  /// requested by the widget and thus notifications are done right.
+  @visibleForTesting
+  TextSpan? lastTextSpan;
+
   late final actions = <Type, Action<Intent>>{
     CopySelectionTextIntent: CopyAction(controller: this),
     RedoTextIntent: RedoAction(controller: this),
@@ -470,6 +477,14 @@ class CodeController extends TextEditingController {
     required BuildContext context,
     TextStyle? style,
     bool? withComposing,
+  }) {
+    // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
+    return lastTextSpan = _createTextSpan(context: context, style: style);
+  }
+
+  TextSpan _createTextSpan({
+    required BuildContext context,
+    TextStyle? style,
   }) {
     // Return parsing
     if (_language != null) {

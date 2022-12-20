@@ -1,3 +1,8 @@
+## 0.2.2
+
+* Added `CodeController.lastTextSpan` field (visible for testing) to return the last `TextSpan`
+produced by `buildTextSpan()`.
+
 ## 0.2.1
 
 * Added the migration guide for 0.2 to README.
