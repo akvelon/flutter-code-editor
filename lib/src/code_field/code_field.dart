@@ -162,9 +162,7 @@ class _CodeFieldState extends State<CodeField> {
     _codeScroll = _controllers?.addAndGet();
 
     widget.controller.addListener(_onTextChanged);
-    widget.controller.addListener(() {
-      _updatePopupOffset(widget.controller.text);
-    });
+    widget.controller.addListener(_updatePopupOffset);
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
@@ -184,9 +182,7 @@ class _CodeFieldState extends State<CodeField> {
   @override
   void dispose() {
     widget.controller.removeListener(_onTextChanged);
-    widget.controller.removeListener(() {
-      _updatePopupOffset(widget.controller.text);
-    });
+    widget.controller.removeListener(_updatePopupOffset);
     _numberScroll?.dispose();
     _codeScroll?.dispose();
     _horizontalCodeScroll?.dispose();
@@ -381,8 +377,8 @@ class _CodeFieldState extends State<CodeField> {
     );
   }
 
-  void _updatePopupOffset(String text) {
-    final TextPainter textPainter = _getTextPainter(text);
+  void _updatePopupOffset() {
+    final TextPainter textPainter = _getTextPainter(widget.controller.text);
     final caretHeight = _getCaretHeight(textPainter);
 
     final double leftOffset = _getPopupLeftOffset(textPainter);

@@ -1,3 +1,7 @@
+## 0.2.3
+
+* Fixed removing listeners in `_CodeFieldState.dispose()`.
+
 ## 0.2.2
 
 * Added `CodeController.lastTextSpan` field (visible for testing) to return the last `TextSpan`
