@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 
-import '../common/snippets.dart';
 import '../common/themes.dart';
 import 'constants/constants.dart';
 import 'widgets/dropdown_selector.dart';
@@ -15,11 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _language = languageList[0];
   String _theme = themeList[0];
 
-  late CodeController _codeController = CodeController(
-    language: builtinLanguages[_language],
-    namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    text: javaFactorialSnippet,
-  );
+  late CodeController _codeController = codeControllers[_language]!;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.code,
               value: _language,
               values: languageList),
+          const SizedBox(
+            width: 20,
+          ),
           DropdownSelector(
               onChanged: _setTheme,
               icon: Icons.color_lens,
@@ -59,12 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _setLanguage(String value) {
     setState(() {
       _language = value;
-
-      _codeController = CodeController(
-        text: _codeController.text,
-        language: builtinLanguages[value],
-        namedSectionParser: const BracketsStartEndNamedSectionParser(),
-      );
+      _codeController = codeControllers[_language]!;
     });
   }
 
