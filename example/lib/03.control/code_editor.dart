@@ -4,8 +4,7 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 import '../common/snippets.dart';
 import '../common/themes.dart';
 import 'constants/constants.dart';
-import 'widgets/code_box.dart';
-import 'widgets/code_editor_appbar.dart';
+import 'widgets/dropdown_selector.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -16,10 +15,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String _language = languageList[0];
   String _theme = themeList[0];
 
-  late final _codeController = CodeController(
+  late CodeController _codeController = CodeController(
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    //readOnlySectionNames: {'section1', 'nonexistent'},
     text: javaFactorialSnippet,
   );
 
@@ -27,22 +25,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Code Editor by Akvelon"),
+        title: const Text('Code Editor by Akvelon'),
         actions: [
-          LanguageDropdown(),
-          ThemeDropdown(),
+          DropdownSelector(
+              onChanged: _setLanguage,
+              icon: Icons.code,
+              value: _language,
+              values: languageList),
+          DropdownSelector(
+              onChanged: _setTheme,
+              icon: Icons.color_lens,
+              value: _theme,
+              values: themeList),
         ],
       ),
-      // appBar: CodeEditorAppbar(
-      //   //height: MediaQuery.of(context).size.height / 13,
-      //   languages: languageList,
-      //   onLanguageChanged: _setLanguage,
-      //   themes: themeList,
-      //   onThemeChanged: _setTheme,
-      //   selectedLanguage: _language,
-      //   selectedTheme: _theme,
-      //   onReset: _onReset,
-      // ),
       body: SingleChildScrollView(
         child: CodeTheme(
           data: CodeThemeData(styles: themes[_theme]),
@@ -63,20 +59,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void _setLanguage(String value) {
     setState(() {
       _language = value;
-      _codeController.language = builtinLanguages[value];
+
+      _codeController = CodeController(
+        text: _codeController.text,
+        language: builtinLanguages[value],
+        namedSectionParser: const BracketsStartEndNamedSectionParser(),
+      );
     });
   }
 
   void _setTheme(String value) {
     setState(() {
       _theme = value;
-    });
-  }
-
-  void _onReset() {
-    setState(() {
-      _setLanguage(languageList[0]);
-      _theme = themeList[0];
     });
   }
 }
