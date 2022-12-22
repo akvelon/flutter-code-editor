@@ -19,10 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: CodeEditor(
-        language: languageList[0],
-        theme: themeList[0],
-      ),
+      home: HomeScreen(),
     );
   }
 }

@@ -1,72 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 
+import '../common/snippets.dart';
+import '../common/themes.dart';
 import 'constants/constants.dart';
 import 'widgets/code_box.dart';
 import 'widgets/code_editor_appbar.dart';
 
-class CodeEditor extends StatefulWidget {
-  final String language;
-  final String theme;
-
-  const CodeEditor({
-    required this.language,
-    required this.theme,
-  });
-
+class HomeScreen extends StatefulWidget {
   @override
-  State<CodeEditor> createState() => _CodeEditorState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _CodeEditorState extends State<CodeEditor> {
-  String language = languageList[0];
-  String theme = themeList[0];
+class _HomeScreenState extends State<HomeScreen> {
+  String _language = languageList[0];
+  String _theme = themeList[0];
 
-  @override
-  void initState() {
-    language = widget.language;
-    theme = widget.theme;
-
-    super.initState();
-  }
+  late final _codeController = CodeController(
+    language: builtinLanguages[_language],
+    namedSectionParser: const BracketsStartEndNamedSectionParser(),
+    //readOnlySectionNames: {'section1', 'nonexistent'},
+    text: javaFactorialSnippet,
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CodeEditorAppbar(
-        height: MediaQuery.of(context).size.height / 13,
-        languages: languageList,
-        onLanguageChanged: _onLanguageChanged,
-        themes: themeList,
-        onThemeChanged: _onThemeChanged,
-        selectedLanguage: language,
-        selectedTheme: theme,
-        onReset: _onReset,
+      appBar: AppBar(
+        title: const Text("Code Editor by Akvelon"),
+        actions: [
+          LanguageDropdown(),
+          ThemeDropdown(),
+        ],
       ),
+      // appBar: CodeEditorAppbar(
+      //   //height: MediaQuery.of(context).size.height / 13,
+      //   languages: languageList,
+      //   onLanguageChanged: _setLanguage,
+      //   themes: themeList,
+      //   onThemeChanged: _setTheme,
+      //   selectedLanguage: _language,
+      //   selectedTheme: _theme,
+      //   onReset: _onReset,
+      // ),
       body: SingleChildScrollView(
-        child: CodeBox(
-          language: language,
-          theme: theme,
+        child: CodeTheme(
+          data: CodeThemeData(styles: themes[_theme]),
+          child: CodeField(
+            controller: _codeController,
+            textStyle: const TextStyle(fontFamily: 'SourceCode'),
+            lineNumberStyle: const LineNumberStyle(
+              textStyle: TextStyle(
+                color: Colors.purple,
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  void _onLanguageChanged(String? value) {
+  void _setLanguage(String value) {
     setState(() {
-      language = value ?? language;
+      _language = value;
+      _codeController.language = builtinLanguages[value];
     });
   }
 
-  void _onThemeChanged(String? value) {
+  void _setTheme(String value) {
     setState(() {
-      theme = value ?? theme;
+      _theme = value;
     });
   }
 
   void _onReset() {
     setState(() {
-      language = languageList[0];
-      theme = themeList[0];
+      _setLanguage(languageList[0]);
+      _theme = themeList[0];
     });
   }
 }
