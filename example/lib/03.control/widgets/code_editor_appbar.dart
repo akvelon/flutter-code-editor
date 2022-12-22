@@ -4,28 +4,23 @@ import 'dropdown_selector.dart';
 
 class CodeEditorAppbar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
-  final List<String?> languages;
-  final List<String?> themes;
-  final String? title;
-  final Function(String?)? onLanguageChanged;
-  final Function(String?)? onThemeChanged;
-
+  final List<String> languages;
+  final ValueChanged<String> onLanguageChanged;
+  final VoidCallback? onReset;
+  final ValueChanged<String> onThemeChanged;
   final String selectedLanguage;
   final String selectedTheme;
-  
-  final VoidCallback? onReset;
+  final List<String> themes;
 
   const CodeEditorAppbar({
-    super.key,
     required this.height,
     required this.languages,
-    required this.themes,
+    required this.onLanguageChanged,
+    this.onReset,
+    required this.onThemeChanged,
     required this.selectedLanguage,
     required this.selectedTheme,
-    this.title,
-    this.onLanguageChanged,
-    this.onThemeChanged,
-    this.onReset,
+    required this.themes,
   });
 
   @override
@@ -36,23 +31,23 @@ class CodeEditorAppbar extends StatelessWidget implements PreferredSizeWidget {
       child: Row(
         children: [
           const Spacer(flex: 2),
-          Text(
-            title ?? 'Code Editor by Akvelon',
-            style: const TextStyle(fontSize: 28, color: Colors.white),
+          const Text(
+            'Code Editor by Akvelon',
+            style: TextStyle(fontSize: 28, color: Colors.white),
           ),
           const Spacer(flex: 35),
           DropdownSelector(
-            choices: languages,
-            value: selectedLanguage,
             icon: Icons.code,
             onChanged: onLanguageChanged,
+            value: selectedLanguage,
+            values: languages,
           ),
           const Spacer(),
           DropdownSelector(
-            choices: themes,
-            value: selectedTheme,
             icon: Icons.color_lens,
             onChanged: onThemeChanged,
+            value: selectedTheme,
+            values: themes,
           ),
           const Spacer(),
           TextButton.icon(

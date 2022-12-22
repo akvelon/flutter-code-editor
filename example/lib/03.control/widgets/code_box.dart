@@ -8,13 +8,10 @@ import '../constants/constants.dart';
 class CodeBox extends StatefulWidget {
   final String language;
   final String theme;
-  final bool shouldContainInitialText;
 
   const CodeBox({
-    super.key,
     required this.language,
     required this.theme,
-    required this.shouldContainInitialText,
   });
 
   @override
@@ -29,9 +26,9 @@ class _CodeBoxState extends State<CodeBox> {
     super.initState();
     _codeController = CodeController(
       language: builtinLanguages[widget.language],
-      text: widget.shouldContainInitialText ? javaFactorialSnippet : null,
       namedSectionParser: const BracketsStartEndNamedSectionParser(),
       readOnlySectionNames: {'section1', 'nonexistent'},
+      text: javaFactorialSnippet,
     );
   }
 
@@ -41,9 +38,9 @@ class _CodeBoxState extends State<CodeBox> {
     setState(() {
       _codeController = CodeController(
         language: builtinLanguages[widget.language],
-        text: widget.shouldContainInitialText ? javaFactorialSnippet : null,
         namedSectionParser: const BracketsStartEndNamedSectionParser(),
         readOnlySectionNames: {'section1', 'nonexistent'},
+        text: javaFactorialSnippet,
       );
     });
 

@@ -1,33 +1,30 @@
 import 'package:flutter/material.dart';
 
 class DropdownSelector extends StatelessWidget {
-  final Iterable<String?> choices;
-  final String value;
   final IconData icon;
-  final Function(String?)? onChanged;
+  final ValueChanged<String> onChanged;
+  final String value;
+  final Iterable<String> values;
 
   const DropdownSelector({
-    super.key,
-    required this.choices,
-    required this.value,
-    required this.icon,
     required this.onChanged,
+    required this.icon,
+    required this.value,
+    required this.values,
   });
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
       value: value,
-      items: choices.map((String? value) {
+      items: values.map((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: value == null
-              ? const Divider()
-              : Text(value, style: const TextStyle(color: Colors.white)),
+          child: Text(value, style: const TextStyle(color: Colors.white)),
         );
-      }).toList(),
+      }).toList(growable: false),
       icon: Icon(icon, color: Colors.white),
-      onChanged: onChanged,
+      onChanged: onChanged as Function(String?),
       dropdownColor: Colors.black87,
     );
   }

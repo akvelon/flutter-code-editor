@@ -12,7 +12,7 @@ final builtinLanguages = {
   'dart': dart,
 };
 
-List<String?> languageList = <String>[
+const languageList = <String>[
   'java',
   'go',
   'python',
@@ -20,7 +20,7 @@ List<String?> languageList = <String>[
   'dart',
 ];
 
-List<String?> themeList = <String>[
+const themeList = <String>[
   'monokai-sublime',
   'a11y-dark',
   'an-old-hope',

@@ -7,12 +7,10 @@ import 'widgets/code_editor_appbar.dart';
 class CodeEditor extends StatefulWidget {
   final String language;
   final String theme;
-  final bool reset;
+
   const CodeEditor({
-    super.key,
     required this.language,
     required this.theme,
-    required this.reset,
   });
 
   @override
@@ -20,15 +18,13 @@ class CodeEditor extends StatefulWidget {
 }
 
 class _CodeEditorState extends State<CodeEditor> {
-  late String language;
-  late String theme;
-  late bool reset;
+  String language = languageList[0];
+  String theme = themeList[0];
 
   @override
   void initState() {
     language = widget.language;
     theme = widget.theme;
-    reset = widget.reset;
 
     super.initState();
   }
@@ -49,7 +45,6 @@ class _CodeEditorState extends State<CodeEditor> {
       body: SingleChildScrollView(
         child: CodeBox(
           language: language,
-          shouldContainInitialText: true,
           theme: theme,
         ),
       ),
@@ -70,8 +65,8 @@ class _CodeEditorState extends State<CodeEditor> {
 
   void _onReset() {
     setState(() {
-      language = languageList[0] ?? language;
-      theme = themeList[0] ?? theme;
+      language = languageList[0];
+      theme = themeList[0];
     });
   }
 }
