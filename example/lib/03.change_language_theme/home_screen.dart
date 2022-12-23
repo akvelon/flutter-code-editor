@@ -68,9 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _codeController.dispose();
     _codeFieldFocusNode.dispose();
+    super.dispose();
   }
 
   void _setLanguage(String value) {
