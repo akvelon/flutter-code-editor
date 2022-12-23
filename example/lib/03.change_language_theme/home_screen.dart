@@ -46,24 +46,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: ListView(
-          children: [
-            CodeTheme(
-              data: CodeThemeData(styles: themes[_theme]),
-              child: CodeField(
-                controller: _codeController,
-                textStyle: const TextStyle(fontFamily: 'SourceCode'),
-                lineNumberStyle: const LineNumberStyle(
-                  textStyle: TextStyle(
-                    color: Colors.purple,
-                  ),
+      body: ListView(
+        children: [
+          CodeTheme(
+            data: CodeThemeData(styles: themes[_theme]),
+            child: CodeField(
+              controller: _codeController,
+              textStyle: const TextStyle(fontFamily: 'SourceCode'),
+              lineNumberStyle: const LineNumberStyle(
+                textStyle: TextStyle(
+                  color: Colors.purple,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
