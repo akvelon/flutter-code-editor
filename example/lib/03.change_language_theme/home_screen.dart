@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
-
+  final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
@@ -51,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
           CodeTheme(
             data: CodeThemeData(styles: themes[_theme]),
             child: CodeField(
+              focusNode: _codeFieldFocusNode,
               controller: _codeController,
               textStyle: const TextStyle(fontFamily: 'SourceCode'),
               lineNumberStyle: const LineNumberStyle(
@@ -69,18 +70,21 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     super.dispose();
     _codeController.dispose();
+    _codeFieldFocusNode.dispose();
   }
 
   void _setLanguage(String value) {
     setState(() {
       _language = value;
       _codeController.language = builtinLanguages[value];
+      _codeFieldFocusNode.requestFocus();
     });
   }
 
   void _setTheme(String value) {
     setState(() {
       _theme = value;
+      _codeFieldFocusNode.requestFocus();
     });
   }
 }

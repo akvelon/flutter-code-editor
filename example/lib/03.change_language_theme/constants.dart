@@ -25,6 +25,6 @@ const themeList = <String>[
   'an-old-hope',
   'atom-one-dark',
   'monokai-sublime',
-  'vs2015',
   'vs',
+  'vs2015',
 ];
