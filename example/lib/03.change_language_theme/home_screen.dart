@@ -3,8 +3,11 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import '../common/snippets.dart';
 import '../common/themes.dart';
-import 'constants/constants.dart';
+import 'constants.dart';
 import 'widgets/dropdown_selector.dart';
+
+const _defaultLanguage = 'java';
+const _defaultTheme = 'monokai-sublime';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,8 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _language = languageList[0];
-  String _theme = themeList[0];
+  String _language = _defaultLanguage;
+  String _theme = _defaultTheme;
 
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
@@ -24,19 +27,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: themes[_theme]?['root']?.backgroundColor,
       appBar: AppBar(
         title: const Text('Code Editor by Akvelon'),
         actions: [
-          // Language Selector
           DropdownSelector(
-              onChanged: _setLanguage,
-              icon: Icons.code,
-              value: _language,
-              values: languageList),
-          const SizedBox(
-            width: 20,
+            onChanged: _setLanguage,
+            icon: Icons.code,
+            value: _language,
+            values: languageList,
           ),
-          // Theme selector
+          const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setTheme,
             icon: Icons.color_lens,
@@ -45,18 +46,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: CodeTheme(
-          data: CodeThemeData(styles: themes[_theme]),
-          child: CodeField(
-            controller: _codeController,
-            textStyle: const TextStyle(fontFamily: 'SourceCode'),
-            lineNumberStyle: const LineNumberStyle(
-              textStyle: TextStyle(
-                color: Colors.purple,
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: ListView(
+          children: [
+            CodeTheme(
+              data: CodeThemeData(styles: themes[_theme]),
+              child: CodeField(
+                controller: _codeController,
+                textStyle: const TextStyle(fontFamily: 'SourceCode'),
+                lineNumberStyle: const LineNumberStyle(
+                  textStyle: TextStyle(
+                    color: Colors.purple,
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

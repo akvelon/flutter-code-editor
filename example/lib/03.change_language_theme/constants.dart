@@ -5,26 +5,26 @@ import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
 
 final builtinLanguages = {
+  'dart': dart,
   'go': go,
   'java': java,
   'python': python,
   'scala': scala,
-  'dart': dart,
 };
 
 const languageList = <String>[
-  'java',
+  'dart',
   'go',
+  'java',
   'python',
   'scala',
-  'dart',
 ];
 
 const themeList = <String>[
-  'monokai-sublime',
   'a11y-dark',
   'an-old-hope',
+  'atom-one-dark',
+  'monokai-sublime',
   'vs2015',
   'vs',
-  'atom-one-dark',
 ];

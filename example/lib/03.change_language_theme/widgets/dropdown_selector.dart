@@ -24,7 +24,9 @@ class DropdownSelector extends StatelessWidget {
         );
       }).toList(growable: false),
       icon: Icon(icon, color: Colors.white),
-      onChanged: (value) { if (value != null) onChanged(value); },
+      onChanged: (value) {
+        if (value != null) onChanged(value);
+      },
       dropdownColor: Colors.black87,
     );
   }
