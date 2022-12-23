@@ -1,5 +1,3 @@
-// This example expands 02.code_field.dart by using CustomCodeBox
-// instead of a CodeField.
 // This adds customization of the code_field
 // by providing an opportunity to change language and theme.
 
