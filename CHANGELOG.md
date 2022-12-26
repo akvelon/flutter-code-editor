@@ -1,3 +1,8 @@
+## 0.2.4
+
+* Exported `StringExtension`.
+* Added an example with changing the language and the theme.
+
 ## 0.2.3
 
 * Fixed removing listeners in `_CodeFieldState.dispose()`.

@@ -1,5 +1,6 @@
 export 'src/code/code.dart';
 export 'src/code/code_line.dart';
+export 'src/code/string.dart';
 export 'src/code/text_range.dart';
 export 'src/code/tokens.dart';
 
