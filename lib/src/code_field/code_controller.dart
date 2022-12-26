@@ -43,6 +43,7 @@ class CodeController extends TextEditingController {
 
     _language = language;
     autocompleter.mode = language;
+    _updateCode(_code.text);
     notifyListeners();
   }
 
