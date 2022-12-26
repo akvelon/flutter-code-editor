@@ -21,7 +21,9 @@ import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/copy.dart';
 import 'actions/redo.dart';
+import 'actions/tab.dart';
 import 'actions/undo.dart';
+import 'actions/untab.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
@@ -96,6 +98,8 @@ class CodeController extends TextEditingController {
     CopySelectionTextIntent: CopyAction(controller: this),
     RedoTextIntent: RedoAction(controller: this),
     UndoTextIntent: UndoAction(controller: this),
+    TabIntent: TabIntentAction(controller: this),
+    UntabIntent: UntabIntentAction(controller: this),
   };
 
   CodeController({
@@ -203,12 +207,6 @@ class CodeController extends TextEditingController {
   }
 
   KeyEventResult _onKeyDownRepeat(KeyEvent event) {
-    // TODO(alexeyinkin): Use a shortcut, https://github.com/akvelon/flutter-code-editor/issues/21
-    if (event.logicalKey == LogicalKeyboardKey.tab) {
-      text = text.replaceRange(selection.start, selection.end, '\t');
-      return KeyEventResult.handled;
-    }
-
     if (popupController.isPopupShown) {
       if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         popupController.scrollByArrow(ScrollDirection.up);
@@ -218,7 +216,8 @@ class CodeController extends TextEditingController {
         popupController.scrollByArrow(ScrollDirection.down);
         return KeyEventResult.handled;
       }
-      if (event.logicalKey == LogicalKeyboardKey.enter) {
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.tab) {
         insertSelectedWord();
         return KeyEventResult.handled;
       }
@@ -331,6 +330,56 @@ class CodeController extends TextEditingController {
     super.value = TextEditingValue(
       text: code.visibleText,
       selection: record.selection,
+    );
+  }
+
+  /// Modify the rows, that are currently affected by selection.
+  /// Do not take into account `\n` symbols. They are inserted automatically after each row excluding the last one.
+  ///
+  /// Row is considered to be affected by a selection if:
+  /// - The row is completely selected.
+  /// - The start of the selection lies on the row.
+  /// - The end of the selection lies on the row.
+  ///
+  /// [modifierCallback] - transformation function that modifies the row.
+  void modifySelectedRows(String Function(String row) modifierCallback) {
+    final lines = value.text.split('\n');
+
+    int count = 0;
+    int insertedBefore = 0;
+    int insertedWithin = 0;
+    final str = StringBuffer();
+
+    for (int i = 0; i < lines.length; i++) {
+      final length = lines[i].length;
+
+      if (count <= selection.start &&
+          count + lines[i].length > selection.start) {
+        final modifiedString = modifierCallback(lines[i]);
+        insertedBefore += modifiedString.length - lines[i].length;
+        lines[i] = modifiedString;
+      } else if (count >= selection.start && count < selection.end) {
+        final modifiedString = modifierCallback(lines[i]);
+        insertedWithin += modifiedString.length - lines[i].length;
+        lines[i] = modifiedString;
+      }
+
+      if (i < lines.length - 1) {
+        str.write('${lines[i]}\n');
+      }
+
+      count += length + 1;
+    }
+
+    // Write the last line without \n
+    str.write(lines[lines.length - 1]);
+
+    value = TextEditingValue(
+      text: str.toString(),
+      selection: selection.copyWith(
+        baseOffset: selection.start + insertedBefore,
+        extentOffset: selection.end + insertedWithin + insertedBefore,
+      ),
     );
   }
 

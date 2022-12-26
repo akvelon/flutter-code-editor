@@ -10,6 +10,8 @@ import '../gutter/gutter.dart';
 import '../line_numbers/line_number_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
+import 'actions/tab.dart';
+import 'actions/untab.dart';
 import 'code_controller.dart';
 
 final _shortcuts = {
@@ -62,6 +64,17 @@ final _shortcuts = {
     LogicalKeyboardKey.meta,
     LogicalKeyboardKey.keyZ,
   ): const RedoTextIntent(SelectionChangedCause.keyboard),
+
+  // Tab
+  LogicalKeySet(
+    LogicalKeyboardKey.tab,
+  ): const TabIntent(),
+
+  // Un-Tab
+  LogicalKeySet(
+    LogicalKeyboardKey.shift,
+    LogicalKeyboardKey.tab,
+  ): const UntabIntent(),
 };
 
 class CodeField extends StatefulWidget {
