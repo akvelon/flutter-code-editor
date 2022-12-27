@@ -34,7 +34,7 @@ class IndentIntentAction extends Action<IndentIntent> {
     // When some area is selected
     // we add 1 level of tabulation to all rows contained in the selection
     if (isSomeTextSelected) {
-      controller.modifySelectedRows((row) => tab + row);
+      controller.modifySelectedRows(_incrementTabulation);
       return null;
     }
 
@@ -46,5 +46,13 @@ class IndentIntentAction extends Action<IndentIntent> {
     }
 
     return null;
+  }
+
+  String _incrementTabulation(String row){
+    if(row == '\n'){
+      return row;
+    }
+
+    return tab + row;
   }
 }

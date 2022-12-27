@@ -25,6 +25,10 @@ class OutdentIntentAction extends Action<OutdentIntent> {
   }
 
   String _unTab(String row) {
+    if(row == '\n'){
+      return row;
+    }
+
     if (row.length < tabSpaces) {
       return row.trimLeft();
     }

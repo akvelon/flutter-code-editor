@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code.dart';
 import '../code/code_edit_result.dart';
@@ -21,9 +22,9 @@ import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/copy.dart';
 import 'actions/redo.dart';
-import 'actions/tab.dart';
+import 'actions/indent.dart';
 import 'actions/undo.dart';
-import 'actions/untab.dart';
+import 'actions/outdent.dart';
 import 'editor_params.dart';
 import 'span_builder.dart';
 
@@ -343,44 +344,47 @@ class CodeController extends TextEditingController {
   ///
   /// [modifierCallback] - transformation function that modifies the row.
   void modifySelectedRows(String Function(String row) modifierCallback) {
-    final lines = value.text.split('\n');
+    final firstLineIndex =
+        _code.lines.characterIndexToLineIndex(selection.start);
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(selection.end);
+    var insertedBeforeSelection = 0;
+    var insertedInsideSelection = 0;
 
-    int count = 0;
-    int insertedBefore = 0;
-    int insertedWithin = 0;
-    final str = StringBuffer();
+    final strBuffer = StringBuffer();
 
-    for (int i = 0; i < lines.length; i++) {
-      final length = lines[i].length;
+    for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+      var insertedLength = _code.lines.lines[i].text.length;
+      final str = CodeLine.fromTextAndStart(
+        modifierCallback(_code.lines.lines[i].text),
+        _code.lines.lines[i].textRange.start + params.tabSpaces,
+      );
+      _code.lines.lines[i] = str;
+      insertedLength = _code.lines.lines[i].text.length - insertedLength;
 
-      if (count <= selection.start &&
-          count + lines[i].length > selection.start) {
-        final modifiedString = modifierCallback(lines[i]);
-        insertedBefore += modifiedString.length - lines[i].length;
-        lines[i] = modifiedString;
-      } else if (count >= selection.start && count < selection.end) {
-        final modifiedString = modifierCallback(lines[i]);
-        insertedWithin += modifiedString.length - lines[i].length;
-        lines[i] = modifiedString;
+      if(i == firstLineIndex){
+        insertedBeforeSelection += insertedLength;
       }
-
-      if (i < lines.length - 1) {
-        str.write('${lines[i]}\n');
+      else {
+        insertedInsideSelection += insertedLength;
       }
-
-      count += length + 1;
     }
 
-    // Write the last line without \n
-    str.write(lines[lines.length - 1]);
-
-    value = TextEditingValue(
-      text: str.toString(),
+    for (final line in _code.lines.lines) { 
+      strBuffer.write(line.text);
+    }
+    
+    final temp = TextEditingValue(
+      text: strBuffer.toString(),
       selection: selection.copyWith(
-        baseOffset: selection.start + insertedBefore,
-        extentOffset: selection.end + insertedWithin + insertedBefore,
+        baseOffset: selection.start + insertedBeforeSelection,
+        extentOffset:
+            selection.end + insertedInsideSelection + insertedBeforeSelection,
       ),
     );
+
+    _updateCode(temp.text);
+
+    value = temp;
   }
 
   Code get code => _code;

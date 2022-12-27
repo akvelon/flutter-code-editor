@@ -10,8 +10,8 @@ import '../gutter/gutter.dart';
 import '../line_numbers/line_number_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
-import 'actions/tab.dart';
-import 'actions/untab.dart';
+import 'actions/indent.dart';
+import 'actions/outdent.dart';
 import 'code_controller.dart';
 
 final _shortcuts = {
