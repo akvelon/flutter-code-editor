@@ -68,13 +68,13 @@ final _shortcuts = {
   // Tab
   LogicalKeySet(
     LogicalKeyboardKey.tab,
-  ): const TabIntent(),
+  ): const IndentIntent(),
 
   // Un-Tab
   LogicalKeySet(
     LogicalKeyboardKey.shift,
     LogicalKeyboardKey.tab,
-  ): const UntabIntent(),
+  ): const OutdentIntent(),
 };
 
 class CodeField extends StatefulWidget {

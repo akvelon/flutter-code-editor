@@ -96,10 +96,10 @@ class CodeController extends TextEditingController {
 
   late final actions = <Type, Action<Intent>>{
     CopySelectionTextIntent: CopyAction(controller: this),
+    IndentIntent: IndentIntentAction(controller: this),
+    OutdentIntent: OutdentIntentAction(controller: this),
     RedoTextIntent: RedoAction(controller: this),
     UndoTextIntent: UndoAction(controller: this),
-    TabIntent: TabIntentAction(controller: this),
-    UntabIntent: UntabIntentAction(controller: this),
   };
 
   CodeController({

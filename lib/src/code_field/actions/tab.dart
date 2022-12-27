@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../flutter_code_editor.dart';
 
-class TabIntent extends Intent {
-  const TabIntent();
+class IndentIntent extends Intent {
+  const IndentIntent();
 }
 
-class TabIntentAction extends Action<TabIntent> {
+class IndentIntentAction extends Action<IndentIntent> {
   final CodeController controller;
-  late final tab = ' ' * controller.params.tabSpaces;
+  String get tab => ' ' * controller.params.tabSpaces;
 
-  TabIntentAction({
+  IndentIntentAction({
     required this.controller,
   });
 
@@ -23,7 +23,7 @@ class TabIntentAction extends Action<TabIntent> {
       controller.selection.start == controller.selection.end;
 
   @override
-  Object? invoke(TabIntent intent) {
+  Object? invoke(IndentIntent intent) {
     // When the popup with suggestions is shown
     // we insert that word into the code field
     if (controller.isPopupShown) {

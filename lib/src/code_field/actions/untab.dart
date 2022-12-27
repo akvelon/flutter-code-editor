@@ -4,21 +4,21 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../flutter_code_editor.dart';
 
-class UntabIntent extends Intent {
-  const UntabIntent();
+class OutdentIntent extends Intent {
+  const OutdentIntent();
 }
 
-class UntabIntentAction extends Action<UntabIntent> {
+class OutdentIntentAction extends Action<OutdentIntent> {
   final CodeController controller;
 
-  UntabIntentAction({
+  OutdentIntentAction({
     required this.controller,
   });
 
   int get tabSpaces => controller.params.tabSpaces;
 
   @override
-  Object? invoke(UntabIntent intent) {
+  Object? invoke(OutdentIntent intent) {
     controller.modifySelectedRows(_unTab);
 
     return null;
@@ -32,8 +32,7 @@ class UntabIntentAction extends Action<UntabIntent> {
     final subStr = row.substring(0, tabSpaces);
     if (subStr == ' ' * tabSpaces) {
       return row.substring(tabSpaces, row.length);
-    } else {
-      return row.trimLeft();
     }
+    return row.trimLeft();
   }
 }
