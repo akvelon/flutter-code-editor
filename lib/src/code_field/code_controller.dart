@@ -477,10 +477,6 @@ class CodeController extends TextEditingController {
 
     // set pure value
     super.value = temp;
-
-    print(_code.text + '\n\n');
-    print(value.text + '\n\n');
-    print(_code.visibleText + '\n\n');
   }
 
   Code get code => _code;
