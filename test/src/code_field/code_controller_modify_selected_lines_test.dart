@@ -1,108 +1,245 @@
+// ignore_for_file: missing_whitespace_between_adjacent_strings
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/languages/java.dart';
 
 void main() {
-  group('Modify selection', () {
-    final language = java;
-    test('normal selection', () {
-      // Arrange
-      const initialText = '''
-class MyClass { 
-  private int _id;
-};
-''';
+  // Arrange Global
+  String modifierCallback(String str) => '**$str';
+  CodeController controller = CodeController();
 
-      const expectedText = '''
-  class MyClass { 
-    private int _id;
-};
-''';
+  setUp(() {
+    controller = CodeController();
+  });
 
-      final CodeController controller = CodeController(
-        text: initialText,
-        language: language,
+  group('Document doesn\'t contain folded blocks', () {
+    test(
+      'WHEN CodeField has no selection '
+      'SHOULD NOT modify any line',
+      () {
+        // arrange
+        const initialText = '''
+aaaaaaaaaaa
+aaaaaaaaaaa
+aaaaaaaaaaa
+''';
+        const expectedText = initialText;
+        const initialSelection =
+            TextSelection(baseOffset: -1, extentOffset: -1);
+        const expectedSelection = initialSelection;
+
+        controller.selection = initialSelection;
+        controller.text = initialText;
+
+        // act
+        controller.modifySelectedLines(modifierCallback);
+
+        // assert
+        assert(
+          controller.value.text == expectedText,
+          'Text is not modified',
+        );
+        assert(
+          controller.value.selection == expectedSelection,
+          'Selection is not modified',
+        );
+      },
+    );
+
+    group('Selection is collapsed, its location is:', () {
+      test(
+        'WHEN At the start of the document '
+        'SHOULD modify the first line',
+        () {
+          // arrange
+          const initialText = '''
+aaaaaaaa
+aaaaaaaa
+aaaaaaaa
+''';
+          const expectedText = '''
+**aaaaaaaa
+aaaaaaaa
+aaaaaaaa
+''';
+          const initialSelection =
+              TextSelection(baseOffset: 0, extentOffset: 0);
+          const expectedSelection =
+              TextSelection(baseOffset: 2, extentOffset: 2);
+          controller.text = initialText;
+          controller.selection = initialSelection;
+
+          // act
+          controller.modifySelectedLines(modifierCallback);
+
+          // assert
+          assert(
+            controller.value.text == expectedText,
+            'Text is modified',
+          );
+          assert(
+            controller.value.selection == expectedSelection,
+            'Selection is modified',
+          );
+        },
       );
 
-      controller.selection = controller.selection.copyWith(
-        baseOffset: 4,
-        extentOffset: 21,
+      test(
+        'WHEN At start of a non-first line '
+        'SHOULD modify that line',
+        () {
+          // arrange
+          const initialText = '''
+aaaa
+aaaa
+aaaa
+''';
+          const expectedText = '''
+aaaa
+**aaaa
+aaaa
+''';
+          const initialSelection =
+              TextSelection(baseOffset: 5, extentOffset: 5);
+          const expectedSelection =
+              TextSelection(baseOffset: 7, extentOffset: 7);
+          controller.text = initialText;
+          controller.selection = initialSelection;
+
+          // act
+          controller.modifySelectedLines(modifierCallback);
+
+          // assert
+          assert(
+            controller.value.text == expectedText,
+            'Text is modified',
+          );
+          assert(
+            controller.value.selection == expectedSelection,
+            'Selection is modified',
+          );
+        },
       );
 
-      // Act
-      controller.modifySelectedRows((row) => '  $row');
+      test(
+        'WHEN at the end of the document '
+        'SHOULD modify the last line',
+        () {
+          // arrange
+          const initialText = '''
+aaaa
+aaaa
+aaaa
+''';
+          const expectedText = '''
+aaaa
+aaaa
+**aaaa
+''';
+          const initialSelection =
+              TextSelection(baseOffset: 14, extentOffset: 14);
+          const expectedSelection =
+              TextSelection(baseOffset: 16, extentOffset: 16);
+          controller.text = initialText;
+          controller.selection = initialSelection;
 
-      // Assert
-      assert(
-        controller.value.text == expectedText,
-        'First 2 lines should have been modified',
+          // act
+          controller.modifySelectedLines(modifierCallback);
+
+          // assert
+          assert(
+            controller.value.text == expectedText,
+            'Text is modified',
+          );
+          assert(
+            controller.value.selection == expectedSelection,
+            'Selection is modified',
+          );
+        },
       );
     });
 
-    test('end is at the beginning of a line', () {
-      // Arrange
-      const initialText = '''
-class MyClass {
-  private int _id;
-};
+    group('Selection is not collapsed', () {
+      test(
+        'WHEN entire multiline document is selected '
+        'SHOULD modify all lines',
+        () {
+          // arrange
+          const initialText = '''
+AAAA
+AAAA
+AAAA
+AAAA
 ''';
-
-      const expectedText = '''
-  class MyClass {
-    private int _id;
-};
+          const expectedText = '''
+**AAAA
+**AAAA
+**AAAA
+**AAAA
 ''';
-      final CodeController controller = CodeController(
-        text: initialText,
-        language: language,
+          const initialSelection =
+              TextSelection(baseOffset: 0, extentOffset: 19);
+          const expectedSelection =
+              TextSelection(baseOffset: 0 + 2, extentOffset: 19 + 8);
+          controller.text = initialText;
+          controller.selection = initialSelection;
+
+          // act
+          controller.modifySelectedLines(modifierCallback);
+
+          // assert
+          assert(
+            controller.value.text == expectedText,
+            'Text is modified',
+          );
+          assert(
+            controller.value.selection == expectedSelection,
+            'Selection is modified',
+          );
+        },
       );
 
-      controller.selection = controller.selection.copyWith(
-        baseOffset: 2,
-        extentOffset: 17,
-      );
-
-      // Act
-      controller.modifySelectedRows((row) => '  $row');
-
-      // Assert
-      assert(
-        controller.value.text == expectedText,
-        'first 2 lines should be modified',
-      );
-    });
-
-    test('when selection is collapsed cursor line is modified', () {
-      // Arrange
-      const initialText = '''
-class MyClass {
-  private int _id;
-};
+      test(
+        'WHEN 2 lines in the middle of the document are selected'
+        'SHOULD modify that 2 lines',
+        () {
+          // arrange
+          const initialText = '''
+aaaa
+aaAA
+AAaa
+aaaa
 ''';
-
-      const expectedText = '''
-  class MyClass {
-  private int _id;
-};
+          const expectedText = '''
+aaaa
+**aaAA
+**AAaa
+aaaa
 ''';
-      final CodeController controller = CodeController(
-        text: initialText,
-        language: language,
-      );
+          const initialSelection =
+              TextSelection(baseOffset: 7, extentOffset: 12);
+          const expectedSelection =
+              TextSelection(baseOffset: 7 + 2, extentOffset: 12 + 4);
+          controller.text = initialText;
+          controller.selection = initialSelection;
 
-      controller.selection = controller.selection.copyWith(
-        baseOffset: 0,
-        extentOffset: 0,
-      );
+          // act
+          controller.modifySelectedLines(modifierCallback);
 
-      // Act
-      controller.modifySelectedRows((row) => '  $row');
-
-      // Assert
-      assert(
-        controller.value.text == expectedText,
-        'first line should be modified',
+          // assert
+          assert(
+            controller.value.text == expectedText,
+            'Text is modified',
+          );
+          assert(
+            controller.value.selection == expectedSelection,
+            'Selection is modified',
+          );
+        },
       );
     });
   });
+
+  group('Contains folded blocks', () {});
 }

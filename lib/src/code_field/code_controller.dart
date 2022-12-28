@@ -334,16 +334,23 @@ class CodeController extends TextEditingController {
     );
   }
 
-  /// Modify the rows, that are currently affected by selection.
-  /// Do not take into account `\n` symbols. They are inserted automatically after each row excluding the last one.
+  /// Modify the line, that are currently affected by selection.
+  /// All lines, except the last one, contain '\n' symbol at the end.
   ///
-  /// Row is considered to be affected by a selection if:
-  /// - The row is completely selected.
-  /// - The start of the selection lies on the row.
-  /// - The end of the selection lies on the row.
+  /// Line is considered to be affected by a selection if:
+  /// - The line is completely selected.
+  /// - The start of the selection lies on the line.
+  /// - The end of the selection lies on the line.
+  ///
+  /// Folded blocks are considered to be selected
+  /// if they are located between start and end of a selection
   ///
   /// [modifierCallback] - transformation function that modifies the row.
-  void modifySelectedRows(String Function(String row) modifierCallback) {
+  void modifySelectedLines(String Function(String line) modifierCallback) {
+    if(selection.start == -1 || selection.end == -1){
+      return;
+    }
+
     final firstLineIndex =
         _code.lines.characterIndexToLineIndex(selection.start);
     final lastLineIndex = _code.lines.characterIndexToLineIndex(selection.end);
@@ -361,18 +368,17 @@ class CodeController extends TextEditingController {
       _code.lines.lines[i] = str;
       insertedLength = _code.lines.lines[i].text.length - insertedLength;
 
-      if(i == firstLineIndex){
+      if (i == firstLineIndex) {
         insertedBeforeSelection += insertedLength;
-      }
-      else {
+      } else {
         insertedInsideSelection += insertedLength;
       }
     }
 
-    for (final line in _code.lines.lines) { 
+    for (final line in _code.lines.lines) {
       strBuffer.write(line.text);
     }
-    
+
     final temp = TextEditingValue(
       text: strBuffer.toString(),
       selection: selection.copyWith(

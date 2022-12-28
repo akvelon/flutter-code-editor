@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 
 import '../../../flutter_code_editor.dart';
@@ -19,7 +17,7 @@ class OutdentIntentAction extends Action<OutdentIntent> {
 
   @override
   Object? invoke(OutdentIntent intent) {
-    controller.modifySelectedRows(_unTab);
+    controller.modifySelectedLines(_unTab);
 
     return null;
   }
