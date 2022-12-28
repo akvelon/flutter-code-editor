@@ -17,24 +17,8 @@ class OutdentIntentAction extends Action<OutdentIntent> {
 
   @override
   Object? invoke(OutdentIntent intent) {
-    controller.modifySelectedLines(_unTab);
+    controller.outdentSelection();
 
     return null;
-  }
-
-  String _unTab(String row) {
-    if(row == '\n'){
-      return row;
-    }
-
-    if (row.length < tabSpaces) {
-      return row.trimLeft();
-    }
-
-    final subStr = row.substring(0, tabSpaces);
-    if (subStr == ' ' * tabSpaces) {
-      return row.substring(tabSpaces, row.length);
-    }
-    return row.trimLeft();
   }
 }

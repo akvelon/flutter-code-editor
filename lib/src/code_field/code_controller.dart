@@ -334,8 +334,68 @@ class CodeController extends TextEditingController {
     );
   }
 
-  /// Modify the line, that are currently affected by selection.
+  void outdentSelection() {
+    final tabSpaces = params.tabSpaces;
+    if (selection.start == -1 || selection.end == -1) {
+      return;
+    }
+
+    modifySelectedLines(
+      (line) {
+        if (line == '\n') {
+          return line;
+        }
+
+        if (line.length < tabSpaces) {
+          return line.trimLeft();
+        }
+
+        final subStr = line.substring(0, tabSpaces);
+        if (subStr == ' ' * tabSpaces) {
+          return line.substring(tabSpaces, line.length);
+        }
+        return line.trimLeft();
+      },
+      shouldSustainSelection: true,
+    );
+  }
+
+  void indentSelection() {
+    final tabSpaces = params.tabSpaces;
+    final tab = ' ' * tabSpaces;
+    final lines = _code.lines.lines;
+    if (selection.start == -1 || selection.end == -1) {
+      return;
+    }
+
+    if (selection.isCollapsed) {
+      final cursor = _code.hiddenRanges.recoverPosition(
+        selection.start,
+        placeHiddenRanges: TextAffinity.downstream,
+      );
+      final lineIndex = _code.lines.characterIndexToLineIndex(cursor);
+      final columnIndex = cursor - lines[lineIndex].textRange.start;
+      final insert = ' ' * (tabSpaces - (columnIndex % tabSpaces).abs());
+      insertStr(insert);
+      return;
+    }
+
+    modifySelectedLines(
+      (line) {
+        if (line == '\n') {
+          return line;
+        }
+        return tab + line;
+      },
+      shouldSustainSelection: true,
+    );
+  }
+
+  /// Modify the lines, that are currently affected by selection.
   /// All lines, except the last one, contain '\n' symbol at the end.
+  ///
+  /// IMPORTANT: Currently only capable to sustain the selection only
+  /// if modificationCallback adds or removes some of the text to/from the line
   ///
   /// Line is considered to be affected by a selection if:
   /// - The line is completely selected.
@@ -343,54 +403,81 @@ class CodeController extends TextEditingController {
   /// - The end of the selection lies on the line.
   ///
   /// Folded blocks are considered to be selected
-  /// if they are located between start and end of a selection
+  /// if they are located between start and end of a selection.
+  /// ALL Folded blocks are unfolded when this method is called.
   ///
-  /// [modifierCallback] - transformation function that modifies the row.
-  void modifySelectedLines(String Function(String line) modifierCallback) {
-    if(selection.start == -1 || selection.end == -1){
+  /// [modifierCallback] - transformation function that modifies the line.
+  void modifySelectedLines(
+    String Function(String line) modifierCallback, {
+    bool shouldSustainSelection = false,
+  }) {
+    if (selection.start == -1 || selection.end == -1) {
       return;
     }
 
+    final lines = _code.lines.lines;
+    final fullSelection = _code.hiddenRanges.recoverSelection(selection);
     final firstLineIndex =
-        _code.lines.characterIndexToLineIndex(selection.start);
-    final lastLineIndex = _code.lines.characterIndexToLineIndex(selection.end);
+        _code.lines.characterIndexToLineIndex(fullSelection.start);
+    final lastLineIndex =
+        _code.lines.characterIndexToLineIndex(fullSelection.end);
+    final firstMargin =
+        lines[firstLineIndex].textRange.start; // first pivot index
+    final secondMargin =
+        lines[lastLineIndex].textRange.end; // second pivot index
     var insertedBeforeSelection = 0;
     var insertedInsideSelection = 0;
 
-    final strBuffer = StringBuffer();
+    final tempBuffer = StringBuffer();
 
     for (int i = firstLineIndex; i <= lastLineIndex; i++) {
       var insertedLength = _code.lines.lines[i].text.length;
-      final str = CodeLine.fromTextAndStart(
-        modifierCallback(_code.lines.lines[i].text),
-        _code.lines.lines[i].textRange.start + params.tabSpaces,
-      );
-      _code.lines.lines[i] = str;
-      insertedLength = _code.lines.lines[i].text.length - insertedLength;
+      final modifiedString = modifierCallback(_code.lines.lines[i].text);
+
+      insertedLength = modifiedString.length - insertedLength;
+
+      tempBuffer.write(modifiedString);
 
       if (i == firstLineIndex) {
-        insertedBeforeSelection += insertedLength;
+        insertedBeforeSelection =
+            fullSelection.start + insertedLength < lines[i].textRange.start
+                ? lines[i].textRange.start - fullSelection.start
+                : insertedLength;
       } else {
         insertedInsideSelection += insertedLength;
       }
     }
 
-    for (final line in _code.lines.lines) {
-      strBuffer.write(line.text);
+    // Divide _code.text into 3 parts
+    // Apply modifications to the selected lines
+    // Then combine parts
+    // Avoids iterating through all lines.
+    final finalText = _code.text.substring(0, firstMargin) +
+        tempBuffer.toString() +
+        _code.text.substring(secondMargin, _code.text.length);
+
+    var modifiedSelection = fullSelection.copyWith(
+      baseOffset: fullSelection.start + insertedBeforeSelection,
+      extentOffset:
+          fullSelection.end + insertedInsideSelection + insertedBeforeSelection,
+    );
+
+    if (!shouldSustainSelection) {
+      modifiedSelection = modifiedSelection.copyWith(
+        baseOffset: fullSelection.start,
+        extentOffset: fullSelection.start,
+      );
     }
 
     final temp = TextEditingValue(
-      text: strBuffer.toString(),
-      selection: selection.copyWith(
-        baseOffset: selection.start + insertedBeforeSelection,
-        extentOffset:
-            selection.end + insertedInsideSelection + insertedBeforeSelection,
-      ),
+      text: finalText,
+      selection: modifiedSelection,
     );
 
-    _updateCode(temp.text);
+    _updateCode(finalText);
 
-    value = temp;
+    // set pure value
+    super.value = temp;
   }
 
   Code get code => _code;
