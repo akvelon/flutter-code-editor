@@ -358,9 +358,6 @@ class CodeController extends TextEditingController {
       },
       shouldSustainSelection: true,
     );
-
-    print(selection.baseOffset);
-    print(selection.extentOffset);
   }
 
   void indentSelection() {
