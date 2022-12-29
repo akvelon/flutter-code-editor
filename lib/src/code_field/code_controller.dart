@@ -358,6 +358,9 @@ class CodeController extends TextEditingController {
       },
       shouldSustainSelection: true,
     );
+
+    print(selection.baseOffset);
+    print(selection.extentOffset);
   }
 
   void indentSelection() {
@@ -443,9 +446,9 @@ class CodeController extends TextEditingController {
             fullSelection.start + insertedLength < lines[i].textRange.start
                 ? lines[i].textRange.start - fullSelection.start
                 : insertedLength;
-      } else {
-        insertedInsideSelection += insertedLength;
       }
+
+      insertedInsideSelection += insertedLength;
     }
 
     // Divide _code.text into 3 parts
@@ -456,11 +459,20 @@ class CodeController extends TextEditingController {
         tempBuffer.toString() +
         _code.text.substring(secondMargin, _code.text.length);
 
-    var modifiedSelection = fullSelection.copyWith(
-      baseOffset: fullSelection.start + insertedBeforeSelection,
-      extentOffset:
-          fullSelection.end + insertedInsideSelection + insertedBeforeSelection,
-    );
+    var modifiedSelection = fullSelection;
+
+    if (fullSelection.isCollapsed) {
+      modifiedSelection = modifiedSelection.copyWith(
+        baseOffset: fullSelection.start + insertedBeforeSelection,
+        extentOffset: fullSelection.start + insertedBeforeSelection,
+      );
+    } 
+    else {
+      modifiedSelection = fullSelection.copyWith(
+        baseOffset: fullSelection.start + insertedBeforeSelection,
+        extentOffset: fullSelection.end + insertedInsideSelection,
+      );
+    }
 
     if (!shouldSustainSelection) {
       modifiedSelection = modifiedSelection.copyWith(
