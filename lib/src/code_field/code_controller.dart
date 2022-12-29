@@ -372,13 +372,13 @@ class CodeController extends TextEditingController {
     }
 
     if (selection.isCollapsed) {
-      final cursor = _code.hiddenRanges.recoverPosition(
+      final fullPosition = _code.hiddenRanges.recoverPosition(
         selection.start,
         placeHiddenRanges: TextAffinity.downstream,
       );
-      final lineIndex = _code.lines.characterIndexToLineIndex(cursor);
-      final columnIndex = cursor - lines[lineIndex].textRange.start;
-      final insert = ' ' * (tabSpaces - (columnIndex % tabSpaces).abs());
+      final lineIndex = _code.lines.characterIndexToLineIndex(fullPosition);
+      final columnIndex = fullPosition - lines[lineIndex].textRange.start;
+      final insert = ' ' * (tabSpaces - (columnIndex % tabSpaces));
       insertStr(insert);
       return;
     }
@@ -394,22 +394,18 @@ class CodeController extends TextEditingController {
     );
   }
 
-  /// Modify the lines, that are currently affected by selection.
-  /// All lines, except the last one, contain '\n' symbol at the end.
+  /// Filters the lines that have at least one character selected.
   ///
   /// IMPORTANT: Currently only capable to sustain the selection only
   /// if modificationCallback adds or removes some of the text to/from the line
   ///
-  /// Line is considered to be affected by a selection if:
-  /// - The line is completely selected.
-  /// - The start of the selection lies on the line.
-  /// - The end of the selection lies on the line.
-  ///
   /// Folded blocks are considered to be selected
   /// if they are located between start and end of a selection.
-  /// ALL Folded blocks are unfolded when this method is called.
+  /// 
+  /// ALL Folded blocks are unfolded when this method is called. // Fixing..
   ///
   /// [modifierCallback] - transformation function that modifies the line.
+  /// `line` in the callback contains '\n' symbol at the end, except for the last one.
   void modifySelectedLines(
     String Function(String line) modifierCallback, {
     bool shouldSustainSelection = false,

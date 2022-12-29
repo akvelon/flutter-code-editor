@@ -8,19 +8,10 @@ class IndentIntent extends Intent {
 
 class IndentIntentAction extends Action<IndentIntent> {
   final CodeController controller;
-  String get tab => ' ' * controller.params.tabSpaces;
 
   IndentIntentAction({
     required this.controller,
   });
-
-  bool get isSomeTextSelected =>
-      controller.selection.isNormalized &&
-      controller.selection.start != controller.selection.end;
-
-  bool get isSelectionCollapsed =>
-      controller.selection.isNormalized &&
-      controller.selection.start == controller.selection.end;
 
   @override
   Object? invoke(IndentIntent intent) {

@@ -102,8 +102,8 @@ aaaa
           ),
         ),
         const _Example(
-          name: 'WHEN at a column that is not a multiply of indent_length '
-              'SHOULD add spaces to adjust indentation to its multiply',
+          name: 'WHEN at a column that is not a multiple of indent_length '
+              'SHOULD add spaces to adjust indentation to its multiple',
           initialFullText: '''
 aaaa
    aaaa
@@ -129,7 +129,7 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN at a column that is a multiply of indent_length '
+          name: 'WHEN at a column that is a multiple of indent_length '
               'SHOULD add full indentation to the cursor location',
           initialFullText: '''
 aaaa

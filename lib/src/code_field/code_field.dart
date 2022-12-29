@@ -65,12 +65,12 @@ final _shortcuts = {
     LogicalKeyboardKey.keyZ,
   ): const RedoTextIntent(SelectionChangedCause.keyboard),
 
-  // Tab
+  // Indent
   LogicalKeySet(
     LogicalKeyboardKey.tab,
   ): const IndentIntent(),
 
-  // Un-Tab
+  // Outdent
   LogicalKeySet(
     LogicalKeyboardKey.shift,
     LogicalKeyboardKey.tab,
