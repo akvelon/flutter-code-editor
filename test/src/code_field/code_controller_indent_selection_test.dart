@@ -1,8 +1,9 @@
-// ignore_for_file: avoid_redundant_argument_values
+// ignore_for_file: avoid_redundant_argument_values, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/languages/java.dart';
 
 void main() {
   group('CodeController.indentSelection() => Unfolded text', () {
@@ -300,23 +301,176 @@ ${indent}AAA
       }
     });
   });
+
+  group('CodeController.indentSelection() => Folded text', () {
+    final language = java;
+    CodeController controller = CodeController(
+      params: const EditorParams(tabSpaces: 2),
+      language: language,
+    );
+    final indentLength = controller.params.tabSpaces;
+    final indent = ' ' * indentLength;
+
+    test('description', () {
+      final examples = [
+        _Example(
+          name: 'Indentation through a folded block affects and unfolds it',
+          initialFullText: '''
+class MyClass {
+  void getSmth(){
+
+  }
+
+  void setSmth(){
+
+  }
+}
+''',
+          initialVisibleText: '''
+class MyClass {
+  void getSmth(){
+
+  void setSmth(){
+
+  }
+}
+''',
+          expectedFullText: '''
+${indent}class MyClass {
+$indent  void getSmth(){
+
+$indent  }
+
+$indent  void setSmth(){
+
+  }
+}
+''',
+          expectedVisibleText: '''
+${indent}class MyClass {
+$indent  void getSmth(){
+
+$indent  }
+
+$indent  void setSmth(){
+
+  }
+}
+''',
+          foldableBlockIndex: 1,
+          initialSelection: TextSelection(
+            baseOffset: 0,
+            extentOffset: 44,
+          ),
+          expectedSelection: TextSelection(
+            baseOffset: 0 + indentLength,
+            extentOffset: 44 + indentLength * 4 + 5, // 5 -> hidden
+          ),
+        ),
+        _Example(
+          name: 'Indentation before folded blocks does not affect neither open them',
+          initialFullText: '''
+class MyClass {
+  void getSmth(){
+
+  }
+
+  void setSmth(){
+
+  }
+}
+''',
+          initialVisibleText: '''
+class MyClass {
+  void getSmth(){
+
+  }
+
+  void setSmth(){
+}
+''',
+          expectedFullText: '''
+${indent}class MyClass {
+$indent  void getSmth(){
+
+$indent  }
+
+  void setSmth(){
+
+  }
+}
+''',
+          expectedVisibleText: '''
+${indent}class MyClass {
+$indent  void getSmth(){
+
+$indent  }
+
+  void setSmth(){
+}
+''',
+          foldableBlockIndex: 2,
+          initialSelection: TextSelection(
+            baseOffset: 0,
+            extentOffset: 38,
+          ),
+          expectedSelection: TextSelection(
+            baseOffset: 0 + indentLength,
+            extentOffset: 38 + indentLength * 3,
+          ),
+        ),
+      ];
+
+      for (final example in examples) {
+        controller.text = example.initialFullText;
+        controller.foldAt(controller.code.foldableBlocks[example.foldableBlockIndex!].firstLine);
+        controller.selection = example.initialSelection;
+
+        expect(
+          controller.value.text,
+          example.initialVisibleText,
+          reason: 'assertion of an arranged data',
+        );
+
+        controller.indentSelection();
+
+        expect(
+          controller.value.text,
+          example.expectedVisibleText,
+          reason: example.name,
+        );
+        expect(
+          controller.code.text,
+          example.expectedFullText,
+          reason: example.name,
+        );
+        expect(
+          controller.value.selection,
+          example.expectedSelection,
+          reason: example.name,
+        );
+      }
+    });
+  });
 }
 
 class _Example {
   final String name;
   final String initialFullText;
+  final String? initialVisibleText;
   final String expectedFullText;
   final String expectedVisibleText;
-  final Set<FoldableBlock>? foldedBlocks;
+  final int? foldableBlockIndex;
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
   const _Example({
     required this.name,
     required this.initialFullText,
+    this.initialVisibleText,
     required this.expectedFullText,
     required this.expectedVisibleText,
-    this.foldedBlocks,
+    this.foldableBlockIndex,
     required this.initialSelection,
     required this.expectedSelection,
   });
