@@ -1,0 +1,4 @@
+enum FoldableBlockMatcherType {
+  defaultFoldableBlockMatcher,
+  multilineIndentOutdentFoldableBlockMatcher,
+}

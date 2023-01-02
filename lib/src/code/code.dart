@@ -6,7 +6,8 @@ import 'package:highlight/highlight_core.dart';
 
 import '../../src/highlight/result.dart';
 import '../folding/foldable_block.dart';
-import '../folding/foldable_block_matcher.dart';
+import '../folding/matchers/foldable_block_matcher_abstract_factory.dart';
+import '../folding/matchers/foldable_block_matcher_type.dart';
 import '../folding/parsers/parser_factory.dart';
 import '../hidden_ranges/hidden_line_ranges.dart';
 import '../hidden_ranges/hidden_line_ranges_builder.dart';
@@ -437,9 +438,15 @@ class Code {
     final firstLine = lines.lines[block.firstLine + 1]; //Keep 1st line visible.
     final lastLine = lines.lines[block.lastLine];
 
+    // Exclude \n from the last line
+    var endOfRange = lastLine.textRange.end - 1;
+    if (lastLine.text[lastLine.text.length - 1] != '\n') {
+      endOfRange++;
+    }
+
     return HiddenRange(
       firstLine.textRange.start - 1, // Includes '\n' before.
-      lastLine.textRange.end - 1, // Excludes '\n' after.
+      endOfRange,
       firstLine: block.firstLine,
       lastLine: block.lastLine,
       wholeFirstLine: false, // Some characters of the first line are visible.
@@ -447,24 +454,26 @@ class Code {
   }
 
   /// Folds this code at the same blocks as the [oldCode] is.
-  Code foldedAs(Code oldCode) {
-    final matcher = FoldableBlockMatcher(
-      oldBlocks: oldCode.foldableBlocks,
-      oldLines: oldCode.lines.lines,
-      newBlocks: foldableBlocks,
-      newLines: lines.lines,
-      oldFoldedBlocks: oldCode.foldedBlocks,
+  Code foldedAs(
+    Code oldCode, {
+    required FoldableBlockMatcherType foldingBlockMatcherType,
+  }) {
+    final newFoldedBlocks =
+        FoldableBlockMatcherAbstractFactory.getNewFoldableBlocks(
+      oldCode: oldCode,
+      newCode: this,
+      matcherType: foldingBlockMatcherType,
     );
 
     final newHiddenRangesBuilder = _hiddenRangesBuilder.copyMergingSourceMap({
       FoldableBlock: {
-        for (final block in matcher.newFoldedBlocks)
+        for (final block in newFoldedBlocks)
           block: foldableBlockToHiddenRange(block),
       },
     });
 
     return _copyWithFolding(
-      foldedBlocks: matcher.newFoldedBlocks,
+      foldedBlocks: newFoldedBlocks,
       hiddenRangesBuilder: newHiddenRangesBuilder,
     );
   }

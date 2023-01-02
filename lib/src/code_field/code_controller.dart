@@ -7,25 +7,16 @@ import 'package:highlight/highlight_core.dart';
 
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
-import '../code/code.dart';
 import '../code/code_edit_result.dart';
-import '../code_field/text_editing_value.dart';
-import '../code_modifiers/close_block_code_modifier.dart';
-import '../code_modifiers/code_modifier.dart';
-import '../code_modifiers/indent_code_modifier.dart';
-import '../code_modifiers/tab_code_modifier.dart';
-import '../code_theme/code_theme.dart';
-import '../code_theme/code_theme_data.dart';
+import '../folding/matchers/foldable_block_matcher_type.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
-import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/copy.dart';
-import 'actions/redo.dart';
 import 'actions/indent.dart';
-import 'actions/undo.dart';
 import 'actions/outdent.dart';
-import 'editor_params.dart';
+import 'actions/redo.dart';
+import 'actions/undo.dart';
 import 'span_builder.dart';
 
 class CodeController extends TextEditingController {
@@ -340,24 +331,21 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    modifySelectedLines(
-      (line) {
-        if (line == '\n') {
-          return line;
-        }
+    modifySelectedLines((line) {
+      if (line == '\n') {
+        return line;
+      }
 
-        if (line.length < tabSpaces) {
-          return line.trimLeft();
-        }
-
-        final subStr = line.substring(0, tabSpaces);
-        if (subStr == ' ' * tabSpaces) {
-          return line.substring(tabSpaces, line.length);
-        }
+      if (line.length < tabSpaces) {
         return line.trimLeft();
-      },
-      shouldSustainSelection: true,
-    );
+      }
+
+      final subStr = line.substring(0, tabSpaces);
+      if (subStr == ' ' * tabSpaces) {
+        return line.substring(tabSpaces, line.length);
+      }
+      return line.trimLeft();
+    });
   }
 
   void indentSelection() {
@@ -380,104 +368,86 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    modifySelectedLines(
-      (line) {
-        if (line == '\n') {
-          return line;
-        }
-        return tab + line;
-      },
-      shouldSustainSelection: true,
-    );
+    modifySelectedLines((line) {
+      if (line == '\n') {
+        return line;
+      }
+      return tab + line;
+    });
   }
 
   /// Filters the lines that have at least one character selected.
   ///
-  /// IMPORTANT: Currently only capable to sustain the selection only
-  /// if modificationCallback adds or removes some of the text to/from the line
-  ///
+  /// IMPORTANT: this method also changes the selection to be:
+  /// start: start of the first selected line 
+  /// end: end of the last line
+  /// 
   /// Folded blocks are considered to be selected
   /// if they are located between start and end of a selection.
-  /// 
-  /// ALL Folded blocks are unfolded when this method is called. // Fixing..
   ///
   /// [modifierCallback] - transformation function that modifies the line.
   /// `line` in the callback contains '\n' symbol at the end, except for the last one.
-  void modifySelectedLines(
-    String Function(String line) modifierCallback, {
-    bool shouldSustainSelection = false,
-  }) {
+  void modifySelectedLines(String Function(String line) modifierCallback) {
     if (selection.start == -1 || selection.end == -1) {
       return;
     }
 
+    // to avoid including the next line if '\n' of the last line is selected.
+    if (!selection.isCollapsed) {
+      selection = selection.copyWith(
+        baseOffset: selection.start,
+        extentOffset: selection.end - 1,
+      );
+    }
+
     final lines = _code.lines.lines;
     final fullSelection = _code.hiddenRanges.recoverSelection(selection);
+
+    // index of the first line to modify
     final firstLineIndex =
         _code.lines.characterIndexToLineIndex(fullSelection.start);
+    // index of the last line to modify
     final lastLineIndex =
         _code.lines.characterIndexToLineIndex(fullSelection.end);
-    final firstMargin =
-        lines[firstLineIndex].textRange.start; // first pivot index
-    final secondMargin =
-        lines[lastLineIndex].textRange.end; // second pivot index
-    var insertedBeforeSelection = 0;
-    var insertedInsideSelection = 0;
 
+    final firstLineStart = lines[firstLineIndex].textRange.start;
+    final lastLineEnd = lines[lastLineIndex].textRange.end;
+
+    // apply modification to the selected lines
     final tempBuffer = StringBuffer();
-
     for (int i = firstLineIndex; i <= lastLineIndex; i++) {
-      var insertedLength = _code.lines.lines[i].text.length;
       final modifiedString = modifierCallback(_code.lines.lines[i].text);
-
-      insertedLength = modifiedString.length - insertedLength;
-
       tempBuffer.write(modifiedString);
-
-      if (i == firstLineIndex) {
-        insertedBeforeSelection =
-            fullSelection.start + insertedLength < lines[i].textRange.start
-                ? lines[i].textRange.start - fullSelection.start
-                : insertedLength;
-      }
-
-      insertedInsideSelection += insertedLength;
     }
 
     // Divide _code.text into 3 parts
     // Apply modifications to the selected lines
     // Then combine parts
     // Avoids iterating through all lines.
-    final finalText = _code.text.substring(0, firstMargin) +
+    final finalText = _code.text.substring(0, firstLineStart) +
         tempBuffer.toString() +
-        _code.text.substring(secondMargin, _code.text.length);
+        _code.text.substring(lastLineEnd, _code.text.length);
 
-    var modifiedSelection = fullSelection;
+    // to preserve the folding
+    _updateCode(
+      finalText,
+      matcherType:
+          FoldableBlockMatcherType.multilineIndentOutdentFoldableBlockMatcher,
+    );
 
-    if (fullSelection.isCollapsed) {
-      modifiedSelection = modifiedSelection.copyWith(
-        baseOffset: fullSelection.start + insertedBeforeSelection,
-        extentOffset: fullSelection.start + insertedBeforeSelection,
-      );
-    } 
-    else {
-      modifiedSelection = fullSelection.copyWith(
-        baseOffset: fullSelection.start + insertedBeforeSelection,
-        extentOffset: fullSelection.end + insertedInsideSelection,
-      );
-    }
+    // new selection is
+    // the start of the first modified line
+    // and the end of the last modified line
+    final finalFullSelection = TextSelection(
+      baseOffset: _code.lines.lines[firstLineIndex].textRange.start,
+      extentOffset: _code.lines.lines[lastLineIndex].textRange.end,
+    );
+    final finalVisibleSelection =
+        _code.hiddenRanges.cutSelection(finalFullSelection);
 
-    if (!shouldSustainSelection) {
-      modifiedSelection = modifiedSelection.copyWith(
-        baseOffset: fullSelection.start,
-        extentOffset: fullSelection.start,
-      );
-    }
-
-    _updateCode(finalText);
     final temp = TextEditingValue(
       text: _code.visibleText,
-      selection: modifiedSelection,
+      selection: finalVisibleSelection,
     );
 
     // set pure value
@@ -501,9 +471,13 @@ class CodeController extends TextEditingController {
     }
   }
 
-  void _updateCode(String text) {
+  void _updateCode(
+    String text, {
+    FoldableBlockMatcherType matcherType =
+        FoldableBlockMatcherType.defaultFoldableBlockMatcher,
+  }) {
     final newCode = _createCode(text);
-    _code = newCode.foldedAs(_code);
+    _code = newCode.foldedAs(_code, foldingBlockMatcherType: matcherType);
   }
 
   Code _createCode(String text) {
