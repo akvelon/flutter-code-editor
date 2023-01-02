@@ -5,16 +5,28 @@ import 'foldable_block_matcher_type.dart';
 import 'multiline_edit_foldable_block_matcher.dart';
 
 class FoldableBlockMatcherAbstractFactory {
-  static final Map<FoldableBlockMatcherType,
-          AbstractFoldableBlockMatcher Function(Code oldCode, Code newCode)>
-      _instanceFactoryMaps = {
-    FoldableBlockMatcherType.defaultFoldableBlockMatcher: (oldCode, newCode) =>
-        DefaultFoldableBlockMatcher(oldCode: oldCode, newCode: newCode),
-    FoldableBlockMatcherType.multilineIndentOutdentFoldableBlockMatcher:
-        (oldCode, newCode) => MultilineIndentOutdentFoldableBlockMatcher(
-              oldCode: oldCode,
-              newCode: newCode,
-            ),
+  static final Map<
+      FoldableBlockMatcherType,
+      AbstractFoldableBlockMatcher Function(
+    Code oldCode,
+    Code newCode,
+  )> _instanceFactoryMaps = {
+    FoldableBlockMatcherType.defaultFoldableBlockMatcher: (
+      oldCode,
+      newCode,
+    ) =>
+        DefaultFoldableBlockMatcher(
+          oldCode: oldCode,
+          newCode: newCode,
+        ),
+    FoldableBlockMatcherType.multilineIndentOutdentFoldableBlockMatcher: (
+      oldCode,
+      newCode,
+    ) =>
+        MultilineIndentOutdentFoldableBlockMatcher(
+          oldCode: oldCode,
+          newCode: newCode,
+        ),
   };
 
   static Set<FoldableBlock> getNewFoldableBlocks({
