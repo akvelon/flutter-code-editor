@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/python.dart';
 
 void main() {
   group('CodeController.indentSelection() => Unfolded text', () {
@@ -240,12 +241,36 @@ aaaa
             extentOffset: 13,
           ),
           expectedSelection: TextSelection(
-            baseOffset: 7 + indentLength,
-            extentOffset: 13 + indentLength * 2,
+            baseOffset: 5,
+            extentOffset: 19,
           ),
         ),
         _Example(
-          name: 'WHEN entire document is selected '
+          name: 'WHEN entire document is selected without new line at the end '
+              'SHOULD add indentation to all lines',
+          initialFullText: '''
+AAA
+AAA
+AAA''',
+          expectedFullText: '''
+${indent}AAA
+${indent}AAA
+${indent}AAA''',
+          expectedVisibleText: '''
+${indent}AAA
+${indent}AAA
+${indent}AAA''',
+          initialSelection: const TextSelection(
+            baseOffset: 0,
+            extentOffset: 11,
+          ),
+          expectedSelection: TextSelection(
+            baseOffset: 0,
+            extentOffset: 17,
+          ),
+        ),
+        _Example(
+          name: 'WHEN entire document is selected with new line at the end '
               'SHOULD add indentation to all lines',
           initialFullText: '''
 AAA
@@ -264,11 +289,11 @@ ${indent}AAA
 ''',
           initialSelection: const TextSelection(
             baseOffset: 0,
-            extentOffset: 11,
+            extentOffset: 12,
           ),
           expectedSelection: TextSelection(
-            baseOffset: 0 + indentLength,
-            extentOffset: 11 + indentLength * 3,
+            baseOffset: 0,
+            extentOffset: 18,
           ),
         ),
       ];
@@ -302,7 +327,7 @@ ${indent}AAA
     });
   });
 
-  group('CodeController.indentSelection() => Folded text', () {
+  group('Folded text, language: java', () {
     final language = java;
     CodeController controller = CodeController(
       params: const EditorParams(tabSpaces: 2),
@@ -311,119 +336,306 @@ ${indent}AAA
     final indentLength = controller.params.tabSpaces;
     final indent = ' ' * indentLength;
 
-    test('description', () {
+    test('Folded text, language: java', () {
       final examples = [
         _Example(
-          name: 'Indentation through a folded block affects and unfolds it',
+          name: 'Indentation through a folded block '
+              'SHOULD affect it entirely but SHOULD NOT unfold it',
           initialFullText: '''
-class MyClass {
-  void getSmth(){
+aaAA{
+  AAAA{
 
   }
 
-  void setSmth(){
+  AAaa{
 
   }
 }
 ''',
           initialVisibleText: '''
-class MyClass {
-  void getSmth(){
+aaAA{
+  AAAA{
 
-  void setSmth(){
+  AAaa{
 
   }
 }
 ''',
           expectedFullText: '''
-${indent}class MyClass {
-$indent  void getSmth(){
+${indent}aaAA{
+$indent  AAAA{
 
 $indent  }
 
-$indent  void setSmth(){
+$indent  AAaa{
 
   }
 }
 ''',
           expectedVisibleText: '''
-${indent}class MyClass {
-$indent  void getSmth(){
+${indent}aaAA{
+$indent  AAAA{
 
-$indent  }
-
-$indent  void setSmth(){
+$indent  AAaa{
 
   }
 }
 ''',
-          foldableBlockIndex: 1,
-          initialSelection: TextSelection(
-            baseOffset: 0,
-            extentOffset: 44,
-          ),
-          expectedSelection: TextSelection(
-            baseOffset: 0 + indentLength,
-            extentOffset: 44 + indentLength * 4 + 5, // 5 -> hidden
-          ),
+          blockIndexesToFold: [1],
+          initialSelection: TextSelection(baseOffset: 2, extentOffset: 19),
+          expectedSelection: TextSelection(baseOffset: 0, extentOffset: 29),
         ),
         _Example(
-          name: 'Indentation before folded blocks does not affect neither open them',
+          name: 'Indentation before the folded block '
+              'SHOULD NOT affect neither unfold it',
           initialFullText: '''
-class MyClass {
-  void getSmth(){
+aaAA{
+  AAaa();
 
-  }
-
-  void setSmth(){
+  aaaa{
 
   }
 }
 ''',
           initialVisibleText: '''
-class MyClass {
-  void getSmth(){
+aaAA{
+  AAaa();
 
-  }
-
-  void setSmth(){
+  aaaa{
 }
 ''',
           expectedFullText: '''
-${indent}class MyClass {
-$indent  void getSmth(){
+${indent}aaAA{
+$indent  AAaa();
 
-$indent  }
-
-  void setSmth(){
+  aaaa{
 
   }
 }
 ''',
           expectedVisibleText: '''
-${indent}class MyClass {
-$indent  void getSmth(){
+${indent}aaAA{
+$indent  AAaa();
 
-$indent  }
-
-  void setSmth(){
+  aaaa{
 }
 ''',
-          foldableBlockIndex: 2,
-          initialSelection: TextSelection(
-            baseOffset: 0,
-            extentOffset: 38,
-          ),
-          expectedSelection: TextSelection(
-            baseOffset: 0 + indentLength,
-            extentOffset: 38 + indentLength * 3,
-          ),
+          blockIndexesToFold: [1],
+          initialSelection: TextSelection(baseOffset: 2, extentOffset: 10),
+          expectedSelection: TextSelection(baseOffset: 0, extentOffset: 20),
         ),
+        _Example(
+          name: 'Indentation after the folded block '
+              'SHOULD NOT affect neither unfold it',
+          initialFullText: '''
+aaaa{
+  aaaa{
+
+  }
+
+  aaAA{
+
+  }A
+}
+''',
+          initialVisibleText: '''
+aaaa{
+  aaaa{
+
+  aaAA{
+
+  }A
+}
+''',
+          expectedFullText: '''
+aaaa{
+  aaaa{
+
+  }
+
+$indent  aaAA{
+
+$indent  }A
+}
+''',
+          expectedVisibleText: '''
+aaaa{
+  aaaa{
+
+$indent  aaAA{
+
+$indent  }A
+}
+''',
+          blockIndexesToFold: [1],
+          initialSelection: TextSelection(baseOffset: 19, extentOffset: 28),
+          expectedSelection: TextSelection(baseOffset: 15, extentOffset: 33),
+        ),
+        _Example(
+          name: 'Indentation between folded blocks '
+              'SHOULD NOT affect neither unfold them',
+          initialFullText: '''
+aaaa{
+  aaaa{
+
+  }
+
+  aaAA{
+
+  }A
+
+  aaaa{
+
+  }
+}
+''',
+          initialVisibleText: '''
+aaaa{
+  aaaa{
+
+  aaAA{
+
+  }A
+
+  aaaa{
+}
+''',
+          expectedFullText: '''
+aaaa{
+  aaaa{
+
+  }
+
+$indent  aaAA{
+
+$indent  }A
+
+  aaaa{
+
+  }
+}
+''',
+          expectedVisibleText: '''
+aaaa{
+  aaaa{
+
+$indent  aaAA{
+
+$indent  }A
+
+  aaaa{
+}
+''',
+          blockIndexesToFold: [1, 3],
+          initialSelection: TextSelection(baseOffset: 19, extentOffset: 28),
+          expectedSelection: TextSelection(baseOffset: 15, extentOffset: 33),
+        )
       ];
 
       for (final example in examples) {
+        controller = CodeController(
+          params: const EditorParams(tabSpaces: 2),
+          language: language,
+        );
         controller.text = example.initialFullText;
-        controller.foldAt(controller.code.foldableBlocks[example.foldableBlockIndex!].firstLine);
+        for (final blockIndexToFold in example.blockIndexesToFold!) {
+          controller.foldAt(
+            controller.code.foldableBlocks[blockIndexToFold].firstLine,
+          );
+        }
+        controller.selection = example.initialSelection;
+
+        expect(
+          controller.value.text,
+          example.initialVisibleText,
+          reason: 'assertion of an arranged data',
+        );
+
+        controller.indentSelection();
+
+        expect(
+          controller.value.text,
+          example.expectedVisibleText,
+          reason: example.name,
+        );
+        expect(
+          controller.code.text,
+          example.expectedFullText,
+          reason: example.name,
+        );
+        expect(
+          controller.value.selection,
+          example.expectedSelection,
+          reason: example.name,
+        );
+      }
+    });
+  });
+
+  group('Folded text, language: python', () {
+    final language = python;
+    CodeController controller = CodeController(
+      params: const EditorParams(tabSpaces: 2),
+      language: language,
+    );
+    final indentLength = controller.params.tabSpaces;
+    final indent = ' ' * indentLength;
+
+    test('Folded text, language: python', () {
+      final examples = {
+        _Example(
+          name: 'WHEN indentation changes folded block\'s lines '
+              'SHOULD unfold that folded block',
+          initialFullText: '''
+aaaa:
+  aaaa:
+    aaaa
+    aaaa
+  aaAA:
+    AAAA
+    AAaa
+''',
+          initialVisibleText: '''
+aaaa:
+  aaaa:
+  aaAA:
+    AAAA
+    AAaa
+''',
+          expectedFullText: '''
+aaaa:
+  aaaa:
+    aaaa
+    aaaa
+    aaAA:
+      AAAA
+      AAaa
+''',
+          expectedVisibleText: '''
+aaaa:
+  aaaa:
+    aaaa
+    aaaa
+    aaAA:
+      AAAA
+      AAaa
+''',
+          blockIndexesToFold: [1],
+          initialSelection: TextSelection(baseOffset: 18, extentOffset: 37),
+          expectedSelection: TextSelection(baseOffset: 32, extentOffset: 64),
+        ),
+      };
+      for (final example in examples) {
+        controller = CodeController(
+          params: const EditorParams(tabSpaces: 2),
+          language: language,
+        );
+        controller.text = example.initialFullText;
+        for (final blockIndexToFold in example.blockIndexesToFold!) {
+          controller.foldAt(
+            controller.code.foldableBlocks[blockIndexToFold].firstLine,
+          );
+        }
         controller.selection = example.initialSelection;
 
         expect(
@@ -460,7 +672,7 @@ class _Example {
   final String? initialVisibleText;
   final String expectedFullText;
   final String expectedVisibleText;
-  final int? foldableBlockIndex;
+  final List<int>? blockIndexesToFold;
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
@@ -470,7 +682,7 @@ class _Example {
     this.initialVisibleText,
     required this.expectedFullText,
     required this.expectedVisibleText,
-    this.foldableBlockIndex,
+    this.blockIndexesToFold,
     required this.initialSelection,
     required this.expectedSelection,
   });
