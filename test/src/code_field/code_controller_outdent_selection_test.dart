@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/python.dart';
 
 void main() {
   group('Unfolded', () {
@@ -65,7 +66,7 @@ aaaa
           ),
           expectedSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 0,
+            extentOffset: 5,
           ),
         ),
         const _Example(
@@ -92,7 +93,7 @@ aaaa
           ),
           expectedSelection: TextSelection(
             baseOffset: 7,
-            extentOffset: 7,
+            extentOffset: 14,
           ),
         ),
         _Example(
@@ -117,15 +118,14 @@ aaaa
             extentOffset: 4,
           ),
           expectedSelection: TextSelection(
-            baseOffset: 4 - indentLength,
-            extentOffset: 4 - indentLength,
+            baseOffset: 0,
+            extentOffset: 5,
           ),
         ),
         const _Example(
           name: 'WHEN at the beginning whiteSpace '
               'that is not a full indent '
-              'SHOULD remove all beginning whitespaces of the line '
-              'and sustain selection at the beginning of that line',
+              'SHOULD remove all beginning whitespaces of the line ',
           initialFullText: '''
   aaaa
  aaaa
@@ -147,7 +147,7 @@ aaaa
           ),
           expectedSelection: TextSelection(
             baseOffset: 7,
-            extentOffset: 7,
+            extentOffset: 12,
           ),
         ),
         _Example(
@@ -173,8 +173,8 @@ aaaa
             extentOffset: 6,
           ),
           expectedSelection: TextSelection(
-            baseOffset: 6 - indentLength,
-            extentOffset: 6 - indentLength,
+            baseOffset: 0,
+            extentOffset: 5,
           ),
         ),
       ];
@@ -215,25 +215,22 @@ aaaa
           initialFullText: '''
   AAAA
       AAAA
-  AAAA
-''',
+  AAAA''',
           expectedFullText: '''
 AAAA
     AAAA
-AAAA
-''',
+AAAA''',
           expectedVisibleText: '''
 AAAA
     AAAA
-AAAA
-''',
+AAAA''',
           initialSelection: TextSelection(
             baseOffset: 0,
             extentOffset: 24,
           ),
           expectedSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 24 - indentLength * 3,
+            extentOffset: 18,
           ),
         ),
         _Example(
@@ -260,7 +257,7 @@ AAAA
           ),
           expectedSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 22 - indentLength * 2,
+            extentOffset: 19,
           ),
         ),
       ];
@@ -294,7 +291,7 @@ AAAA
     });
   });
 
-  group('Folded', () {
+  group('Folded, language: java', () {
     final language = java;
     CodeController controller = CodeController(
       params: const EditorParams(tabSpaces: 2),
@@ -303,122 +300,197 @@ AAAA
     final indentLength = controller.params.tabSpaces;
     final indent = ' ' * indentLength;
 
-    test('description', () {
+    test('Folded blocks test', () {
       final examples = [
         _Example(
-          name: 'Outdentation through a folded block affects and unfolds it',
+          name: 'Outdentation through a folded block '
+              'SHOULD affect it but SHOULD NOT unfold it',
           initialFullText: '''
-class MyClass {
-${indent}void getSmth(){
+AAAA{
+  AAAA{
 
-$indent}
-
-${indent}void setSmth(){
-
-$indent}
+  }
 }
 ''',
           initialVisibleText: '''
-class MyClass {
-${indent}void getSmth(){
-
-${indent}void setSmth(){
-
-$indent}
+AAAA{
+  AAAA{
 }
 ''',
           expectedFullText: '''
-class MyClass {
-void getSmth(){
+AAAA{
+AAAA{
 
 }
-
-void setSmth(){
-
-$indent}
 }
 ''',
           expectedVisibleText: '''
-class MyClass {
-void getSmth(){
-
-}
-
-void setSmth(){
-
-$indent}
+AAAA{
+AAAA{
 }
 ''',
-          foldableBlockIndex: 1,
+          blockIndexesToFold: [1],
           initialSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 44,
+            extentOffset: 15,
           ),
           expectedSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 44 - indentLength * 3 + 5, // 5 -> hidden
+            extentOffset: 14,
           ),
         ),
         _Example(
-          name:
-              'Indentation before folded blocks does not affect neither open them',
+          name: 'Outdentation before a folded block '
+              'SHOULD NOT affect neither unfold it',
           initialFullText: '''
-class MyClass {
-${indent}void getSmth(){
+  AAAA{
+    aaaa{
 
-$indent}
-
-  void setSmth(){
-
+    }
   }
-}
 ''',
           initialVisibleText: '''
-class MyClass {
-${indent}void getSmth(){
-
-$indent}
-
-  void setSmth(){
-}
+  AAAA{
+    aaaa{
+  }
 ''',
           expectedFullText: '''
-class MyClass {
-void getSmth(){
+AAAA{
+    aaaa{
 
-}
-
-  void setSmth(){
-
+    }
   }
-}
 ''',
           expectedVisibleText: '''
-class MyClass {
-void getSmth(){
-
-}
-
-  void setSmth(){
-}
+AAAA{
+    aaaa{
+  }
 ''',
-          foldableBlockIndex: 2,
+          blockIndexesToFold: [1],
           initialSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 38,
+            extentOffset: 0,
           ),
           expectedSelection: TextSelection(
             baseOffset: 0,
-            extentOffset: 38 - indentLength * 2,
+            extentOffset: 6,
+          ),
+        ),
+        _Example(
+          name: 'Outdentation after a folded block '
+              'SHOULD NOT affect neither unfold it',
+          initialFullText: '''
+aaaa{
+
+}
+
+  AAAa{
+
+  }
+''',
+          initialVisibleText: '''
+aaaa{
+
+  AAAa{
+
+  }
+''',
+          expectedFullText: '''
+aaaa{
+
+}
+
+AAAa{
+
+  }
+''',
+          expectedVisibleText: '''
+aaaa{
+
+AAAa{
+
+  }
+''',
+          blockIndexesToFold: [0],
+          initialSelection: TextSelection(
+            baseOffset: 9,
+            extentOffset: 12,
+          ),
+          expectedSelection: TextSelection(
+            baseOffset: 7,
+            extentOffset: 13,
+          ),
+        ),
+        _Example(
+          name: 'Outdentation between folded blocks '
+              'SHOULD NOT affect neither unfold them',
+          initialFullText: '''
+aaaa{
+
+}
+
+  aaAA{
+
+  }A
+
+aaaa{
+
+}
+''',
+          initialVisibleText: '''
+aaaa{
+
+  aaAA{
+
+  }A
+
+aaaa{
+''',
+          expectedFullText: '''
+aaaa{
+
+}
+
+aaAA{
+
+}A
+
+aaaa{
+
+}
+''',
+          expectedVisibleText: '''
+aaaa{
+
+aaAA{
+
+}A
+
+aaaa{
+''',
+          blockIndexesToFold: [0, 2],
+          initialSelection: TextSelection(
+            baseOffset: 11,
+            extentOffset: 20,
+          ),
+          expectedSelection: TextSelection(
+            baseOffset: 7,
+            extentOffset: 17,
           ),
         ),
       ];
 
       for (final example in examples) {
-        controller.text = example.initialFullText;
-        controller.foldAt(
-          controller.code.foldableBlocks[example.foldableBlockIndex!].firstLine,
+        CodeController controller = CodeController(
+          params: const EditorParams(tabSpaces: 2),
+          language: language,
         );
+        controller.text = example.initialFullText;
+        for (final blockIndexToFold in example.blockIndexesToFold!) {
+          controller.foldAt(
+            controller.code.foldableBlocks[blockIndexToFold].firstLine,
+          );
+        }
         controller.selection = example.initialSelection;
 
         expect(
@@ -455,7 +527,7 @@ class _Example {
   final String? initialVisibleText;
   final String expectedFullText;
   final String expectedVisibleText;
-  final int? foldableBlockIndex;
+  final List<int>? blockIndexesToFold;
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
@@ -465,7 +537,7 @@ class _Example {
     this.initialVisibleText,
     required this.expectedFullText,
     required this.expectedVisibleText,
-    this.foldableBlockIndex,
+    this.blockIndexesToFold,
     required this.initialSelection,
     required this.expectedSelection,
   });
