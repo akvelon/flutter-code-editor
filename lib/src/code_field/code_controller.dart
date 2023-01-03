@@ -208,8 +208,7 @@ class CodeController extends TextEditingController {
         popupController.scrollByArrow(ScrollDirection.down);
         return KeyEventResult.handled;
       }
-      if (event.logicalKey == LogicalKeyboardKey.enter ||
-          event.logicalKey == LogicalKeyboardKey.tab) {
+      if (event.logicalKey == LogicalKeyboardKey.enter) {
         insertSelectedWord();
         return KeyEventResult.handled;
       }
@@ -379,9 +378,9 @@ class CodeController extends TextEditingController {
   /// Filters the lines that have at least one character selected.
   ///
   /// IMPORTANT: this method also changes the selection to be:
-  /// start: start of the first selected line 
+  /// start: start of the first selected line
   /// end: end of the last line
-  /// 
+  ///
   /// Folded blocks are considered to be selected
   /// if they are located between start and end of a selection.
   ///
