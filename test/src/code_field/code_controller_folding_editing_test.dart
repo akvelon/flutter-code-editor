@@ -208,38 +208,38 @@ private class MyClass {
       });
 
       // TODO(alexeyinkin): Fix, https://github.com/akvelon/flutter-code-editor/issues/83
-//       testWidgets(
-//         'When deleting 2nd identical folded block, 1st one incorrectly folds',
-//         (WidgetTester wt) async {
-//           final controller = await pumpController(wt, '''
-// {
-// if (true) {
-// }
-// if (true) {
-// }
-// }
-// ''');
-//           controller.foldAt(3);
-//           await wt.selectFromHome(26, offset: 2);
-//           // {\nif (true) {\n}\nif (true) {}\n\n
-//           //                              \ cursor
+      testWidgets(
+        'When deleting 2nd identical folded block, 1st one incorrectly folds',
+        (WidgetTester wt) async {
+          final controller = await pumpController(wt, '''
+{
+if (true) {
+}
+if (true) {
+}
+}
+''');
+          controller.foldAt(3);
+          await wt.selectFromHome(26, offset: 2);
+          // {\nif (true) {\n}\nif (true) {}\n\n
+          //                              \ cursor
 
-//           controller.value = controller.value.replacedSelection(';');
+          controller.value = controller.value.replacedSelection(';');
 
-//           expect(
-//             controller.value,
-//             const TextEditingValue(
-//               text: '''
-// {
-// if (true) {
-// if (true) ;}
-// ''',
-//               // TODO(alexeyinkin): Selection.
-//               selection: TextSelection.collapsed(offset: 13),
-//             ),
-//           );
-//         },
-//       );
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
+{
+if (true) {
+if (true) ;}
+''',
+              // TODO(alexeyinkin): Selection.
+              selection: TextSelection.collapsed(offset: 13),
+            ),
+          );
+        },
+      );
 
       testWidgets('Deleting folded comments', (WidgetTester wt) async {
         final controller = await pumpController(wt, _commentsCode);

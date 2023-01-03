@@ -7,7 +7,7 @@ import 'abstract_foldable_block_matcher.dart';
 /// folding state.
 ///
 /// Blocks match if they go in the same order and have the same content.
-class DefaultFoldableBlockMatcher implements AbstractFoldableBlockMatcher{
+class DefaultFoldableBlockMatcher implements AbstractFoldableBlockMatcher {
   @override
   final Set<FoldableBlock> newFoldedBlocks;
   final List<CodeLine> _newLines;
@@ -40,7 +40,7 @@ class DefaultFoldableBlockMatcher implements AbstractFoldableBlockMatcher{
       if (_match(oldBlock: oldBlock, newBlock: newBlock)) {
         oldToNew[oldBlock] = newBlock;
       } else {
-        continue;
+        break;
       }
     }
 
