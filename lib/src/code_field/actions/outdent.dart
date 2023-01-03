@@ -13,8 +13,6 @@ class OutdentIntentAction extends Action<OutdentIntent> {
     required this.controller,
   });
 
-  int get tabSpaces => controller.params.tabSpaces;
-
   @override
   Object? invoke(OutdentIntent intent) {
     controller.outdentSelection();
