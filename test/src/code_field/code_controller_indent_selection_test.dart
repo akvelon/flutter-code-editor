@@ -691,6 +691,14 @@ aAA{
 }
 // [END $readonlySectionName]
 ''',
+          initialVisibleText: '''
+
+aAA{
+  AAAA();
+  AAaa();
+}
+
+''',
           expectedFullText: '''
 // [START $readonlySectionName]
 aAA{
@@ -722,6 +730,20 @@ AAA{
   AAAA();
 }
 // [END $readonlySectionName]
+Aaa{
+
+}
+''',
+          initialVisibleText: '''
+aAA{
+
+}
+
+AAA{
+  AAAA();
+  AAAA();
+}
+
 Aaa{
 
 }
@@ -768,6 +790,12 @@ AAA{
         );
         controller.text = example.initialFullText;
         controller.selection = example.initialSelection;
+
+        expect(
+          controller.value.text,
+          example.initialVisibleText,
+        );
+
         controller.indentSelection();
 
         expect(
