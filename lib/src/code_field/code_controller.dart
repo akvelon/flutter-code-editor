@@ -415,7 +415,13 @@ class CodeController extends TextEditingController {
     // apply modification to the selected lines
     final tempBuffer = StringBuffer();
     for (int i = firstLineIndex; i <= lastLineIndex; i++) {
-      final modifiedString = modifierCallback(_code.lines.lines[i].text);
+      // we don't want to modify line if it is readonly
+      if (lines[i].isReadOnly) {
+        tempBuffer.write(lines[i].text);
+        continue;
+      }
+
+      final modifiedString = modifierCallback(lines[i].text);
       tempBuffer.write(modifiedString);
     }
 
