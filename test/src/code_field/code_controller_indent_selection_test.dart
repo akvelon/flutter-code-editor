@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 
+import 'split_highlight_lines_test.dart';
+
 void main() {
   group('CodeController.indentSelection() => Unfolded text', () {
     CodeController controller = CodeController(
@@ -644,6 +646,128 @@ aaaa:
           reason: 'assertion of an arranged data',
         );
 
+        controller.indentSelection();
+
+        expect(
+          controller.value.text,
+          example.expectedVisibleText,
+          reason: example.name,
+        );
+        expect(
+          controller.code.text,
+          example.expectedFullText,
+          reason: example.name,
+        );
+        expect(
+          controller.value.selection,
+          example.expectedSelection,
+          reason: example.name,
+        );
+      }
+    });
+  });
+
+  group('Readonly blocks shouldn\'t be modified', () {
+    final language = java;
+    const readonlySectionName = 'readonlySection'; // length = 15
+    CodeController controller = CodeController(
+      language: language,
+      namedSectionParser: BracketsStartEndNamedSectionParser(),
+      params: const EditorParams(tabSpaces: 2),
+      readOnlySectionNames: {readonlySectionName},
+    );
+    final indentLength = controller.params.tabSpaces;
+    final indent = ' ' * indentLength;
+
+    test('Readonly blocks', () {
+      final examples = [
+        _Example(
+          name: 'Selection is within readonly section',
+          initialFullText: '''
+// [START $readonlySectionName]
+aAA{
+  AAAA();
+  AAaa();
+}
+// [END $readonlySectionName]
+''',
+          expectedFullText: '''
+// [START $readonlySectionName]
+aAA{
+  AAAA();
+  AAaa();
+}
+// [END $readonlySectionName]
+''',
+          expectedVisibleText: '''
+
+aAA{
+  AAAA();
+  AAaa();
+}
+
+''',
+          initialSelection: TextSelection(baseOffset: 2, extentOffset: 20),
+          expectedSelection: TextSelection(baseOffset: 1, extentOffset: 26),
+        ),
+        _Example(
+          name: 'Selection goes through readonly section',
+          initialFullText: '''
+aAA{
+
+}
+// [START $readonlySectionName]
+AAA{
+  AAAA();
+  AAAA();
+}
+// [END $readonlySectionName]
+Aaa{
+
+}
+''',
+          expectedFullText: '''
+  aAA{
+
+  }
+// [START $readonlySectionName]
+AAA{
+  AAAA();
+  AAAA();
+}
+// [END $readonlySectionName]
+  Aaa{
+
+}
+''',
+          expectedVisibleText: '''
+  aAA{
+
+  }
+
+AAA{
+  AAAA();
+  AAAA();
+}
+
+  Aaa{
+
+}
+''',
+          initialSelection: TextSelection(baseOffset: 1, extentOffset: 38),
+          expectedSelection: TextSelection(baseOffset: 0, extentOffset: 48),
+        ),
+      ];
+
+      for (final example in examples) {
+        controller = CodeController(
+          language: language,
+          namedSectionParser: BracketsStartEndNamedSectionParser(),
+          params: const EditorParams(tabSpaces: 2),
+          readOnlySectionNames: {readonlySectionName},
+        );
+        controller.text = example.initialFullText;
+        controller.selection = example.initialSelection;
         controller.indentSelection();
 
         expect(
