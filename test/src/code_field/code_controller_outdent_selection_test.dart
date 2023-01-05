@@ -16,7 +16,7 @@ void main() {
     test('Selection is collapsed', () {
       final examples = [
         const _Example(
-          name: 'WHEN start == -1 && end == -1 SHOULD NOT modify anything',
+          'WHEN start == -1 && end == -1 SHOULD NOT modify anything',
           initialFullText: '''
   aaaa
 aaaa
@@ -42,8 +42,8 @@ aaaa
           ),
         ),
         const _Example(
-          name: 'WHEN at the start of the first line '
-              'SHOULD modify first line',
+          'WHEN at the start of the first line '
+          'SHOULD modify first line',
           initialFullText: '''
   aaaa
 aaaa
@@ -69,8 +69,8 @@ aaaa
           ),
         ),
         const _Example(
-          name: 'WHEN at the start of a non-first line '
-              'SHOULD modify that line',
+          'WHEN at the start of a non-first line '
+          'SHOULD modify that line',
           initialFullText: '''
   aaaa
     aaaa
@@ -96,7 +96,7 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN at the middle of a line SHOULD modify that line',
+          'WHEN at the middle of a line SHOULD modify that line',
           initialFullText: '''
   aaaa
 aaaa
@@ -122,9 +122,9 @@ aaaa
           ),
         ),
         const _Example(
-          name: 'WHEN at the beginning whiteSpace '
-              'that is not a full indent '
-              'SHOULD remove all beginning whitespaces of the line ',
+          'WHEN at the beginning whiteSpace '
+          'that is not a full indent '
+          'SHOULD remove all beginning whitespaces of the line ',
           initialFullText: '''
   aaaa
  aaaa
@@ -150,8 +150,8 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN at the end of a line '
-              'SHOULD modify that line',
+          'WHEN at the end of a line '
+          'SHOULD modify that line',
           initialFullText: '''
   aaaa
 aaaa
@@ -209,8 +209,8 @@ aaaa
     test('Selection is a range', () {
       final examples = [
         _Example(
-          name: 'WHEN the entire document is selectd '
-              'SHOULD outdent all lines',
+          'WHEN the entire document is selectd '
+          'SHOULD outdent all lines',
           initialFullText: '''
   AAAA
       AAAA
@@ -233,8 +233,8 @@ AAAA''',
           ),
         ),
         _Example(
-          name: 'WHEN lines that doesn\'t have indent are selected '
-              'SHOULD NOT outdent that lines',
+          'WHEN lines that doesn\'t have indent are selected '
+          'SHOULD NOT outdent that lines',
           initialFullText: '''
 AAAA
       AAAA
@@ -260,8 +260,8 @@ AAAA
           ),
         ),
         _Example(
-          name: 'Outdent SHOULD NOT unfold folded comment at line 0 '
-              'and folded imports',
+          'Outdent SHOULD NOT unfold folded comment at line 0 '
+          'and folded imports',
           initialFullText: '''
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -393,8 +393,8 @@ class _Example {
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
-  const _Example({
-    required this.name,
+  const _Example(
+    this.name, {
     required this.initialFullText,
     this.initialVisibleText,
     required this.expectedFullText,

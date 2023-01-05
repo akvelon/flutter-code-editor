@@ -23,7 +23,7 @@ void main() {
     test('Selection is collapsed', () {
       final examples = [
         const _Example(
-          name: 'WHEN start == -1 && end == -1 SHOULD NOT modify anything',
+          'WHEN start == -1 && end == -1 SHOULD NOT modify anything',
           initialFullText: '''
 aaaa
 aaaa
@@ -49,8 +49,8 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN start == 0 && end == 0 '
-              'SHOULD add indentation to the cursor location',
+          'WHEN start == 0 && end == 0 '
+          'SHOULD add indentation to the cursor location',
           initialFullText: '''
 aaaa
 aaaa
@@ -76,8 +76,8 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN collapsed at start of a non-first line '
-              'SHOULD add indentation to the cursor location',
+          'WHEN collapsed at start of a non-first line '
+          'SHOULD add indentation to the cursor location',
           initialFullText: '''
 aaaa
 aaaa
@@ -103,8 +103,8 @@ aaaa
           ),
         ),
         const _Example(
-          name: 'WHEN at a column that is not a multiple of indent_length '
-              'SHOULD add spaces to adjust indentation to its multiple',
+          'WHEN at a column that is not a multiple of indent_length '
+          'SHOULD add spaces to adjust indentation to its multiple',
           initialFullText: '''
 aaaa
    aaaa
@@ -130,8 +130,8 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN at a column that is a multiple of indent_length '
-              'SHOULD add full indentation to the cursor location',
+          'WHEN at a column that is a multiple of indent_length '
+          'SHOULD add full indentation to the cursor location',
           initialFullText: '''
 aaaa
   aaaa
@@ -157,8 +157,8 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN at the end of a document '
-              'SHOULD add indentation to the cursor location',
+          'WHEN at the end of a document '
+          'SHOULD add indentation to the cursor location',
           initialFullText: '''
 aaaa
 aaaa
@@ -216,8 +216,8 @@ aaaa$indent
     test('Selection is a range', () {
       final examples = [
         _Example(
-          name: 'WHEN non-collapsed selection, two lines, not first, not last. '
-              'SHOULD add indentation to the selected lines',
+          'WHEN non-collapsed selection, two lines, not first, not last. '
+          'SHOULD add indentation to the selected lines',
           initialFullText: '''
 aaaa
 aaAA
@@ -246,8 +246,8 @@ aaaa
           ),
         ),
         _Example(
-          name: 'WHEN entire document is selected without new line at the end '
-              'SHOULD add indentation to all lines',
+          'WHEN entire document is selected without new line at the end '
+          'SHOULD add indentation to all lines',
           initialFullText: '''
 AAA
 AAA
@@ -270,8 +270,8 @@ ${indent}AAA''',
           ),
         ),
         _Example(
-          name: 'WHEN entire document is selected with new line at the end '
-              'SHOULD add indentation to all lines',
+          'WHEN entire document is selected with new line at the end '
+          'SHOULD add indentation to all lines',
           initialFullText: '''
 AAA
 AAA
@@ -297,8 +297,8 @@ ${indent}AAA
           ),
         ),
         _Example(
-          name: 'Indent SHOULD NOT unfold folded comment at line 0 '
-              'and folded imports',
+          'Indent SHOULD NOT unfold folded comment at line 0 '
+          'and folded imports',
           initialFullText: '''
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -438,7 +438,7 @@ package org.apache.beam.examples;
         'entire modification should be cancelled', () {
       final examples = [
         _Example(
-          name: 'Selection is within readonly section',
+          'Selection is within readonly section',
           initialFullText: '''
 // [START $readonlySectionName]
 aAA{
@@ -475,7 +475,7 @@ aAA{
           expectedSelection: TextSelection(baseOffset: 2, extentOffset: 20),
         ),
         _Example(
-          name: 'Selection goes through readonly section',
+          'Selection goes through readonly section',
           initialFullText: '''
 aAA{
 
@@ -584,8 +584,8 @@ class _Example {
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
-  const _Example({
-    required this.name,
+  const _Example(
+    this.name, {
     required this.initialFullText,
     this.initialVisibleText,
     required this.expectedFullText,
