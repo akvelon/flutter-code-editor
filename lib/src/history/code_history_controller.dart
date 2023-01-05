@@ -51,7 +51,7 @@ class CodeHistoryController {
 
     bool shouldSave = false;
 
-    if (_wasTextChanged) {
+    if (!shouldSave && _wasTextChanged) {
       // Inserting and deleting lines are significant enough
       // to save a record without waiting for idle.
       shouldSave = code.lines.lines.length != lastCode.lines.lines.length;
