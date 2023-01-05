@@ -24,7 +24,7 @@ class CodeHistoryController {
   Code lastCode;
   TextSelection lastSelection;
   int _currentRecordIndex = 0;
-  bool _isTextChanged = false;
+  bool _wasTextChanged = false;
   Timer? _debounceTimer;
 
   @visibleForTesting
@@ -40,20 +40,29 @@ class CodeHistoryController {
     _push();
   }
 
-  void beforeChanged(Code code, TextSelection selection) {
-    _dropRedoIfNeed();
+  void beforeChanged({
+    required Code code,
+    required TextSelection selection,
+    required bool isTextChanging,
+  }) {
+    if (isTextChanging) {
+      _dropRedoIfAny();
+    }
+
     bool shouldSave = false;
 
-    if (_isTextChanged) {
+    if (_wasTextChanged) {
+      // Inserting and deleting lines are significant enough
+      // to save a record without waiting for idle.
       shouldSave = code.lines.lines.length != lastCode.lines.lines.length;
     }
 
     if (!shouldSave) {
-      if (lastCode.text != code.text) {
-        _isTextChanged = true;
+      if (isTextChanging) {
+        _wasTextChanged = true;
       }
 
-      if (_isTextChanged) {
+      if (_wasTextChanged) {
         final isText1CharLonger = code.text.length == lastCode.text.length + 1;
         final isTypingContinuous = isText1CharLonger &&
             selection.hasMovedOneCharacterRight(lastSelection);
@@ -74,12 +83,12 @@ class CodeHistoryController {
     lastSelection = selection;
   }
 
-  void _dropRedoIfNeed() {
-    stack.removeAfter(_currentRecordIndex + 1);
+  void _dropRedoIfAny() {
+    stack.removeStartingAt(_currentRecordIndex + 1);
   }
 
   void undo() {
-    if (_isTextChanged) {
+    if (_wasTextChanged) {
       _push();
     }
 
@@ -108,7 +117,7 @@ class CodeHistoryController {
   void _push() {
     _debounceTimer?.cancel();
     _pushRecord(_createRecord());
-    _isTextChanged = false;
+    _wasTextChanged = false;
   }
 
   void _setTimer() {

@@ -185,6 +185,23 @@ void main() {
         );
       });
 
+      testWidgets(
+        'Selection after undo does not affect future',
+        (WidgetTester wt) async {
+          final controller = await pumpController(wt, MethodSnippet.full);
+
+          await wt.cursorEnd();
+          controller.value = controller.value.typed('a');
+          await wt.sendUndo(); // Creates.
+          await wt.pumpAndSettle();
+
+          controller.value = controller.value.copyWith(
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+          expect(controller.historyController.stack.length, 2);
+        },
+      );
+
       testWidgets('Undo to bottom, then redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
