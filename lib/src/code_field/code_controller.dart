@@ -8,7 +8,6 @@ import 'package:highlight/highlight_core.dart';
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
-import '../folding/matchers/foldable_block_matcher_type.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../wip/autocomplete/popup_controller.dart';
@@ -330,7 +329,7 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    modifySelectedLines((line) {
+    value = modifySelectedLines((line) {
       if (line == '\n') {
         return line;
       }
@@ -363,11 +362,11 @@ class CodeController extends TextEditingController {
       final lineIndex = _code.lines.characterIndexToLineIndex(fullPosition);
       final columnIndex = fullPosition - lines[lineIndex].textRange.start;
       final insert = ' ' * (tabSpaces - (columnIndex % tabSpaces));
-      insertStr(insert);
+      value = value.replaced(selection, insert);
       return;
     }
 
-    modifySelectedLines((line) {
+    value = modifySelectedLines((line) {
       if (line == '\n') {
         return line;
       }
@@ -384,79 +383,77 @@ class CodeController extends TextEditingController {
   /// Folded blocks are considered to be selected
   /// if they are located between start and end of a selection.
   ///
+  /// Unfolds folded blocks that are affected by a selection.
+  ///
   /// [modifierCallback] - transformation function that modifies the line.
   /// `line` in the callback contains '\n' symbol at the end, except for the last one.
-  void modifySelectedLines(String Function(String line) modifierCallback) {
+  // TODO(yescorp): need to preserve folding..
+  TextEditingValue modifySelectedLines(
+    String Function(String line) modifierCallback,
+  ) {
     if (selection.start == -1 || selection.end == -1) {
-      return;
+      return value;
     }
+
+    var selectionStart = selection.start;
+    var selectionEnd = selection.end;
 
     // to avoid including the next line if '\n' of the last line is selected.
     if (!selection.isCollapsed) {
-      selection = selection.copyWith(
-        baseOffset: selection.start,
-        extentOffset: selection.end - 1,
-      );
+      selectionEnd--;
     }
 
-    final lines = _code.lines.lines;
-    final fullSelection = _code.hiddenRanges.recoverSelection(selection);
+    selectionStart = _code.hiddenRanges.recoverPosition(
+      selectionStart,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+    selectionEnd = _code.hiddenRanges.recoverPosition(
+      selectionEnd,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
 
     // index of the first line to modify
     final firstLineIndex =
-        _code.lines.characterIndexToLineIndex(fullSelection.start);
+        _code.lines.characterIndexToLineIndex(selectionStart);
     // index of the last line to modify
-    final lastLineIndex =
-        _code.lines.characterIndexToLineIndex(fullSelection.end);
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
 
-    final firstLineStart = lines[firstLineIndex].textRange.start;
-    final lastLineEnd = lines[lastLineIndex].textRange.end;
+    final firstLineStart = _code.lines.lines[firstLineIndex].textRange.start;
+    final firstLineStartVisible =
+        _code.hiddenRanges.cutPosition(firstLineStart);
+
+    final lastLineEnd = _code.lines.lines[lastLineIndex].textRange.end;
+    final lastLineEndVisible = _code.hiddenRanges.cutPosition(lastLineEnd);
 
     // apply modification to the selected lines
-    final tempBuffer = StringBuffer();
+    final modifiedLinesBuffer = StringBuffer();
     for (int i = firstLineIndex; i <= lastLineIndex; i++) {
-      // we don't want to modify line if it is readonly
-      if (lines[i].isReadOnly) {
-        tempBuffer.write(lines[i].text);
-        continue;
-      }
-
-      final modifiedString = modifierCallback(lines[i].text);
-      tempBuffer.write(modifiedString);
+      final modifiedString = modifierCallback(_code.lines.lines[i].text);
+      modifiedLinesBuffer.write(modifiedString);
     }
 
-    // Divide _code.text into 3 parts
-    // Apply modifications to the selected lines
-    // Then combine parts
-    // Avoids iterating through all lines.
-    final finalText = _code.text.substring(0, firstLineStart) +
-        tempBuffer.toString() +
-        _code.text.substring(lastLineEnd, _code.text.length);
+    final modifiedLinesString = modifiedLinesBuffer.toString();
 
-    // to preserve the folding
-    _updateCode(
-      finalText,
-      matcherType:
-          FoldableBlockMatcherType.multilineIndentOutdentFoldableBlockMatcher,
+    // replace visible selected lines with modified ones
+    final replacedValue = value.replaced(
+      TextSelection(
+        baseOffset: firstLineStartVisible,
+        extentOffset: lastLineEndVisible,
+      ),
+      modifiedLinesString,
     );
 
-    // new selection is
-    // the start of the first modified line
-    // and the end of the last modified line
-    final finalFullSelection = TextSelection(
-      baseOffset: _code.lines.lines[firstLineIndex].textRange.start,
-      extentOffset: _code.lines.lines[lastLineIndex].textRange.end,
-    );
-    final finalVisibleSelection =
-        _code.hiddenRanges.cutSelection(finalFullSelection);
-
-    final temp = TextEditingValue(
-      text: _code.visibleText,
-      selection: finalVisibleSelection,
+    // adjust selection to be:
+    // start of the first selected line
+    // end of the last selected line (including '\n')
+    final finalSelection = TextSelection(
+      baseOffset: firstLineStartVisible,
+      extentOffset: firstLineStartVisible + modifiedLinesString.length,
     );
 
-    // set pure value
-    super.value = temp;
+    return replacedValue.copyWith(
+      selection: finalSelection,
+    );
   }
 
   Code get code => _code;
@@ -476,13 +473,9 @@ class CodeController extends TextEditingController {
     }
   }
 
-  void _updateCode(
-    String text, {
-    FoldableBlockMatcherType matcherType =
-        FoldableBlockMatcherType.defaultFoldableBlockMatcher,
-  }) {
+  void _updateCode(String text) {
     final newCode = _createCode(text);
-    _code = newCode.foldedAs(_code, foldingBlockMatcherType: matcherType);
+    _code = newCode.foldedAs(_code);
   }
 
   Code _createCode(String text) {

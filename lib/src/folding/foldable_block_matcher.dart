@@ -1,30 +1,26 @@
 import 'dart:math';
 
-import '../../../flutter_code_editor.dart';
-import 'abstract_foldable_block_matcher.dart';
+import '../code/code_line.dart';
+import 'foldable_block.dart';
 
 /// Matches foldable blocks before and after an edit to preserve their
 /// folding state.
 ///
 /// Blocks match if they go in the same order and have the same content.
-class DefaultFoldableBlockMatcher implements AbstractFoldableBlockMatcher {
-  @override
-  final Set<FoldableBlock> newFoldedBlocks;
-  final List<CodeLine> _newLines;
-  final List<CodeLine> _oldLines;
+class FoldableBlockMatcher {
+  final List<CodeLine> oldLines;
+  final List<FoldableBlock> newBlocks;
+  final List<CodeLine> newLines;
+  final oldToNew = <FoldableBlock, FoldableBlock>{};
+  final newFoldedBlocks = <FoldableBlock>{};
 
-  DefaultFoldableBlockMatcher({
-    required Code oldCode,
-    required Code newCode,
-  })  : newFoldedBlocks = <FoldableBlock>{},
-        _oldLines = oldCode.lines.lines,
-        _newLines = newCode.lines.lines {
-    final oldFoldedBlocks = oldCode.foldedBlocks;
-    final oldBlocks = oldCode.foldableBlocks;
-    final newBlocks = newCode.foldableBlocks;
-
-    final oldToNew = <FoldableBlock, FoldableBlock>{};
-
+  FoldableBlockMatcher({
+    required List<FoldableBlock> oldBlocks,
+    required this.oldLines,
+    required this.newBlocks,
+    required this.newLines,
+    required Set<FoldableBlock> oldFoldedBlocks,
+  }) {
     if (oldBlocks.isEmpty || newBlocks.isEmpty) {
       return;
     }
@@ -82,7 +78,7 @@ class DefaultFoldableBlockMatcher implements AbstractFoldableBlockMatcher {
     int newLineIndex = newBlock.firstLine + 1;
 
     while (oldLineIndex <= oldBlock.lastLine) {
-      if (_oldLines[oldLineIndex].text != _newLines[newLineIndex].text) {
+      if (oldLines[oldLineIndex].text != newLines[newLineIndex].text) {
         return false;
       }
 

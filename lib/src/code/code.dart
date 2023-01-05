@@ -6,8 +6,7 @@ import 'package:highlight/highlight_core.dart';
 
 import '../../src/highlight/result.dart';
 import '../folding/foldable_block.dart';
-import '../folding/matchers/foldable_block_matcher_abstract_factory.dart';
-import '../folding/matchers/foldable_block_matcher_type.dart';
+import '../folding/foldable_block_matcher.dart';
 import '../folding/parsers/parser_factory.dart';
 import '../hidden_ranges/hidden_line_ranges.dart';
 import '../hidden_ranges/hidden_line_ranges_builder.dart';
@@ -454,26 +453,24 @@ class Code {
   }
 
   /// Folds this code at the same blocks as the [oldCode] is.
-  Code foldedAs(
-    Code oldCode, {
-    required FoldableBlockMatcherType foldingBlockMatcherType,
-  }) {
-    final newFoldedBlocks =
-        FoldableBlockMatcherAbstractFactory.getNewFoldableBlocks(
-      oldCode: oldCode,
-      newCode: this,
-      matcherType: foldingBlockMatcherType,
+  Code foldedAs(Code oldCode) {
+    final matcher = FoldableBlockMatcher(
+      oldBlocks: oldCode.foldableBlocks,
+      oldLines: oldCode.lines.lines,
+      newBlocks: foldableBlocks,
+      newLines: lines.lines,
+      oldFoldedBlocks: oldCode.foldedBlocks,
     );
 
     final newHiddenRangesBuilder = _hiddenRangesBuilder.copyMergingSourceMap({
       FoldableBlock: {
-        for (final block in newFoldedBlocks)
+        for (final block in matcher.newFoldedBlocks)
           block: foldableBlockToHiddenRange(block),
       },
     });
 
     return _copyWithFolding(
-      foldedBlocks: newFoldedBlocks,
+      foldedBlocks: matcher.newFoldedBlocks,
       hiddenRangesBuilder: newHiddenRangesBuilder,
     );
   }
