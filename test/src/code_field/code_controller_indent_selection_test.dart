@@ -1,23 +1,19 @@
-// ignore_for_file: avoid_redundant_argument_values, prefer_const_constructors
+// ignore_for_file: avoid_redundant_argument_values
+// ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_code_editor/src/single_line_comments/parser/text_single_line_comment_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 
 void main() {
   group('CodeController.indentSelection() => Unfolded text', () {
-    CodeController controller = CodeController(
-      params: const EditorParams(tabSpaces: 2),
-    );
+    CodeController controller = CodeController();
     final indentLength = controller.params.tabSpaces;
     final indent = ' ' * indentLength;
 
     setUp(() {
-      controller = CodeController(
-        params: const EditorParams(tabSpaces: 2),
-      );
+      controller = CodeController();
     });
 
     test('Selection is collapsed', () {
@@ -217,7 +213,7 @@ aaaa$indent
       final examples = [
         _Example(
           'WHEN non-collapsed selection, two lines, not first, not last. '
-          'SHOULD add indentation to the selected lines',
+          'SHOULD add indentation to the selected lines and select the whole lines',
           initialFullText: '''
 aaaa
 aaAA
@@ -381,13 +377,11 @@ package org.apache.beam.examples;
 ''',
           initialSelection: TextSelection(baseOffset: 38, extentOffset: 47),
           expectedSelection: TextSelection(baseOffset: 38, extentOffset: 52),
-          blockIndexesToFold: [0, 1],
         ),
       ];
 
       for (final example in examples) {
         controller = CodeController(
-          params: const EditorParams(tabSpaces: 2),
           language: java,
         );
         controller.text = example.initialFullText;
@@ -427,7 +421,6 @@ package org.apache.beam.examples;
     CodeController controller = CodeController(
       language: language,
       namedSectionParser: BracketsStartEndNamedSectionParser(),
-      params: const EditorParams(tabSpaces: 2),
       readOnlySectionNames: {readonlySectionName},
     );
     final indentLength = controller.params.tabSpaces;
@@ -541,7 +534,6 @@ Aaa{
         controller = CodeController(
           language: language,
           namedSectionParser: BracketsStartEndNamedSectionParser(),
-          params: const EditorParams(tabSpaces: 2),
           readOnlySectionNames: {readonlySectionName},
         );
         controller.text = example.initialFullText;
@@ -580,7 +572,6 @@ class _Example {
   final String? initialVisibleText;
   final String expectedFullText;
   final String expectedVisibleText;
-  final List<int>? blockIndexesToFold;
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
@@ -590,7 +581,6 @@ class _Example {
     this.initialVisibleText,
     required this.expectedFullText,
     required this.expectedVisibleText,
-    this.blockIndexesToFold,
     required this.initialSelection,
     required this.expectedSelection,
   });

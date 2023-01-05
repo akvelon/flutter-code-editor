@@ -1,4 +1,6 @@
-// ignore_for_file: avoid_redundant_argument_values, prefer_final_locals, prefer_const_constructors
+// ignore_for_file: avoid_redundant_argument_values
+// ignore_for_file: prefer_final_locals
+// ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -7,9 +9,7 @@ import 'package:highlight/languages/java.dart';
 
 void main() {
   group('Unfolded', () {
-    CodeController controller = CodeController(
-      params: const EditorParams(tabSpaces: 2),
-    );
+    CodeController controller = CodeController();
     final indentLength = controller.params.tabSpaces;
     final indent = ' ' * indentLength;
 
@@ -122,8 +122,7 @@ aaaa
           ),
         ),
         const _Example(
-          'WHEN at the beginning whiteSpace '
-          'that is not a full indent '
+          'WHEN indented less than a full indent '
           'SHOULD remove all beginning whitespaces of the line ',
           initialFullText: '''
   aaaa
@@ -233,7 +232,7 @@ AAAA''',
           ),
         ),
         _Example(
-          'WHEN lines that doesn\'t have indent are selected '
+          'WHEN unindented lines are selected '
           'SHOULD NOT outdent that lines',
           initialFullText: '''
 AAAA
@@ -349,7 +348,6 @@ aaaa {
 
       for (final example in examples) {
         controller = CodeController(
-          params: EditorParams(tabSpaces: 2),
           language: java,
         );
         controller.text = example.initialFullText;
@@ -386,20 +384,16 @@ aaaa {
 class _Example {
   final String name;
   final String initialFullText;
-  final String? initialVisibleText;
   final String expectedFullText;
   final String expectedVisibleText;
-  final List<int>? blockIndexesToFold;
   final TextSelection initialSelection;
   final TextSelection expectedSelection;
 
   const _Example(
     this.name, {
     required this.initialFullText,
-    this.initialVisibleText,
     required this.expectedFullText,
     required this.expectedVisibleText,
-    this.blockIndexesToFold,
     required this.initialSelection,
     required this.expectedSelection,
   });
