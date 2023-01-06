@@ -5,24 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
+import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
-import '../code/code.dart';
 import '../code/code_edit_result.dart';
-import '../code_field/text_editing_value.dart';
-import '../code_modifiers/close_block_code_modifier.dart';
-import '../code_modifiers/code_modifier.dart';
-import '../code_modifiers/indent_code_modifier.dart';
-import '../code_modifiers/tab_code_modifier.dart';
-import '../code_theme/code_theme.dart';
-import '../code_theme/code_theme_data.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
-import '../named_sections/parsers/abstract.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/copy.dart';
+import 'actions/indent.dart';
+import 'actions/outdent.dart';
 import 'actions/redo.dart';
 import 'actions/undo.dart';
-import 'editor_params.dart';
 import 'span_builder.dart';
 
 class CodeController extends TextEditingController {
@@ -94,6 +87,8 @@ class CodeController extends TextEditingController {
 
   late final actions = <Type, Action<Intent>>{
     CopySelectionTextIntent: CopyAction(controller: this),
+    IndentIntent: IndentIntentAction(controller: this),
+    OutdentIntent: OutdentIntentAction(controller: this),
     RedoTextIntent: RedoAction(controller: this),
     UndoTextIntent: UndoAction(controller: this),
   };
@@ -112,7 +107,6 @@ class CodeController extends TextEditingController {
     this.modifiers = const [
       IndentModifier(),
       CloseBlockModifier(),
-      TabModifier(),
     ],
   })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
@@ -203,12 +197,6 @@ class CodeController extends TextEditingController {
   }
 
   KeyEventResult _onKeyDownRepeat(KeyEvent event) {
-    // TODO(alexeyinkin): Use a shortcut, https://github.com/akvelon/flutter-code-editor/issues/21
-    if (event.logicalKey == LogicalKeyboardKey.tab) {
-      text = text.replaceRange(selection.start, selection.end, '\t');
-      return KeyEventResult.handled;
-    }
-
     if (popupController.isPopupShown) {
       if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         popupController.scrollByArrow(ScrollDirection.up);
@@ -295,6 +283,7 @@ class CodeController extends TextEditingController {
       if (_isTabReplacementEnabled) {
         newValue = newValue.tabsToSpaces(params.tabSpaces);
       }
+
       final editResult = _getEditResultNotBreakingReadOnly(newValue);
 
       if (editResult == null) {
@@ -336,6 +325,134 @@ class CodeController extends TextEditingController {
     super.value = TextEditingValue(
       text: code.visibleText,
       selection: record.selection,
+    );
+  }
+
+  void outdentSelection() {
+    final tabSpaces = params.tabSpaces;
+    if (selection.start == -1 || selection.end == -1) {
+      return;
+    }
+
+    modifySelectedLines((line) {
+      if (line == '\n') {
+        return line;
+      }
+
+      if (line.length < tabSpaces) {
+        return line.trimLeft();
+      }
+
+      final subStr = line.substring(0, tabSpaces);
+      if (subStr == ' ' * tabSpaces) {
+        return line.substring(tabSpaces, line.length);
+      }
+      return line.trimLeft();
+    });
+  }
+
+  void indentSelection() {
+    final tabSpaces = params.tabSpaces;
+    final tab = ' ' * tabSpaces;
+    final lines = _code.lines.lines;
+    if (selection.start == -1 || selection.end == -1) {
+      return;
+    }
+
+    if (selection.isCollapsed) {
+      final fullPosition = _code.hiddenRanges.recoverPosition(
+        selection.start,
+        placeHiddenRanges: TextAffinity.downstream,
+      );
+      final lineIndex = _code.lines.characterIndexToLineIndex(fullPosition);
+      final columnIndex = fullPosition - lines[lineIndex].textRange.start;
+      final insert = ' ' * (tabSpaces - (columnIndex % tabSpaces));
+      value = value.replaced(selection, insert);
+      return;
+    }
+
+    modifySelectedLines((line) {
+      if (line == '\n') {
+        return line;
+      }
+      return tab + line;
+    });
+  }
+
+  /// Filters the lines that have at least one character selected.
+  ///
+  /// IMPORTANT: this method also changes the selection to be:
+  /// start: start of the first selected line
+  /// end: end of the last line
+  ///
+  /// Folded blocks are considered to be selected
+  /// if they are located between start and end of a selection.
+  ///
+  /// [modifierCallback] - transformation function that modifies the line.
+  /// `line` in the callback contains '\n' symbol at the end, except for the last line of the document.
+  // TODO(yescorp): need to preserve folding..
+  void modifySelectedLines(
+    String Function(String line) modifierCallback,
+  ) {
+    if (selection.start == -1 || selection.end == -1) {
+      return;
+    }
+
+    final selectionStart = _code.hiddenRanges.recoverPosition(
+      selection.start,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+    final selectionEnd = _code.hiddenRanges.recoverPosition(
+      // to avoid including the next line if `\n` is selected
+      selection.isCollapsed ? selection.end : selection.end - 1,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+
+    // index of the first line to modify
+    final firstLineIndex =
+        _code.lines.characterIndexToLineIndex(selectionStart);
+    // index of the last line to modify
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
+
+    final firstLineStart = _code.lines.lines[firstLineIndex].textRange.start;
+    final lastLineEnd = _code.lines.lines[lastLineIndex].textRange.end;
+
+    // apply modification to the selected lines
+    final modifiedLinesBuffer = StringBuffer();
+    for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+      // cancel modification entirely if any of the lines is readOnly
+      if (_code.lines.lines[i].isReadOnly) {
+        return;
+      }
+      final modifiedString = modifierCallback(_code.lines.lines[i].text);
+      modifiedLinesBuffer.write(modifiedString);
+    }
+
+    final modifiedLinesString = modifiedLinesBuffer.toString();
+
+    // replace selected lines with modified ones
+    final finalFullText = _code.text.replaceRange(
+      firstLineStart,
+      lastLineEnd,
+      modifiedLinesString,
+    );
+
+    _updateCodeIfChanged(finalFullText);
+
+    final finalFullSelection = TextSelection(
+      baseOffset: firstLineStart,
+      extentOffset: firstLineStart + modifiedLinesString.length,
+    );
+    final finalVisibleSelection =
+        _code.hiddenRanges.cutSelection(finalFullSelection);
+
+    // TODO(yescorp): move to the listener both here and in `set value`
+    /// or come up with a different approach
+    historyController.beforeChanged(_code, finalVisibleSelection);
+
+    super.value = TextEditingValue(
+      text: _code.visibleText,
+      selection: finalVisibleSelection,
     );
   }
 

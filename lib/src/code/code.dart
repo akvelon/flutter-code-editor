@@ -437,9 +437,15 @@ class Code {
     final firstLine = lines.lines[block.firstLine + 1]; //Keep 1st line visible.
     final lastLine = lines.lines[block.lastLine];
 
+    // Exclude \n from the last line
+    var endOfRange = lastLine.textRange.end - 1;
+    if (lastLine.text[lastLine.text.length - 1] != '\n') {
+      endOfRange++;
+    }
+
     return HiddenRange(
       firstLine.textRange.start - 1, // Includes '\n' before.
-      lastLine.textRange.end - 1, // Excludes '\n' after.
+      endOfRange,
       firstLine: block.firstLine,
       lastLine: block.lastLine,
       wholeFirstLine: false, // Some characters of the first line are visible.
