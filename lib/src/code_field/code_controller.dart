@@ -383,8 +383,6 @@ class CodeController extends TextEditingController {
   /// Folded blocks are considered to be selected
   /// if they are located between start and end of a selection.
   ///
-  /// Unfolds folded blocks that are affected by a selection.
-  ///
   /// [modifierCallback] - transformation function that modifies the line.
   /// `line` in the callback contains '\n' symbol at the end, except for the last line of the document.
   // TODO(yescorp): need to preserve folding..
