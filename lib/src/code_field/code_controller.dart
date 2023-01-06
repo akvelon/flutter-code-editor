@@ -107,7 +107,6 @@ class CodeController extends TextEditingController {
     this.modifiers = const [
       IndentModifier(),
       CloseBlockModifier(),
-      TabModifier(),
     ],
   })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
@@ -284,13 +283,17 @@ class CodeController extends TextEditingController {
       if (_isTabReplacementEnabled) {
         newValue = newValue.tabsToSpaces(params.tabSpaces);
       }
-      final editResult = _getEditResultNotBreakingReadOnly(newValue);
 
-      if (editResult == null) {
-        return;
+      // in case that code is updated right before calling `set value`
+      if (newValue.text != _code.visibleText) {
+        final editResult = _getEditResultNotBreakingReadOnly(newValue);
+
+        if (editResult == null) {
+          return;
+        }
+
+        _updateCodeIfChanged(editResult.fullTextAfter);
       }
-
-      _updateCodeIfChanged(editResult.fullTextAfter);
 
       if (newValue.text != _code.visibleText) {
         // Manually typed in a text that has become a hidden range.
@@ -329,7 +332,7 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    value = modifySelectedLines((line) {
+    modifySelectedLines((line) {
       if (line == '\n') {
         return line;
       }
@@ -366,7 +369,7 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    value = modifySelectedLines((line) {
+    modifySelectedLines((line) {
       if (line == '\n') {
         return line;
       }
@@ -388,27 +391,20 @@ class CodeController extends TextEditingController {
   /// [modifierCallback] - transformation function that modifies the line.
   /// `line` in the callback contains '\n' symbol at the end, except for the last line of the document.
   // TODO(yescorp): need to preserve folding..
-  TextEditingValue modifySelectedLines(
+  void modifySelectedLines(
     String Function(String line) modifierCallback,
   ) {
     if (selection.start == -1 || selection.end == -1) {
-      return value;
+      return;
     }
 
-    var selectionStart = selection.start;
-    var selectionEnd = selection.end;
-
-    // to avoid including the next line if '\n' of the last line is selected.
-    if (!selection.isCollapsed) {
-      selectionEnd--;
-    }
-
-    selectionStart = _code.hiddenRanges.recoverPosition(
-      selectionStart,
+    final selectionStart = _code.hiddenRanges.recoverPosition(
+      selection.start,
       placeHiddenRanges: TextAffinity.downstream,
     );
-    selectionEnd = _code.hiddenRanges.recoverPosition(
-      selectionEnd,
+    final selectionEnd = _code.hiddenRanges.recoverPosition(
+      // to avoid including the next line if `\n` is selected
+      selection.isCollapsed ? selection.end : selection.end - 1,
       placeHiddenRanges: TextAffinity.downstream,
     );
 
@@ -419,40 +415,40 @@ class CodeController extends TextEditingController {
     final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
 
     final firstLineStart = _code.lines.lines[firstLineIndex].textRange.start;
-    final firstLineStartVisible =
-        _code.hiddenRanges.cutPosition(firstLineStart);
-
     final lastLineEnd = _code.lines.lines[lastLineIndex].textRange.end;
-    final lastLineEndVisible = _code.hiddenRanges.cutPosition(lastLineEnd);
 
     // apply modification to the selected lines
     final modifiedLinesBuffer = StringBuffer();
     for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+      // cancel modification entirely if any of the lines is readOnly
+      if (_code.lines.lines[i].isReadOnly) {
+        return;
+      }
       final modifiedString = modifierCallback(_code.lines.lines[i].text);
       modifiedLinesBuffer.write(modifiedString);
     }
 
     final modifiedLinesString = modifiedLinesBuffer.toString();
 
-    // replace visible selected lines with modified ones
-    final replacedValue = value.replaced(
-      TextSelection(
-        baseOffset: firstLineStartVisible,
-        extentOffset: lastLineEndVisible,
-      ),
+    // replace selected lines with modified ones
+    final finalFullText = _code.text.replaceRange(
+      firstLineStart,
+      lastLineEnd,
       modifiedLinesString,
     );
 
-    // adjust selection to be:
-    // start of the first selected line
-    // end of the last selected line (including '\n')
-    final finalSelection = TextSelection(
-      baseOffset: firstLineStartVisible,
-      extentOffset: firstLineStartVisible + modifiedLinesString.length,
-    );
+    _updateCodeIfChanged(finalFullText);
 
-    return replacedValue.copyWith(
-      selection: finalSelection,
+    final finalFullSelection = TextSelection(
+      baseOffset: firstLineStart,
+      extentOffset: firstLineStart + modifiedLinesString.length,
+    );
+    final finalVisibleSelection =
+        _code.hiddenRanges.cutSelection(finalFullSelection);
+
+    value = TextEditingValue(
+      text: _code.visibleText,
+      selection: finalVisibleSelection,
     );
   }
 

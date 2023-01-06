@@ -8,13 +8,8 @@ import 'package:highlight/languages/java.dart';
 
 void main() {
   group('CodeController.indentSelection() => Unfolded text', () {
-    CodeController controller = CodeController();
-    final indentLength = controller.params.tabSpaces;
+    const indentLength = 2;
     final indent = ' ' * indentLength;
-
-    setUp(() {
-      controller = CodeController();
-    });
 
     test('Selection is collapsed', () {
       final examples = [
@@ -182,6 +177,7 @@ aaaa$indent
       ];
 
       for (final example in examples) {
+        final controller = CodeController();
         controller.text = example.initialFullText;
         controller.selection = example.initialSelection;
         controller.indentSelection();
@@ -325,7 +321,7 @@ package org.apache.beam.examples;
       ];
 
       for (final example in examples) {
-        controller = CodeController(
+        final controller = CodeController(
           language: java,
         );
         controller.text = example.initialFullText;
@@ -362,12 +358,7 @@ package org.apache.beam.examples;
   group('Readonly blocks', () {
     final language = java;
     const readonlySectionName = 'readonlySection'; // length = 15
-    CodeController controller = CodeController(
-      language: language,
-      namedSectionParser: BracketsStartEndNamedSectionParser(),
-      readOnlySectionNames: {readonlySectionName},
-    );
-    final indentLength = controller.params.tabSpaces;
+    const indentLength = 2;
     final indent = ' ' * indentLength;
 
     test(
@@ -475,7 +466,7 @@ Aaa{
       ];
 
       for (final example in examples) {
-        controller = CodeController(
+        final controller = CodeController(
           language: language,
           namedSectionParser: BracketsStartEndNamedSectionParser(),
           readOnlySectionNames: {readonlySectionName},
