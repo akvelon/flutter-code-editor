@@ -386,7 +386,7 @@ class CodeController extends TextEditingController {
   /// Unfolds folded blocks that are affected by a selection.
   ///
   /// [modifierCallback] - transformation function that modifies the line.
-  /// `line` in the callback contains '\n' symbol at the end, except for the last one.
+  /// `line` in the callback contains '\n' symbol at the end, except for the last line of the document.
   // TODO(yescorp): need to preserve folding..
   TextEditingValue modifySelectedLines(
     String Function(String line) modifierCallback,
