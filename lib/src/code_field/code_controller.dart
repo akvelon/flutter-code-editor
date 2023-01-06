@@ -107,6 +107,7 @@ class CodeController extends TextEditingController {
     this.modifiers = const [
       IndentModifier(),
       CloseBlockModifier(),
+      TabModifier(),
     ],
   })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
@@ -448,7 +449,11 @@ class CodeController extends TextEditingController {
 
     // TODO(yescorp): move to the listener both here and in `set value`
     /// or come up with a different approach
-    historyController.beforeChanged(_code, finalVisibleSelection);
+    historyController.beforeChanged(
+      code: _code,
+      selection: finalVisibleSelection,
+      isTextChanging: true,
+    );
 
     super.value = TextEditingValue(
       text: _code.visibleText,
