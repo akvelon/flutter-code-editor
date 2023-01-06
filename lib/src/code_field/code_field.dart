@@ -107,6 +107,7 @@ class CodeField extends StatefulWidget {
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
   final bool lineNumbers;
+  final BoxDecoration? numbersTabDecoration;
 
   const CodeField({
     super.key,
@@ -128,6 +129,7 @@ class CodeField extends StatefulWidget {
     this.focusNode,
     this.onChanged,
     this.lineNumbers = true,
+    this.numbersTabDecoration,
   });
 
   @override
@@ -304,6 +306,12 @@ class _CodeFieldState extends State<CodeField> {
         codeController: widget.controller,
         style: lineNumberStyle,
       );
+      if(widget.numbersTabDecoration != null) {
+        numberCol = DecoratedBox(
+          decoration: widget.numbersTabDecoration!,
+          child: numberCol,
+        );
+      }
     }
 
     final codeField = TextField(

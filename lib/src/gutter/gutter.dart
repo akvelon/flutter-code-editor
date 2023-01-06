@@ -51,7 +51,7 @@ class GutterWidget extends StatelessWidget {
     _fillFoldToggles(tableRows);
 
     return Container(
-      padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
+      padding: style.margin,
       width: style.width,
       child: Table(
         columnWidths: const {

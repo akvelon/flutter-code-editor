@@ -21,13 +21,13 @@ class LineNumberStyle {
   /// Background of the line number column
   final Color? background;
 
-  /// Central horizontal margin between the numbers and the code.
-  final double margin;
+  /// Central margin between the numbers and the code.
+  final EdgeInsets margin;
 
   const LineNumberStyle({
     this.width = 80.0,
     this.textAlign = TextAlign.right,
-    this.margin = 10.0,
+    this.margin = const EdgeInsets.only(top: 12, bottom: 12, right: 10),
     this.textStyle,
     this.background,
   });
