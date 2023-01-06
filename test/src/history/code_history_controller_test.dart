@@ -247,7 +247,7 @@ void main() {
         expect(controller.fullText, MethodSnippet.full + 'cba');
       });
 
-      testWidgets('Changing disables redo', (WidgetTester wt) async {
+      testWidgets('Changing text disables redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
@@ -293,6 +293,20 @@ void main() {
         await wt.sendRedo();
 
         expect(controller.fullText, MethodSnippet.full + 'ab');
+      });
+
+      testWidgets('Selection does not disable redo', (WidgetTester wt) async {
+        final controller = await pumpController(wt, MethodSnippet.full);
+
+        await wt.cursorEnd();
+        controller.value = controller.value.typed('a');
+        await wt.sendUndo(); // Creates.
+        await wt.pumpAndSettle();
+
+        controller.value = controller.value.copyWith(
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+        expect(controller.historyController.stack.length, 2);
       });
 
       testWidgets('Limit depth', (WidgetTester wt) async {

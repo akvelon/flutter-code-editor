@@ -313,7 +313,12 @@ class CodeController extends TextEditingController {
       //print('\n\n${_code.text}');
     }
 
-    historyController.beforeChanged(_code, newValue.selection);
+    historyController.beforeChanged(
+      code: _code,
+      selection: newValue.selection,
+      isTextChanging: hasTextChanged,
+    );
+
     super.value = newValue;
 
     if (hasTextChanged) {
