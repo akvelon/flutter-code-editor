@@ -441,6 +441,8 @@ class CodeController extends TextEditingController {
     final finalVisibleSelection =
         _code.hiddenRanges.cutSelection(finalFullSelection);
 
+    // TODO(yescorp): move to the listener both here and in `set value`
+    /// or come up with a different approach
     historyController.beforeChanged(_code, finalVisibleSelection);
 
     super.value = TextEditingValue(
