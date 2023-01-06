@@ -202,6 +202,14 @@ aaaa
           example.expectedSelection,
           reason: example.name,
         );
+        expect(
+          controller.code,
+          controller.historyController.lastCode,
+        );
+        expect(
+          controller.value.selection,
+          controller.historyController.lastSelection,
+        );
       }
     });
 
@@ -319,6 +327,14 @@ a;
           controller.value.selection,
           example.expectedSelection,
           reason: example.name,
+        );
+        expect(
+          controller.code,
+          controller.historyController.lastCode,
+        );
+        expect(
+          controller.value.selection,
+          controller.historyController.lastSelection,
         );
       }
     });

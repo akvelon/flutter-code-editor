@@ -202,6 +202,14 @@ aaaa$indent
           example.expectedSelection,
           reason: example.name,
         );
+        expect(
+          controller.code,
+          controller.historyController.lastCode,
+        );
+        expect(
+          controller.value.selection,
+          controller.historyController.lastSelection,
+        );
       }
     });
 
@@ -351,6 +359,14 @@ package org.apache.beam.examples;
           example.expectedSelection,
           reason: example.name,
         );
+        expect(
+          controller.code,
+          controller.historyController.lastCode,
+        );
+        expect(
+          controller.value.selection,
+          controller.historyController.lastSelection,
+        );
       }
     });
   });
@@ -495,6 +511,14 @@ Aaa{
           controller.value.selection,
           example.expectedSelection,
           reason: example.name,
+        );
+        expect(
+          controller.code,
+          controller.historyController.lastCode,
+        );
+        expect(
+          controller.value.selection,
+          controller.historyController.lastSelection,
         );
       }
     });

@@ -284,16 +284,13 @@ class CodeController extends TextEditingController {
         newValue = newValue.tabsToSpaces(params.tabSpaces);
       }
 
-      // in case that code is updated right before calling `set value`
-      if (newValue.text != _code.visibleText) {
-        final editResult = _getEditResultNotBreakingReadOnly(newValue);
+      final editResult = _getEditResultNotBreakingReadOnly(newValue);
 
-        if (editResult == null) {
-          return;
-        }
-
-        _updateCodeIfChanged(editResult.fullTextAfter);
+      if (editResult == null) {
+        return;
       }
+
+      _updateCodeIfChanged(editResult.fullTextAfter);
 
       if (newValue.text != _code.visibleText) {
         // Manually typed in a text that has become a hidden range.
@@ -446,7 +443,9 @@ class CodeController extends TextEditingController {
     final finalVisibleSelection =
         _code.hiddenRanges.cutSelection(finalFullSelection);
 
-    value = TextEditingValue(
+    historyController.beforeChanged(_code, finalVisibleSelection);
+
+    super.value = TextEditingValue(
       text: _code.visibleText,
       selection: finalVisibleSelection,
     );
