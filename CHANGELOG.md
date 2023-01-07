@@ -1,3 +1,8 @@
+## 0.2.5
+
+* Tab and Shift-Tab handling ([Issue 116](https://github.com/akvelon/flutter-code-editor/issues/116)).
+* Selection does not reset redo history ([Issue 133](https://github.com/akvelon/flutter-code-editor/issues/133)).
+
 ## 0.2.4
 
 * Exported `StringExtension`.

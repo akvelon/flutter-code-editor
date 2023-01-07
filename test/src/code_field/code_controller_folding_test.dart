@@ -2,6 +2,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/languages/python.dart';
 
 import '../common/create_app.dart';
 import '../common/snippets.dart';
@@ -366,6 +367,21 @@ package mypackage;
           controller.code.visibleText,
           foldedVisible,
         );
+      });
+
+      test(
+          'When the last foldable block is folded '
+          'SHOULD NOT show characters other than `\n`', () {
+        const initialText = '''
+aaaa:
+  aaaa
+  aaaa''';
+        const finalVisibleText = '''
+aaaa:''';
+        final controller = createController(initialText, language: python);
+        controller.foldAt(0);
+
+        expect(controller.value.text, finalVisibleText);
       });
     });
   });
