@@ -417,7 +417,7 @@ class CodeController extends TextEditingController {
 
     modifySelectedLines((line) {
       // if line is empty do not comment it
-      if (RegExps.emptyLine.hasMatch(line)) {
+      if (line.trim() == '') {
         return line;
       }
 
@@ -432,7 +432,7 @@ class CodeController extends TextEditingController {
   void _uncommentSelectedLines() {
     modifySelectedLines((line) {
       // if line is empty skip it
-      if (RegExps.emptyLine.hasMatch(line)) {
+      if (line.trim() == '') {
         return line;
       }
 
@@ -456,7 +456,7 @@ class CodeController extends TextEditingController {
   bool _anySelectedLineUncommented() {
     return _anySelectedLine((line) {
       for (final commentType in SingleLineComments.byMode[language] ?? []) {
-        if (line.trimLeft().startsWith(commentType)) {
+        if (line.trimLeft().startsWith(commentType) || line.trim() == '') {
           return false;
         }
       }
