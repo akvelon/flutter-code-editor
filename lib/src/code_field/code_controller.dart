@@ -11,7 +11,9 @@ import '../code/code_edit_result.dart';
 import '../code/reg_exp.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
+import '../single_line_comments/parser/single_line_comment_parser.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
+import '../single_line_comments/single_line_comment.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/copy.dart';
@@ -400,33 +402,18 @@ class CodeController extends TextEditingController {
   /// The method doesn't care about multiline comments
   /// and treats them as a normal text (not a comment)
   void commentOrUncommentSelection() {
-    final commentTypes = SingleLineComments.byMode[language] ?? [];
-
-    for (final commentType in commentTypes) {
-      final regExpForCommentedLine =
-          RegExps.getSingleLineCommentRegExp(commentType, multiline: true);
-
-      // line is either a comment or empty
-      final allSelectedLinesAreCommented = checkSelectedLinesForCondition(
-        (line) =>
-            regExpForCommentedLine.hasMatch(line) ||
-            RegExps.emptyLine.hasMatch(line),
-      );
-
-      if (allSelectedLinesAreCommented) {
-        _uncommentSelectedLines(commentType);
-        return;
-      } else {
-        _commentSelectedLines(commentType);
-        return;
-      }
+    if (_anySelectedLineUncommented()) {
+      _commentSelectedLines();
+    } else {
+      _uncommentSelectedLines();
     }
   }
 
-  /// Utility method to divide [commentOrUncommentSelection] method into parts
-  /// [commentSymbols] - `//` or `#` indicates what to use to comment
-  void _commentSelectedLines(String commentSymbols) {
-    int? startOfCommentSymbols;
+  void _commentSelectedLines() {
+    final sequence = SingleLineComments.byMode[language]?.first;
+    if (sequence == null) {
+      return;
+    }
 
     modifySelectedLines((line) {
       // if line is empty do not comment it
@@ -434,41 +421,52 @@ class CodeController extends TextEditingController {
         return line;
       }
 
-      startOfCommentSymbols ??=
-          RegExps.whiteSpacesAfterStartOfLine.firstMatch(line)?.end;
-
-      if (startOfCommentSymbols == null) {
-        return '$commentSymbols $line';
-      }
-
       return line.replaceRange(
-        startOfCommentSymbols!,
-        startOfCommentSymbols,
-        '$commentSymbols ',
+        0,
+        0,
+        '$sequence ',
       );
     });
   }
 
-  /// Utility method to divide [commentOrUncommentSelection] method into parts
-  /// [commentSymbols] - `//` or `#` indicates what to use to uncomment
-  void _uncommentSelectedLines(String commentSymbols) {
+  void _uncommentSelectedLines() {
     modifySelectedLines((line) {
       // if line is empty skip it
       if (RegExps.emptyLine.hasMatch(line)) {
         return line;
       }
 
-      // replace first `// ` or `# ` or `//` or `#` with empty string
-      return line.replaceFirst(
-        RegExps.getCommentPlusWhitespaceRegExp(commentSymbols),
-        '',
-      );
+      for (final sequence
+          in SingleLineComments.byMode[language] ?? <String>[]) {
+        // if there is a space after sequence we should remove it
+        if (line.trim().startsWith('$sequence ')) {
+          return line.replaceFirst('$sequence ', '');
+        }
+        // if there is no space after sequence we should remove the sequence
+        if (line.trim().startsWith(sequence)) {
+          return line.replaceFirst(sequence, '');
+        }
+      }
+
+      // if line is not commented just return it
+      return line;
     });
   }
 
-  /// Returns true if all selected lines meet condition in the callback.
+  bool _anySelectedLineUncommented() {
+    return _anySelectedLine((line) {
+      for (final commentType in SingleLineComments.byMode[language] ?? []) {
+        if (line.trimLeft().startsWith(commentType)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  /// Returns true if any of the selected lines meets condition in the callback.
   /// Returns false otherwise.
-  bool checkSelectedLinesForCondition(bool Function(String line) callback) {
+  bool _anySelectedLine(bool Function(String line) callback) {
     if (selection.start == -1 || selection.end == -1) {
       return false;
     }
@@ -491,12 +489,12 @@ class CodeController extends TextEditingController {
 
     for (int i = firstLineIndex; i <= lastLineIndex; i++) {
       final currentLineMatchesCondition = callback(_code.lines.lines[i].text);
-      if (!currentLineMatchesCondition) {
-        return false;
+      if (currentLineMatchesCondition) {
+        return true;
       }
     }
 
-    return true;
+    return false;
   }
 
   /// Filters the lines that have at least one character selected.

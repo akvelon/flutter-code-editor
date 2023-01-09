@@ -2,6 +2,7 @@ import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/go.dart';
 import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/php.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
 
@@ -14,6 +15,7 @@ class SingleLineComments {
     go: [_slashes],
     scala: [_slashes],
     python: [_hash],
+    php: [_slashes, _hash],
   };
 
   static const _slashes = '//';
