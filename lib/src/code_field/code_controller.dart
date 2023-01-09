@@ -380,6 +380,27 @@ class CodeController extends TextEditingController {
     });
   }
 
+  /// Comments or uncomments the current selected lines.
+  ///
+  /// If any of the selected lines is not a single line comment:
+  /// adds one level of single line comment to every selected line.
+  ///
+  /// If all of the selected lines are single line comments:
+  /// removes one level of single line comment from every selected line.
+  ///
+  /// When commenting adds `// ` or `# ` (or another symbol depending on a language) with a space after.
+  /// Removes these spaces on uncomment respectively.
+  ///
+  /// The method doesn't care about multiline comments
+  /// and treats them as a normal text (not a comment)
+  void commentOrUncommentSelection() {}
+
+  /// Utility method to divide [commentOrUncommentSelection] method into parts
+  void _commentSelectedLines() {}
+
+  /// Utility method to divide [commentOrUncommentSelection] method into parts
+  void _uncommentSelectedLines() {}
+
   /// Filters the lines that have at least one character selected.
   ///
   /// IMPORTANT: this method also changes the selection to be:
