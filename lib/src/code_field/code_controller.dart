@@ -8,9 +8,12 @@ import 'package:highlight/highlight_core.dart';
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
+import '../code/reg_exp.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
+import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
+import 'actions/comment_uncomment.dart';
 import 'actions/copy.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
@@ -86,6 +89,7 @@ class CodeController extends TextEditingController {
   TextSpan? lastTextSpan;
 
   late final actions = <Type, Action<Intent>>{
+    CommentUncommentIntent: CommentUncommentAction(controller: this),
     CopySelectionTextIntent: CopyAction(controller: this),
     IndentIntent: IndentIntentAction(controller: this),
     OutdentIntent: OutdentIntentAction(controller: this),
@@ -382,6 +386,8 @@ class CodeController extends TextEditingController {
 
   /// Comments or uncomments the current selected lines.
   ///
+  /// Doesn't affect empty lines
+  ///
   /// If any of the selected lines is not a single line comment:
   /// adds one level of single line comment to every selected line.
   ///
@@ -393,13 +399,105 @@ class CodeController extends TextEditingController {
   ///
   /// The method doesn't care about multiline comments
   /// and treats them as a normal text (not a comment)
-  void commentOrUncommentSelection() {}
+  void commentOrUncommentSelection() {
+    final commentTypes = SingleLineComments.byMode[language] ?? [];
+
+    for (final commentType in commentTypes) {
+      final regExpForCommentedLine =
+          RegExps.getSingleLineCommentRegExp(commentType, multiline: true);
+
+      // line is either a comment or empty
+      final allSelectedLinesAreCommented = checkSelectedLinesForCondition(
+        (line) =>
+            regExpForCommentedLine.hasMatch(line) ||
+            RegExps.emptyLine.hasMatch(line),
+      );
+
+      if (allSelectedLinesAreCommented) {
+        _uncommentSelectedLines(commentType);
+        return;
+      } else {
+        _commentSelectedLines(commentType);
+        return;
+      }
+    }
+  }
 
   /// Utility method to divide [commentOrUncommentSelection] method into parts
-  void _commentSelectedLines() {}
+  /// [commentSymbols] - `//` or `#` indicates what to use to comment
+  void _commentSelectedLines(String commentSymbols) {
+    int? startOfCommentSymbols;
+
+    modifySelectedLines((line) {
+      // if line is empty do not comment it
+      if (RegExps.emptyLine.hasMatch(line)) {
+        return line;
+      }
+
+      startOfCommentSymbols ??=
+          RegExps.whiteSpacesAfterStartOfLine.firstMatch(line)?.end;
+
+      if (startOfCommentSymbols == null) {
+        return '$commentSymbols $line';
+      }
+
+      return line.replaceRange(
+        startOfCommentSymbols!,
+        startOfCommentSymbols,
+        '$commentSymbols ',
+      );
+    });
+  }
 
   /// Utility method to divide [commentOrUncommentSelection] method into parts
-  void _uncommentSelectedLines() {}
+  /// [commentSymbols] - `//` or `#` indicates what to use to uncomment
+  void _uncommentSelectedLines(String commentSymbols) {
+    modifySelectedLines((line) {
+      // if line is empty skip it
+      if (RegExps.emptyLine.hasMatch(line)) {
+        return line;
+      }
+
+      // replace first `// ` or `# ` or `//` or `#` with empty string
+      return line.replaceFirst(
+        RegExps.getCommentPlusWhitespaceRegExp(commentSymbols),
+        '',
+      );
+    });
+  }
+
+  /// Returns true if all selected lines meet condition in the callback.
+  /// Returns false otherwise.
+  bool checkSelectedLinesForCondition(bool Function(String line) callback) {
+    if (selection.start == -1 || selection.end == -1) {
+      return false;
+    }
+
+    final selectionStart = _code.hiddenRanges.recoverPosition(
+      selection.start,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+    final selectionEnd = _code.hiddenRanges.recoverPosition(
+      // to avoid including the next line if `\n` is selected
+      selection.isCollapsed ? selection.end : selection.end - 1,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+
+    // index of the first line to modify
+    final firstLineIndex =
+        _code.lines.characterIndexToLineIndex(selectionStart);
+    // index of the last line to modify
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
+
+    for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+      final currentLineMatchesCondition = callback(_code.lines.lines[i].text);
+      if (!currentLineMatchesCondition) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   /// Filters the lines that have at least one character selected.
   ///

@@ -157,7 +157,7 @@ Aa
 // AA
 // Aa
 ''',
-          expectedSelection: TextSelection(baseOffset: 0, extentOffset: 9),
+          expectedSelection: TextSelection(baseOffset: 0, extentOffset: 18),
         ),
         _Example(
           'WHEN all selected lines are commented '

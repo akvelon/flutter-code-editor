@@ -10,6 +10,7 @@ import '../gutter/gutter.dart';
 import '../line_numbers/line_number_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
+import 'actions/comment_uncomment.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
@@ -75,6 +76,16 @@ final _shortcuts = {
     LogicalKeyboardKey.shift,
     LogicalKeyboardKey.tab,
   ): const OutdentIntent(),
+
+  // Comment Uncomment
+  LogicalKeySet(
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.slash,
+  ): const CommentUncommentIntent(),
+  LogicalKeySet(
+    LogicalKeyboardKey.meta,
+    LogicalKeyboardKey.slash,
+  ): const CommentUncommentIntent(),
 };
 
 class CodeField extends StatefulWidget {
