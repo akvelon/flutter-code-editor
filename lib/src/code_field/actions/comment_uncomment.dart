@@ -15,7 +15,7 @@ class CommentUncommentAction extends Action<CommentUncommentIntent> {
 
   @override
   Object? invoke(CommentUncommentIntent intent) {
-    controller.commentOrUncommentSelection();
+    controller.commentOutOrUncommentSelection();
     return null;
   }
 }

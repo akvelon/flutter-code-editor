@@ -121,7 +121,7 @@ aa''',
           controller.text = example.initialFullText;
           controller.selection = example.initialSelection;
 
-          controller.commentOrUncommentSelection();
+          controller.commentOutOrUncommentSelection();
 
           expect(
             controller.value.text,
@@ -229,7 +229,7 @@ Aa
           controller.text = example.initialFullText;
           controller.selection = example.initialSelection;
 
-          controller.commentOrUncommentSelection();
+          controller.commentOutOrUncommentSelection();
 
           expect(
             controller.value.text,
@@ -325,7 +325,7 @@ a
           controller.text = example.initialFullText;
           controller.selection = example.initialSelection;
 
-          controller.commentOrUncommentSelection();
+          controller.commentOutOrUncommentSelection();
 
           expect(
             controller.value.text,
@@ -484,7 +484,7 @@ Aa
           controller.text = example.initialFullText;
           controller.selection = example.initialSelection;
 
-          controller.commentOrUncommentSelection();
+          controller.commentOutOrUncommentSelection();
 
           expect(
             controller.value.text,

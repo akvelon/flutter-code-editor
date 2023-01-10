@@ -386,7 +386,7 @@ class CodeController extends TextEditingController {
     });
   }
 
-  /// Comments or uncomments the current selected lines.
+  /// Comments out or uncomments the current selected lines.
   ///
   /// Doesn't affect empty lines
   ///
@@ -396,12 +396,13 @@ class CodeController extends TextEditingController {
   /// If all of the selected lines are single line comments:
   /// removes one level of single line comment from every selected line.
   ///
-  /// When commenting adds `// ` or `# ` (or another symbol depending on a language) with a space after.
+  /// When commenting out, adds `// ` or `# ` (or another symbol depending on a language) with a space after.
   /// Removes these spaces on uncomment respectively.
+  /// (if there are no spaces just removes the comments)
   ///
   /// The method doesn't care about multiline comments
   /// and treats them as a normal text (not a comment)
-  void commentOrUncommentSelection() {
+  void commentOutOrUncommentSelection() {
     if (_anySelectedLineUncommented()) {
       _commentOutSelectedLines();
     } else {
