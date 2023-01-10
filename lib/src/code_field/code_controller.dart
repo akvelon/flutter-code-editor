@@ -429,23 +429,9 @@ class CodeController extends TextEditingController {
       return false;
     }
 
-    final selectionStart = _code.hiddenRanges.recoverPosition(
-      selection.start,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-    final selectionEnd = _code.hiddenRanges.recoverPosition(
-      // to avoid including the next line if `\n` is selected
-      selection.isCollapsed ? selection.end : selection.end - 1,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
+    final selectedLinesRange = getSelectedLineRange();
 
-    // index of the first line to modify
-    final firstLineIndex =
-        _code.lines.characterIndexToLineIndex(selectionStart);
-    // index of the last line to modify
-    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
-
-    for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+    for (int i = selectedLinesRange.start; i < selectedLinesRange.end; i++) {
       final currentLineMatchesCondition = callback(_code.lines.lines[i].text);
       if (currentLineMatchesCondition) {
         return true;
@@ -518,28 +504,11 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    final selectionStart = _code.hiddenRanges.recoverPosition(
-      selection.start,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-    final selectionEnd = _code.hiddenRanges.recoverPosition(
-      // to avoid including the next line if `\n` is selected
-      selection.isCollapsed ? selection.end : selection.end - 1,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-
-    // index of the first line to modify
-    final firstLineIndex =
-        _code.lines.characterIndexToLineIndex(selectionStart);
-    // index of the last line to modify
-    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
-
-    final firstLineStart = _code.lines.lines[firstLineIndex].textRange.start;
-    final lastLineEnd = _code.lines.lines[lastLineIndex].textRange.end;
+    final selectedLinesRange = getSelectedLineRange();
 
     // apply modification to the selected lines
     final modifiedLinesBuffer = StringBuffer();
-    for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+    for (int i = selectedLinesRange.start; i < selectedLinesRange.end; i++) {
       // cancel modification entirely if any of the lines is readOnly
       if (_code.lines.lines[i].isReadOnly) {
         return;
@@ -549,6 +518,11 @@ class CodeController extends TextEditingController {
     }
 
     final modifiedLinesString = modifiedLinesBuffer.toString();
+
+    final firstLineStart =
+        _code.lines.lines[selectedLinesRange.start].textRange.start;
+    final lastLineEnd =
+        _code.lines.lines[selectedLinesRange.end - 1].textRange.end;
 
     // replace selected lines with modified ones
     final finalFullText = _code.text.replaceRange(
@@ -577,6 +551,29 @@ class CodeController extends TextEditingController {
     super.value = TextEditingValue(
       text: _code.visibleText,
       selection: finalVisibleSelection,
+    );
+  }
+
+  TextRange getSelectedLineRange() {
+    final selectionStart = _code.hiddenRanges.recoverPosition(
+      selection.start,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+    final selectionEnd = _code.hiddenRanges.recoverPosition(
+      // to avoid including the next line if `\n` is selected
+      selection.isCollapsed ? selection.end : selection.end - 1,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+
+    // index of the first line to modify
+    final firstLineIndex =
+        _code.lines.characterIndexToLineIndex(selectionStart);
+    // index of the last line to modify
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
+
+    return TextRange(
+      start: firstLineIndex,
+      end: lastLineIndex + 1,
     );
   }
 
