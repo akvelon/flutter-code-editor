@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
-
-import '../../../flutter_code_editor.dart';
+import '../code_controller.dart';
 
 class CommentUncommentIntent extends Intent {
   const CommentUncommentIntent();
