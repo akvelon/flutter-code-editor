@@ -182,7 +182,6 @@ Aa
     });
 
     group('Language: PHP', () {
-      final examples = [];
       test('Selection is collapsed', () {
         final examples = [
           //
@@ -263,6 +262,7 @@ a
           );
         }
       });
+
       test('Selection is a range', () {
         final examples = [
           //
