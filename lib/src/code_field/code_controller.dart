@@ -413,7 +413,8 @@ class CodeController extends TextEditingController {
   bool _anySelectedLineUncommented() {
     return _anySelectedLine((line) {
       for (final commentType in SingleLineComments.byMode[language] ?? []) {
-        if (line.trimLeft().startsWith(commentType) || line.trim() == '') {
+        if (line.trimLeft().startsWith(commentType) ||
+            line.hasOnlyWhitespaces()) {
           return false;
         }
       }
@@ -462,7 +463,7 @@ class CodeController extends TextEditingController {
 
     modifySelectedLines((line) {
       // if line is empty do not comment it
-      if (line.trim() == '') {
+      if (line.hasOnlyWhitespaces()) {
         return line;
       }
 
@@ -477,7 +478,7 @@ class CodeController extends TextEditingController {
   void _uncommentSelectedLines() {
     modifySelectedLines((line) {
       // if line is empty skip it
-      if (line.trim() == '') {
+      if (line.hasOnlyWhitespaces()) {
         return line;
       }
 
