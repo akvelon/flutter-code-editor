@@ -11,7 +11,7 @@ void main() {
     group('Language: java', () {
       test(
           'WHEN selection is collapsed '
-          'SHOULD comment selected line if it is not a comment '
+          'SHOULD comment out the selected line if it is not a comment '
           'and uncomment otherwise '
           'AND select whole lines', () {
         final examples = [
@@ -23,14 +23,14 @@ void main() {
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 5),
           ),
           _Example(
-            'Document has only 1 commented line with a space after comment',
+            'Document has only 1 commented out line with a space after comment',
             initialFullText: '// aa',
             initialSelection: TextSelection.collapsed(offset: 0),
             expectedFullText: 'aa',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 2),
           ),
           _Example(
-            'Document has only 1 commented line without spaces between comment and text',
+            'Document has only 1 commented out line without spaces between comment and text',
             initialFullText: '//aa',
             initialSelection: TextSelection.collapsed(offset: 0),
             expectedFullText: 'aa',
@@ -140,11 +140,12 @@ aa''',
           );
         }
       });
+
       test('Selection is a range that occupies several lines', () {
         final examples = [
           _Example(
             'WHEN all selected lines are uncommented '
-            'SHOULD comment all selected lines',
+            'SHOULD comment out all selected lines',
             initialFullText: '''
 aA
 AA
@@ -159,7 +160,7 @@ Aa
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 18),
           ),
           _Example(
-            'WHEN all selected lines are commented '
+            'WHEN all selected lines are commented out '
             'SHOULD uncomment all selected lines',
             initialFullText: '''
 // aA
@@ -175,8 +176,8 @@ Aa
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 9),
           ),
           _Example(
-            'WHEN first selected line is uncommented, the rest are commented '
-            'SHOULD comment all lines',
+            'WHEN first selected line is uncommented, the rest are commented out '
+            'SHOULD comment all lines out',
             initialFullText: '''
 aA
 // AA
@@ -191,8 +192,8 @@ aA
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 24),
           ),
           _Example(
-            'WHEN non-first selected line is uncommented, the rest are commented '
-            'SHOULD comment all lines',
+            'WHEN non-first selected line is uncommented, the rest are commented out '
+            'SHOULD comment out all lines',
             initialFullText: '''
 // aA
 AA
@@ -207,8 +208,8 @@ AA
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 24),
           ),
           _Example(
-            'WHEN last selected line is uncommented, the rest are commented '
-            'SHOULD comment all lines',
+            'WHEN last selected line is uncommented, the rest are commented out '
+            'SHOULD comment out all lines',
             initialFullText: '''
 // aA
 // AA
@@ -255,7 +256,7 @@ Aa
       test('Selection is collapsed', () {
         final examples = [
           _Example(
-            'WHEN line is not commented '
+            'WHEN line is not commented out '
             'SHOULD comment it out',
             initialFullText: '''
 a
@@ -405,7 +406,7 @@ AA
           _Example(
             'WHEN every selected line has different type of single line comments '
             'and they have different indentation '
-            'SHOULD uncomment all commented lines and do not affect empty line',
+            'SHOULD uncomment all commented out lines and do not affect empty line',
             initialFullText: '''
     // aA
   # AA
