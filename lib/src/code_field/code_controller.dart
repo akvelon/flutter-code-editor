@@ -386,9 +386,9 @@ class CodeController extends TextEditingController {
     });
   }
 
-  /// Comments out or uncomments the current selected lines.
+  /// Comments out or uncomments the currently selected lines.
   ///
-  /// Doesn't affect empty lines
+  /// Doesn't affect empty lines.
   ///
   /// If any of the selected lines is not a single line comment:
   /// adds one level of single line comment to every selected line.
@@ -397,11 +397,11 @@ class CodeController extends TextEditingController {
   /// removes one level of single line comment from every selected line.
   ///
   /// When commenting out, adds `// ` or `# ` (or another symbol depending on a language) with a space after.
-  /// Removes these spaces on uncomment respectively.
+  /// Removes these spaces on uncommenting.
   /// (if there are no spaces just removes the comments)
   ///
-  /// The method doesn't care about multiline comments
-  /// and treats them as a normal text (not a comment)
+  /// The method doesn't account for multiline comments
+  /// and treats them as a normal text (not a comment).
   void commentOutOrUncommentSelection() {
     if (_anySelectedLineUncommented()) {
       _commentOutSelectedLines();
@@ -422,8 +422,7 @@ class CodeController extends TextEditingController {
     });
   }
 
-  /// Returns true if any of the selected lines meets condition in the callback.
-  /// Returns false otherwise.
+  /// Whether any of the selected lines meets the condition in the callback.
   bool _anySelectedLine(bool Function(String line) callback) {
     if (selection.start == -1 || selection.end == -1) {
       return false;
@@ -448,7 +447,6 @@ class CodeController extends TextEditingController {
     }
 
     modifySelectedLines((line) {
-      // if line is empty do not comment it
       if (line.hasOnlyWhitespaces()) {
         return line;
       }
@@ -463,7 +461,6 @@ class CodeController extends TextEditingController {
 
   void _uncommentSelectedLines() {
     modifySelectedLines((line) {
-      // if line is empty skip it
       if (line.hasOnlyWhitespaces()) {
         return line;
       }
@@ -504,11 +501,11 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    final selectedLinesRange = getSelectedLineRange();
+    final lineRange = getSelectedLineRange();
 
     // apply modification to the selected lines
     final modifiedLinesBuffer = StringBuffer();
-    for (int i = selectedLinesRange.start; i < selectedLinesRange.end; i++) {
+    for (int i = lineRange.start; i < lineRange.end; i++) {
       // cancel modification entirely if any of the lines is readOnly
       if (_code.lines.lines[i].isReadOnly) {
         return;
@@ -519,10 +516,8 @@ class CodeController extends TextEditingController {
 
     final modifiedLinesString = modifiedLinesBuffer.toString();
 
-    final firstLineStart =
-        _code.lines.lines[selectedLinesRange.start].textRange.start;
-    final lastLineEnd =
-        _code.lines.lines[selectedLinesRange.end - 1].textRange.end;
+    final firstLineStart = _code.lines.lines[lineRange.start].textRange.start;
+    final lastLineEnd = _code.lines.lines[lineRange.end - 1].textRange.end;
 
     // replace selected lines with modified ones
     final finalFullText = _code.text.replaceRange(
@@ -555,21 +550,18 @@ class CodeController extends TextEditingController {
   }
 
   TextRange getSelectedLineRange() {
-    final selectionStart = _code.hiddenRanges.recoverPosition(
+    final firstChar = _code.hiddenRanges.recoverPosition(
       selection.start,
       placeHiddenRanges: TextAffinity.downstream,
     );
-    final selectionEnd = _code.hiddenRanges.recoverPosition(
+    final lastChar = _code.hiddenRanges.recoverPosition(
       // to avoid including the next line if `\n` is selected
       selection.isCollapsed ? selection.end : selection.end - 1,
       placeHiddenRanges: TextAffinity.downstream,
     );
 
-    // index of the first line to modify
-    final firstLineIndex =
-        _code.lines.characterIndexToLineIndex(selectionStart);
-    // index of the last line to modify
-    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
+    final firstLineIndex = _code.lines.characterIndexToLineIndex(firstChar);
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(lastChar);
 
     return TextRange(
       start: firstLineIndex,

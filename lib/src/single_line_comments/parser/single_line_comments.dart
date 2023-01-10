@@ -10,12 +10,12 @@ class SingleLineComments {
   const SingleLineComments._();
 
   static final byMode = <Mode, List<String>>{
-    java: [_slashes],
     dart: [_slashes],
     go: [_slashes],
-    scala: [_slashes],
-    python: [_hash],
+    java: [_slashes],
     php: [_slashes, _hash],
+    python: [_hash],
+    scala: [_slashes],
   };
 
   static const _slashes = '//';

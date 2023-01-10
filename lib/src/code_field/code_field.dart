@@ -21,9 +21,9 @@ final _shortcuts = <ShortcutActivator, Intent>{
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyC,
   ): CopySelectionTextIntent.copy,
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.keyC,
+    meta: true,
   ): CopySelectionTextIntent.copy,
   LogicalKeySet(
     LogicalKeyboardKey.control,
@@ -35,9 +35,9 @@ final _shortcuts = <ShortcutActivator, Intent>{
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyX,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.keyX,
+    meta: true,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
   LogicalKeySet(
     LogicalKeyboardKey.shift,
@@ -49,9 +49,9 @@ final _shortcuts = <ShortcutActivator, Intent>{
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyZ,
   ): const UndoTextIntent(SelectionChangedCause.keyboard),
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.keyZ,
+    meta: true,
   ): const UndoTextIntent(SelectionChangedCause.keyboard),
 
   // Redo
