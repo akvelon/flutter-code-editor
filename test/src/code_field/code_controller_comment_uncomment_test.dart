@@ -15,6 +15,7 @@ void main() {
           'and uncomment otherwise '
           'AND select whole lines', () {
         final examples = [
+          //
           _Example(
             'Document has only 1 not-commented line and it is selected',
             initialFullText: 'aa',
@@ -22,6 +23,7 @@ void main() {
             expectedFullText: '// aa',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 5),
           ),
+
           _Example(
             'Document has only 1 commented out line with a space after comment',
             initialFullText: '// aa',
@@ -29,90 +31,13 @@ void main() {
             expectedFullText: 'aa',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 2),
           ),
+
           _Example(
             'Document has only 1 commented out line without spaces between comment and text',
             initialFullText: '//aa',
             initialSelection: TextSelection.collapsed(offset: 0),
             expectedFullText: 'aa',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 2),
-          ),
-          _Example(
-            'Document has several lines, first line(not comment) is selected',
-            initialFullText: '''
-aa
-aa
-''',
-            initialSelection: TextSelection.collapsed(offset: 0),
-            expectedFullText: '''
-// aa
-aa
-''',
-            expectedSelection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
-          _Example(
-            'Document has several lines, first line(comment) is selected',
-            initialFullText: '''
-// aa
-aa
-''',
-            initialSelection: TextSelection.collapsed(offset: 0),
-            expectedFullText: '''
-aa
-aa
-''',
-            expectedSelection: TextSelection(baseOffset: 0, extentOffset: 3),
-          ),
-          _Example(
-            'Document has several lines, non-first line(not-comment) is selected',
-            initialFullText: '''
-aa
-aa
-aa
-''',
-            initialSelection: TextSelection.collapsed(offset: 3),
-            expectedFullText: '''
-aa
-// aa
-aa
-''',
-            expectedSelection: TextSelection(baseOffset: 3, extentOffset: 9),
-          ),
-          _Example(
-            'Document has several lines, non-first line(comment) is selected',
-            initialFullText: '''
-aa
-// aa
-aa
-''',
-            initialSelection: TextSelection.collapsed(offset: 3),
-            expectedFullText: '''
-aa
-aa
-aa
-''',
-            expectedSelection: TextSelection(baseOffset: 3, extentOffset: 6),
-          ),
-          _Example(
-            'Document has several lines, last line(not comment) is selected',
-            initialFullText: '''
-aa
-aa''',
-            initialSelection: TextSelection.collapsed(offset: 3),
-            expectedFullText: '''
-aa
-// aa''',
-            expectedSelection: TextSelection(baseOffset: 3, extentOffset: 8),
-          ),
-          _Example(
-            'Document has several lines, last line(comment) is selected',
-            initialFullText: '''
-aa
-// aa''',
-            initialSelection: TextSelection.collapsed(offset: 3),
-            expectedFullText: '''
-aa
-aa''',
-            expectedSelection: TextSelection(baseOffset: 3, extentOffset: 5),
           ),
         ];
 
@@ -143,6 +68,7 @@ aa''',
 
       test('Selection is a range that occupies several lines', () {
         final examples = [
+          //
           _Example(
             'WHEN all selected lines are uncommented '
             'SHOULD comment out all selected lines',
@@ -159,6 +85,7 @@ Aa
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 18),
           ),
+
           _Example(
             'WHEN all selected lines are commented out '
             'SHOULD uncomment all selected lines',
@@ -175,6 +102,7 @@ Aa
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 9),
           ),
+
           _Example(
             'WHEN first selected line is uncommented, the rest are commented out '
             'SHOULD comment all lines out',
@@ -191,6 +119,7 @@ aA
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 24),
           ),
+
           _Example(
             'WHEN non-first selected line is uncommented, the rest are commented out '
             'SHOULD comment out all lines',
@@ -207,6 +136,7 @@ AA
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 24),
           ),
+
           _Example(
             'WHEN last selected line is uncommented, the rest are commented out '
             'SHOULD comment out all lines',
@@ -255,9 +185,10 @@ Aa
       final examples = [];
       test('Selection is collapsed', () {
         final examples = [
+          //
           _Example(
             'WHEN line is not commented out '
-            'SHOULD comment it out',
+            'SHOULD comment it out with the first sequence in the list',
             initialFullText: '''
 a
 ''',
@@ -267,6 +198,7 @@ a
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 5),
           ),
+
           _Example(
             'WHEN line is commented out with the first type of comment '
             'SHOULD uncomment it',
@@ -279,6 +211,7 @@ a
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 2),
           ),
+
           _Example(
             'WHEN line is commented out with the second type of comment '
             'SHOULD uncomment it',
@@ -291,6 +224,7 @@ a
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 2),
           ),
+
           _Example(
             'WHEN line is empty '
             'SHOULD only change selection',
@@ -302,22 +236,6 @@ a
 
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 1),
-          ),
-          _Example(
-            'WHEN empty line between commented lines is selected '
-            'SHOULD only change selection',
-            initialFullText: '''
-// a
-
-# a
-''',
-            initialSelection: TextSelection.collapsed(offset: 5),
-            expectedFullText: '''
-// a
-
-# a
-''',
-            expectedSelection: TextSelection(baseOffset: 5, extentOffset: 6),
           ),
         ];
 
@@ -347,6 +265,7 @@ a
       });
       test('Selection is a range', () {
         final examples = [
+          //
           _Example(
             'WHEN every selected line has different type of single line comments '
             'SHOULD uncomment all of them',
@@ -365,6 +284,7 @@ Aa
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 12),
           ),
+
           _Example(
             'WHEN every selected line has different type of single line comments '
             'and one line inbetween is empty '
@@ -384,6 +304,7 @@ Aa
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 10),
           ),
+
           _Example(
             'WHEN every selected line has different type of single line comments '
             'but one of them is not commented '
@@ -403,6 +324,7 @@ AA
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 24),
           ),
+
           _Example(
             'WHEN every selected line has different type of single line comments '
             'and they have different indentation '
@@ -422,6 +344,7 @@ AA
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 22),
           ),
+
           _Example(
             'WHEN every selected line has different type of single line comments '
             'and they have different indentation '
@@ -441,6 +364,7 @@ AA
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 22),
           ),
+
           _Example(
             'WHEN every selected line has different type of single line comments '
             'and they have different indentation '
@@ -460,6 +384,7 @@ Aa
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 16),
           ),
+
           _Example(
             'WHEN non-commented lines have different indentation '
             'SHOULD comment out all lines and do not affect empty line',
