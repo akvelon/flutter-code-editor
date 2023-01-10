@@ -15,7 +15,7 @@ import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
 
-final _shortcuts = {
+final _shortcuts = <ShortcutActivator, Intent>{
   // Copy
   LogicalKeySet(
     LogicalKeyboardKey.control,
@@ -82,9 +82,9 @@ final _shortcuts = {
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.slash,
   ): const CommentUncommentIntent(),
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.slash,
+    meta: true,
   ): const CommentUncommentIntent(),
 };
 

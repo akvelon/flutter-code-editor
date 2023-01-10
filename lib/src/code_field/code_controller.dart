@@ -403,54 +403,10 @@ class CodeController extends TextEditingController {
   /// and treats them as a normal text (not a comment)
   void commentOrUncommentSelection() {
     if (_anySelectedLineUncommented()) {
-      _commentSelectedLines();
+      _commentOutSelectedLines();
     } else {
       _uncommentSelectedLines();
     }
-  }
-
-  void _commentSelectedLines() {
-    final sequence = SingleLineComments.byMode[language]?.first;
-    if (sequence == null) {
-      return;
-    }
-
-    modifySelectedLines((line) {
-      // if line is empty do not comment it
-      if (line.trim() == '') {
-        return line;
-      }
-
-      return line.replaceRange(
-        0,
-        0,
-        '$sequence ',
-      );
-    });
-  }
-
-  void _uncommentSelectedLines() {
-    modifySelectedLines((line) {
-      // if line is empty skip it
-      if (line.trim() == '') {
-        return line;
-      }
-
-      for (final sequence
-          in SingleLineComments.byMode[language] ?? <String>[]) {
-        // if there is a space after sequence we should remove it
-        if (line.trim().startsWith('$sequence ')) {
-          return line.replaceFirst('$sequence ', '');
-        }
-        // if there is no space after sequence we should remove the sequence
-        if (line.trim().startsWith(sequence)) {
-          return line.replaceFirst(sequence, '');
-        }
-      }
-
-      // if line is not commented just return it
-      return line;
-    });
   }
 
   bool _anySelectedLineUncommented() {
@@ -495,6 +451,50 @@ class CodeController extends TextEditingController {
     }
 
     return false;
+  }
+
+  void _commentOutSelectedLines() {
+    final sequence = SingleLineComments.byMode[language]?.first;
+    if (sequence == null) {
+      return;
+    }
+
+    modifySelectedLines((line) {
+      // if line is empty do not comment it
+      if (line.trim() == '') {
+        return line;
+      }
+
+      return line.replaceRange(
+        0,
+        0,
+        '$sequence ',
+      );
+    });
+  }
+
+  void _uncommentSelectedLines() {
+    modifySelectedLines((line) {
+      // if line is empty skip it
+      if (line.trim() == '') {
+        return line;
+      }
+
+      for (final sequence
+          in SingleLineComments.byMode[language] ?? <String>[]) {
+        // if there is a space after a sequence we should remove it with the sequence
+        if (line.trim().startsWith('$sequence ')) {
+          return line.replaceFirst('$sequence ', '');
+        }
+        // if there is no space after a sequence we should remove the sequence
+        if (line.trim().startsWith(sequence)) {
+          return line.replaceFirst(sequence, '');
+        }
+      }
+
+      // if line is not commented just return it
+      return line;
+    });
   }
 
   /// Filters the lines that have at least one character selected.
