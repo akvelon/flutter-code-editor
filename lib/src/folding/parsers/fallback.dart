@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:charcode/ascii.dart';
 import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
+import 'package:tuple/tuple.dart';
 
 import '../../code/code_lines.dart';
 import '../foldable_block_type.dart';
@@ -12,6 +13,9 @@ import 'text.dart';
 class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   final List<String> singleLineCommentSequences;
   final List<String> importPrefixes;
+
+  /// [ ['/*', '*/'] , ...]
+  final List<Tuple2<String, String>>? multilineCommentSequences;
 
   /// The size of a rolling window to remember processed characters.
   final int _tailLength;
@@ -23,11 +27,16 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool _isInDoubleQuoteLiteral = false;
   bool _foundServiceSingleLineComment = false;
   bool _isLineStart = true;
+  bool _isInMultilineComment = false;
 
   FallbackFoldableBlockParser({
     required this.singleLineCommentSequences,
     required this.importPrefixes,
-  }) : _tailLength = singleLineCommentSequences.map((s) => s.length).max;
+    this.multilineCommentSequences,
+  }) : _tailLength = getTailLength(
+          singleLineCommentSequences,
+          multilineCommentSequences,
+        );
 
   @override
   void parse({
@@ -100,6 +109,34 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 break;
               }
             }
+
+            if (isMultilineCommentingEnabled) {
+              for (final c in multilineCommentSequences!) {
+                if (tail.endsWith(c.item1)) {
+                  if (!serviceCommentLines.contains(lineIndex)) {
+                    startBlock(lineIndex, FoldableBlockType.multilineComment);
+                    _isInMultilineComment = true;
+                    break;
+                  } else {
+                    _foundServiceSingleLineComment = true;
+                  }
+                }
+              }
+            }
+          }
+
+          if (isInMultilineComment) {
+            for (final c in multilineCommentSequences!) {
+              if (tail.endsWith(c.item2)) {
+                if (!serviceCommentLines.contains(lineIndex)) {
+                  endBlock(lineIndex, FoldableBlockType.multilineComment);
+                  _isInMultilineComment = false;
+                  break;
+                } else {
+                  _foundServiceSingleLineComment = true;
+                }
+              }
+            }
           }
 
           if (!_foundSingleLineComment && !foundImport) {
@@ -109,20 +146,26 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
       switch (code) {
         case $lf: // Newline
+          _isInDoubleQuoteLiteral = false;
+          _isInSingleQuoteLiteral = false;
           submitCurrentLine();
           clearLineFlags();
           addToLineIndex(1);
           break;
 
         case $singleQuote: // '
-          if (_foundSingleLineComment || _wasBackslash) {
+          if (_foundSingleLineComment ||
+              _wasBackslash ||
+              isInMultilineComment) {
             break;
           }
           _isInSingleQuoteLiteral = !_isInSingleQuoteLiteral;
           break;
 
         case $doubleQuote: // "
-          if (_foundSingleLineComment || _wasBackslash) {
+          if (_foundSingleLineComment ||
+              _wasBackslash ||
+              isInMultilineComment) {
             break;
           }
           _isInDoubleQuoteLiteral = !_isInDoubleQuoteLiteral;
@@ -184,7 +227,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   }
 
   bool _canStartLexeme() {
-    return !_isInStringLiteral() && !_foundSingleLineComment;
+    return !_isInStringLiteral() &&
+        !_foundSingleLineComment &&
+        !isInMultilineComment;
   }
 
   @override
@@ -196,4 +241,21 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
   bool get _foundSingleLineComment =>
       _foundServiceSingleLineComment || foundSingleLineComment;
+
+  bool get isInMultilineComment =>
+      _isInMultilineComment && isMultilineCommentingEnabled;
+
+  bool get isMultilineCommentingEnabled =>
+      multilineCommentSequences != null &&
+      multilineCommentSequences!.isNotEmpty;
+
+  static int getTailLength(List<String> singleLineCommentSequences,
+          List<Tuple2<String, String>>? multilineCommentSequences) =>
+      [
+        singleLineCommentSequences.map((s) => s.length).max,
+        (multilineCommentSequences
+                    ?.map((e) => max(e.item1.length, e.item2.length)) ??
+                [0])
+            .max
+      ].max;
 }
