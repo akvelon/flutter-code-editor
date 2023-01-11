@@ -186,6 +186,19 @@ Aa
         final examples = [
           //
           _Example(
+            'WHEN selection is invalid '
+            'SHOULD do nothing',
+            initialFullText: '''
+a
+''',
+            initialSelection: TextSelection.collapsed(offset: -1),
+            expectedFullText: '''
+a
+''',
+            expectedSelection: TextSelection.collapsed(offset: -1),
+          ),
+
+          _Example(
             'WHEN line is not commented out '
             'SHOULD comment it out with the first sequence in the list',
             initialFullText: '''
@@ -402,6 +415,25 @@ Aa
 //       Aa
 ''',
             expectedSelection: TextSelection(baseOffset: 0, extentOffset: 31),
+          ),
+
+          _Example(
+            'WHEN there are deselected lines '
+            'SHOULD only comment selected lines.',
+            initialFullText: '''
+a
+A
+A
+a
+''',
+            initialSelection: TextSelection(baseOffset: 2, extentOffset: 5),
+            expectedFullText: '''
+a
+// A
+// A
+a
+''',
+            expectedSelection: TextSelection(baseOffset: 2, extentOffset: 12),
           ),
         ];
 
