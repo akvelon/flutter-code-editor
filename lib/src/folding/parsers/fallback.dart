@@ -123,14 +123,14 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 if (tail.endsWith(c.item1)) {
                   if (!serviceCommentLines.contains(lineIndex)) {
                     if (!foundImportTerminator) {
+                      startBlock(lineIndex, FoldableBlockType.multilineComment);
+                      _shouldEndMultilineComment = true;
+                    } else {
                       // shouldn't start multiline comment block
 
                       // class MyClass { /*
                       // */
                       // }
-                      startBlock(lineIndex, FoldableBlockType.multilineComment);
-                      _shouldEndMultilineComment = true;
-                    } else {
                       _shouldEndMultilineComment = false;
                     }
                     _startedMultilineCommentWith = c.item1;
