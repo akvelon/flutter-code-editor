@@ -127,6 +127,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                     break;
                   }
                 }
+                if (c.item1.contains(char)) {
+                  _isPossibleCommentSequence = true;
+                }
               }
             }
           }
@@ -136,7 +139,12 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               if (tail.endsWith(c.item2) &&
                   _startedMultilineCommentWith == c.item1) {
                 if (!serviceCommentLines.contains(lineIndex)) {
+                  final blocksCount = blocks.length;
                   endBlock(lineIndex, FoldableBlockType.multilineComment);
+                  if (blocksCount == blocks.length) {
+                    setFoundSingleLineComment();
+                  }
+
                   _isInMultilineComment = false;
                   _startedMultilineCommentWith = null;
                   break;

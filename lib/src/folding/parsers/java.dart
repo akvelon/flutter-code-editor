@@ -22,5 +22,6 @@ class JavaFoldableBlockParser extends AbstractFoldableBlockParser {
     );
 
     blocks.addAll(textParser.blocks);
+    invalidBlocks.addAll(textParser.invalidBlocks);
   }
 }
