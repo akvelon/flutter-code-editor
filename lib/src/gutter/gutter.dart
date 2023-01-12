@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../code_field/code_controller.dart';
@@ -5,21 +6,53 @@ import '../line_numbers/gutter_style.dart';
 import 'error.dart';
 import 'fold_toggle.dart';
 
-const _issueColumnWidth = 16.0;
-const _foldingColumnWidth = 16.0;
+class _GutterRowBuilder {
+  final GutterStyle style;
+  final int lineNumber;
+  final bool isWrappedLine;
 
-const _lineNumberColumn = 0;
-const _issueColumn = 1;
-const _foldingColumn = 2;
+  Widget? errorWidget;
+  Widget? foldingWidget;
+
+  _GutterRowBuilder({
+    required this.style,
+    required this.lineNumber,
+    this.isWrappedLine = false,
+  });
+
+  TableRow build(BuildContext context) {
+    final text =
+        (isWrappedLine || !style.showLineNumbers) ? '' : '${lineNumber + 1}';
+    return TableRow(
+      children: [
+        Text(
+          text,
+          style: style.textStyle,
+          textAlign: style.textAlign,
+        ),
+        if (style.showErrors && errorWidget != null)
+          errorWidget!
+        else
+          const SizedBox(),
+        if (style.showFoldingHandles && foldingWidget != null)
+          foldingWidget!
+        else
+          const SizedBox(),
+      ],
+    );
+  }
+}
 
 class GutterWidget extends StatelessWidget {
   const GutterWidget({
     required this.codeController,
     required this.style,
+    required this.linesInParagraps,
   });
 
   final CodeController codeController;
   final GutterStyle style;
+  final List<int> linesInParagraps;
 
   @override
   Widget build(BuildContext context) {
@@ -32,109 +65,90 @@ class GutterWidget extends StatelessWidget {
   Widget _buildOnChange(BuildContext context, Widget? child) {
     final code = codeController.code;
 
-    final gutterWidth = style.width -
-        (style.showErrors ? 0 : _issueColumnWidth) -
-        (style.showFoldingHandles ? 0 : _foldingColumnWidth);
-
-    final issueColumnWidth = style.showErrors ? _issueColumnWidth : 0.0;
-    final foldingColumnWidth =
-        style.showFoldingHandles ? _foldingColumnWidth : 0.0;
-
-    final tableRows = List.generate(
-      code.hiddenLineRanges.visibleLineNumbers.length,
-      // ignore: prefer_const_constructors
-      (i) => TableRow(
-        // ignore: prefer_const_literals_to_create_immutables
-        children: [
-          const SizedBox(),
-          const SizedBox(),
-          const SizedBox(),
-        ],
-      ),
-    );
-
-    _fillLineNumbers(tableRows);
+    // build rows
+    final List<_GutterRowBuilder> tableRowBuilders = [];
+    final visibleLineNumbers =
+        code.hiddenLineRanges.visibleLineNumbers.toList();
+    for (var i = 0; i < visibleLineNumbers.length; ++i) {
+      final lineNumber = visibleLineNumbers[i];
+      tableRowBuilders.add(
+        _GutterRowBuilder(
+          style: style,
+          lineNumber: lineNumber,
+        ),
+      );
+      // line wrap cache and folding cache may temporarily be out of sync while
+      // rebuilding layouts, as the line wrap cache is built while creating the
+      // layout and the folding cache when the text changes
+      if (i < linesInParagraps.length) {
+        for (var l = 1; l < linesInParagraps[i]; ++l) {
+          // wrapped lines
+          tableRowBuilders.add(
+            _GutterRowBuilder(
+              style: style,
+              lineNumber: lineNumber,
+              isWrappedLine: true,
+            ),
+          );
+        }
+      }
+    }
 
     if (style.showErrors) {
-      _fillIssues(tableRows);
+      _fillIssues(tableRowBuilders);
     }
     if (style.showFoldingHandles) {
-      _fillFoldToggles(tableRows);
+      _fillFoldToggles(tableRowBuilders);
     }
-
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
-      width: style.showLineNumbers ? gutterWidth : null,
+      width: style.showLineNumbers ? style.totalWidth() : null,
       child: Table(
         columnWidths: {
-          _lineNumberColumn: const FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(foldingColumnWidth),
+          0: const FlexColumnWidth(),
+          1: FixedColumnWidth(style.errorColumnWidth()),
+          2: FixedColumnWidth(style.foldingColumnWidth()),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-        children: tableRows,
+        children: tableRowBuilders.map((e) => e.build(context)).toList(),
       ),
     );
   }
 
-  void _fillLineNumbers(List<TableRow> tableRows) {
-    final code = codeController.code;
 
-    for (final i in code.hiddenLineRanges.visibleLineNumbers) {
-      final lineIndex = _lineIndexToTableRowIndex(i);
-
-      if (lineIndex == null) {
-        continue;
-      }
-
-      tableRows[lineIndex].children![_lineNumberColumn] = Text(
-        style.showLineNumbers ? '${i + 1}' : ' ',
-        style: style.textStyle,
-        textAlign: style.textAlign,
-      );
-    }
-  }
-
-  void _fillIssues(List<TableRow> tableRows) {
+  void _fillIssues(List<_GutterRowBuilder> tableRowBuilders) {
     for (final issue in codeController.issues) {
-      if (issue.line >= codeController.code.lines.length) {
-        continue;
-      }
-
-      final lineIndex = _lineIndexToTableRowIndex(issue.line);
-      if (lineIndex == null || lineIndex >= tableRows.length) {
-        continue;
-      }
-      tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
-        issue,
-        style.errorPopupTextStyle ??
-            (throw Exception('Error popup style should never be null')),
+      final row = tableRowBuilders.firstWhereOrNull(
+        (element) => element.lineNumber == issue.line && !element.isWrappedLine,
       );
+      if (row != null) {
+        row.errorWidget = GutterErrorWidget(
+          issue,
+          style.errorPopupTextStyle ??
+              (throw Exception('Error popup style should never be null')),
+        );
+      }
     }
   }
 
-  void _fillFoldToggles(List<TableRow> tableRows) {
+  void _fillFoldToggles(List<_GutterRowBuilder> tableRowBuilders) {
     final code = codeController.code;
 
     for (final block in code.foldableBlocks) {
-      final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
-      if (lineIndex == null) {
-        continue;
-      }
-
-      final isFolded = code.foldedBlocks.contains(block);
-
-      tableRows[lineIndex].children![_foldingColumn] = FoldToggle(
-        color: style.textStyle?.color,
-        isFolded: isFolded,
-        onTap: isFolded
-            ? () => codeController.unfoldAt(block.firstLine)
-            : () => codeController.foldAt(block.firstLine),
+      final lineIndex = block.firstLine;
+      final row = tableRowBuilders.firstWhereOrNull(
+        (element) => element.lineNumber == lineIndex && !element.isWrappedLine,
       );
+      if (row != null) {
+        final isFolded = code.foldedBlocks.contains(block);
+        row.foldingWidget = FoldToggle(
+          color: style.textStyle?.color,
+          isFolded: isFolded,
+          onTap: isFolded
+              ? () => codeController.unfoldAt(block.firstLine)
+              : () => codeController.foldAt(block.firstLine),
+        );
+      }
     }
-  }
-
-  int? _lineIndexToTableRowIndex(int line) {
-    return codeController.code.hiddenLineRanges.cutLineIndexIfVisible(line);
   }
 }

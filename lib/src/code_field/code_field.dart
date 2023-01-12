@@ -313,6 +313,8 @@ class _CodeFieldState extends State<CodeField> {
       backgroundCol = null;
     }
 
+    const paddingLeft = 8.0;
+
     final defaultTextStyle = TextStyle(
       color: styles?[rootKey]?.color ?? DefaultStyles.textColor,
       fontSize: themeData.textTheme.subtitle1?.fontSize,
@@ -341,87 +343,129 @@ class _CodeFieldState extends State<CodeField> {
           ),
     );
 
-    Widget? gutter;
-    if (gutterStyle.showGutter) {
-      gutter = GutterWidget(
-        codeController: widget.controller,
-        style: gutterStyle,
-      );
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
 
-    final codeField = TextField(
-      focusNode: _focusNode,
-      scrollPadding: widget.padding,
-      style: textStyle,
-      controller: widget.controller,
-      minLines: widget.minLines,
-      maxLines: widget.maxLines,
-      expands: widget.expands,
-      scrollController: _codeScroll,
-      decoration: const InputDecoration(
-        isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16),
-        disabledBorder: InputBorder.none,
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-      ),
-      cursorColor: widget.cursorColor ?? defaultTextStyle.color,
-      autocorrect: false,
-      enableSuggestions: false,
-      enabled: widget.enabled,
-      onChanged: widget.onChanged,
-      readOnly: widget.readOnly,
-    );
+        Widget? gutter;
+        if (gutterStyle.showGutter) {
+          final List<int> linesInParagraps;
+          final codeLines = widget.controller.code.lines.lines;
+          if (widget.wrap) {
+            // get wrapped line count in each paragraph
+            const textFieldPadding =
+                paddingLeft + 3; // TODO: not sure why the 3 is needed!
+            final codeFieldWidth = constraints.maxWidth.floorToDouble() -
+                gutterStyle.totalWidth() -
+                textFieldPadding;
+            linesInParagraps = [];
+            for (var i = 0; i < codeLines.length; ++i) {
+              final codeLine = codeLines[i];
+              // codelines contain an extra newline at the end, except for the last line
+              final text = (i == codeLines.length - 1)
+                  ? codeLine.text
+                  : codeLine.text.replaceAll('\n', '');
+              // create painter with max width
+              final TextPainter paragraphPainter =
+                  _getTextPainter(text, codeFieldWidth);
+              // compute paragraph's metrics to get number of line wraps
+              final lineMetrics = paragraphPainter.computeLineMetrics();
+              linesInParagraps.add(max(1, lineMetrics.length));
+            }
+          } else {
+            // unrwapped editor's show one line per paragraph
+            linesInParagraps = codeLines.map((_) => 1).toList();
+          }
+          gutter = GutterWidget(
+            codeController: widget.controller,
+            style: gutterStyle,
+            linesInParagraps: linesInParagraps,
+          );
+        }
 
-    final editingField = Theme(
-      data: Theme.of(context).copyWith(
-        textSelectionTheme: widget.textSelectionTheme,
-      ),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          // Control horizontal scrolling
-          return _wrapInScrollView(codeField, textStyle, constraints.maxWidth);
-        },
-      ),
-    );
+        final codeField = TextField(
+          focusNode: _focusNode,
+          scrollPadding: widget.padding,
+          style: textStyle,
+          controller: widget.controller,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
+          expands: widget.expands,
+          scrollController: _codeScroll,
+          decoration: const InputDecoration(
+            isCollapsed: true,
+            contentPadding: EdgeInsets.symmetric(vertical: 16),
+            disabledBorder: InputBorder.none,
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+          ),
+          cursorColor: widget.cursorColor ?? defaultTextStyle.color,
+          autocorrect: false,
+          enableSuggestions: false,
+          enabled: widget.enabled,
+          onChanged: widget.onChanged,
+          readOnly: widget.readOnly,
+        );
 
-    return FocusableActionDetector(
-      actions: widget.controller.actions,
-      shortcuts: _shortcuts,
-      child: Container(
-        decoration: widget.decoration,
-        color: backgroundCol,
-        key: _codeFieldKey,
-        padding: const EdgeInsets.only(left: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (gutter != null) gutter,
-            Expanded(
-              child: Stack(
-                children: [
-                  editingField,
-                  if (widget.controller.popupController.isPopupShown)
-                    Popup(
-                      normalOffset: _normalPopupOffset,
-                      flippedOffset: _flippedPopupOffset,
-                      controller: widget.controller.popupController,
-                      editingWindowSize: windowSize,
-                      style: textStyle,
-                      backgroundColor: backgroundCol,
-                      parentFocusNode: _focusNode!,
-                    ),
-                ],
-              ),
+        final editingField = Theme(
+          data: Theme.of(context).copyWith(
+            textSelectionTheme: widget.textSelectionTheme,
+          ),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              // Control horizontal scrolling when not wrapping
+              if (widget.wrap) {
+                return codeField;
+              } else {
+                return _wrapInScrollView(
+                      codeField,
+                      textStyle,
+                      constraints.maxWidth,
+                    );
+              }
+            },
+          ),
+        );
+
+        return FocusableActionDetector(
+          actions: widget.controller.actions,
+          shortcuts: _shortcuts,
+          child: Container(
+            decoration: widget.decoration,
+            color: backgroundCol,
+            key: _codeFieldKey,
+            padding: const EdgeInsets.only(left: paddingLeft),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (gutter != null) gutter,
+                Expanded(
+                  child: Stack(
+                    children: [
+                      editingField,
+                      if (widget.controller.popupController.isPopupShown)
+                        Popup(
+                          normalOffset: _normalPopupOffset,
+                          flippedOffset: _flippedPopupOffset,
+                          controller: widget.controller.popupController,
+                          editingWindowSize: windowSize,
+                          style: textStyle,
+                          backgroundColor: backgroundCol,
+                          parentFocusNode: _focusNode!,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   void _updatePopupOffset() {
-    final TextPainter textPainter = _getTextPainter(widget.controller.text);
+    final TextPainter textPainter =
+        _getTextPainter(widget.controller.text, double.infinity);
     final caretHeight = _getCaretHeight(textPainter);
 
     final double leftOffset = _getPopupLeftOffset(textPainter);
@@ -435,11 +479,11 @@ class _CodeFieldState extends State<CodeField> {
     });
   }
 
-  TextPainter _getTextPainter(String text) {
+  TextPainter _getTextPainter(String text, double maxWidth) {
     return TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(text: text, style: textStyle),
-    )..layout();
+    )..layout(maxWidth: maxWidth);
   }
 
   Offset _getCaretOffset(TextPainter textPainter) {
@@ -461,7 +505,7 @@ class _CodeFieldState extends State<CodeField> {
     return max(
       _getCaretOffset(textPainter).dx +
           widget.padding.left -
-          _horizontalCodeScroll!.offset,
+          (widget.wrap ? 0.0 : _horizontalCodeScroll!.offset),
       0,
     );
   }

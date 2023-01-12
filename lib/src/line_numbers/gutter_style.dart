@@ -75,6 +75,25 @@ class GutterStyle {
         showFoldingHandles: showFoldingHandles,
         showLineNumbers: showLineNumbers,
       );
+
+  // internally used sizes
+  static const _errorColumnWidth = 16.0;
+  static const _foldingColumnWidth = 16.0;
+
+  // applied width, depending on showError and showFoldingHandles states
+  double totalWidth() {
+    return (width - _errorColumnWidth - _foldingColumnWidth) +
+        errorColumnWidth() +
+        foldingColumnWidth();
+  }
+
+  double errorColumnWidth() {
+    return showErrors ? _errorColumnWidth : 0.0;
+  }
+
+  double foldingColumnWidth() {
+    return showFoldingHandles ? _foldingColumnWidth : 0.0;
+  }
 }
 
 @Deprecated('Renamed to GutterStyle')
