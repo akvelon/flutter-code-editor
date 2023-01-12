@@ -256,15 +256,16 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
       multilineCommentSequences != null &&
       multilineCommentSequences!.isNotEmpty;
 
+  /// get max length of a sequence from possible sequences
   static int getTailLength(
     List<Tuple2<String, String>>? multilineCommentSequences,
     List<String> singleLineCommentSequences,
   ) =>
       [
         singleLineCommentSequences.map((s) => s.length).max,
-        (multilineCommentSequences
-                    ?.map((e) => max(e.item1.length, e.item2.length)) ??
-                [0])
-            .max
+        multilineCommentSequences
+                ?.map((e) => max(e.item1.length, e.item2.length))
+                .max ??
+            0
       ].max;
 }
