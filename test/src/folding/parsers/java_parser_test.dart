@@ -286,6 +286,22 @@ void method2 // Not the only thing in the line        10
           _FB(firstLine: 14, lastLine: 15, type: _T.multilineComment),
         ],
       ),
+
+      _Example(
+        'Pair characters in a multiline that started at the end of a normal line',
+        code: '''
+class MyClass{
+
+} /*
+{
+
+}
+*/
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 2, type: _T.braces),
+        ],
+      ),
     ];
 
     for (final example in examples) {

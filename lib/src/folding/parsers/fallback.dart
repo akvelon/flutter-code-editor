@@ -31,6 +31,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool _isLineStart = true;
   bool _isPossibleCommentSequence = false;
   bool _foundServiceSingleLineComment = false;
+  bool _shouldEndMultilineComment = false;
 
   FallbackFoldableBlockParser({
     required this.singleLineCommentSequences,
@@ -117,11 +118,16 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               }
             }
 
-            if (isMultilineCommentingEnabled && !foundImportTerminator) {
+            if (isMultilineCommentingEnabled) {
               for (final c in multilineCommentSequences!) {
                 if (tail.endsWith(c.item1)) {
                   if (!serviceCommentLines.contains(lineIndex)) {
-                    startBlock(lineIndex, FoldableBlockType.multilineComment);
+                    if (!foundImportTerminator) {
+                      startBlock(lineIndex, FoldableBlockType.multilineComment);
+                      _shouldEndMultilineComment = true;
+                    } else {
+                      _shouldEndMultilineComment = false;
+                    }
                     _startedMultilineCommentWith = c.item1;
                     _isInMultilineComment = true;
                     break;
@@ -140,7 +146,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   _startedMultilineCommentWith == c.item1) {
                 if (!serviceCommentLines.contains(lineIndex)) {
                   final blocksCount = blocks.length;
-                  endBlock(lineIndex, FoldableBlockType.multilineComment);
+                  if (_shouldEndMultilineComment) {
+                    endBlock(lineIndex, FoldableBlockType.multilineComment);
+                  }
                   if (blocksCount == blocks.length) {
                     setFoundSingleLineComment();
                   }
