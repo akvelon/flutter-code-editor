@@ -20,6 +20,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   /// The size of a rolling window to remember processed characters.
   final int _tailLength;
 
+  String? _startedMultilineCommentWith;
+
   /// If in a string literal the last char was a backslash.
   bool _wasBackslash = false;
 
@@ -120,6 +122,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 if (tail.endsWith(c.item1)) {
                   if (!serviceCommentLines.contains(lineIndex)) {
                     startBlock(lineIndex, FoldableBlockType.multilineComment);
+                    _startedMultilineCommentWith = c.item1;
                     _isInMultilineComment = true;
                     break;
                   }
@@ -130,10 +133,12 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
           if (isInMultilineComment) {
             for (final c in multilineCommentSequences!) {
-              if (tail.endsWith(c.item2)) {
+              if (tail.endsWith(c.item2) &&
+                  _startedMultilineCommentWith == c.item1) {
                 if (!serviceCommentLines.contains(lineIndex)) {
                   endBlock(lineIndex, FoldableBlockType.multilineComment);
                   _isInMultilineComment = false;
+                  _startedMultilineCommentWith = null;
                   break;
                 }
               }
