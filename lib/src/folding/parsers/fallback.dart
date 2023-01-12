@@ -153,10 +153,11 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   final blocksCountBefore = blocks.length;
                   if (_shouldEndMultilineComment) {
                     endBlock(lineIndex, FoldableBlockType.multilineComment);
-                  }
-                  if (blocksCountBefore == blocks.length) {
-                    // in case firstLine == endLine
-                    setFoundSingleLineComment();
+
+                    if (blocksCountBefore == blocks.length) {
+                      // in case firstLine == endLine
+                      setFoundSingleLineComment();
+                    }
                   }
 
                   _isInMultilineComment = false;
