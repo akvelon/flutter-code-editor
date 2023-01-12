@@ -117,7 +117,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               }
             }
 
-            if (isMultilineCommentingEnabled) {
+            if (isMultilineCommentingEnabled && !foundImportTerminator) {
               for (final c in multilineCommentSequences!) {
                 if (tail.endsWith(c.item1)) {
                   if (!serviceCommentLines.contains(lineIndex)) {

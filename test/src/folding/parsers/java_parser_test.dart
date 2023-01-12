@@ -219,6 +219,29 @@ class MyClass {
           _FB(firstLine: 0, lastLine: 3, type: _T.braces),
         ],
       ),
+      _Example(
+        'Pair symbols should be ignored inside a multiline comment',
+        code: '''
+/*[([       0
+])]*/       1
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 1, type: _T.multilineComment),
+        ],
+      ),
+      _Example(
+        'Multiline comment after a brace',
+        code: '''
+class MyClass{            // 0
+
+} /*                         2
+* some weird comment         3
+*/                        // 4
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 2, type: _T.braces),
+        ],
+      ),
     ];
 
     for (final example in examples) {
