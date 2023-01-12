@@ -28,6 +28,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool _foundServiceSingleLineComment = false;
   bool _isLineStart = true;
   bool _isInMultilineComment = false;
+  bool _isPossibleCommentSequence = false;
 
   FallbackFoldableBlockParser({
     required this.singleLineCommentSequences,
@@ -76,7 +77,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
     String tail = '';
 
     for (final code in text.runes) {
-      tail += String.fromCharCode(code); // ignore: use_string_buffers
+      final char = String.fromCharCode(code);
+      tail += char; // ignore: use_string_buffers
       tail = tail.substring(max(0, tail.length - _tailLength));
 
       if (_isLineStart) {
@@ -107,6 +109,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   _foundServiceSingleLineComment = true;
                 }
                 break;
+              }
+              if (c.contains(char)) {
+                _isPossibleCommentSequence = true;
               }
             }
 
@@ -139,7 +144,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
             }
           }
 
-          if (!_foundSingleLineComment && !foundImport) {
+          if (!_foundSingleLineComment &&
+              !foundImport &&
+              !_isPossibleCommentSequence) {
             setFoundImportTerminator();
           }
       }
@@ -148,6 +155,10 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
         case $lf: // Newline
           _isInDoubleQuoteLiteral = false;
           _isInSingleQuoteLiteral = false;
+          if (_isPossibleCommentSequence && !_foundSingleLineComment) {
+            setFoundImportTerminator();
+          }
+          _isPossibleCommentSequence = false;
           submitCurrentLine();
           clearLineFlags();
           addToLineIndex(1);
