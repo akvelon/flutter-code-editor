@@ -209,6 +209,20 @@ void method() {
       ),
 
       _Example(
+        'Multiline comment after a closing brace with following single line comment',
+        code: '''
+class MyClass {
+void method() {
+}/* comment */
+// comment
+}''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 4, type: _T.braces),
+          _FB(firstLine: 1, lastLine: 2, type: _T.braces),
+        ],
+      ),
+
+      _Example(
         'Service comment sequences do not form a foldable block.',
         code: '''
 class MyClass {
