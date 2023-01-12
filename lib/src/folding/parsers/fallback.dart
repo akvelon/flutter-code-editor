@@ -23,20 +23,20 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   /// If in a string literal the last char was a backslash.
   bool _wasBackslash = false;
 
-  bool _isInSingleQuoteLiteral = false;
   bool _isInDoubleQuoteLiteral = false;
-  bool _foundServiceSingleLineComment = false;
-  bool _isLineStart = true;
   bool _isInMultilineComment = false;
+  bool _isInSingleQuoteLiteral = false;
+  bool _isLineStart = true;
   bool _isPossibleCommentSequence = false;
+  bool _foundServiceSingleLineComment = false;
 
   FallbackFoldableBlockParser({
     required this.singleLineCommentSequences,
     required this.importPrefixes,
     this.multilineCommentSequences,
   }) : _tailLength = getTailLength(
-          singleLineCommentSequences,
           multilineCommentSequences,
+          singleLineCommentSequences,
         );
 
   @override
@@ -122,8 +122,6 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                     startBlock(lineIndex, FoldableBlockType.multilineComment);
                     _isInMultilineComment = true;
                     break;
-                  } else {
-                    _foundServiceSingleLineComment = true;
                   }
                 }
               }
@@ -137,8 +135,6 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   endBlock(lineIndex, FoldableBlockType.multilineComment);
                   _isInMultilineComment = false;
                   break;
-                } else {
-                  _foundServiceSingleLineComment = true;
                 }
               }
             }
@@ -260,8 +256,10 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
       multilineCommentSequences != null &&
       multilineCommentSequences!.isNotEmpty;
 
-  static int getTailLength(List<String> singleLineCommentSequences,
-          List<Tuple2<String, String>>? multilineCommentSequences) =>
+  static int getTailLength(
+    List<Tuple2<String, String>>? multilineCommentSequences,
+    List<String> singleLineCommentSequences,
+  ) =>
       [
         singleLineCommentSequences.map((s) => s.length).max,
         (multilineCommentSequences
