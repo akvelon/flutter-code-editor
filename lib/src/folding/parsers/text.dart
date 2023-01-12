@@ -34,6 +34,10 @@ abstract class TextFoldableBlockParser extends AbstractFoldableBlockParser {
   @protected
   void setFoundImportTerminator() => _foundImportTerminator = true;
 
+  /// Import terminator is
+  /// Any line that has first non-whitespace character to be:
+  /// - not a sequence of a single line comment
+  /// - not a sequence of start of a multiline comment that terminates within the line
   bool get foundImportTerminator => _foundImportTerminator;
 
   /// If in the current line we found a non-service single-line comment.
