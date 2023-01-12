@@ -110,8 +110,8 @@ public static void main)String][ args( }
       _Example(
         'Pair characters in literals are ignored.',
         code: '''
-String a = "{[(";
-String b = ")]}";''',
+String a = "{[(/*";
+String b = ")]}*/";''',
         expected: [],
       ),
       _Example(
@@ -240,6 +240,50 @@ class MyClass{            // 0
 ''',
         expected: [
           _FB(firstLine: 0, lastLine: 2, type: _T.braces),
+        ],
+      ),
+
+      _Example(
+        'Multiline comment between imports',
+        code: '''
+import java.util.Arrays;      // 0
+import java.util.Date;        // 1
+/*                               2
+*/                               3
+import java.lang.Math;        // 4
+import java.lang.Exception;   // 5
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 1, type: _T.imports),
+          _FB(firstLine: 2, lastLine: 3, type: _T.multilineComment),
+          _FB(firstLine: 4, lastLine: 5, type: _T.imports),
+        ],
+      ),
+      _Example(
+        'Multiple multiline comments',
+        code: '''
+/* License                                            0
+ * License                                            1  */
+public class MyClass {
+
+/* Method                                             4
+ *
+ * Method                                             6  */
+
+void method() {} // Not the only thing in the line    8
+/* Single                                             9  */
+void method2 // Not the only thing in the line        10
+/* Single                                             11 */
+() {}
+}
+/* Comment                                            14
+ * Comment                                            15 */
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 1, type: _T.multilineComment),
+          _FB(firstLine: 2, lastLine: 13, type: _T.braces),
+          _FB(firstLine: 4, lastLine: 6, type: _T.multilineComment),
+          _FB(firstLine: 14, lastLine: 15, type: _T.multilineComment),
         ],
       ),
     ];
