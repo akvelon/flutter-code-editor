@@ -134,6 +134,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   // }
                   shouldEndMultilineComment = false;
                 }
+                // We are in a multiline comment
+                // regardless of whether we create foldable block or not.
                 _startedMultilineCommentWith = c.item1;
                 break;
               }
