@@ -15,28 +15,27 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   final List<String> importPrefixes;
 
   /// [ ['/*', '*/'] , ...]
-  final List<Tuple2<String, String>>? multilineCommentSequences;
+  final List<Tuple2<String, String>> multilineCommentSequences;
 
   /// The size of a rolling window to remember processed characters.
   final int _tailLength;
 
   String? _startedMultilineCommentWith;
+  bool get _isInMultilineComment => _startedMultilineCommentWith != null;
 
   /// If in a string literal the last char was a backslash.
   bool _wasBackslash = false;
 
-  bool _isInDoubleQuoteLiteral = false;
-  bool _isInMultilineComment = false;
   bool _isInSingleQuoteLiteral = false;
+  bool _isInDoubleQuoteLiteral = false;
+
   bool _isLineStart = true;
-  bool _isPossibleCommentSequence = false;
   bool _foundServiceSingleLineComment = false;
-  bool _shouldEndMultilineComment = false;
 
   FallbackFoldableBlockParser({
     required this.singleLineCommentSequences,
     required this.importPrefixes,
-    this.multilineCommentSequences,
+    this.multilineCommentSequences = const [],
   }) : _tailLength = getTailLength(
           multilineCommentSequences,
           singleLineCommentSequences,
@@ -78,6 +77,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
     required CodeLines lines,
   }) {
     String tail = '';
+    bool shouldEndMultilineComment = false;
+    bool isPossibleCommentSequence = false;
 
     for (final code in text.runes) {
       final char = String.fromCharCode(code);
@@ -114,63 +115,55 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 break;
               }
               if (c.contains(char)) {
-                _isPossibleCommentSequence = true;
+                isPossibleCommentSequence = true;
               }
             }
 
-            if (isMultilineCommentingEnabled) {
-              for (final c in multilineCommentSequences!) {
-                if (tail.endsWith(c.item1)) {
-                  if (!serviceCommentLines.contains(lineIndex)) {
-                    if (!foundImportTerminator) {
-                      startBlock(lineIndex, FoldableBlockType.multilineComment);
-                      _shouldEndMultilineComment = true;
-                    } else {
-                      // shouldn't start multiline comment block
+            for (final c in multilineCommentSequences) {
+              if (tail.endsWith(c.item1)) {
+                if (!foundImportTerminator) {
+                  startBlock(lineIndex, FoldableBlockType.multilineComment);
+                  shouldEndMultilineComment = true;
+                } else {
+                  // shouldn't start multiline comment block
 
-                      // class MyClass { /*
-                      // */
-                      // }
-                      _shouldEndMultilineComment = false;
-                    }
-                    _startedMultilineCommentWith = c.item1;
-                    _isInMultilineComment = true;
-                    break;
-                  }
+                  // class MyClass { /*
+                  // */
+                  // }
+                  shouldEndMultilineComment = false;
                 }
-                if (c.item1.contains(char)) {
-                  _isPossibleCommentSequence = true;
-                }
+                _startedMultilineCommentWith = c.item1;
+                break;
+              }
+              if (c.item1.contains(char)) {
+                isPossibleCommentSequence = true;
               }
             }
           }
 
-          if (isInMultilineComment) {
-            for (final c in multilineCommentSequences!) {
+          if (_isInMultilineComment) {
+            for (final c in multilineCommentSequences) {
               if (tail.endsWith(c.item2) &&
                   _startedMultilineCommentWith == c.item1) {
-                if (!serviceCommentLines.contains(lineIndex)) {
-                  final blocksCountBefore = blocks.length;
-                  if (_shouldEndMultilineComment) {
-                    endBlock(lineIndex, FoldableBlockType.multilineComment);
+                final blocksCountBefore = blocks.length;
+                if (shouldEndMultilineComment) {
+                  endBlock(lineIndex, FoldableBlockType.multilineComment);
 
-                    if (blocksCountBefore == blocks.length) {
-                      // in case firstLine == endLine
-                      setFoundSingleLineComment();
-                    }
+                  if (blocksCountBefore == blocks.length) {
+                    // in case firstLine == lastLine
+                    setFoundSingleLineComment();
                   }
-
-                  _isInMultilineComment = false;
-                  _startedMultilineCommentWith = null;
-                  break;
                 }
+
+                _startedMultilineCommentWith = null;
+                break;
               }
             }
           }
 
           if (!_foundSingleLineComment &&
               !foundImport &&
-              !_isPossibleCommentSequence) {
+              !isPossibleCommentSequence) {
             setFoundImportTerminator();
           }
       }
@@ -179,10 +172,10 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
         case $lf: // Newline
           _isInDoubleQuoteLiteral = false;
           _isInSingleQuoteLiteral = false;
-          if (_isPossibleCommentSequence && !_foundSingleLineComment) {
+          if (isPossibleCommentSequence && !_foundSingleLineComment) {
             setFoundImportTerminator();
           }
-          _isPossibleCommentSequence = false;
+          isPossibleCommentSequence = false;
           submitCurrentLine();
           clearLineFlags();
           addToLineIndex(1);
@@ -191,7 +184,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
         case $singleQuote: // '
           if (_foundSingleLineComment ||
               _wasBackslash ||
-              isInMultilineComment) {
+              _isInMultilineComment) {
             break;
           }
           _isInSingleQuoteLiteral = !_isInSingleQuoteLiteral;
@@ -200,7 +193,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
         case $doubleQuote: // "
           if (_foundSingleLineComment ||
               _wasBackslash ||
-              isInMultilineComment) {
+              _isInMultilineComment) {
             break;
           }
           _isInDoubleQuoteLiteral = !_isInDoubleQuoteLiteral;
@@ -264,7 +257,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool _canStartLexeme() {
     return !_isInStringLiteral() &&
         !_foundSingleLineComment &&
-        !isInMultilineComment;
+        !_isInMultilineComment;
   }
 
   @override
@@ -277,23 +270,14 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool get _foundSingleLineComment =>
       _foundServiceSingleLineComment || foundSingleLineComment;
 
-  bool get isInMultilineComment =>
-      _isInMultilineComment && isMultilineCommentingEnabled;
-
-  bool get isMultilineCommentingEnabled =>
-      multilineCommentSequences != null &&
-      multilineCommentSequences!.isNotEmpty;
-
   /// get max length of a sequence from possible sequences
   static int getTailLength(
-    List<Tuple2<String, String>>? multilineCommentSequences,
+    List<Tuple2<String, String>> multilineCommentSequences,
     List<String> singleLineCommentSequences,
   ) =>
       [
-        singleLineCommentSequences.map((s) => s.length).max,
-        multilineCommentSequences
-                ?.map((e) => max(e.item1.length, e.item2.length))
-                .max ??
-            0
+        ...singleLineCommentSequences.map((s) => s.length),
+        ...multilineCommentSequences
+            .map((e) => max(e.item1.length, e.item2.length))
       ].max;
 }
