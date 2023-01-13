@@ -8,9 +8,14 @@ import 'package:highlight/highlight_core.dart';
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
+import '../code/reg_exp.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
+import '../single_line_comments/parser/single_line_comment_parser.dart';
+import '../single_line_comments/parser/single_line_comments.dart';
+import '../single_line_comments/single_line_comment.dart';
 import '../wip/autocomplete/popup_controller.dart';
+import 'actions/comment_uncomment.dart';
 import 'actions/copy.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
@@ -86,6 +91,7 @@ class CodeController extends TextEditingController {
   TextSpan? lastTextSpan;
 
   late final actions = <Type, Action<Intent>>{
+    CommentUncommentIntent: CommentUncommentAction(controller: this),
     CopySelectionTextIntent: CopyAction(controller: this),
     IndentIntent: IndentIntentAction(controller: this),
     OutdentIntent: OutdentIntentAction(controller: this),
@@ -380,6 +386,102 @@ class CodeController extends TextEditingController {
     });
   }
 
+  /// Comments out or uncomments the currently selected lines.
+  ///
+  /// Doesn't affect empty lines.
+  ///
+  /// If any of the selected lines is not a single line comment:
+  /// adds one level of single line comment to every selected line.
+  ///
+  /// If all of the selected lines are single line comments:
+  /// removes one level of single line comment from every selected line.
+  ///
+  /// When commenting out, adds `// ` or `# ` (or another symbol depending on a language) with a space after.
+  /// Removes these spaces on uncommenting.
+  /// (if there are no spaces just removes the comments)
+  ///
+  /// The method doesn't account for multiline comments
+  /// and treats them as a normal text (not a comment).
+  void commentOutOrUncommentSelection() {
+    if (_anySelectedLineUncommented()) {
+      _commentOutSelectedLines();
+    } else {
+      _uncommentSelectedLines();
+    }
+  }
+
+  bool _anySelectedLineUncommented() {
+    return _anySelectedLine((line) {
+      for (final commentType in SingleLineComments.byMode[language] ?? []) {
+        if (line.trimLeft().startsWith(commentType) ||
+            line.hasOnlyWhitespaces()) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  /// Whether any of the selected lines meets the condition in the callback.
+  bool _anySelectedLine(bool Function(String line) callback) {
+    if (selection.start == -1 || selection.end == -1) {
+      return false;
+    }
+
+    final selectedLinesRange = getSelectedLineRange();
+
+    for (int i = selectedLinesRange.start; i < selectedLinesRange.end; i++) {
+      final currentLineMatchesCondition = callback(_code.lines.lines[i].text);
+      if (currentLineMatchesCondition) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  void _commentOutSelectedLines() {
+    final sequence = SingleLineComments.byMode[language]?.first;
+    if (sequence == null) {
+      return;
+    }
+
+    modifySelectedLines((line) {
+      if (line.hasOnlyWhitespaces()) {
+        return line;
+      }
+
+      return line.replaceRange(
+        0,
+        0,
+        '$sequence ',
+      );
+    });
+  }
+
+  void _uncommentSelectedLines() {
+    modifySelectedLines((line) {
+      if (line.hasOnlyWhitespaces()) {
+        return line;
+      }
+
+      for (final sequence
+          in SingleLineComments.byMode[language] ?? <String>[]) {
+        // if there is a space after a sequence we should remove it with the sequence
+        if (line.trim().startsWith('$sequence ')) {
+          return line.replaceFirst('$sequence ', '');
+        }
+        // if there is no space after a sequence we should remove the sequence
+        if (line.trim().startsWith(sequence)) {
+          return line.replaceFirst(sequence, '');
+        }
+      }
+
+      // if line is not commented just return it
+      return line;
+    });
+  }
+
   /// Filters the lines that have at least one character selected.
   ///
   /// IMPORTANT: this method also changes the selection to be:
@@ -399,28 +501,11 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    final selectionStart = _code.hiddenRanges.recoverPosition(
-      selection.start,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-    final selectionEnd = _code.hiddenRanges.recoverPosition(
-      // to avoid including the next line if `\n` is selected
-      selection.isCollapsed ? selection.end : selection.end - 1,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-
-    // index of the first line to modify
-    final firstLineIndex =
-        _code.lines.characterIndexToLineIndex(selectionStart);
-    // index of the last line to modify
-    final lastLineIndex = _code.lines.characterIndexToLineIndex(selectionEnd);
-
-    final firstLineStart = _code.lines.lines[firstLineIndex].textRange.start;
-    final lastLineEnd = _code.lines.lines[lastLineIndex].textRange.end;
+    final lineRange = getSelectedLineRange();
 
     // apply modification to the selected lines
     final modifiedLinesBuffer = StringBuffer();
-    for (int i = firstLineIndex; i <= lastLineIndex; i++) {
+    for (int i = lineRange.start; i < lineRange.end; i++) {
       // cancel modification entirely if any of the lines is readOnly
       if (_code.lines.lines[i].isReadOnly) {
         return;
@@ -430,6 +515,9 @@ class CodeController extends TextEditingController {
     }
 
     final modifiedLinesString = modifiedLinesBuffer.toString();
+
+    final firstLineStart = _code.lines.lines[lineRange.start].textRange.start;
+    final lastLineEnd = _code.lines.lines[lineRange.end - 1].textRange.end;
 
     // replace selected lines with modified ones
     final finalFullText = _code.text.replaceRange(
@@ -458,6 +546,26 @@ class CodeController extends TextEditingController {
     super.value = TextEditingValue(
       text: _code.visibleText,
       selection: finalVisibleSelection,
+    );
+  }
+
+  TextRange getSelectedLineRange() {
+    final firstChar = _code.hiddenRanges.recoverPosition(
+      selection.start,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+    final lastChar = _code.hiddenRanges.recoverPosition(
+      // to avoid including the next line if `\n` is selected
+      selection.isCollapsed ? selection.end : selection.end - 1,
+      placeHiddenRanges: TextAffinity.downstream,
+    );
+
+    final firstLineIndex = _code.lines.characterIndexToLineIndex(firstChar);
+    final lastLineIndex = _code.lines.characterIndexToLineIndex(lastChar);
+
+    return TextRange(
+      start: firstLineIndex,
+      end: lastLineIndex + 1,
     );
   }
 

@@ -10,19 +10,20 @@ import '../gutter/gutter.dart';
 import '../line_numbers/line_number_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
+import 'actions/comment_uncomment.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
 
-final _shortcuts = {
+final _shortcuts = <ShortcutActivator, Intent>{
   // Copy
   LogicalKeySet(
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyC,
   ): CopySelectionTextIntent.copy,
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.keyC,
+    meta: true,
   ): CopySelectionTextIntent.copy,
   LogicalKeySet(
     LogicalKeyboardKey.control,
@@ -34,9 +35,9 @@ final _shortcuts = {
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyX,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.keyX,
+    meta: true,
   ): const CopySelectionTextIntent.cut(SelectionChangedCause.keyboard),
   LogicalKeySet(
     LogicalKeyboardKey.shift,
@@ -48,9 +49,9 @@ final _shortcuts = {
     LogicalKeyboardKey.control,
     LogicalKeyboardKey.keyZ,
   ): const UndoTextIntent(SelectionChangedCause.keyboard),
-  LogicalKeySet(
-    LogicalKeyboardKey.meta,
+  const SingleActivator(
     LogicalKeyboardKey.keyZ,
+    meta: true,
   ): const UndoTextIntent(SelectionChangedCause.keyboard),
 
   // Redo
@@ -75,6 +76,16 @@ final _shortcuts = {
     LogicalKeyboardKey.shift,
     LogicalKeyboardKey.tab,
   ): const OutdentIntent(),
+
+  // Comment Uncomment
+  LogicalKeySet(
+    LogicalKeyboardKey.control,
+    LogicalKeyboardKey.slash,
+  ): const CommentUncommentIntent(),
+  const SingleActivator(
+    LogicalKeyboardKey.slash,
+    meta: true,
+  ): const CommentUncommentIntent(),
 };
 
 class CodeField extends StatefulWidget {
