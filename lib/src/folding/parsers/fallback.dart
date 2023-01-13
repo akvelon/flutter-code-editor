@@ -274,6 +274,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool get _foundSingleLineComment =>
       _foundServiceSingleLineComment || foundSingleLineComment;
 
+  bool get lineStartsWithACommentSequence => !foundImportTerminator;
+
   /// get max length of a sequence from possible sequences
   static int getTailLength(
     List<Tuple2<String, String>> multilineCommentSequences,

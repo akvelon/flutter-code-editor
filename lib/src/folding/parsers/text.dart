@@ -34,7 +34,7 @@ abstract class TextFoldableBlockParser extends AbstractFoldableBlockParser {
   @protected
   void setFoundImportTerminator() => _foundImportTerminator = true;
 
-  bool get lineStartsWithACommentSequence => !_foundImportTerminator;
+  bool get foundImportTerminator => _foundImportTerminator;
 
   /// If in the current line we found a non-service single-line comment.
   bool _foundSingleLineComment = false;
