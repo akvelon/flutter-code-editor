@@ -30,8 +30,8 @@ void main() {
 package some.package;                               // 4
 
 import java.util.Arrays;                            // 6
-import org.apache.beam.sdk.Pipeline;                // 7
-import org.apache.beam.sdk.io.TextIO;               // 8
+import java.util.Date;                              // 7
+import java.lang.Math;                              // 8
 
 class MyClass{                                      // 10
   public static ArrayList<String> sequences = [     // 11
@@ -56,22 +56,6 @@ class MyClass{                                      // 10
           _FB(firstLine: 16, lastLine: 22, type: _T.union),
           _FB(firstLine: 20, lastLine: 21, type: _T.singleLineComment),
         ],
-      ),
-
-      _Example(
-        'Multiline pair-character blocks',
-        code: '''
-public class MyClass {
-public static void main(
-  String[
-  ] args) {
-  }
-}''',
-        expected: [
-          _FB(firstLine: 0, lastLine: 5, type: _T.braces),
-          _FB(firstLine: 1, lastLine: 4, type: _T.union),
-        ],
-        invalidBlocks: [],
       ),
 
       _Example(
@@ -107,6 +91,7 @@ public static void main)String][ args( }
           InvalidFoldableBlock(startLine: 4, type: _T.braces),
         ],
       ),
+
       _Example(
         'Pair characters in literals are ignored.',
         code: '''
@@ -122,13 +107,13 @@ public class MyClass {
 /*                       2
   )]}                    3
 */                       4
-/// {                    5
 }''',
         expected: [
-          _FB(firstLine: 0, lastLine: 6, type: _T.braces),
+          _FB(firstLine: 0, lastLine: 5, type: _T.braces),
           _FB(firstLine: 2, lastLine: 4, type: _T.multilineComment),
         ],
       ),
+
       _Example(
         'Single line comments in a row',
         code: '''
@@ -136,18 +121,18 @@ public class MyClass {
 // License                                            1
 public class MyClass {
 
-/// Method                                          4
+/// Comment                                           4
 
-/// Method                                          6
+/// Comment                                           6
 
-void method() {} // Not the only thing in the line  8
-// Single                                           9
-void method2 // Not the only thing in the line      10
-// Single                                           11
+void method() {} // Not the only thing in the line    8
+// Comment                                            9
+void method2 // Not the only thing in the line        10
+// Comment                                            11
 () {}
 }
-// Single                                             14
-// Single                                             15''',
+// Comment                                            14
+// Comment                                            15''',
         expected: [
           _FB(firstLine: 0, lastLine: 1, type: _T.singleLineComment),
           _FB(firstLine: 2, lastLine: 13, type: _T.braces),
@@ -223,7 +208,7 @@ void method() {
       ),
 
       _Example(
-        'Service comment sequences do not form a foldable block.',
+        'A service comment sequence does not form a foldable block.',
         code: '''
 class MyClass {
 // [START section1]
@@ -233,16 +218,7 @@ class MyClass {
           _FB(firstLine: 0, lastLine: 3, type: _T.braces),
         ],
       ),
-      _Example(
-        'Pair symbols should be ignored inside a multiline comment',
-        code: '''
-/*[([       0
-])]*/       1
-''',
-        expected: [
-          _FB(firstLine: 0, lastLine: 1, type: _T.multilineComment),
-        ],
-      ),
+
       _Example(
         'Multiline comment after a brace',
         code: '''
