@@ -11,11 +11,13 @@ import 'text.dart';
 
 /// A parser for foldable blocks from raw text.
 class FallbackFoldableBlockParser extends TextFoldableBlockParser {
-  final List<String> singleLineCommentSequences;
   final List<String> importPrefixes;
 
   /// [ ['/*', '*/'] , ...]
   final List<Tuple2<String, String>> multilineCommentSequences;
+
+  /// ['//', '#']
+  final List<String> singleLineCommentSequences;
 
   /// The size of a rolling window to remember processed characters.
   final int _tailLength;
@@ -29,13 +31,13 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   bool _isInSingleQuoteLiteral = false;
   bool _isInDoubleQuoteLiteral = false;
 
-  bool _isLineStart = true;
   bool _foundServiceSingleLineComment = false;
+  bool _isLineStart = true;
 
   FallbackFoldableBlockParser({
-    required this.singleLineCommentSequences,
     required this.importPrefixes,
     this.multilineCommentSequences = const [],
+    required this.singleLineCommentSequences,
   }) : _tailLength = getTailLength(
           multilineCommentSequences,
           singleLineCommentSequences,
