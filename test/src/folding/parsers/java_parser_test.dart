@@ -99,6 +99,7 @@ String a = "{[(/*";
 String b = ")]}*/";''',
         expected: [],
       ),
+
       _Example(
         'Pair characters in comments are ignored.',
         code: '''
@@ -249,6 +250,7 @@ import java.lang.Exception;   // 5
           _FB(firstLine: 4, lastLine: 5, type: _T.imports),
         ],
       ),
+
       _Example(
         'Multiple multiline comments',
         code: '''
