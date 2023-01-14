@@ -1,3 +1,7 @@
+## 0.2.6
+
+* Comment out and uncomment code with Ctrl-/ ([Issue 117](https://github.com/akvelon/flutter-code-editor/issues/117)).
+
 ## 0.2.5
 
 * Tab and Shift-Tab handling ([Issue 116](https://github.com/akvelon/flutter-code-editor/issues/116)).
