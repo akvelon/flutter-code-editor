@@ -6,128 +6,6 @@ import '../common/lorem_ipsum.dart';
 
 void main() {
   group('TextEditingValue ', () {
-    test('wordAtCursorStart', () {
-      const examples = [
-        //
-        _IntExample(
-          'Empty -> null',
-          value: TextEditingValue.empty,
-          expected: null,
-        ),
-
-        _IntExample(
-          'No selection -> null',
-          value: TextEditingValue(text: loremIpsum),
-          expected: null,
-        ),
-
-        _IntExample(
-          'Word start',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 2),
-          ),
-          expected: 2,
-        ),
-
-        _IntExample(
-          '1 char',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 3),
-          ),
-          expected: 2,
-        ),
-
-        _IntExample(
-          '2 chars',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 4),
-          ),
-          expected: 2,
-        ),
-
-        _IntExample(
-          '3 chars',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 5),
-          ),
-          expected: 2,
-        ),
-
-        _IntExample(
-          '4 chars',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 6),
-          ),
-          expected: 2,
-        ),
-
-        _IntExample(
-          'Just after a word',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 7),
-          ),
-          expected: 2,
-        ),
-
-        _IntExample(
-          'Non-collapsed -> null',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection(baseOffset: 3, extentOffset: 4),
-          ),
-          expected: null,
-        ),
-
-        _IntExample(
-          'String start',
-          value: TextEditingValue(
-            text: loremIpsum,
-            selection: TextSelection.collapsed(offset: 0),
-          ),
-          expected: 0,
-        ),
-
-        _IntExample(
-          'Non-word string start',
-          value: TextEditingValue(
-            text: '   ',
-            selection: TextSelection.collapsed(offset: 0),
-          ),
-          expected: null,
-        ),
-
-        _IntExample(
-          'At the last word',
-          value: TextEditingValue(
-            text: 'abc def',
-            selection: TextSelection.collapsed(offset: 6),
-          ),
-          expected: 4,
-        ),
-
-        _IntExample(
-          'After the last word',
-          value: TextEditingValue(
-            text: 'abc def',
-            selection: TextSelection.collapsed(offset: 7),
-          ),
-          expected: 4,
-        ),
-      ];
-
-      for (final example in examples) {
-        final result = example.value.wordAtCursorStart;
-
-        expect(result, example.expected, reason: example.name);
-      }
-    });
-
     test('wordAtCursor', () {
       const examples = [
         //
@@ -250,6 +128,128 @@ void main() {
       }
     });
 
+    test('wordAtCursorStart', () {
+      const examples = [
+        //
+        _IntExample(
+          'Empty -> null',
+          value: TextEditingValue.empty,
+          expected: null,
+        ),
+
+        _IntExample(
+          'No selection -> null',
+          value: TextEditingValue(text: loremIpsum),
+          expected: null,
+        ),
+
+        _IntExample(
+          'Word start',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 2),
+          ),
+          expected: 2,
+        ),
+
+        _IntExample(
+          '1 char',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 3),
+          ),
+          expected: 2,
+        ),
+
+        _IntExample(
+          '2 chars',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 4),
+          ),
+          expected: 2,
+        ),
+
+        _IntExample(
+          '3 chars',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 5),
+          ),
+          expected: 2,
+        ),
+
+        _IntExample(
+          '4 chars',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 6),
+          ),
+          expected: 2,
+        ),
+
+        _IntExample(
+          'Just after a word',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 7),
+          ),
+          expected: 2,
+        ),
+
+        _IntExample(
+          'Non-collapsed -> null',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection(baseOffset: 3, extentOffset: 4),
+          ),
+          expected: null,
+        ),
+
+        _IntExample(
+          'String start',
+          value: TextEditingValue(
+            text: loremIpsum,
+            selection: TextSelection.collapsed(offset: 0),
+          ),
+          expected: 0,
+        ),
+
+        _IntExample(
+          'Non-word string start',
+          value: TextEditingValue(
+            text: '   ',
+            selection: TextSelection.collapsed(offset: 0),
+          ),
+          expected: null,
+        ),
+
+        _IntExample(
+          'At the last word',
+          value: TextEditingValue(
+            text: 'abc def',
+            selection: TextSelection.collapsed(offset: 6),
+          ),
+          expected: 4,
+        ),
+
+        _IntExample(
+          'After the last word',
+          value: TextEditingValue(
+            text: 'abc def',
+            selection: TextSelection.collapsed(offset: 7),
+          ),
+          expected: 4,
+        ),
+      ];
+
+      for (final example in examples) {
+        final result = example.value.wordAtCursorStart;
+
+        expect(result, example.expected, reason: example.name);
+      }
+    });
+
     test('wordToCursor', () {
       const examples = [
         //
@@ -356,24 +356,24 @@ void main() {
   });
 }
 
-class _StringExample {
-  final String name;
-  final TextEditingValue value;
-  final String? expected;
-
-  const _StringExample(
-    this.name, {
-    required this.value,
-    required this.expected,
-  });
-}
-
 class _IntExample {
   final String name;
   final TextEditingValue value;
   final int? expected;
 
   const _IntExample(
+    this.name, {
+    required this.value,
+    required this.expected,
+  });
+}
+
+class _StringExample {
+  final String name;
+  final TextEditingValue value;
+  final String? expected;
+
+  const _StringExample(
     this.name, {
     required this.value,
     required this.expected,

@@ -7,13 +7,17 @@ import 'package:highlight/languages/dart.dart';
 
 import '../common/create_app.dart';
 
+//                                    separate      separate      separate      trailing      trailing      trailing      no          no
+//                                    start         start         start         start         start         start         start       start
+//                                    no            separate      trailing      no            separate      trailing      trailing    separate
+//                                    end           end           end           end           end           end           end         end
 const _fullText = '''
-class MyClass {//    0 [START whole]
-  //                 1 [START separate_start_no_end][START separate_start_separate_end][START separate_start_trailing_end]
-  void method() {//  2 [START trailing_start_no_end][START trailing_start_separate_end][START trailing_start_trailing_end]
-  }//                3 [END separate_start_trailing_end][END trailing_start_trailing_end][END no_start_trailing_end]
-  //                 4 [END separate_start_separate_end][END trailing_start_separate_end][END no_start_separate_end]
-}//                  5 [END whole]''';
+class MyClass {//    0 [START whole]                                                                                      |           |
+  //                 1 |              [START ss_ne] [START ss_se] [START ss_te]                                           |           |
+  void method() {//  2 |              |             |             |             [START ts_ne] [START ts_se] [START ts_te] |           |
+  }//                3 |              |             |             [END ss_te]   |             |             [END ts_te]   [END ns_te] |
+  //                 4 |              |             [END ss_se]                 |             [END ts_se]                             [END ns_se]
+}//                  5 [END whole]    |                                         |''';
 
 const _fullVisibleText = '''
 class MyClass {
@@ -53,7 +57,7 @@ void main() {
     });
 
     test('Separate start no end', () {
-      final controller = createTestController({'separate_start_no_end'});
+      final controller = createTestController({'ss_ne'});
 
       expect(controller.value.text, '''
   
@@ -67,7 +71,7 @@ $_method
     });
 
     test('Separate start separate end', () {
-      final controller = createTestController({'separate_start_separate_end'});
+      final controller = createTestController({'ss_se'});
 
       expect(controller.value.text, '''
   
@@ -81,7 +85,7 @@ $_method
     });
 
     test('Separate start trailing end', () {
-      final controller = createTestController({'separate_start_trailing_end'});
+      final controller = createTestController({'ss_te'});
 
       expect(controller.value.text, '''
   
@@ -94,7 +98,7 @@ $_method
     });
 
     test('Trailing start no end', () {
-      final controller = createTestController({'trailing_start_no_end'});
+      final controller = createTestController({'ts_ne'});
 
       expect(controller.value.text, '''
 $_method
@@ -107,7 +111,7 @@ $_method
     });
 
     test('Trailing start separate end', () {
-      final controller = createTestController({'trailing_start_separate_end'});
+      final controller = createTestController({'ts_se'});
 
       expect(controller.value.text, '''
 $_method
@@ -120,7 +124,7 @@ $_method
     });
 
     test('Trailing start trailing end', () {
-      final controller = createTestController({'trailing_start_trailing_end'});
+      final controller = createTestController({'ts_te'});
 
       expect(controller.value.text, '''
 $_method
@@ -132,7 +136,7 @@ $_method
     });
 
     test('No start separate end', () {
-      final controller = createTestController({'no_start_separate_end'});
+      final controller = createTestController({'ns_se'});
 
       expect(controller.value.text, '''
 class MyClass {
@@ -147,7 +151,7 @@ $_method
     });
 
     test('No start trailing end', () {
-      final controller = createTestController({'no_start_trailing_end'});
+      final controller = createTestController({'ns_te'});
 
       expect(controller.value.text, '''
 class MyClass {
@@ -223,6 +227,19 @@ void method1() {
 }
 
 void method2() {''');
+    });
+
+    test('Newline after closing comment on the last line', () {
+      final controller = createController(
+        '''
+//[START show]
+//[END show]
+''',
+        language: dart,
+        visibleSectionNames: {'show'},
+      );
+
+      expect(controller.value.text, '\n\n');
     });
   });
 }

@@ -146,7 +146,23 @@ import (
 
 func main() {}''';
       const expectedBlocks = [
-        FB(firstLine: 0, lastLine: 6, type: FBT.union),
+        FB(firstLine: 0, lastLine: 6, type: FBT.imports),
+      ];
+      _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
+    });
+
+    test('Comments inside multiline imports', () {
+      const code = '''
+package main
+//
+//
+import (
+	"fmt"
+	"strings"
+)''';
+      const expectedBlocks = [
+        FB(firstLine: 0, lastLine: 6, type: FBT.imports),
+        FB(firstLine: 1, lastLine: 2, type: FBT.singleLineComment),
       ];
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
