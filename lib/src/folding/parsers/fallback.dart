@@ -1,7 +1,6 @@
-import 'dart:math';
+// ignore_for_file: use_string_buffers
 
 import 'package:charcode/ascii.dart';
-import 'package:collection/collection.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:tuple/tuple.dart';
 
@@ -19,9 +18,6 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   /// ['//', '#']
   final List<String> singleLineCommentSequences;
 
-  /// The size of a rolling window to remember processed characters.
-  final int _tailLength;
-
   String? _startedMultilineCommentWith;
   bool get _isInMultilineComment => _startedMultilineCommentWith != null;
 
@@ -38,10 +34,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
     required this.importPrefixes,
     this.multilineCommentSequences = const [],
     required this.singleLineCommentSequences,
-  }) : _tailLength = getTailLength(
-          multilineCommentSequences,
-          singleLineCommentSequences,
-        );
+  });
 
   @override
   void parse({
@@ -78,14 +71,11 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
     required Set<int> serviceCommentLines,
     required CodeLines lines,
   }) {
-    String tail = '';
+    String line = '';
     bool shouldEndMultilineComment = false;
-    bool isPossibleCommentSequence = false;
 
     for (final code in text.runes) {
-      final char = String.fromCharCode(code);
-      tail += char; // ignore: use_string_buffers
-      tail = tail.substring(max(0, tail.length - _tailLength));
+      line += String.fromCharCode(code);
 
       if (_isLineStart) {
         final lineText = lines[lineIndex].text;
@@ -106,7 +96,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
           if (_canStartLexeme()) {
             for (final c in singleLineCommentSequences) {
-              if (tail.endsWith(c)) {
+              if (line.endsWith(c)) {
                 if (!serviceCommentLines.contains(lineIndex)) {
                   setFoundSingleLineComment();
                 } else {
@@ -114,16 +104,19 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   // so this comment does not join a possible comment block.
                   _foundServiceSingleLineComment = true;
                 }
+
+                if (line.replaceFirst(c, '').trim() != '') {
+                  // if there are some symbols before comment sequence,
+                  // the line is a terminator for an import block
+                  setFoundImportTerminator();
+                }
                 break;
-              }
-              if (c.contains(char)) {
-                isPossibleCommentSequence = true;
               }
             }
 
             for (final c in multilineCommentSequences) {
-              if (tail.endsWith(c.item1)) {
-                if (lineStartsWithACommentSequence) {
+              if (line.endsWith(c.item1)) {
+                if (line.replaceFirst(c.item1, '').trim() == '') {
                   startBlock(lineIndex, FoldableBlockType.multilineComment);
                   shouldEndMultilineComment = true;
                 } else {
@@ -139,15 +132,12 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 _startedMultilineCommentWith = c.item1;
                 break;
               }
-              if (c.item1.contains(char)) {
-                isPossibleCommentSequence = true;
-              }
             }
           }
 
           if (_isInMultilineComment) {
             for (final c in multilineCommentSequences) {
-              if (tail.endsWith(c.item2) &&
+              if (line.endsWith(c.item2) &&
                   _startedMultilineCommentWith == c.item1) {
                 final blocksCountBefore = blocks.length;
                 if (shouldEndMultilineComment) {
@@ -164,22 +154,17 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               }
             }
           }
-
-          if (!_foundSingleLineComment &&
-              !foundImport &&
-              !isPossibleCommentSequence) {
-            setFoundImportTerminator();
-          }
       }
 
       switch (code) {
         case $lf: // Newline
-          _isInDoubleQuoteLiteral = false;
-          _isInSingleQuoteLiteral = false;
-          if (isPossibleCommentSequence && !_foundSingleLineComment) {
+          if (foundNonWhitespace && !_foundSingleLineComment && !foundImport) {
             setFoundImportTerminator();
           }
-          isPossibleCommentSequence = false;
+
+          line = '';
+          _isInDoubleQuoteLiteral = false;
+          _isInSingleQuoteLiteral = false;
           submitCurrentLine();
           clearLineFlags();
           addToLineIndex(1);
@@ -273,17 +258,4 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
   bool get _foundSingleLineComment =>
       _foundServiceSingleLineComment || foundSingleLineComment;
-
-  bool get lineStartsWithACommentSequence => !foundImportTerminator;
-
-  /// get max length of a sequence from possible sequences
-  static int getTailLength(
-    List<Tuple2<String, String>> multilineCommentSequences,
-    List<String> singleLineCommentSequences,
-  ) =>
-      [
-        ...singleLineCommentSequences.map((s) => s.length),
-        ...multilineCommentSequences
-            .map((e) => max(e.item1.length, e.item2.length))
-      ].max;
 }
