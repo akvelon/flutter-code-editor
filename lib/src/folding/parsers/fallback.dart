@@ -72,7 +72,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
     required CodeLines lines,
   }) {
     String line = '';
-    bool shouldEndMultilineComment = false;
+    bool isMultilineCommentBlockStarted = false;
 
     for (final code in text.runes) {
       line += String.fromCharCode(code);
@@ -118,14 +118,14 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               if (line.endsWith(c.item1)) {
                 if (line.replaceFirst(c.item1, '').trim() == '') {
                   startBlock(lineIndex, FoldableBlockType.multilineComment);
-                  shouldEndMultilineComment = true;
+                  isMultilineCommentBlockStarted = true;
                 } else {
                   // shouldn't start multiline comment block
 
                   // class MyClass { /*
                   // */
                   // }
-                  shouldEndMultilineComment = false;
+                  isMultilineCommentBlockStarted = false;
                 }
                 // We are in a multiline comment
                 // regardless of whether we create foldable block or not.
@@ -140,7 +140,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               if (line.endsWith(c.item2) &&
                   _startedMultilineCommentWith == c.item1) {
                 final blocksCountBefore = blocks.length;
-                if (shouldEndMultilineComment) {
+                if (isMultilineCommentBlockStarted) {
                   endBlock(lineIndex, FoldableBlockType.multilineComment);
 
                   if (blocksCountBefore == blocks.length) {

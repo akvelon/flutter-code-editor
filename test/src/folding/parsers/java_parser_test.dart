@@ -294,6 +294,24 @@ class MyClass{
           _FB(firstLine: 0, lastLine: 2, type: _T.braces),
         ],
       ),
+
+      _Example(
+        'Multiline comment that terminates on the same line '
+        'and have non-whitespace char before it, '
+        'should terminate import sequence',
+        code: '''
+import java.util.Arrays;      // 0
+import java.util.Date;        // 1
+class MyClass { } /*             2 */
+                              // 3
+import java.lang.Math;        // 4
+import java.lang.Exception;   // 5
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 1, type: _T.imports),
+          _FB(firstLine: 4, lastLine: 5, type: _T.imports),
+        ],
+      ),
     ];
 
     for (final example in examples) {
