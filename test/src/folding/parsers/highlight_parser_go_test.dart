@@ -193,7 +193,7 @@ func main() {
       _Tester.parseAndCheck(mode: go, code: code, expected: expectedBlocks);
     });
 
-    test('', () {
+    test('Service comment sequences do not form a foldable block.', () {
       const code = '''
 func main() {
 // [START section1]
