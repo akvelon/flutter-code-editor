@@ -92,9 +92,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
           break;
 
         default:
-          setFoundNonWhitespace();
-
           if (_canStartLexeme()) {
+            setFoundNonWhitespace();
+
             for (final c in singleLineCommentSequences) {
               if (line.endsWith(c)) {
                 if (!serviceCommentLines.contains(lineIndex)) {
@@ -116,20 +116,12 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
             for (final c in multilineCommentSequences) {
               if (line.endsWith(c.item1)) {
-                if (line.replaceFirst(c.item1, '').trim() == '') {
-                  startBlock(lineIndex, FoldableBlockType.multilineComment);
-                  isMultilineCommentBlockStarted = true;
-                } else {
-                  // shouldn't start multiline comment block
-
-                  // class MyClass { /*
-                  // */
-                  // }
-                  isMultilineCommentBlockStarted = false;
-                }
-                // We are in a multiline comment
-                // regardless of whether we create foldable block or not.
+                startBlock(lineIndex, FoldableBlockType.multilineComment);
                 _startedMultilineCommentWith = c.item1;
+
+                if (line.replaceFirst(c.item1, '').trim() != '') {
+                  setFoundImportTerminator();
+                }
                 break;
               }
             }
@@ -140,13 +132,11 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               if (line.endsWith(c.item2) &&
                   _startedMultilineCommentWith == c.item1) {
                 final blocksCountBefore = blocks.length;
-                if (isMultilineCommentBlockStarted) {
-                  endBlock(lineIndex, FoldableBlockType.multilineComment);
+                endBlock(lineIndex, FoldableBlockType.multilineComment);
 
-                  if (blocksCountBefore == blocks.length) {
-                    // in case firstLine == lastLine
-                    setFoundSingleLineComment();
-                  }
+                if (blocksCountBefore == blocks.length) {
+                  // in case firstLine == lastLine
+                  setFoundSingleLineComment();
                 }
 
                 _startedMultilineCommentWith = null;
@@ -158,7 +148,10 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
       switch (code) {
         case $lf: // Newline
-          if (foundNonWhitespace && !_foundSingleLineComment && !foundImport) {
+          if (foundNonWhitespace &&
+              !_foundSingleLineComment &&
+              !foundImport &&
+              !_isInMultilineComment) {
             setFoundImportTerminator();
           }
 

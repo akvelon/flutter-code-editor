@@ -159,7 +159,7 @@ import java.lang.Math;
 
 public class MyClass {}''',
         expected: [
-          _FB(firstLine: 0, lastLine: 6, type: _T.imports),
+          _FB(firstLine: 0, lastLine: 10, type: _T.imports),
           _FB(firstLine: 4, lastLine: 5, type: _T.singleLineComment),
           _FB(firstLine: 8, lastLine: 9, type: _T.multilineComment),
         ],
@@ -230,7 +230,7 @@ class MyClass{            // 0
 */                        // 4
 ''',
         expected: [
-          _FB(firstLine: 0, lastLine: 2, type: _T.braces),
+          _FB(firstLine: 0, lastLine: 4, type: _T.union),
         ],
       ),
 
@@ -240,14 +240,13 @@ class MyClass{            // 0
 import java.util.Arrays;      // 0
 import java.util.Date;        // 1
 /*                               2
-*/                               3
+*/
 import java.lang.Math;        // 4
 import java.lang.Exception;   // 5
 ''',
         expected: [
-          _FB(firstLine: 0, lastLine: 1, type: _T.imports),
+          _FB(firstLine: 0, lastLine: 5, type: _T.imports),
           _FB(firstLine: 2, lastLine: 3, type: _T.multilineComment),
-          _FB(firstLine: 4, lastLine: 5, type: _T.imports),
         ],
       ),
 
@@ -291,7 +290,7 @@ class MyClass{
 */
 ''',
         expected: [
-          _FB(firstLine: 0, lastLine: 2, type: _T.braces),
+          _FB(firstLine: 0, lastLine: 6, type: _T.union),
         ],
       ),
 

@@ -53,7 +53,7 @@ class HighlightFoldableBlockParser extends TextFoldableBlockParser {
   void _processComment(Node node, Set<Object?> serviceCommentsSources) {
     final newlineCount = node.getNewlineCount();
 
-    if (foundNonWhitespace) {
+    if (foundNonWhitespace && newlineCount == 0) {
       return;
     }
 
@@ -66,12 +66,13 @@ class HighlightFoldableBlockParser extends TextFoldableBlockParser {
       return;
     }
 
-    setFoundImportTerminator();
-    submitCurrentLine();
-
     startBlock(lineIndex, FoldableBlockType.multilineComment);
 
-    addToLineIndex(newlineCount);
+    for (int i = 0; i < newlineCount; i++) {
+      submitCurrentLine();
+      addToLineIndex(1);
+    }
+
     endBlock(lineIndex, FoldableBlockType.multilineComment);
   }
 
