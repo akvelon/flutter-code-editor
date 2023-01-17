@@ -167,13 +167,11 @@ extension TextEditingValueExtension on TextEditingValue {
     }
 
     final position = text.indexOf(pattern, start);
-
     if (position == -1) {
       return null;
     }
 
     final match = pattern.matchAsPrefix(text, position);
-
     if (match == null) {
       throw AssertionError('');
     }

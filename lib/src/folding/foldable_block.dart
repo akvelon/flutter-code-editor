@@ -100,6 +100,9 @@ extension FoldableBlockList on List<FoldableBlock> {
     final ancestorIndexToOverallIndex = <int>[];
 
     for (int overallIndex = 0; overallIndex < length; overallIndex++) {
+      // The pointer to the block we currently compare with ancestors.
+      // If it merges with any ancestor, it is redefined to point
+      // to that ancestor (bubbles up).
       FoldableBlock bubble = this[overallIndex];
 
       // Throw the block into the current nesting hierarchy...
