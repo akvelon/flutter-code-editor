@@ -1,3 +1,7 @@
+## 0.2.7
+
+* Fix joining nested foldable blocks ([Issue 136](https://github.com/akvelon/flutter-code-editor/issues/136)).
+
 ## 0.2.6
 
 * Comment out and uncomment code with Ctrl-/ ([Issue 117](https://github.com/akvelon/flutter-code-editor/issues/117)).
