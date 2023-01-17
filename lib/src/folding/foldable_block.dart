@@ -111,7 +111,9 @@ extension FoldableBlockList on List<FoldableBlock> {
 
       // And fix every violation of the hierarchy by bubbling the block up,
       // removing non-ancestors from the working list, and joining when needed.
-      for (int ancestorIndex = ancestors.length - 1; --ancestorIndex >= 0;) {
+      for (int ancestorIndex = ancestors.length - 2;
+          ancestorIndex >= 0;
+          ancestorIndex--) {
         final ancestor = ancestors[ancestorIndex];
 
         if (ancestor.lastLine < bubble.firstLine) {
