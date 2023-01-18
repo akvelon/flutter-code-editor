@@ -19,6 +19,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   final List<String> singleLineCommentSequences;
 
   String? _startedMultilineCommentWith;
+  int? _startedMultilineCommentAt;
   bool get _isInMultilineComment => _startedMultilineCommentWith != null;
 
   /// If in a string literal the last char was a backslash.
@@ -117,6 +118,7 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
             for (final c in multilineCommentSequences) {
               if (line.endsWith(c.item1)) {
                 startBlock(lineIndex, FoldableBlockType.multilineComment);
+                _startedMultilineCommentAt = lineIndex;
                 _startedMultilineCommentWith = c.item1;
 
                 if (line.replaceFirst(c.item1, '').trim() != '') {
@@ -131,14 +133,14 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
             for (final c in multilineCommentSequences) {
               if (line.endsWith(c.item2) &&
                   _startedMultilineCommentWith == c.item1) {
-                final blocksCountBefore = blocks.length;
                 endBlock(lineIndex, FoldableBlockType.multilineComment);
 
-                if (blocksCountBefore == blocks.length) {
-                  // in case firstLine == lastLine
+                if (_startedMultilineCommentAt == lineIndex &&
+                    lines.lines[lineIndex].text.trim() == line.trim()) {
                   setFoundSingleLineComment();
                 }
 
+                _startedMultilineCommentAt = null;
                 _startedMultilineCommentWith = null;
                 break;
               }

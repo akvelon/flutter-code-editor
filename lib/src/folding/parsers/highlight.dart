@@ -69,6 +69,7 @@ class HighlightFoldableBlockParser extends TextFoldableBlockParser {
     startBlock(lineIndex, FoldableBlockType.multilineComment);
 
     for (int i = 0; i < newlineCount; i++) {
+      setFoundMultilineComment();
       submitCurrentLine();
       addToLineIndex(1);
     }

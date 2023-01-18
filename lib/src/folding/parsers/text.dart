@@ -42,6 +42,15 @@ abstract class TextFoldableBlockParser extends AbstractFoldableBlockParser {
   @protected
   void setFoundSingleLineComment() => _foundSingleLineComment = true;
 
+  // if in the current we found a multiline comment,
+  // or the line is inside of a multiline comment
+  bool _foundMultilineComment = false;
+
+  bool get foundMultilineComment => _foundMultilineComment;
+
+  @protected
+  void setFoundMultilineComment() => _foundMultilineComment = true;
+
   /// If in the current line we found a non-whitespace character that is
   /// not a comment.
   bool _foundNonWhitespace = false;
@@ -80,6 +89,12 @@ abstract class TextFoldableBlockParser extends AbstractFoldableBlockParser {
     if (_foundNonWhitespace) {
       _endCommentSequence();
       _submitLineSemantics(LineSemantics.singleLineCommentTerminator);
+      return;
+    }
+
+    if (_foundMultilineComment) {
+      _endCommentSequence();
+      _submitLineSemantics(LineSemantics.multilineComment);
       return;
     }
 
