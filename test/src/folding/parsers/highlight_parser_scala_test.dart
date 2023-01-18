@@ -120,9 +120,8 @@ import users.{UserPreferences => UPrefs} // import and rename for convenience   
 
 class MyClass() {} //                                                           10 ''';
       const expected = [
-        FB(firstLine: 0, lastLine: 2, type: FBT.imports),
+        FB(firstLine: 0, lastLine: 8, type: FBT.imports),
         FB(firstLine: 3, lastLine: 5, type: FBT.multilineComment),
-        FB(firstLine: 6, lastLine: 8, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });

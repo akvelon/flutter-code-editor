@@ -141,6 +141,7 @@ abstract class AbstractFoldableBlockParser {
           return;
 
         case LineSemantics.blank:
+        case LineSemantics.multilineComment:
         case LineSemantics.singleLineComment:
         case LineSemantics.singleLineCommentTerminator:
           break; // no op
