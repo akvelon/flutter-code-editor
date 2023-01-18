@@ -106,8 +106,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 }
 
                 if (line.replaceFirst(c, '').trim() != '') {
-                  // if there are some symbols before comment sequence,
-                  // the line is a terminator for an import block
+                  // If there are some symbols before comment sequence,
+                  // the line is a terminator for an import block.
                   setFoundImportTerminator();
                 }
                 break;
@@ -138,14 +138,14 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
                 if (_startedMultilineCommentAt == lineIndex &&
                     lines.lines[lineIndex].text.trim() == line.trim()) {
-                  // if multiline comment terminated on the same line and
-                  // the full line text doesn't contain anything except comment
+                  // If multiline comment terminated on the same line and
+                  // the full line text doesn't contain anything except comment.
                   setFoundSingleLineComment();
                 }
 
                 if (line.trim().startsWith(c.item1) ||
                     !line.contains(c.item1)) {
-                  // if the line only contains multiline comment we can reset it
+                  // If the line only contains multiline comment we can reset it
                   // without any issue.
                   // It is needed if there is a single line comment afterwards:
                   // /* this is a comment  */    // and this is also a comment
