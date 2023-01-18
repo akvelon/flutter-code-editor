@@ -18,9 +18,9 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
   /// ['//', '#']
   final List<String> singleLineCommentSequences;
 
-  String? _startedMultilineCommentWith;
-  int? _startedMultilineCommentAt;
-  bool get _isInMultilineComment => _startedMultilineCommentWith != null;
+  String? _startedMultilineCommentSequence;
+  int? _startedMultilineCommentLine;
+  bool get _isInMultilineComment => _startedMultilineCommentSequence != null;
 
   /// If in a string literal the last char was a backslash.
   bool _wasBackslash = false;
@@ -119,8 +119,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                 startBlock(lineIndex, FoldableBlockType.multilineComment);
                 setFoundMultilineComment();
 
-                _startedMultilineCommentAt = lineIndex;
-                _startedMultilineCommentWith = c.item1;
+                _startedMultilineCommentLine = lineIndex;
+                _startedMultilineCommentSequence = c.item1;
 
                 if (line.replaceFirst(c.item1, '').trim() != '') {
                   setFoundImportTerminator();
@@ -133,10 +133,10 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
           if (_isInMultilineComment) {
             for (final c in multilineCommentSequences) {
               if (line.endsWith(c.item2) &&
-                  _startedMultilineCommentWith == c.item1) {
+                  _startedMultilineCommentSequence == c.item1) {
                 endBlock(lineIndex, FoldableBlockType.multilineComment);
 
-                if (_startedMultilineCommentAt == lineIndex &&
+                if (_startedMultilineCommentLine == lineIndex &&
                     lines.lines[lineIndex].text.trim() == line.trim()) {
                   // If multiline comment terminated on the same line and
                   // the full line text doesn't contain anything except comment.
@@ -152,8 +152,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
                   line = '';
                 }
 
-                _startedMultilineCommentAt = null;
-                _startedMultilineCommentWith = null;
+                _startedMultilineCommentLine = null;
+                _startedMultilineCommentSequence = null;
                 break;
               }
             }
