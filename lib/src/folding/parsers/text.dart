@@ -103,6 +103,7 @@ abstract class TextFoldableBlockParser extends AbstractFoldableBlockParser {
 
   @protected
   void clearLineFlags() {
+    _foundMultilineComment = false;
     _foundImport = false;
     _foundPossibleImport = false;
     _foundImportTerminator = false;

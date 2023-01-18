@@ -296,7 +296,7 @@ class MyClass{
 
       _Example(
         'Multiline comment that terminates on the same line '
-        'and have non-whitespace char before it, '
+        'and has non-whitespace char before it, '
         'should terminate import sequence',
         code: '''
 import java.util.Arrays;      // 0
@@ -314,12 +314,12 @@ import java.lang.Exception;   // 5
 
       _Example(
         'Multiline comment that terminates on the same line '
-        'and have non-whitespace char after it, '
+        'and has non-whitespace char after it, '
         'should terminate import sequence',
         code: '''
 import java.util.Arrays;      // 0
 import java.util.Date;        // 1
-/*                            2 */ class MyClass { } 
+/*                            2 */ int a;
                               // 3
 import java.lang.Math;        // 4
 import java.lang.Exception;   // 5
@@ -331,58 +331,24 @@ import java.lang.Exception;   // 5
       ),
 
       _Example(
-        'Multiline comment that terminates on the same line '
-        'and have single-line comment after it, '
+        'Multiline comment that has a single-line comment after it, '
         'SHOULD NOT terminate import sequence',
         code: '''
 import java.util.Arrays;      // 0
 import java.util.Date;        // 1
-/*                               2 */ // single-line comment
-                              // 3
-import java.lang.Math;        // 4
-import java.lang.Exception;   // 5
-''',
-        expected: [
-          _FB(firstLine: 0, lastLine: 5, type: _T.imports),
-          _FB(firstLine: 2, lastLine: 3, type: _T.singleLineComment),
-        ],
-      ),
+/*                               2 */ // Comment
 
-      _Example(
-        'Multiline comment that terminates on the same line '
-        'and have single-line comment after it, '
-        'and if the next line is blank '
-        'SHOULD NOT terminate import sequence',
-        code: '''
-import java.util.Arrays;      // 0
-import java.util.Date;        // 1
-/*                            2 */ // single-line comment
-
-import java.lang.Math;        // 4
-import java.lang.Exception;   // 5
-''',
-        expected: [
-          _FB(firstLine: 0, lastLine: 5, type: _T.imports),
-        ],
-      ),
-
-      _Example(
-        'Multiline comment that terminates on the same line '
-        'and have single-line comment after it, '
-        'and if the next line is blank '
-        'SHOULD NOT terminate import sequence',
-        code: '''
-import java.util.Arrays;      // 0
-import java.util.Date;        // 1
-/*                               2 
-*/ // single-line comment     // 3
                               // 4
-import java.lang.Math;        // 5
-import java.lang.Exception;   // 6
+/*                               5
+*/ // Comment                    6
+   // Comment                    7
+import java.lang.Math;        // 8
+import java.lang.Exception;   // 9
 ''',
         expected: [
-          _FB(firstLine: 0, lastLine: 6, type: _T.imports),
-          _FB(firstLine: 2, lastLine: 4, type: _T.union),
+          _FB(firstLine: 0, lastLine: 9, type: _T.imports),
+          _FB(firstLine: 2, lastLine: 4, type: _T.singleLineComment),
+          _FB(firstLine: 5, lastLine: 7, type: _T.union),
         ],
       ),
     ];
