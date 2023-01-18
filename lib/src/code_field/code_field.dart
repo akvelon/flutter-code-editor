@@ -99,11 +99,11 @@ class CodeField extends StatefulWidget {
   final bool expands;
 
   /// Whether overflowing lines should wrap around
-  /// or make the field scrollable horizontally
+  /// or make the field scrollable horizontally.
   final bool wrap;
 
   /// A CodeController instance to apply
-  /// language highlight, themeing and modifiers
+  /// language highlight, themeing and modifiers.
   final CodeController controller;
 
   /// A LineNumberStyle instance to tweak the line number column styling

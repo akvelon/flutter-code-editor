@@ -1,5 +1,5 @@
-// ignore_for_file: prefer_const_constructors
 // ignore_for_file: avoid_private_typedef_functions
+// ignore_for_file: prefer_const_constructors
 
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_code_editor/src/code/code_lines_builder.dart';
