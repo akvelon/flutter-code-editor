@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+// ignore_for_file: avoid_private_typedef_functions
 
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_code_editor/src/code/code_lines_builder.dart';
@@ -195,7 +196,8 @@ void method() {
       ),
 
       _Example(
-        'Multiline comment after a closing brace with following single line comment',
+        'Multiline comment after a closing brace '
+        'with following single line comment',
         code: '''
 class MyClass {
 void method() {
@@ -279,7 +281,8 @@ void method2 // Not the only thing in the line        10
       ),
 
       _Example(
-        'Pair characters in a multiline that started at the end of a normal line',
+        'Pair characters in a multiline '
+        'that started at the end of a normal line',
         code: '''
 class MyClass{
 

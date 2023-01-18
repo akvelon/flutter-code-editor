@@ -98,10 +98,12 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.expands}
   final bool expands;
 
-  /// Whether overflowing lines should wrap around or make the field scrollable horizontally
+  /// Whether overflowing lines should wrap around
+  /// or make the field scrollable horizontally
   final bool wrap;
 
-  /// A CodeController instance to apply language highlight, themeing and modifiers
+  /// A CodeController instance to apply
+  /// language highlight, themeing and modifiers
   final CodeController controller;
 
   /// A LineNumberStyle instance to tweak the line number column styling
@@ -210,7 +212,7 @@ class _CodeFieldState extends State<CodeField> {
     _numberScroll?.dispose();
     _codeScroll?.dispose();
     _horizontalCodeScroll?.dispose();
-    _keyboardVisibilitySubscription?.cancel();
+    unawaited(_keyboardVisibilitySubscription?.cancel());
     super.dispose();
   }
 
@@ -268,6 +270,7 @@ class _CodeFieldState extends State<CodeField> {
               child: Text(longestLine, style: textStyle),
             ), // Add extra padding
           ),
+          // ignore: prefer_if_elements_to_conditional_expressions
           widget.expands ? Expanded(child: codeField) : codeField,
         ],
       ),

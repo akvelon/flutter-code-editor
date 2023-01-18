@@ -6,12 +6,12 @@ extension MapExtension<K, V> on Map<K, V> {
   }) {
     final keys = this.keys.toList();
     for (int i = keys.length - 1; i >= 0; i--) {
-      if (!executeWhile(keys[i], this[keys[i]]!)) {
+      if (!executeWhile(keys[i], this[keys[i]] as V)) {
         break;
       }
       final key = keys[i];
-      final value = this[key];
-      f(key, value!);
+      final value = this[key] as V;
+      f(key, value);
     }
   }
 

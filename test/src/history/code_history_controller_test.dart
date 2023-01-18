@@ -9,7 +9,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
 import '../common/snippets.dart';
-import '../common/text_editing_value.dart';
 import '../common/widget_tester.dart';
 
 void main() {

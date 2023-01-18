@@ -1,5 +1,7 @@
 // ignore_for_file: parameter_assignments
 
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,7 +58,8 @@ class CodeController extends TextEditingController {
   /// Will be exposed to all [modifiers]
   final EditorParams params;
 
-  /// A list of code modifiers to dynamically update the code upon certain keystrokes
+  /// A list of code modifiers
+  /// to dynamically update the code upon certain keystrokes
   final List<CodeModifier> modifiers;
 
   final bool _isTabReplacementEnabled;
@@ -317,7 +320,7 @@ class CodeController extends TextEditingController {
     if (hasTextChanged) {
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
-      generateSuggestions();
+      unawaited(generateSuggestions());
     } else if (hasSelectionChanged) {
       popupController.hide();
     }
@@ -464,11 +467,13 @@ class CodeController extends TextEditingController {
 
       for (final sequence
           in SingleLineComments.byMode[language] ?? <String>[]) {
-        // if there is a space after a sequence we should remove it with the sequence
+        // if there is a space after a sequence
+        // we should remove it with the sequence
         if (line.trim().startsWith('$sequence ')) {
           return line.replaceFirst('$sequence ', '');
         }
-        // if there is no space after a sequence we should remove the sequence
+        // if there is no space after a sequence
+        // we should remove the sequence
         if (line.trim().startsWith(sequence)) {
           return line.replaceFirst(sequence, '');
         }
@@ -752,10 +757,12 @@ class CodeController extends TextEditingController {
                 m.group(idx) == null;
             idx++) {}
 
-        children.add(TextSpan(
-          text: m[0],
-          style: _styleList[idx - 1],
-        ));
+        children.add(
+          TextSpan(
+            text: m[0],
+            style: _styleList[idx - 1],
+          ),
+        );
         return '';
       },
       onNonMatch: (String span) {

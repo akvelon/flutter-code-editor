@@ -9,9 +9,6 @@ import 'package:highlight/languages/java.dart';
 
 void main() {
   group('Unfolded', () {
-    const indentLength = 2;
-    final indent = ' ' * indentLength;
-
     test('Selection is collapsed', () {
       final examples = [
         const _Example(
