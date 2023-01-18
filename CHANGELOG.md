@@ -1,3 +1,7 @@
+## 0.2.8
+
+* Java fallback parser preserves foldable blocks if `highlight` fails ([Issue 48](https://github.com/akvelon/flutter-code-editor/issues/48)).
+
 ## 0.2.7
 
 * Fix joining nested foldable blocks ([Issue 136](https://github.com/akvelon/flutter-code-editor/issues/136)).
