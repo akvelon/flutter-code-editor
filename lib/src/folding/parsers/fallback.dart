@@ -117,6 +117,8 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
             for (final c in multilineCommentSequences) {
               if (line.endsWith(c.item1)) {
                 startBlock(lineIndex, FoldableBlockType.multilineComment);
+                setFoundMultilineComment();
+
                 _startedMultilineCommentAt = lineIndex;
                 _startedMultilineCommentWith = c.item1;
 
@@ -136,7 +138,18 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
 
                 if (_startedMultilineCommentAt == lineIndex &&
                     lines.lines[lineIndex].text.trim() == line.trim()) {
+                  // if multiline comment terminated on the same line and
+                  // the full line text doesn't contain anything except comment
                   setFoundSingleLineComment();
+                }
+
+                if (line.trim().startsWith(c.item1) ||
+                    !line.contains(c.item1)) {
+                  // if the line only contains multiline comment we can reset it
+                  // without any issue.
+                  // It is needed if there is a single line comment afterwards:
+                  // /* this is a comment  */    // and this is also a comment
+                  line = '';
                 }
 
                 _startedMultilineCommentAt = null;
@@ -154,6 +167,10 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
               !foundImport &&
               !_isInMultilineComment) {
             setFoundImportTerminator();
+          }
+
+          if (_isInMultilineComment) {
+            setFoundMultilineComment();
           }
 
           line = '';

@@ -365,6 +365,26 @@ import java.lang.Exception;   // 5
           _FB(firstLine: 0, lastLine: 5, type: _T.imports),
         ],
       ),
+
+      _Example(
+        'Multiline comment that terminates on the same line '
+        'and have single-line comment after it, '
+        'and if the next line is blank '
+        'SHOULD NOT terminate import sequence',
+        code: '''
+import java.util.Arrays;      // 0
+import java.util.Date;        // 1
+/*                               2 
+*/ // single-line comment     // 3
+                              // 4
+import java.lang.Math;        // 5
+import java.lang.Exception;   // 6
+''',
+        expected: [
+          _FB(firstLine: 0, lastLine: 6, type: _T.imports),
+          _FB(firstLine: 2, lastLine: 4, type: _T.union),
+        ],
+      ),
     ];
 
     for (final example in examples) {
