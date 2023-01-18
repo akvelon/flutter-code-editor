@@ -73,7 +73,6 @@ class FallbackFoldableBlockParser extends TextFoldableBlockParser {
     required CodeLines lines,
   }) {
     String line = '';
-    bool isMultilineCommentBlockStarted = false;
 
     for (final code in text.runes) {
       line += String.fromCharCode(code);
