@@ -4,10 +4,10 @@ import 'code_theme_data.dart';
 
 class CodeTheme extends InheritedWidget {
   const CodeTheme({
+    super.key,
+    required super.child,
     required this.data,
-    Key? key,
-    required Widget child,
-  }) : super(key: key, child: child);
+  });
 
   final CodeThemeData? data;
 

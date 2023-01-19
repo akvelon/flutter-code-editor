@@ -217,7 +217,8 @@ aaaa$indent
       final examples = [
         _Example(
           'WHEN non-collapsed selection, two lines, not first, not last. '
-          'SHOULD add indentation to the selected lines and select the whole lines',
+          'SHOULD add indentation to the selected lines '
+          'and select the whole lines',
           initialFullText: '''
 aaaa
 aaAA
@@ -374,8 +375,6 @@ package org.apache.beam.examples;
   group('Readonly blocks', () {
     final language = java;
     const readonlySectionName = 'readonlySection'; // length = 15
-    const indentLength = 2;
-    final indent = ' ' * indentLength;
 
     test(
         'If the there is at least 1 readonly line selected, '

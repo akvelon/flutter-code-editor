@@ -1,5 +1,7 @@
 // ignore_for_file: parameter_assignments
 
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,7 +58,8 @@ class CodeController extends TextEditingController {
   /// Will be exposed to all [modifiers]
   final EditorParams params;
 
-  /// A list of code modifiers to dynamically update the code upon certain keystrokes
+  /// A list of code modifiers
+  /// to dynamically update the code upon certain keystrokes.
   final List<CodeModifier> modifiers;
 
   final bool _isTabReplacementEnabled;
@@ -317,7 +320,7 @@ class CodeController extends TextEditingController {
     if (hasTextChanged) {
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
-      generateSuggestions();
+      unawaited(generateSuggestions());
     } else if (hasSelectionChanged) {
       popupController.hide();
     }
@@ -464,17 +467,19 @@ class CodeController extends TextEditingController {
 
       for (final sequence
           in SingleLineComments.byMode[language] ?? <String>[]) {
-        // if there is a space after a sequence we should remove it with the sequence
+        // If there is a space after a sequence
+        // we should remove it with the sequence.
         if (line.trim().startsWith('$sequence ')) {
           return line.replaceFirst('$sequence ', '');
         }
-        // if there is no space after a sequence we should remove the sequence
+        // If there is no space after a sequence
+        // we should remove the sequence.
         if (line.trim().startsWith(sequence)) {
           return line.replaceFirst(sequence, '');
         }
       }
 
-      // if line is not commented just return it
+      // If line is not commented just return it.
       return line;
     });
   }
@@ -500,10 +505,10 @@ class CodeController extends TextEditingController {
 
     final lineRange = getSelectedLineRange();
 
-    // apply modification to the selected lines
+    // Apply modification to the selected lines.
     final modifiedLinesBuffer = StringBuffer();
     for (int i = lineRange.start; i < lineRange.end; i++) {
-      // cancel modification entirely if any of the lines is readOnly
+      // Cancel modification entirely if any of the lines is readOnly.
       if (_code.lines.lines[i].isReadOnly) {
         return;
       }
@@ -516,7 +521,7 @@ class CodeController extends TextEditingController {
     final firstLineStart = _code.lines.lines[lineRange.start].textRange.start;
     final lastLineEnd = _code.lines.lines[lineRange.end - 1].textRange.end;
 
-    // replace selected lines with modified ones
+    // Replace selected lines with modified ones.
     final finalFullText = _code.text.replaceRange(
       firstLineStart,
       lastLineEnd,
@@ -533,7 +538,7 @@ class CodeController extends TextEditingController {
         _code.hiddenRanges.cutSelection(finalFullSelection);
 
     // TODO(yescorp): move to the listener both here and in `set value`
-    /// or come up with a different approach
+    //  or come up with a different approach
     historyController.beforeChanged(
       code: _code,
       selection: finalVisibleSelection,
@@ -552,7 +557,7 @@ class CodeController extends TextEditingController {
       placeHiddenRanges: TextAffinity.downstream,
     );
     final lastChar = _code.hiddenRanges.recoverPosition(
-      // to avoid including the next line if `\n` is selected
+      // To avoid including the next line if `\n` is selected.
       selection.isCollapsed ? selection.end : selection.end - 1,
       placeHiddenRanges: TextAffinity.downstream,
     );
@@ -752,10 +757,12 @@ class CodeController extends TextEditingController {
                 m.group(idx) == null;
             idx++) {}
 
-        children.add(TextSpan(
-          text: m[0],
-          style: _styleList[idx - 1],
-        ));
+        children.add(
+          TextSpan(
+            text: m[0],
+            style: _styleList[idx - 1],
+          ),
+        );
         return '';
       },
       onNonMatch: (String span) {
