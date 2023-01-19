@@ -10,6 +10,10 @@ enum LineSemantics {
   /// whitespace characters before it.
   singleLineComment,
 
+  /// A line that is completely inside of a multiline comment.
+  /// And possibly whitespaces around it.
+  multilineComment,
+
   /// A line containing any keyword with [KeywordSemantics.import]
   /// and possibly other entities that do not terminate an import block.
   import,

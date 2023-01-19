@@ -152,4 +152,37 @@ extension TextEditingValueExtension on TextEditingValue {
     }
     return text.substring(selection.end);
   }
+
+  TextEditingValue typed(String text) {
+    final lengthDiff = text.length - selected.length;
+
+    return replaced(selection, text).copyWith(
+      selection: TextSelection.collapsed(offset: selection.end + lengthDiff),
+    );
+  }
+
+  TextEditingValue? select(Pattern pattern, [int start = 0]) {
+    if (pattern == '') {
+      throw AssertionError('Cannot search for an empty pattern');
+    }
+
+    final position = text.indexOf(pattern, start);
+    if (position == -1) {
+      return null;
+    }
+
+    final match = pattern.matchAsPrefix(text, position);
+    if (match == null) {
+      throw AssertionError('');
+    }
+
+    return TextEditingValue(
+      composing: composing,
+      selection: TextSelection(
+        baseOffset: position,
+        extentOffset: match.end,
+      ),
+      text: text,
+    );
+  }
 }

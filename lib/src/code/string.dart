@@ -113,4 +113,6 @@ extension StringExtension on String {
   String tabsToSpaces(int spaceCount) {
     return replaceAll('\t', ' ' * spaceCount);
   }
+
+  bool hasOnlyWhitespaces() => trim() == '';
 }

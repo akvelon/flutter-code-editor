@@ -246,13 +246,19 @@ class Code {
     }
     final lastLine = section.lastLine;
     if (lastLine != null && lastLine < lines.lines.length - 1) {
-      result['ending'] = HiddenRange(
-        lines.lines[lastLine].textRange.end,
-        lines.lines.last.textRange.end,
-        firstLine: lastLine,
-        lastLine: lines.lines.length - 1,
-        wholeFirstLine: false,
-      );
+      final start = lines.lines[lastLine].textRange.end;
+      final end = lines.lines.last.textRange.end;
+
+      // Can be equal if the last line has no \n.
+      if (end > start) {
+        result['ending'] = HiddenRange(
+          start,
+          end,
+          firstLine: lastLine,
+          lastLine: lines.lines.length - 1,
+          wholeFirstLine: false,
+        );
+      }
     }
     return result;
   }

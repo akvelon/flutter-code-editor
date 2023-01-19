@@ -120,9 +120,8 @@ import users.{UserPreferences => UPrefs} // import and rename for convenience   
 
 class MyClass() {} //                                                           10 ''';
       const expected = [
-        FB(firstLine: 0, lastLine: 2, type: FBT.imports),
+        FB(firstLine: 0, lastLine: 8, type: FBT.imports),
         FB(firstLine: 3, lastLine: 5, type: FBT.multilineComment),
-        FB(firstLine: 6, lastLine: 8, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });
@@ -146,13 +145,12 @@ import users.{ User, UserPreferences}  // Only imports selected members''';
       //TODO(Malarg): handle scala multiline blocks
       //https://github.com/akvelon/flutter-code-editor/issues/78.
       const code = '''
-import users.User  // import the class User
+import users.User // Without this, it is 'braces' block.
 import users.{ 
-  User, 
-  UserPreferences
-}  // Only imports selected members''';
+  User
+}''';
       const expected = [
-        FB(firstLine: 0, lastLine: 4, type: FBT.union),
+        FB(firstLine: 0, lastLine: 3, type: FBT.imports),
       ];
       _Tester.parseAndCheck(mode: scala, code: code, expected: expected);
     });

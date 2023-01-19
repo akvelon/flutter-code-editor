@@ -1,3 +1,15 @@
+## 0.2.8
+
+* Java fallback parser preserves foldable blocks if `highlight` fails ([Issue 48](https://github.com/akvelon/flutter-code-editor/issues/48)).
+
+## 0.2.7
+
+* Fix joining nested foldable blocks ([Issue 136](https://github.com/akvelon/flutter-code-editor/issues/136)).
+
+## 0.2.6
+
+* Comment out and uncomment code with Ctrl-/ ([Issue 117](https://github.com/akvelon/flutter-code-editor/issues/117)).
+
 ## 0.2.5
 
 * Tab and Shift-Tab handling ([Issue 116](https://github.com/akvelon/flutter-code-editor/issues/116)).
