@@ -17,7 +17,6 @@ class MyClass {
 }
 ''';
 
-
 const javaFactorialSectionsSnippet = '''
 class MyClass {
   /// Calculates the factorial of the number.
