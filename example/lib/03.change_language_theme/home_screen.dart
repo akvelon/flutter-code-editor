@@ -21,8 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    text: javaFactorialSectionsSnippet,
-    visibleSectionNames: {'section1'},
+    text: javaFactorialSnippet,
   );
 
   @override
