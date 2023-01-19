@@ -81,6 +81,10 @@ class SpanBuilder {
   }
 
   TextStyle? _paleIfRequired(TextStyle? style) {
+    if (code.visibleSectionNames.isNotEmpty) {
+      return style;
+    }
+
     final fullLineIndex =
         code.hiddenLineRanges.recoverLineIndex(_visibleLineIndex);
     if (code.lines[fullLineIndex].isReadOnly) {
