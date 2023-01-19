@@ -5,8 +5,8 @@ import 'code_theme_data.dart';
 class CodeTheme extends InheritedWidget {
   const CodeTheme({
     super.key,
-    required super.child,
     required this.data,
+    required super.child,
   });
 
   final CodeThemeData? data;
