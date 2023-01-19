@@ -2,7 +2,7 @@ import 'package:highlight/highlight_core.dart';
 
 import '../../code/code_line.dart';
 import '../../code/code_lines.dart';
-import '../../code/map.dart';
+import '../../code/iterable.dart';
 import '../foldable_block.dart';
 import '../foldable_block_type.dart';
 import 'abstract.dart';
@@ -83,13 +83,18 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
     _openBlocksLinesByIndent[indent] = lineIndex;
   }
 
-  void _closeBlocks(int i, int nextNonEmptyIndent) {
-    _openBlocksLinesByIndent.forEachInvertedWhile(
-      (indentsCount, startLine) {
-        _closeBlock(startLine, i);
-      },
-      executeWhile: (indentsCount, _) => indentsCount >= nextNonEmptyIndent,
-    );
+  void _closeBlocks(int index, int nextNonEmptyIndent) {
+    for (final indent in _openBlocksLinesByIndent.keys.reversed) {
+      final indentsCount = indent;
+
+      if (indentsCount < nextNonEmptyIndent) {
+        break;
+      }
+
+      final startLine = _openBlocksLinesByIndent[indentsCount];
+      _closeBlock(startLine!, index);
+    }
+
     _openBlocksLinesByIndent.removeWhere(
       (key, value) => key >= nextNonEmptyIndent,
     );

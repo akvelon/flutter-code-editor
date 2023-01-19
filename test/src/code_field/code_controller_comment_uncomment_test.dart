@@ -33,7 +33,8 @@ void main() {
           ),
 
           _Example(
-            'Document has only 1 commented out line without spaces between comment and text',
+            'Document has only 1 commented out line '
+            'without spaces between comment and text',
             initialFullText: '//aa',
             initialSelection: TextSelection.collapsed(offset: 0),
             expectedFullText: 'aa',
@@ -104,7 +105,8 @@ Aa
           ),
 
           _Example(
-            'WHEN first selected line is uncommented, the rest are commented out '
+            'WHEN first selected line is uncommented, '
+            'the rest are commented out '
             'SHOULD comment all lines out',
             initialFullText: '''
 aA
@@ -121,7 +123,8 @@ aA
           ),
 
           _Example(
-            'WHEN non-first selected line is uncommented, the rest are commented out '
+            'WHEN non-first selected line is uncommented, '
+            'the rest are commented out '
             'SHOULD comment out all lines',
             initialFullText: '''
 // aA
@@ -138,7 +141,8 @@ AA
           ),
 
           _Example(
-            'WHEN last selected line is uncommented, the rest are commented out '
+            'WHEN last selected line is uncommented, '
+            'the rest are commented out '
             'SHOULD comment out all lines',
             initialFullText: '''
 // aA
@@ -280,7 +284,8 @@ a
         final examples = [
           //
           _Example(
-            'WHEN every selected line has different type of single line comments '
+            'WHEN every selected line '
+            'has different type of single line comments '
             'SHOULD uncomment all of them',
             initialFullText: '''
 // aA
@@ -299,7 +304,8 @@ Aa
           ),
 
           _Example(
-            'WHEN every selected line has different type of single line comments '
+            'WHEN every selected line '
+            'has different type of single line comments '
             'and one line inbetween is empty '
             'SHOULD uncomment all commented lines and do not affect empty line',
             initialFullText: '''
@@ -319,7 +325,8 @@ Aa
           ),
 
           _Example(
-            'WHEN every selected line has different type of single line comments '
+            'WHEN every selected line '
+            'has different type of single line comments '
             'but one of them is not commented '
             'SHOULD comment out all lines',
             initialFullText: '''
@@ -339,9 +346,11 @@ AA
           ),
 
           _Example(
-            'WHEN every selected line has different type of single line comments '
+            'WHEN every selected line '
+            'has different type of single line comments '
             'and they have different indentation '
-            'SHOULD uncomment all commented out lines and do not affect empty line',
+            'SHOULD uncomment all commented out lines '
+            'and do not affect empty line',
             initialFullText: '''
     // aA
   # AA
@@ -359,7 +368,8 @@ AA
           ),
 
           _Example(
-            'WHEN every selected line has different type of single line comments '
+            'WHEN every selected line '
+            'has different type of single line comments '
             'and they have different indentation '
             'SHOULD uncomment all commented lines and do not affect empty line',
             initialFullText: '''
@@ -379,7 +389,8 @@ AA
           ),
 
           _Example(
-            'WHEN every selected line has different type of single line comments '
+            'WHEN every selected line '
+            'has different type of single line comments '
             'and they have different indentation '
             'SHOULD uncomment all commented lines and do not affect empty line',
             initialFullText: '''
