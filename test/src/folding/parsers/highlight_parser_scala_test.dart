@@ -145,7 +145,7 @@ import users.{ User, UserPreferences}  // Only imports selected members''';
 
     test('Multiline imports form braces foldable block', () {
       // TODO(Malarg): handle scala multiline blocks
-      //  https://github.com/akvelon/flutter-code-editor/issues/78.
+      //  https://github.com/akvelon/flutter-code-editor/issues/78
       const code = '''
 import users.User // Without this, it is 'braces' block.
 import users.{ 
