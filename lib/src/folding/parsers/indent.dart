@@ -84,7 +84,7 @@ class IndentFoldableBlockParser extends AbstractFoldableBlockParser {
   }
 
   void _closeBlocks(int index, int nextNonEmptyIndent) {
-    for(final indent in _openBlocksLinesByIndent.keys.reversed){
+    for (final indent in _openBlocksLinesByIndent.keys.reversed) {
       final indentsCount = indent;
 
       if (indentsCount < nextNonEmptyIndent) {
