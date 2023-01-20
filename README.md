@@ -205,7 +205,13 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
+<details>
+  <summary>Epilepsy warning! Example gif:</summary>
+
+
 ![cleaner-readonly](https://user-images.githubusercontent.com/79095619/213762470-683e6304-681f-4292-80a2-67d8ec88cde6.gif)
+  
+</details>
 
 ## Advanced Code Blocks Folding
 
