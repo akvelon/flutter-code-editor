@@ -205,7 +205,7 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
-![readonly-section](https://user-images.githubusercontent.com/79095619/213680082-49a5a55a-c0d5-4121-88c6-3924335ad746.gif)
+![cleaner-readonly](https://user-images.githubusercontent.com/79095619/213762470-683e6304-681f-4292-80a2-67d8ec88cde6.gif)
 
 ## Advanced Code Blocks Folding
 
