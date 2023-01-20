@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_private_typedef_functions
-
 import 'package:flutter_code_editor/src/folding/invalid_foldable_block.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/scala.dart';
@@ -22,7 +20,7 @@ class MyClass(var myVar1: Int,
   def main(main1: Int,
            main2: Int
   ) = {
-    println("h")
+    method1("h")
   }
 }''';
       const expected = [
@@ -144,8 +142,8 @@ import users.{ User, UserPreferences}  // Only imports selected members''';
     });
 
     test('Multiline imports form braces foldable block', () {
-      // TODO(Malarg): handle scala multiline blocks
-      //  https://github.com/akvelon/flutter-code-editor/issues/78
+      //TODO(Malarg): handle scala multiline blocks
+      //https://github.com/akvelon/flutter-code-editor/issues/78.
       const code = '''
 import users.User // Without this, it is 'braces' block.
 import users.{ 
@@ -203,7 +201,7 @@ object IdFactory {
       const code = '''
 object Main {
   def main(args: Array[String]): Unit =
-    println("Hello, Scala developer!")
+    method1("Hello, Scala developer!")
 }''';
       const expected = [
         FB(firstLine: 0, lastLine: 3, type: FBT.braces),

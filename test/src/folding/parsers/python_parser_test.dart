@@ -200,16 +200,16 @@ class Mapping:
       _Example(
         'One-liner does not form a block',
         code: '''
-def printAgeType(age):                         # 0
+def method1(age):                              # 0
     type = "Minor" if age < 18 else "Adult"    # 1
-    print(type)                                # 2
+    process(type)                              # 2
 
-def squareNumbers(numbers):                    # 4
+def method2(numbers):                          # 4
     squaredNumbers = [x**2 for x in numbers]   # 5
-    print(squaredNumbers)                      # 6
+    process(squaredNumbers)                    # 6
 
-printAgeType(19)                               # 8
-squareNumbers([1, 2, 3, 4, 5])                 # 9''',
+method1(19)                                    # 8
+method2([1, 2, 3, 4, 5])                       # 9''',
         expected: [
           _FB(firstLine: 0, lastLine: 2, type: _T.indent),
           _FB(firstLine: 4, lastLine: 6, type: _T.indent),
@@ -226,7 +226,7 @@ numbers = [1,
 5
 ]
 squaredNumbers = [x**2 for x in numbers]
-print(squaredNumbers)''',
+process(squaredNumbers)''',
         expected: [_FB(firstLine: 0, lastLine: 5, type: _T.brackets)],
       ),
 
@@ -241,7 +241,7 @@ import foo
 import bar
 
 pie = math.pi
-print("The value of pi is : ",pie)''',
+process("The value of pi is : ",pie)''',
         expected: [
           _FB(firstLine: 0, lastLine: 5, type: _T.imports),
         ],
@@ -261,7 +261,7 @@ import foo                            # 7
 import bar                            # 8
 
 pie = math.pi                         # 10
-print("The value of pi is : ",pie)    # 11''',
+process("The value of pi is : ",pie)  # 11''',
         expected: [
           _FB(firstLine: 0, lastLine: 2, type: _T.singleLineComment),
           _FB(firstLine: 4, lastLine: 8, type: _T.imports),
@@ -273,8 +273,8 @@ print("The value of pi is : ",pie)    # 11''',
         code: '''
 if (isFlutterCodeEditor 
       == True): 
-    print("I like Flutter code editor!")
-    print("I will upvote it on pub.dev right now!")
+    process("I like Flutter code editor!")
+    process("I will upvote it on pub.dev right now!")
 ''',
         expected: [
           _FB(firstLine: 0, lastLine: 3, type: _T.union),

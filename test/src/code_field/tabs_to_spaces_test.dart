@@ -6,7 +6,7 @@ const _codeWithTabs = '''
 class Foo {
 \tint field;
 \tvoid method() {
-\t\tprint(field);
+\t\tint a;
 \t}
 }
 ''';
@@ -14,7 +14,7 @@ const _codeWithDoubleSpaces = '''
 class Foo {
   int field;
   void method() {
-    print(field);
+    int a;
   }
 }
 ''';
