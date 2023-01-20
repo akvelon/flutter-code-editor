@@ -13,8 +13,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Themes,
 - And many other features.
 
-![Basic Example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/factorial.png)
-
+![main](https://user-images.githubusercontent.com/79095619/213679642-c6f7f200-224c-4437-b739-63e2794f1f42.gif)
 
 ## Basic Usage
 
@@ -92,6 +91,8 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 - Java
 - Python
 - Scala
+
+![foldable_blocks](https://user-images.githubusercontent.com/79095619/213679862-a307333b-d73e-4fc2-99f8-442550e43781.gif)
 
 Code blocks folding may support other languages in experimental mode.
 
@@ -204,6 +205,7 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
+![readonly-section](https://user-images.githubusercontent.com/79095619/213680082-49a5a55a-c0d5-4121-88c6-3924335ad746.gif)
 
 ## Advanced Code Blocks Folding
 
@@ -303,6 +305,7 @@ when exploring classes and methods.
 
 Autocompletion currently cannot be disabled.
 
+![suggestions](https://user-images.githubusercontent.com/79095619/213680153-38f5df12-8304-480b-aae2-37e6df1433f2.gif)
 
 ## Migration Guides
 
