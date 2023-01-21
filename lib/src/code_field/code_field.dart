@@ -131,7 +131,9 @@ class CodeField extends StatefulWidget {
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
   final bool lineNumbers;
+  final EdgeInsets? codeFieldPadding;
   final BoxDecoration? numbersTabDecoration;
+  final FixedColumnWidth? fixedColumnWidth;
 
   const CodeField({
     super.key,
@@ -154,6 +156,8 @@ class CodeField extends StatefulWidget {
     this.onChanged,
     this.lineNumbers = true,
     this.numbersTabDecoration,
+    this.codeFieldPadding,
+    this.fixedColumnWidth,
   });
 
   @override
@@ -251,10 +255,7 @@ class _CodeFieldState extends State<CodeField> {
 
   // Wrap the codeField in a horizontal scrollView
   Widget _wrapInScrollView(
-    Widget codeField,
-    TextStyle textStyle,
-    double minWidth,
-  ) {
+      Widget codeField, TextStyle textStyle, double minWidth,) {
     final intrinsic = IntrinsicWidth(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -312,8 +313,7 @@ class _CodeFieldState extends State<CodeField> {
     final lineNumberColor = widget.lineNumberStyle.textStyle?.color ??
         textStyle.color?.withOpacity(.5);
 
-    final lineNumberTextStyle =
-        (widget.lineNumberStyle.textStyle ?? textStyle).copyWith(
+    final lineNumberTextStyle = (widget.lineNumberStyle.textStyle ?? textStyle).copyWith(
       color: lineNumberColor,
       fontFamily: textStyle.fontFamily,
       fontSize: lineNumberSize,
@@ -329,12 +329,15 @@ class _CodeFieldState extends State<CodeField> {
       numberCol = GutterWidget(
         codeController: widget.controller,
         style: lineNumberStyle,
+        fixedColumnWidth: widget.fixedColumnWidth,
       );
       if(widget.numbersTabDecoration != null) {
-        numberCol = DecoratedBox(
-          decoration: widget.numbersTabDecoration!,
-          child: numberCol,
-        );
+        numberCol = SizedBox(
+            height: double.maxFinite,
+            child: DecoratedBox(
+              decoration: widget.numbersTabDecoration!,
+              child: numberCol,
+            ));
       }
     }
 
@@ -347,9 +350,9 @@ class _CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _codeScroll,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16),
+        contentPadding: widget.codeFieldPadding ?? const EdgeInsets.symmetric(vertical: 16),
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,

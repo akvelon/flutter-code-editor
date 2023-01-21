@@ -16,10 +16,12 @@ class GutterWidget extends StatelessWidget {
   const GutterWidget({
     required this.codeController,
     required this.style,
+    this.fixedColumnWidth,
   });
 
   final CodeController codeController;
   final LineNumberStyle style;
+  final FixedColumnWidth? fixedColumnWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +56,10 @@ class GutterWidget extends StatelessWidget {
       padding: style.margin,
       width: style.width,
       child: Table(
-        columnWidths: const {
-          _lineNumberColumn: FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(_issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
+        columnWidths: {
+          _lineNumberColumn: const FlexColumnWidth(),
+          _issueColumn: const FixedColumnWidth(_issueColumnWidth),
+          _foldingColumn: fixedColumnWidth ?? const FixedColumnWidth(_foldingColumnWidth),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
