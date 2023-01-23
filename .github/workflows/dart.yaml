@@ -67,6 +67,6 @@ jobs:
       #     'lib/generated/*/*.dart' -o coverage/lcov.info
 
       - name: Codecov
-        uses: codecov/codecov-action@v1.2.1
+        uses: codecov/codecov-action@v3
         with:
           file: coverage/lcov.info
