@@ -48,7 +48,7 @@ jobs:
           echo "void main(){}" >> $file
 
       - name: Test
-          run: flutter test --coverage
+        run: flutter test --coverage
 
       # As we don't use file generation, it is fine to include everything.
       # - name: Install lcov
