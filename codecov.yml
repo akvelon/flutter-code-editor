@@ -1,0 +1,17 @@
+codecov:
+  require_ci_to_pass: no
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 3%
+        base: auto
+        flags:
+          - unit
+        paths:
+          - "src"
+        if_ci_failed: ignore #success, failure, error, ignore
+        informational: true
+        only_pulls: false
