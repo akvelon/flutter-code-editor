@@ -70,20 +70,3 @@ jobs:
         uses: codecov/codecov-action@v1.2.1
         with:
           file: coverage/lcov.info
-
-coverage:
-  status:
-    project:
-      default:
-        target: auto
-        threshold: 3%
-        base: auto 
-        flags: 
-          - unit
-        paths: 
-          - "src"
-        branches: 
-          - main
-        if_ci_failed: ignore #success, failure, error, ignore
-        informational: false
-        only_pulls: false
