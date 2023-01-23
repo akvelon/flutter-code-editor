@@ -4,12 +4,12 @@ coverage:
       default:
         target: auto
         threshold: 3%
-        base: auto 
-        flags: 
+        base: auto
+        flags:
           - unit
-        paths: 
+        paths:
           - "src"
-        branches: 
+        branches:
           - main
         if_ci_failed: ignore #success, failure, error, ignore
         informational: true
