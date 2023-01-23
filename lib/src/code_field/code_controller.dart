@@ -551,6 +551,28 @@ class CodeController extends TextEditingController {
     );
   }
 
+  int testMethod(int a) {
+    if (a == 1) {
+      return 1;
+    }
+    if (a == 2) {
+      return 2;
+    }
+    if (a == 3) {
+      return 3;
+    }
+    if (a == 4) {
+      for (int i = 0; i < 100; i++) {
+        if (a == 54) {
+          break;
+        }
+        a++;
+      }
+      return a;
+    }
+    return 0;
+  }
+
   TextRange getSelectedLineRange() {
     final firstChar = _code.hiddenRanges.recoverPosition(
       selection.start,
