@@ -12,8 +12,6 @@ coverage:
           - unit
         paths:
           - "src"
-        branches:
-          - main
         if_ci_failed: ignore #success, failure, error, ignore
         informational: true
         only_pulls: false
