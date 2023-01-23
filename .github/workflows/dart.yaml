@@ -46,6 +46,9 @@ jobs:
           '*.part.dart' '!' -name '*freezed.dart' -name '*dart' | cut -c4- |
           awk -v package=$1 '{printf "import '\''package:flutter_code_editor%s%s'\'';\n", package, $1}' >> $file
           echo "void main(){}" >> $file
+          echo "\n"
+          cat $file
+          echo "\n"
 
       - name: Test
         run: flutter test --coverage
@@ -66,4 +69,4 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v1.2.1
         with:
-          file: codevrage/lcov.info
+          file: coverage/lcov.info
