@@ -58,10 +58,6 @@ class CodeController extends TextEditingController {
   /// Will be exposed to all [modifiers]
   final EditorParams params;
 
-  /// A list of code modifiers
-  /// to dynamically update the code upon certain keystrokes.
-  final List<CodeModifier> modifiers;
-
   final bool _isTabReplacementEnabled;
 
   /* Computed members */
@@ -110,18 +106,21 @@ class CodeController extends TextEditingController {
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
-    this.modifiers = const [
-      IndentModifier(),
-      CloseBlockModifier(),
-      TabModifier(),
-    ],
+    List<CodeModifier>? modifiers,
   })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
-        _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
+        _isTabReplacementEnabled =
+            modifiers?.any((e) => e is TabModifier) ?? false {
     this.language = language;
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
+
+    modifiers ??= [
+      IndentModifier(controller: this),
+      CloseBlockModifier(),
+      TabModifier(),
+    ];
 
     // Create modifier map
     for (final el in modifiers) {
@@ -605,7 +604,7 @@ class CodeController extends TextEditingController {
   }
 
   String _replaceTabsWithSpacesIfNeeded(String text) {
-    if (modifiers.contains(const TabModifier())) {
+    if (_modifierMap.values.contains(const TabModifier())) {
       return text.replaceAll('\t', ' ' * params.tabSpaces);
     }
     return text;
