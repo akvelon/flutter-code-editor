@@ -37,11 +37,11 @@ jobs:
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Test
-        run: flutter test
+        run: flutter test --coverage
       
       - name: Codecov
         run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov
+          ./coverage
 
