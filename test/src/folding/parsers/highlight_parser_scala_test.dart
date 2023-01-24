@@ -22,7 +22,7 @@ class MyClass(var myVar1: Int,
   def main(main1: Int,
            main2: Int
   ) = {
-    println("h")
+    method1("h")
   }
 }''';
       const expected = [
@@ -203,7 +203,7 @@ object IdFactory {
       const code = '''
 object Main {
   def main(args: Array[String]): Unit =
-    println("Hello, Scala developer!")
+    method1("Hello, Scala developer!")
 }''';
       const expected = [
         FB(firstLine: 0, lastLine: 3, type: FBT.braces),

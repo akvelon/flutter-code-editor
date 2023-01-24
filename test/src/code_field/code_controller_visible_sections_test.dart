@@ -207,11 +207,11 @@ class MyClass {
       final controller = createController(
         '''
 void method1() {// [START method1]
-  print('method1');
+  int a;
 }// [END method1]
 
 void method2() {// [START method2]
-  print('method2');
+  int a;
 }// [END method2]''',
         language: dart,
       );
@@ -223,7 +223,7 @@ void method2() {// [START method2]
       controller.visibleSectionNames = {};
       expect(controller.value.text, '''
 void method1() {
-  print('method1');
+  int a;
 }
 
 void method2() {''');

@@ -6,7 +6,7 @@ const _codeWithTabs = '''
 class Foo {
 \tint field;
 \tvoid method() {
-\t\tprint(field);
+\t\tint a;
 \t}
 }
 ''';
@@ -14,7 +14,7 @@ const _codeWithDoubleSpaces = '''
 class Foo {
   int field;
   void method() {
-    print(field);
+    int a;
   }
 }
 ''';
@@ -175,13 +175,13 @@ void main() {
           text: _codeWithTabs,
           selection: TextSelection(
             baseOffset: 24,
-            extentOffset: 59,
+            extentOffset: 55,
             isDirectional: true,
           ),
         );
         final expected = value.copyWith(
           text: _codeWithDoubleSpaces,
-          selection: value.selection.copyWith(baseOffset: 25, extentOffset: 64),
+          selection: value.selection.copyWith(baseOffset: 25, extentOffset: 60),
         );
 
         value = value.tabsToSpaces(_spaceCount);
@@ -193,13 +193,13 @@ void main() {
         TextEditingValue value = const TextEditingValue(
           text: _codeWithTabs,
           selection: TextSelection(
-            baseOffset: 59,
+            baseOffset: 55,
             extentOffset: 24,
           ),
         );
         final expected = value.copyWith(
           text: _codeWithDoubleSpaces,
-          selection: const TextSelection(baseOffset: 64, extentOffset: 25),
+          selection: const TextSelection(baseOffset: 60, extentOffset: 25),
         );
 
         value = value.tabsToSpaces(_spaceCount);
