@@ -13,7 +13,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Themes,
 - And many other features.
 
-![main](https://user-images.githubusercontent.com/79095619/213679642-c6f7f200-224c-4437-b739-63e2794f1f42.gif)
+![Basic example](https://user-images.githubusercontent.com/79095619/213679642-c6f7f200-224c-4437-b739-63e2794f1f42.gif)
 
 
 ## Basic Usage
@@ -93,7 +93,7 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 - Python
 - Scala
 
-![foldable_blocks](https://user-images.githubusercontent.com/79095619/213679862-a307333b-d73e-4fc2-99f8-442550e43781.gif)
+![Foldable blocks example](https://user-images.githubusercontent.com/79095619/213679862-a307333b-d73e-4fc2-99f8-442550e43781.gif)
 
 Code blocks folding may support other languages in experimental mode.
 
@@ -206,7 +206,7 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
-![readonly-blocks-example](https://user-images.githubusercontent.com/79095619/214567798-14b03e32-8b57-4c7d-8e98-7ffb9a4325f5.gif)
+![Readonly blocks example](https://user-images.githubusercontent.com/79095619/214567798-14b03e32-8b57-4c7d-8e98-7ffb9a4325f5.gif)
 
 
 ## Advanced Code Blocks Folding
@@ -307,7 +307,7 @@ when exploring classes and methods.
 
 Autocompletion currently cannot be disabled.
 
-![suggestions](https://user-images.githubusercontent.com/79095619/213680153-38f5df12-8304-480b-aae2-37e6df1433f2.gif)
+![Suggestions example](https://user-images.githubusercontent.com/79095619/213680153-38f5df12-8304-480b-aae2-37e6df1433f2.gif)
 
 
 ## Shortcuts
@@ -317,12 +317,12 @@ Most editors have certain shortcuts to help developers with writing the code. Th
 - Indent (Tab)
 - Outdent (Shift-Tab)
 
-![indent-outdent-example](https://user-images.githubusercontent.com/79095619/213770852-9c0855cb-b8fc-4f40-b33a-380f77c90a0f.gif)
+![indent outdent example](https://user-images.githubusercontent.com/79095619/213770852-9c0855cb-b8fc-4f40-b33a-380f77c90a0f.gif)
 
 - Comment out (Control-/)
 - Uncomment (Control-/)
 
-![comment-out-uncomment-example](https://user-images.githubusercontent.com/79095619/213770876-829dda06-87b3-4242-9d0e-d26f05090abf.gif)
+![comment out uncomment example](https://user-images.githubusercontent.com/79095619/213770876-829dda06-87b3-4242-9d0e-d26f05090abf.gif)
 
 
 ## Migration Guides
