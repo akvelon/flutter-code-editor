@@ -113,6 +113,8 @@ class Code {
       lines,
     );
 
+    print('hello');
+
     final commentsHiddenRanges = _commentsToHiddenRanges(
       serviceComments,
     );
