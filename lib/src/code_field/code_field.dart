@@ -133,28 +133,28 @@ class CodeField extends StatefulWidget {
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
   final bool lineNumbers;
-
-  const CodeField({
-    super.key,
-    required this.controller,
-    this.minLines,
-    this.maxLines,
-    this.expands = false,
-    this.wrap = false,
-    this.background,
-    this.decoration,
-    this.textStyle,
-    this.padding = EdgeInsets.zero,
-    this.lineNumberStyle = const LineNumberStyle(),
-    this.enabled,
-    this.readOnly = false,
-    this.cursorColor,
-    this.textSelectionTheme,
-    this.lineNumberBuilder,
-    this.focusNode,
-    this.onChanged,
-    this.lineNumbers = true,
-  });
+  final bool showErrors;
+  const CodeField(
+      {super.key,
+      required this.controller,
+      this.minLines,
+      this.maxLines,
+      this.expands = false,
+      this.wrap = false,
+      this.background,
+      this.decoration,
+      this.textStyle,
+      this.padding = EdgeInsets.zero,
+      this.lineNumberStyle = const LineNumberStyle(),
+      this.enabled,
+      this.readOnly = false,
+      this.cursorColor,
+      this.textSelectionTheme,
+      this.lineNumberBuilder,
+      this.focusNode,
+      this.onChanged,
+      this.lineNumbers = true,
+      this.showErrors = true});
 
   @override
   State<CodeField> createState() => _CodeFieldState();
@@ -330,6 +330,7 @@ class _CodeFieldState extends State<CodeField> {
       numberCol = GutterWidget(
         codeController: widget.controller,
         style: lineNumberStyle,
+        showErrors: widget.showErrors,
       );
     }
 

@@ -13,14 +13,14 @@ const _issueColumn = 1;
 const _foldingColumn = 2;
 
 class GutterWidget extends StatelessWidget {
-  const GutterWidget({
-    required this.codeController,
-    required this.style,
-  });
+  const GutterWidget(
+      {required this.codeController,
+      required this.style,
+      required this.showErrors});
 
   final CodeController codeController;
   final LineNumberStyle style;
-
+  final bool showErrors;
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -46,8 +46,9 @@ class GutterWidget extends StatelessWidget {
           ],
         ),
     ];
-
-    _fillIssues(tableRows);
+    if (showErrors) {
+      _fillIssues(tableRows);
+    }
     _fillFoldToggles(tableRows);
 
     return Container(
