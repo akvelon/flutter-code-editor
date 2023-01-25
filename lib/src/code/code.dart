@@ -113,7 +113,7 @@ class Code {
       lines,
     );
 
-    print('hello');
+    print('hello'); // ignore: avoid_print
 
     final commentsHiddenRanges = _commentsToHiddenRanges(
       serviceComments,
