@@ -21,6 +21,9 @@ class IndentModifier extends CodeModifier {
     var spacesCount = 0;
     var braceCount = 0;
 
+    final indexOfLastChar = sel.start - 1;
+    final lastchar = indexOfLastChar >= 0 ? text[indexOfLastChar] : null;
+
     for (var k = min(sel.start, text.length) - 1; k >= 0; k--) {
       if (text[k] == '\n') {
         break;
@@ -40,6 +43,8 @@ class IndentModifier extends CodeModifier {
     }
 
     if (braceCount > 0) {
+      spacesCount += params.tabSpaces;
+    } else if (lastchar == ':') {
       spacesCount += params.tabSpaces;
     }
 
