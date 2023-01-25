@@ -39,13 +39,11 @@ class GutterWidget extends StatelessWidget {
       for (final i in code.hiddenLineRanges.visibleLineNumbers)
         TableRow(
           children: [
-            if (showNumbers)
-              Text(
-                '${i + 1}',
-                style: style.textStyle,
-                textAlign: style.textAlign,
-              ),
-            if (!showNumbers) const SizedBox(),
+            Text(
+              showNumbers ? '${i + 1}' : '',
+              style: style.textStyle,
+              textAlign: style.textAlign,
+            ),
             const SizedBox(),
             const SizedBox(),
           ],
