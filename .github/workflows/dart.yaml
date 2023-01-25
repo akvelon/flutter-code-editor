@@ -36,5 +36,37 @@ jobs:
       - name: Format
         run: dart format --output=none --set-exit-if-changed .
 
+      - name: Create helper file for coverage results
+        run: |
+          file=test/coverage_helper_test.dart
+          echo "// Helper file to make coverage work for all dart files\n" > $file
+          echo "// ignore_for_file: unused_import, directives_ordering" >> $file
+
+          find lib '!' -path '*/generated*/*' '!' -name '*g.dart' '!' -name \
+          '*.part.dart' '!' -name '*freezed.dart' -name '*dart' | cut -c4- |
+          awk -v package=$1 '{printf "import '\''package:flutter_code_editor%s%s'\'';\n", package, $1}' >> $file
+          echo "void main(){}" >> $file
+          echo "\n"
+          cat $file
+          echo "\n"
+
       - name: Test
-        run: flutter test
+        run: flutter test --coverage
+
+      # As we don't use file generation, it is fine to include everything.
+      # - name: Install lcov
+      #   run: sudo apt-get install -y lcov
+      #
+      # - name: Remove generated files from coverage results
+      #   run: |
+      #     lcov --remove coverage/lcov.info \
+      #     'lib/*/*freezed.dart' \
+      #     'lib/*/*.g.dart' \
+      #     'lib/*/*.part.dart' \
+      #     'lib/generated/*.dart' \
+      #     'lib/generated/*/*.dart' -o coverage/lcov.info
+
+      - name: Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
