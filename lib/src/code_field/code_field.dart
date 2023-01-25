@@ -134,6 +134,7 @@ class CodeField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool lineNumbers;
   final bool showErrors;
+  final bool showNumbers;
   const CodeField(
       {super.key,
       required this.controller,
@@ -154,7 +155,8 @@ class CodeField extends StatefulWidget {
       this.focusNode,
       this.onChanged,
       this.lineNumbers = true,
-      this.showErrors = true});
+      this.showErrors = true,
+      this.showNumbers = true});
 
   @override
   State<CodeField> createState() => _CodeFieldState();
@@ -331,6 +333,7 @@ class _CodeFieldState extends State<CodeField> {
         codeController: widget.controller,
         style: lineNumberStyle,
         showErrors: widget.showErrors,
+        showNumbers: widget.showNumbers,
       );
     }
 

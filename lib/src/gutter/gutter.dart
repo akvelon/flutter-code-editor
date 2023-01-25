@@ -13,14 +13,17 @@ const _issueColumn = 1;
 const _foldingColumn = 2;
 
 class GutterWidget extends StatelessWidget {
-  const GutterWidget(
-      {required this.codeController,
-      required this.style,
-      required this.showErrors});
+  const GutterWidget({
+    required this.codeController,
+    required this.style,
+    required this.showErrors,
+    required this.showNumbers,
+  });
 
   final CodeController codeController;
   final LineNumberStyle style;
   final bool showErrors;
+  final bool showNumbers;
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -36,11 +39,13 @@ class GutterWidget extends StatelessWidget {
       for (final i in code.hiddenLineRanges.visibleLineNumbers)
         TableRow(
           children: [
-            Text(
-              '${i + 1}',
-              style: style.textStyle,
-              textAlign: style.textAlign,
-            ),
+            if (showNumbers)
+              Text(
+                '${i + 1}',
+                style: style.textStyle,
+                textAlign: style.textAlign,
+              ),
+            if (!showNumbers) const SizedBox(),
             const SizedBox(),
             const SizedBox(),
           ],
@@ -55,10 +60,11 @@ class GutterWidget extends StatelessWidget {
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
       width: style.width,
       child: Table(
-        columnWidths: const {
-          _lineNumberColumn: FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(_issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
+        columnWidths: {
+          _lineNumberColumn:
+              showNumbers ? const FlexColumnWidth() : const FixedColumnWidth(0),
+          _issueColumn: FixedColumnWidth(showErrors ? _issueColumnWidth : 0),
+          _foldingColumn: const FixedColumnWidth(_foldingColumnWidth),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
