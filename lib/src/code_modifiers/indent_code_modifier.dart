@@ -19,10 +19,7 @@ class IndentModifier extends CodeModifier {
     EditorParams params,
   ) {
     var spacesCount = 0;
-    var braceCount = 0;
-
-    final indexOfLastChar = sel.start - 1;
-    final lastchar = indexOfLastChar >= 0 ? text[indexOfLastChar] : null;
+    String? lastChar;
 
     for (var k = min(sel.start, text.length) - 1; k >= 0; k--) {
       if (text[k] == '\n') {
@@ -32,19 +29,12 @@ class IndentModifier extends CodeModifier {
       if (text[k] == ' ') {
         spacesCount += 1;
       } else {
+        lastChar ??= text[k];
         spacesCount = 0;
-      }
-
-      if (text[k] == '{') {
-        braceCount += 1;
-      } else if (text[k] == '}') {
-        braceCount -= 1;
       }
     }
 
-    if (braceCount > 0) {
-      spacesCount += params.tabSpaces;
-    } else if (lastchar == ':') {
+    if (lastChar == ':' || lastChar == '{') {
       spacesCount += params.tabSpaces;
     }
 
