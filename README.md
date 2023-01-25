@@ -2,6 +2,7 @@
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_code_editor)](https://pub.dev/packages/flutter_code_editor)
 [![CodeFactor](https://img.shields.io/codefactor/grade/github/akvelon/flutter-code-editor?style=flat-square)](https://www.codefactor.io/repository/github/akvelon/flutter-code-editor)
+[![codecov](https://codecov.io/gh/akvelon/flutter-code-editor/branch/main/graph/badge.svg?token=3IL0R2PK2Y)](https://codecov.io/gh/akvelon/flutter-code-editor)
 
 Flutter Code Editor is a multi-platform code editor supporting:
 
