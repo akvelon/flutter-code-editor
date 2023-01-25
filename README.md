@@ -15,6 +15,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 
 ![main](https://user-images.githubusercontent.com/79095619/213679642-c6f7f200-224c-4437-b739-63e2794f1f42.gif)
 
+
 ## Basic Usage
 
 ```dart
@@ -209,9 +210,10 @@ To change a partially locked controller, set the `fullText` property.
   <summary>Epilepsy warning! Example gif:</summary>
 
 
-![cleaner-readonly](https://user-images.githubusercontent.com/79095619/213762470-683e6304-681f-4292-80a2-67d8ec88cde6.gif)
+![readonly-blocks-example](https://user-images.githubusercontent.com/79095619/213762470-683e6304-681f-4292-80a2-67d8ec88cde6.gif)
   
 </details>
+
 
 ## Advanced Code Blocks Folding
 
@@ -314,32 +316,26 @@ Autocompletion currently cannot be disabled.
 ![suggestions](https://user-images.githubusercontent.com/79095619/213680153-38f5df12-8304-480b-aae2-37e6df1433f2.gif)
 
 
-## Modification of the selected lines
+## Shortcuts
 
-Sometimes it is useful to perform some operation on the selected lines.
-The CodeEditor exposes an API for that purpose through the `modifySelectedLines` method inside `CodeController`
+Most editors have certain shortcuts to help developers with writing the code. The following are the shortcuts, supported by CodeEditor:
 
-```dart
-controller.modifySelectedLines((line) {
-  return line.toUpperCase(); // performs modification on each line
-});
-```
-
-On the basis of the method, basic shortcuts are added to the `CodeEditor`:
 - Indent (Tab)
 - Outdent (Shift-Tab)
-<img src="https://user-images.githubusercontent.com/79095619/213770852-9c0855cb-b8fc-4f40-b33a-380f77c90a0f.gif" width="50%">
+
+![indent-outdent-example](https://user-images.githubusercontent.com/79095619/213770852-9c0855cb-b8fc-4f40-b33a-380f77c90a0f.gif)
 
 - Comment out (Control-/)
 - Uncomment (Control-/)
-<img src="https://user-images.githubusercontent.com/79095619/213770876-829dda06-87b3-4242-9d0e-d26f05090abf.gif" width="50%">
 
-Note: if there is any readonly line inside selection, the method invokation will have no effect.
+![comment-out-uncomment-example](https://user-images.githubusercontent.com/79095619/213770876-829dda06-87b3-4242-9d0e-d26f05090abf.gif)
+
 
 ## Migration Guides
 
 - [Migrating from code_text_field to 0.1](https://github.com/akvelon/flutter-code-editor/blob/main/doc/migrating/0.1.md)
 - [Migrating from 0.1 to 0.2](https://github.com/akvelon/flutter-code-editor/blob/main/doc/migrating/0.2.md)
+
 
 ## Contact Us
 
