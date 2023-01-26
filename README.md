@@ -13,7 +13,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Themes,
 - And many other features.
 
-![Basic example](https://user-images.githubusercontent.com/79095619/213679642-c6f7f200-224c-4437-b739-63e2794f1f42.gif)
+![Basic example](example/images/main.gif)
 
 
 ## Basic Usage
@@ -93,7 +93,7 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 - Python
 - Scala
 
-![Foldable blocks example](https://user-images.githubusercontent.com/79095619/213679862-a307333b-d73e-4fc2-99f8-442550e43781.gif)
+![Foldable blocks example](example/images/foldable_blocks_example.gif)
 
 Code blocks folding may support other languages in experimental mode.
 
@@ -206,7 +206,7 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
-![Readonly blocks example](https://user-images.githubusercontent.com/79095619/214567798-14b03e32-8b57-4c7d-8e98-7ffb9a4325f5.gif)
+![Readonly blocks example](example/images/readonly-sections-example.gif)
 
 
 ## Advanced Code Blocks Folding
@@ -307,22 +307,20 @@ when exploring classes and methods.
 
 Autocompletion currently cannot be disabled.
 
-![Suggestions example](https://user-images.githubusercontent.com/79095619/213680153-38f5df12-8304-480b-aae2-37e6df1433f2.gif)
+![Suggestions example](example/images/suggestions_example.gif)
 
 
 ## Shortcuts
 
-Most editors have certain shortcuts to help developers with writing the code. The following are the shortcuts, supported by CodeEditor:
-
 - Indent (Tab)
 - Outdent (Shift-Tab)
 
-![indent outdent example](https://user-images.githubusercontent.com/79095619/213770852-9c0855cb-b8fc-4f40-b33a-380f77c90a0f.gif)
+![indent outdent example](example/images/tab-shift-tab_example.gif)
 
 - Comment out (Control-/)
 - Uncomment (Control-/)
 
-![comment out uncomment example](https://user-images.githubusercontent.com/79095619/213770876-829dda06-87b3-4242-9d0e-d26f05090abf.gif)
+![comment out uncomment example](example/images/comment_out_example.gif)
 
 
 ## Migration Guides
