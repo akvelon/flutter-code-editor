@@ -197,7 +197,10 @@ void main() {
           const TextEditingValue(
             text: 'abc\nro\nro\nabc\n',
             //        \ cursor
-            selection: TextSelection.collapsed(offset: 3),
+            selection: TextSelection.collapsed(
+              offset: 3,
+              affinity: TextAffinity.upstream,
+            ),
           ),
           reason: 'Delete EOL before readonly - No effect',
         );
