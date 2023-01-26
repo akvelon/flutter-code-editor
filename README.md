@@ -14,7 +14,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Themes,
 - And many other features.
 
-![Basic Example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/factorial.png)
+![Basic example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/main.gif)
 
 
 ## Basic Usage
@@ -93,6 +93,8 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 - Java
 - Python
 - Scala
+
+![Foldable blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/foldable_blocks_example.gif)
 
 Code blocks folding may support other languages in experimental mode.
 
@@ -205,6 +207,8 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
+![Readonly blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/readonly-sections-example.gif)
+
 
 ## Advanced Code Blocks Folding
 
@@ -303,6 +307,21 @@ the method the user is typing. This feature is meant to simplify typing but not 
 when exploring classes and methods.
 
 Autocompletion currently cannot be disabled.
+
+![Suggestions example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/suggestions_example.gif)
+
+
+## Shortcuts
+
+- Indent (Tab)
+- Outdent (Shift-Tab)
+
+![indent outdent example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/tab-shift-tab_example.gif)
+
+- Comment out (Control-/)
+- Uncomment (Control-/)
+
+![comment out uncomment example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/comment_out_example.gif)
 
 
 ## Migration Guides
