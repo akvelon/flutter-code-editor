@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_returning_this
+
 import 'dart:math';
 
 import 'package:collection/collection.dart';
