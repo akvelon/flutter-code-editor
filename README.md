@@ -13,7 +13,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Themes,
 - And many other features.
 
-![Basic example](example/images/main.gif)
+![Basic example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/main.gif)
 
 
 ## Basic Usage
@@ -93,7 +93,7 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 - Python
 - Scala
 
-![Foldable blocks example](example/images/foldable_blocks_example.gif)
+![Foldable blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/foldable_blocks_example.gif)
 
 Code blocks folding may support other languages in experimental mode.
 
@@ -206,7 +206,7 @@ and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
 
-![Readonly blocks example](example/images/readonly-sections-example.gif)
+![Readonly blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/readonly-sections-example.gif)
 
 
 ## Advanced Code Blocks Folding
@@ -307,7 +307,7 @@ when exploring classes and methods.
 
 Autocompletion currently cannot be disabled.
 
-![Suggestions example](example/images/suggestions_example.gif)
+![Suggestions example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/suggestions_example.gif)
 
 
 ## Shortcuts
@@ -315,12 +315,12 @@ Autocompletion currently cannot be disabled.
 - Indent (Tab)
 - Outdent (Shift-Tab)
 
-![indent outdent example](example/images/tab-shift-tab_example.gif)
+![indent outdent example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/tab-shift-tab_example.gif)
 
 - Comment out (Control-/)
 - Uncomment (Control-/)
 
-![comment out uncomment example](example/images/comment_out_example.gif)
+![comment out uncomment example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/comment_out_example.gif)
 
 
 ## Migration Guides
