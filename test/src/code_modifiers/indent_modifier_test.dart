@@ -7,217 +7,58 @@ void main() {
     const examples = [
       //
       _Example(
-        r'`:` is right before `\n`',
-        initialValue: TextEditingValue(
-          text: '''
-aaa:
-''',
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        editedValue: TextEditingValue(
-          text: '''
-aaa:
-
-''',
-          selection: TextSelection.collapsed(offset: 5),
-        ),
-        expected: TextEditingValue(
-          text: '''
-aaa:
-  
-''',
-          selection: TextSelection.collapsed(offset: 7),
-        ),
-      ),
-
-      _Example(
-        '`:` is in the middle of the line',
-        initialValue: TextEditingValue(
-          text: '''
-{'a' : 'a'}
-''',
-          selection: TextSelection.collapsed(offset: 11),
-        ),
-        editedValue: TextEditingValue(
-          text: '''
-{'a' : 'a'}
-
-''',
-          selection: TextSelection.collapsed(offset: 12),
-        ),
-        expected: TextEditingValue(
-          text: '''
-{'a' : 'a'}
-
-''',
-          selection: TextSelection.collapsed(offset: 12),
-        ),
-      ),
-
-      _Example(
-        r'`{` is right before `\n`',
-        initialValue: TextEditingValue(
-          text: '''
-a{
-''',
-          selection: TextSelection.collapsed(offset: 2),
-        ),
-        editedValue: TextEditingValue(
-          text: '''
-a{
-
-''',
-          selection: TextSelection.collapsed(offset: 3),
-        ),
-        expected: TextEditingValue(
-          text: '''
-a{
-  
-''',
-          selection: TextSelection.collapsed(offset: 5),
-        ),
-      ),
-
-      _Example(
-        '`{` char is in the middle of the line',
-        initialValue: TextEditingValue(
-          text: '''
-a{a
-''',
-          selection: TextSelection.collapsed(offset: 3),
-        ),
-        editedValue: TextEditingValue(
-          text: '''
-a{a
-
-''',
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        expected: TextEditingValue(
-          text: '''
-a{a
-
-''',
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-      ),
-
-      _Example(
-        r'There are spaces between `:` and `\n`',
-        initialValue: TextEditingValue(
-          text: '''
-a:  
-''',
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        editedValue: TextEditingValue(
-          text: '''
-a:  
-
-''',
-          selection: TextSelection.collapsed(offset: 5),
-        ),
-        expected: TextEditingValue(
-          text: '''
-a:  
-  
-''',
-          selection: TextSelection.collapsed(offset: 7),
-        ),
-      ),
-
-      _Example(
-        r'There are spaces between `{` and `\n`',
-        initialValue: TextEditingValue(
-          text: '''
-a{  
-''',
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        editedValue: TextEditingValue(
-          text: '''
-a{  
-
-''',
-          selection: TextSelection.collapsed(offset: 5),
-        ),
-        expected: TextEditingValue(
-          text: '''
-a{  
-  
-''',
-          selection: TextSelection.collapsed(offset: 7),
-        ),
-      ),
-
-      _Example(
         r'`:` and `{` are on the same line `\n`',
         initialValue: TextEditingValue(
-          text: '''
-a{:  
-''',
-          selection: TextSelection.collapsed(offset: 5),
+          text: 'a{:',
+          //        \ cursor
+          selection: TextSelection.collapsed(offset: 3),
         ),
         editedValue: TextEditingValue(
-          text: '''
-a{:  
-
-''',
-          selection: TextSelection.collapsed(offset: 6),
+          text: 'a{:\n',
+          //          \ cursor
+          selection: TextSelection.collapsed(offset: 4),
         ),
         expected: TextEditingValue(
-          text: '''
-a{:  
-  
-''',
-          selection: TextSelection.collapsed(offset: 8),
+          text: 'a{:\n__',
+          //            \ cursor
+          selection: TextSelection.collapsed(offset: 6),
         ),
       ),
 
       _Example(
         'Preserves indentation of the previous line',
         initialValue: TextEditingValue(
-          text: '''
-  a
-''',
+          text: '__a',
+          //        \ cursor
           selection: TextSelection.collapsed(offset: 3),
         ),
         editedValue: TextEditingValue(
-          text: '''
-  a
-
-''',
+          text: '__a\n',
+          //          \ cursor
           selection: TextSelection.collapsed(offset: 4),
         ),
         expected: TextEditingValue(
-          text: '''
-  a
-  
-''',
+          text: '__a\n__',
+          //            \ cursor
           selection: TextSelection.collapsed(offset: 6),
         ),
       ),
 
       _Example(
-        'Indentation for `:` is added to the previous indentation',
+        '`:` adds indentation to the previous indentation',
         initialValue: TextEditingValue(
-          text: '''
-  a:
-''',
+          text: '__a:',
+          //         \ cursor
           selection: TextSelection.collapsed(offset: 4),
         ),
         editedValue: TextEditingValue(
-          text: '''
-  a:
-
-''',
+          text: '__a:\n',
+          //           \ cursor
           selection: TextSelection.collapsed(offset: 5),
         ),
         expected: TextEditingValue(
-          text: '''
-  a:
-    
-''',
+          text: '__a:\n____',
+          //               \ cursor
           selection: TextSelection.collapsed(offset: 9),
         ),
       ),
@@ -225,23 +66,18 @@ a{:
       _Example(
         'Indentation for `{` is added to the previous indentation',
         initialValue: TextEditingValue(
-          text: '''
-  a{
-''',
+          text: '__a{',
+          //         \ cursor
           selection: TextSelection.collapsed(offset: 4),
         ),
         editedValue: TextEditingValue(
-          text: '''
-  a{
-
-''',
+          text: '__a{\n',
+          //           \ cursor
           selection: TextSelection.collapsed(offset: 5),
         ),
         expected: TextEditingValue(
-          text: '''
-  a{
-    
-''',
+          text: '__a{\n____',
+          //               \ cursor
           selection: TextSelection.collapsed(offset: 9),
         ),
       ),
@@ -249,13 +85,19 @@ a{:
 
     for (final example in examples) {
       final controller = CodeController();
-      controller.value = example.initialValue;
+      controller.value = example.initialValue.copyWith(
+        text: example.initialValue.text.replaceAll('_', ' '),
+      );
 
-      controller.value = example.editedValue;
+      controller.value = example.editedValue.copyWith(
+        text: example.editedValue.text.replaceAll('_', ' '),
+      );
 
       expect(
         controller.value,
-        example.expected,
+        example.expected.copyWith(
+          text: example.expected.text.replaceAll('_', ' '),
+        ),
         reason: example.name,
       );
     }
