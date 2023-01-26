@@ -7,101 +7,6 @@ void main() {
     const examples = [
       //
       _Example(
-        '`:` is in the middle of the line',
-        initialValue: TextEditingValue(
-          text: 'a:a',
-          //        \ cursor
-          selection: TextSelection.collapsed(offset: 3),
-        ),
-        editedValue: TextEditingValue(
-          text: 'a:a\n',
-          //          \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        expected: TextEditingValue(
-          text: 'a:a\n',
-          //            \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-      ),
-
-      _Example(
-        '`{` is in the middle of the line',
-        initialValue: TextEditingValue(
-          text: 'a{a',
-          //        \ cursor
-          selection: TextSelection.collapsed(offset: 3),
-        ),
-        editedValue: TextEditingValue(
-          text: 'a{a\n',
-          //          \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        expected: TextEditingValue(
-          text: 'a{a\n',
-          //            \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-      ),
-
-      _Example(
-        'There are spaces after `:`',
-        initialValue: TextEditingValue(
-          text: 'a:__',
-          //        \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        editedValue: TextEditingValue(
-          text: 'a:__\n',
-          //          \ cursor
-          selection: TextSelection.collapsed(offset: 5),
-        ),
-        expected: TextEditingValue(
-          text: 'a:__\n__',
-          //            \ cursor
-          selection: TextSelection.collapsed(offset: 7),
-        ),
-      ),
-
-      _Example(
-        'There are spaces after `{`',
-        initialValue: TextEditingValue(
-          text: 'a{__',
-          //        \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        editedValue: TextEditingValue(
-          text: 'a{__\n',
-          //          \ cursor
-          selection: TextSelection.collapsed(offset: 5),
-        ),
-        expected: TextEditingValue(
-          text: 'a{__\n__',
-          //            \ cursor
-          selection: TextSelection.collapsed(offset: 7),
-        ),
-      ),
-
-      _Example(
-        r'`:` and `{` are on the same line `\n`',
-        initialValue: TextEditingValue(
-          text: 'a{:',
-          //        \ cursor
-          selection: TextSelection.collapsed(offset: 3),
-        ),
-        editedValue: TextEditingValue(
-          text: 'a{:\n',
-          //          \ cursor
-          selection: TextSelection.collapsed(offset: 4),
-        ),
-        expected: TextEditingValue(
-          text: 'a{:\n__',
-          //            \ cursor
-          selection: TextSelection.collapsed(offset: 6),
-        ),
-      ),
-
-      _Example(
         'Preserves indentation of the previous line',
         initialValue: TextEditingValue(
           text: '__a',
@@ -140,7 +45,7 @@ void main() {
       ),
 
       _Example(
-        'Indentation for `{` is added to the previous indentation',
+        '`{` adds indentation to the previous indentation',
         initialValue: TextEditingValue(
           text: '__a{',
           //         \ cursor
@@ -155,6 +60,101 @@ void main() {
           text: '__a{\n____',
           //               \ cursor
           selection: TextSelection.collapsed(offset: 9),
+        ),
+      ),
+
+      _Example(
+        '`:` is in the middle of the line',
+        initialValue: TextEditingValue(
+          text: '__a:a',
+          //          \ cursor
+          selection: TextSelection.collapsed(offset: 5),
+        ),
+        editedValue: TextEditingValue(
+          text: '__a:a\n',
+          //            \ cursor
+          selection: TextSelection.collapsed(offset: 6),
+        ),
+        expected: TextEditingValue(
+          text: '__a:a\n__',
+          //              \ cursor
+          selection: TextSelection.collapsed(offset: 8),
+        ),
+      ),
+
+      _Example(
+        '`{` is in the middle of the line',
+        initialValue: TextEditingValue(
+          text: '__a{a',
+          //          \ cursor
+          selection: TextSelection.collapsed(offset: 5),
+        ),
+        editedValue: TextEditingValue(
+          text: '__a{a\n',
+          //            \ cursor
+          selection: TextSelection.collapsed(offset: 6),
+        ),
+        expected: TextEditingValue(
+          text: '__a{a\n__',
+          //              \ cursor
+          selection: TextSelection.collapsed(offset: 8),
+        ),
+      ),
+
+      _Example(
+        'There are spaces after `:`',
+        initialValue: TextEditingValue(
+          text: '__a:__',
+          //           \ cursor
+          selection: TextSelection.collapsed(offset: 6),
+        ),
+        editedValue: TextEditingValue(
+          text: '__a:__\n',
+          //             \ cursor
+          selection: TextSelection.collapsed(offset: 7),
+        ),
+        expected: TextEditingValue(
+          text: '__a:__\n____',
+          //                 \ cursor
+          selection: TextSelection.collapsed(offset: 11),
+        ),
+      ),
+
+      _Example(
+        'There are spaces after `{`',
+        initialValue: TextEditingValue(
+          text: '__a{__',
+          //           \ cursor
+          selection: TextSelection.collapsed(offset: 6),
+        ),
+        editedValue: TextEditingValue(
+          text: '__a{__\n',
+          //             \ cursor
+          selection: TextSelection.collapsed(offset: 7),
+        ),
+        expected: TextEditingValue(
+          text: '__a{__\n____',
+          //                 \ cursor
+          selection: TextSelection.collapsed(offset: 11),
+        ),
+      ),
+
+      _Example(
+        r'`:` and `{` are on the same line `\n`',
+        initialValue: TextEditingValue(
+          text: 'a{:',
+          //        \ cursor
+          selection: TextSelection.collapsed(offset: 3),
+        ),
+        editedValue: TextEditingValue(
+          text: 'a{:\n',
+          //          \ cursor
+          selection: TextSelection.collapsed(offset: 4),
+        ),
+        expected: TextEditingValue(
+          text: 'a{:\n__',
+          //            \ cursor
+          selection: TextSelection.collapsed(offset: 6),
         ),
       ),
     ];
