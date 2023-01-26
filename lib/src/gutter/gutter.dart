@@ -19,7 +19,7 @@ class GutterWidget extends StatelessWidget {
   });
 
   final CodeController codeController;
-  final LineNumberStyle style;
+  final GutterStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -32,23 +32,40 @@ class GutterWidget extends StatelessWidget {
   Widget _buildOnChange(BuildContext context, Widget? child) {
     final code = codeController.code;
 
-    final tableRows = [
-      for (final i in code.hiddenLineRanges.visibleLineNumbers)
-        TableRow(
-          children: [
-            Text(
-              '${i + 1}',
-              style: style.textStyle,
-              textAlign: style.textAlign,
-            ),
-            const SizedBox(),
-            const SizedBox(),
-          ],
-        ),
-    ];
+    final tableRows = List.generate(
+      code.hiddenLineRanges.visibleLineNumbers.length,
+      (i) => TableRow(
+        children: [
+          SizedBox(),
+          SizedBox(),
+          SizedBox(),
+        ],
+      ),
+    );
+    //     [
+    //   for (final i in code.hiddenLineRanges.visibleLineNumbers)
+    //     const TableRow(
+    //       children: [
+    //         // Text(
+    //         //   '${i + 1}',
+    //         //   style: style.textStyle,
+    //         //   textAlign: style.textAlign,
+    //         // ),
+    //         SizedBox(),
+    //         SizedBox(),
+    //         SizedBox(),
+    //       ],
+    //     ),
+    // ];
 
-    _fillIssues(tableRows);
-    _fillFoldToggles(tableRows);
+    _fillLineNumbers(tableRows, style.showLineNumbers);
+
+    if (style.showErrors) {
+      _fillIssues(tableRows);
+    }
+    if (style.showFoldingHandles) {
+      _fillFoldToggles(tableRows);
+    }
 
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
@@ -63,6 +80,24 @@ class GutterWidget extends StatelessWidget {
         children: tableRows,
       ),
     );
+  }
+
+  void _fillLineNumbers(List<TableRow> tableRows, bool showLineNumbers) {
+    final code = codeController.code;
+
+    for (final i in code.hiddenLineRanges.visibleLineNumbers) {
+      final lineIndex = _lineIndexToTableRowIndex(i);
+
+      if (lineIndex == null) {
+        continue;
+      }
+
+      tableRows[lineIndex].children![_lineNumberColumn] = Text(
+        showLineNumbers ? '${i + 1}' : ' ',
+        style: style.textStyle,
+        textAlign: style.textAlign,
+      );
+    }
   }
 
   void _fillIssues(List<TableRow> tableRows) {

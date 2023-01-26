@@ -54,10 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
               focusNode: _codeFieldFocusNode,
               controller: _codeController,
               textStyle: const TextStyle(fontFamily: 'SourceCode'),
-              lineNumberStyle: const LineNumberStyle(
+              gutterStyle: const GutterStyle(
                 textStyle: TextStyle(
                   color: Colors.purple,
                 ),
+                showLineNumbers: false,
               ),
             ),
           ),
