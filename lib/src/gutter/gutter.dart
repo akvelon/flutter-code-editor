@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../code_field/code_controller.dart';
-import '../line_numbers/line_number_style.dart';
 import 'error.dart';
 import 'fold_toggle.dart';
+import 'gutter_style.dart';
 
 const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;

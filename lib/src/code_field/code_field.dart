@@ -7,7 +7,7 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../code_theme/code_theme.dart';
 import '../gutter/gutter.dart';
-import '../line_numbers/line_number_style.dart';
+import '../gutter/gutter_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
