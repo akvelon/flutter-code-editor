@@ -5,15 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
-import '../code_theme/code_theme.dart';
+import '../../flutter_code_editor.dart';
 import '../gutter/gutter.dart';
-import '../gutter/gutter_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
-import 'code_controller.dart';
 
 final _shortcuts = <ShortcutActivator, Intent>{
   // Copy

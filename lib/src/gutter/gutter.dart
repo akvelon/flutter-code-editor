@@ -4,10 +4,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../code_field/code_controller.dart';
+import '../../flutter_code_editor.dart';
 import 'error.dart';
 import 'fold_toggle.dart';
-import 'gutter_style.dart';
 
 const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;
