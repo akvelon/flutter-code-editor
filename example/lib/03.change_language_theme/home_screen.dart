@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
+  final _isSelected = [false, false, false];
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
@@ -31,6 +32,23 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Code Editor by Akvelon'),
         actions: [
+          ToggleButtons(
+            isSelected: _isSelected,
+            onPressed: (index) => setState(() {
+              _isSelected[index] = !_isSelected[index];
+            }),
+            color: Colors.grey,
+            selectedBorderColor: Colors.white,
+            selectedColor: Colors.white,
+            children: const [
+              Icon(Icons.numbers),
+              Icon(Icons.cancel),
+              Icon(
+                Icons.chevron_right,
+              ),
+            ],
+          ),
+          const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setLanguage,
             icon: Icons.code,
@@ -44,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _theme,
             values: themeList,
           ),
+          const SizedBox(width: 20),
         ],
       ),
       body: ListView(
@@ -54,10 +73,13 @@ class _HomeScreenState extends State<HomeScreen> {
               focusNode: _codeFieldFocusNode,
               controller: _codeController,
               textStyle: const TextStyle(fontFamily: 'SourceCode'),
-              gutterStyle: const GutterStyle(
-                textStyle: TextStyle(
+              gutterStyle: GutterStyle(
+                textStyle: const TextStyle(
                   color: Colors.purple,
                 ),
+                showLineNumbers: _isSelected[0],
+                showErrors: _isSelected[1],
+                showFoldingHandles: _isSelected[2],
               ),
             ),
           ),
