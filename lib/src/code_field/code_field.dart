@@ -106,7 +106,6 @@ class CodeField extends StatefulWidget {
   /// language highlight, themeing and modifiers.
   final CodeController controller;
 
-  /// A LineNumberStyle instance to tweak the line number column styling
   @Deprecated('Use gutterStyle instead')
   final GutterStyle lineNumberStyle;
 
