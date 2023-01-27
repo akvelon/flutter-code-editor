@@ -1,3 +1,13 @@
+## 0.2.9
+
+* Hiding line numbers, errors, and folding handles ([Issue 159](https://github.com/akvelon/flutter-code-editor/issues/159)).
+* Indent new line after `:` in Python ([Issue 135](https://github.com/akvelon/flutter-code-editor/issues/135)).
+* Track the test coverage, add the codecov badge ([Issue 146](https://github.com/akvelon/flutter-code-editor/issues/146)).
+* Do not pale the editor if a visible section is set ([Issue 153](https://github.com/akvelon/flutter-code-editor/pull/153)).
+* Added GIFs to README ([Issue 148](https://github.com/akvelon/flutter-code-editor/issues/148)).
+* Fixed 'Index out of range' exception with visible sections on the default factorial example ([Issue 152](https://github.com/akvelon/flutter-code-editor/issues/152)).
+* Fixed linter issues ([Issue 147](https://github.com/akvelon/flutter-code-editor/issues/147)).
+
 ## 0.2.8
 
 * Java fallback parser preserves foldable blocks if `highlight` fails ([Issue 48](https://github.com/akvelon/flutter-code-editor/issues/48)).
