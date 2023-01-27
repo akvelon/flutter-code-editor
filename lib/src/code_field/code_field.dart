@@ -164,13 +164,7 @@ class CodeField extends StatefulWidget {
             'Can not provide gutterStyle and lineNumbers at the same time. '
             'Please use gutterStyle and provide necessary columns to show/hide'),
         gutterStyle = gutterStyle ??
-            ((lineNumbers ?? true)
-                ? lineNumberStyle
-                : const GutterStyle(
-                    showErrors: false,
-                    showFoldingHandles: false,
-                    showLineNumbers: false,
-                  ));
+            ((lineNumbers == false) ? GutterStyle.none : lineNumberStyle);
 
   @override
   State<CodeField> createState() => _CodeFieldState();

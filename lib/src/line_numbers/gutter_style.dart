@@ -17,21 +17,22 @@ class GutterStyle {
   /// half the opacity.
   final TextStyle? textStyle;
 
-  /// Background of the line number column
+  /// Background of the line number column.
   final Color? background;
 
   /// Central horizontal margin between the numbers and the code.
   final double margin;
 
-  /// Whether to show line numbers column
+  /// Whether to show line numbers column.
   final bool showLineNumbers;
 
-  /// Whether to show errors column
+  /// Whether to show errors column.
   final bool showErrors;
 
-  /// Whether to show folding handles column
+  /// Whether to show folding handles column.
   final bool showFoldingHandles;
 
+  /// Whether there is any column to show in gutter.
   bool get showGutter => showLineNumbers || showErrors || showFoldingHandles;
 
   const GutterStyle({
@@ -44,6 +45,12 @@ class GutterStyle {
     this.background,
     this.textStyle,
   });
+
+  static const GutterStyle none = GutterStyle(
+    showErrors: false,
+    showFoldingHandles: false,
+    showLineNumbers: false,
+  );
 
   GutterStyle copyWith({
     TextStyle? textStyle,
