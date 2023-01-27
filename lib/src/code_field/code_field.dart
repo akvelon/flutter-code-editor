@@ -306,11 +306,6 @@ class _CodeFieldState extends State<CodeField> {
 
   @override
   Widget build(BuildContext context) {
-    final showLineNumbers = widget.gutterStyle.showLineNumbers;
-    final showErrors = widget.gutterStyle.showErrors;
-    final showFoldingHandles = widget.gutterStyle.showFoldingHandles;
-    final showAnyGutter = showLineNumbers || showErrors || showFoldingHandles;
-
     // Default color scheme
     const rootKey = 'root';
     final defaultBg = Colors.grey.shade900;
@@ -348,7 +343,7 @@ class _CodeFieldState extends State<CodeField> {
     );
 
     Widget? gutter;
-    if (showAnyGutter) {
+    if (gutterStyle.showGutter) {
       gutter = GutterWidget(
         codeController: widget.controller,
         style: gutterStyle,
