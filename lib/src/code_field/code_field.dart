@@ -7,7 +7,7 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../code_theme/code_theme.dart';
 import '../gutter/gutter.dart';
-import '../line_numbers/line_number_style.dart';
+import '../line_numbers/gutter_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
@@ -106,8 +106,8 @@ class CodeField extends StatefulWidget {
   /// language highlight, themeing and modifiers.
   final CodeController controller;
 
-  /// A LineNumberStyle instance to tweak the line number column styling
-  final LineNumberStyle lineNumberStyle;
+  @Deprecated('Use gutterStyle instead')
+  final GutterStyle lineNumberStyle;
 
   /// {@macro flutter.widgets.textField.cursorColor}
   final Color? cursorColor;
@@ -132,7 +132,11 @@ class CodeField extends StatefulWidget {
   final Decoration? decoration;
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
-  final bool lineNumbers;
+
+  @Deprecated('Use gutterStyle instead')
+  final bool? lineNumbers;
+
+  final GutterStyle gutterStyle;
 
   const CodeField({
     super.key,
@@ -145,7 +149,7 @@ class CodeField extends StatefulWidget {
     this.decoration,
     this.textStyle,
     this.padding = EdgeInsets.zero,
-    this.lineNumberStyle = const LineNumberStyle(),
+    GutterStyle? gutterStyle,
     this.enabled,
     this.readOnly = false,
     this.cursorColor,
@@ -153,8 +157,15 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
-    this.lineNumbers = true,
-  });
+    @Deprecated('Use gutterStyle instead') this.lineNumbers,
+    @Deprecated('Use gutterStyle instead')
+        this.lineNumberStyle = const GutterStyle(),
+  })  : assert(
+            gutterStyle == null || lineNumbers == null,
+            'Can not provide gutterStyle and lineNumbers at the same time. '
+            'Please use gutterStyle and provide necessary columns to show/hide'),
+        gutterStyle = gutterStyle ??
+            ((lineNumbers == false) ? GutterStyle.none : lineNumberStyle);
 
   @override
   State<CodeField> createState() => _CodeFieldState();
@@ -310,26 +321,25 @@ class _CodeFieldState extends State<CodeField> {
     textStyle = defaultTextStyle.merge(widget.textStyle);
 
     final lineNumberSize = textStyle.fontSize;
-    final lineNumberColor = widget.lineNumberStyle.textStyle?.color ??
-        textStyle.color?.withOpacity(.5);
+    final lineNumberColor =
+        widget.gutterStyle.textStyle?.color ?? textStyle.color?.withOpacity(.5);
 
     final lineNumberTextStyle =
-        (widget.lineNumberStyle.textStyle ?? textStyle).copyWith(
+        (widget.gutterStyle.textStyle ?? textStyle).copyWith(
       color: lineNumberColor,
       fontFamily: textStyle.fontFamily,
       fontSize: lineNumberSize,
     );
 
-    final lineNumberStyle = widget.lineNumberStyle.copyWith(
+    final gutterStyle = widget.gutterStyle.copyWith(
       textStyle: lineNumberTextStyle,
     );
 
-    Widget? numberCol;
-
-    if (widget.lineNumbers) {
-      numberCol = GutterWidget(
+    Widget? gutter;
+    if (gutterStyle.showGutter) {
+      gutter = GutterWidget(
         codeController: widget.controller,
-        style: lineNumberStyle,
+        style: gutterStyle,
       );
     }
 
@@ -376,11 +386,11 @@ class _CodeFieldState extends State<CodeField> {
         decoration: widget.decoration,
         color: backgroundCol,
         key: _codeFieldKey,
-        padding: !widget.lineNumbers ? const EdgeInsets.only(left: 8) : null,
+        padding: const EdgeInsets.only(left: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.lineNumbers && numberCol != null) numberCol,
+            if (gutter != null) gutter,
             Expanded(
               child: Stack(
                 children: [
