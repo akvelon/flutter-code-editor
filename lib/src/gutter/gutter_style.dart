@@ -59,6 +59,3 @@ class GutterStyle {
         showLineNumbers: showLineNumbers,
       );
 }
-
-@Deprecated('Renamed to GutterStyle')
-typedef LineNumberStyle = GutterStyle;

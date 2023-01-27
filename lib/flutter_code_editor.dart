@@ -22,6 +22,7 @@ export 'src/folding/foldable_block_type.dart';
 export 'src/folding/invalid_foldable_block.dart';
 export 'src/folding/parsers/highlight.dart';
 
+export 'src/gutter/gutter_style.dart';
 export 'src/line_numbers/line_number_style.dart';
 
 export 'src/named_sections/named_section.dart';

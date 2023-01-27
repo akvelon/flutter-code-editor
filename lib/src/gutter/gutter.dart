@@ -1,3 +1,7 @@
+// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables,
+// reason: to enable mutation on the objects later on.
+
 import 'package:flutter/material.dart';
 
 import '../code_field/code_controller.dart';
@@ -7,6 +11,8 @@ import 'gutter_style.dart';
 
 const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;
+
+const _padding = 5.0;
 
 const _lineNumberColumn = 0;
 const _issueColumn = 1;
@@ -42,23 +48,8 @@ class GutterWidget extends StatelessWidget {
         ],
       ),
     );
-    //     [
-    //   for (final i in code.hiddenLineRanges.visibleLineNumbers)
-    //     const TableRow(
-    //       children: [
-    //         // Text(
-    //         //   '${i + 1}',
-    //         //   style: style.textStyle,
-    //         //   textAlign: style.textAlign,
-    //         // ),
-    //         SizedBox(),
-    //         SizedBox(),
-    //         SizedBox(),
-    //       ],
-    //     ),
-    // ];
 
-    _fillLineNumbers(tableRows, style.showLineNumbers);
+    _fillLineNumbers(tableRows);
 
     if (style.showErrors) {
       _fillIssues(tableRows);
@@ -67,14 +58,22 @@ class GutterWidget extends StatelessWidget {
       _fillFoldToggles(tableRows);
     }
 
+    final gutterWidth = style.width -
+        (style.showErrors ? 0 : _issueColumnWidth) -
+        (style.showFoldingHandles ? 0 : _foldingColumnWidth);
+
+    final issueColumnWidth = style.showErrors ? _issueColumnWidth : _padding;
+    final foldingColumnWidth =
+        style.showFoldingHandles ? _foldingColumnWidth : _padding;
+
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
-      width: style.width,
+      width: style.showLineNumbers ? gutterWidth : null,
       child: Table(
-        columnWidths: const {
-          _lineNumberColumn: FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(_issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
+        columnWidths: {
+          _lineNumberColumn: const FlexColumnWidth(),
+          _issueColumn: FixedColumnWidth(issueColumnWidth),
+          _foldingColumn: FixedColumnWidth(foldingColumnWidth),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
@@ -82,7 +81,7 @@ class GutterWidget extends StatelessWidget {
     );
   }
 
-  void _fillLineNumbers(List<TableRow> tableRows, bool showLineNumbers) {
+  void _fillLineNumbers(List<TableRow> tableRows) {
     final code = codeController.code;
 
     for (final i in code.hiddenLineRanges.visibleLineNumbers) {
@@ -93,7 +92,7 @@ class GutterWidget extends StatelessWidget {
       }
 
       tableRows[lineIndex].children![_lineNumberColumn] = Text(
-        showLineNumbers ? '${i + 1}' : ' ',
+        style.showLineNumbers ? '${i + 1}' : ' ',
         style: style.textStyle,
         textAlign: style.textAlign,
       );
