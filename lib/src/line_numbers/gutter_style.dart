@@ -46,6 +46,10 @@ class GutterStyle {
     this.textStyle,
   });
 
+  /// Hides the gutter entirely.
+  ///
+  /// Use this instead of all-`false` because new elements can be added
+  /// to the gutter in the future versions.
   static const GutterStyle none = GutterStyle(
     showErrors: false,
     showFoldingHandles: false,

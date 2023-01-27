@@ -130,6 +130,33 @@ To use a custom theme, create a map of styles under the pre-defined class names.
 See [an example](https://github.com/git-touch/highlight.dart/blob/master/flutter_highlight/lib/themes/monokai-sublime.dart).
 
 
+## Hiding Line Numbers, Errors, and Folding Handles
+
+A lot of styling can be tuned with `GutterStyle` object passed to `CodeField` widget.
+See
+[the example](https://github.com/akvelon/flutter-code-editor/tree/main/example/lib/03.change_language_theme)
+that dynamically changes the properties listed here.
+
+```dart
+CodeField(
+  gutterStyle: GutterStyle(
+    showErrors: false,
+    showFoldingHandles: false,
+    showLineNumbers: false,
+  ),
+  // ...
+),
+```
+
+If you want to hide the entire gutter, use `GutterStyle.none` constant instead:
+
+```dart
+CodeField(
+  gutterStyle: GutterStyle.none,
+  // ...
+),
+```
+
 ## Accessing the Text
 
 `CodeController` extends the Flutter's built-in `TextEditingController` and is immediately
