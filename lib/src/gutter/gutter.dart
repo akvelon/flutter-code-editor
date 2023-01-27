@@ -1,7 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-// ignore_for_file: prefer_const_literals_to_create_immutables,
-// reason: to enable mutation on the objects later on.
-
 import 'package:flutter/material.dart';
 
 import '../../flutter_code_editor.dart';
@@ -45,11 +41,13 @@ class GutterWidget extends StatelessWidget {
 
     final tableRows = List.generate(
       code.hiddenLineRanges.visibleLineNumbers.length,
+      // ignore: prefer_const_constructors
       (i) => TableRow(
+        // ignore: prefer_const_literals_to_create_immutables
         children: [
-          SizedBox(),
-          SizedBox(),
-          SizedBox(),
+          const SizedBox(),
+          const SizedBox(),
+          const SizedBox(),
         ],
       ),
     );
