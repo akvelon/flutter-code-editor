@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: (index) => setState(() {
               _isSelected[index] = !_isSelected[index];
             }),
-            color: Colors.grey,
+            color: const Color.fromARGB(124, 255, 255, 255),
             selectedBorderColor: Colors.white,
             selectedColor: Colors.white,
             children: const [
