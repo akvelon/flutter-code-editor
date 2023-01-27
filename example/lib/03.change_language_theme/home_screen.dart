@@ -9,6 +9,9 @@ import 'widgets/dropdown_selector.dart';
 const _defaultLanguage = 'java';
 const _defaultTheme = 'monokai-sublime';
 
+const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
+const toggleButtonActiveColor = Colors.white;
+
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -17,7 +20,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
-  final _isSelected = [false, false, false];
+
+  bool _showNumbers = true;
+  bool _showErrors = true;
+  bool _showFoldingHandles = true;
+
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
@@ -32,21 +39,28 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Code Editor by Akvelon'),
         actions: [
-          ToggleButtons(
-            isSelected: _isSelected,
-            onPressed: (index) => setState(() {
-              _isSelected[index] = !_isSelected[index];
+          IconButton(
+            color: _showNumbers ? toggleButtonActiveColor : toggleButtonColor,
+            onPressed: () => setState(() {
+              _showNumbers = !_showNumbers;
             }),
-            color: const Color.fromARGB(124, 255, 255, 255),
-            selectedBorderColor: Colors.white,
-            selectedColor: Colors.white,
-            children: const [
-              Icon(Icons.numbers),
-              Icon(Icons.cancel),
-              Icon(
-                Icons.chevron_right,
-              ),
-            ],
+            icon: const Icon(Icons.numbers),
+          ),
+          IconButton(
+            color: _showErrors ? toggleButtonActiveColor : toggleButtonColor,
+            onPressed: () => setState(() {
+              _showErrors = !_showErrors;
+            }),
+            icon: const Icon(Icons.cancel),
+          ),
+          IconButton(
+            color: _showFoldingHandles
+                ? toggleButtonActiveColor
+                : toggleButtonColor,
+            onPressed: () => setState(() {
+              _showFoldingHandles = !_showFoldingHandles;
+            }),
+            icon: const Icon(Icons.chevron_right),
           ),
           const SizedBox(width: 20),
           DropdownSelector(
@@ -77,9 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 textStyle: const TextStyle(
                   color: Colors.purple,
                 ),
-                showLineNumbers: _isSelected[0],
-                showErrors: _isSelected[1],
-                showFoldingHandles: _isSelected[2],
+                showLineNumbers: _showNumbers,
+                showErrors: _showErrors,
+                showFoldingHandles: _showFoldingHandles,
               ),
             ),
           ),
