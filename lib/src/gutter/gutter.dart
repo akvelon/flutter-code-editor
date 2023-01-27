@@ -11,8 +11,6 @@ import 'fold_toggle.dart';
 const _issueColumnWidth = 16.0;
 const _foldingColumnWidth = 16.0;
 
-const _padding = 5.0;
-
 const _lineNumberColumn = 0;
 const _issueColumn = 1;
 const _foldingColumn = 2;
@@ -37,6 +35,14 @@ class GutterWidget extends StatelessWidget {
   Widget _buildOnChange(BuildContext context, Widget? child) {
     final code = codeController.code;
 
+    final gutterWidth = style.width -
+        (style.showErrors ? 0 : _issueColumnWidth) -
+        (style.showFoldingHandles ? 0 : _foldingColumnWidth);
+
+    final issueColumnWidth = style.showErrors ? _issueColumnWidth : 0.0;
+    final foldingColumnWidth =
+        style.showFoldingHandles ? _foldingColumnWidth : 0.0;
+
     final tableRows = List.generate(
       code.hiddenLineRanges.visibleLineNumbers.length,
       (i) => TableRow(
@@ -56,14 +62,6 @@ class GutterWidget extends StatelessWidget {
     if (style.showFoldingHandles) {
       _fillFoldToggles(tableRows);
     }
-
-    final gutterWidth = style.width -
-        (style.showErrors ? 0 : _issueColumnWidth) -
-        (style.showFoldingHandles ? 0 : _foldingColumnWidth);
-
-    final issueColumnWidth = style.showErrors ? _issueColumnWidth : _padding;
-    final foldingColumnWidth =
-        style.showFoldingHandles ? _foldingColumnWidth : _padding;
 
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
