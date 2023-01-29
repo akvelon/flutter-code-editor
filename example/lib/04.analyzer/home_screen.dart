@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
-    // analyzer: AnalyzerImpl(),
+    analyzer: AnalyzerImpl(),
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
     text: dartSnippet,

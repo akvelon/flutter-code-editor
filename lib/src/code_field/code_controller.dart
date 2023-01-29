@@ -125,12 +125,13 @@ class CodeController extends TextEditingController {
   })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
-    analyzer ??= DefaultAnalyzer();
-
     this.language = language;
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
+
+    analyzer ??= DefaultAnalyzer();
+    analyzer?.init(code: _code, listener: processIssues);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -148,9 +149,6 @@ class CodeController extends TextEditingController {
       _styleList.addAll(patternMap!.values);
     }
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
-
-    analyzer?.addListener(processIssues);
-    analyzer?.codeStream.add(code);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
@@ -335,7 +333,7 @@ class CodeController extends TextEditingController {
     super.value = newValue;
 
     if (hasTextChanged) {
-      analyzer?.codeStream.add(_code);
+      analyzer?.emit(_code);
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
       unawaited(generateSuggestions());
@@ -351,6 +349,8 @@ class CodeController extends TextEditingController {
       text: code.visibleText,
       selection: record.selection,
     );
+
+    analyzer?.emit(_code);
   }
 
   void outdentSelection() {
@@ -609,6 +609,8 @@ class CodeController extends TextEditingController {
   void _updateCode(String text) {
     final newCode = _createCode(text);
     _code = newCode.foldedAs(_code);
+
+    analyzer?.emit(_code);
   }
 
   Code _createCode(String text) {
