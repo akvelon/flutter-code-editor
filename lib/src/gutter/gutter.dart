@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../code_field/code_controller.dart';
@@ -102,7 +103,13 @@ class GutterWidget extends StatelessWidget {
         continue;
       }
 
-      tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
+      tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
+        issue,
+        style: style.textStyle ??
+            const TextStyle(
+              fontFamily: 'SourceCode',
+            ),
+      );
     }
   }
 

@@ -79,6 +79,11 @@ class CodeController extends TextEditingController {
   String get languageId => _languageId;
 
   Code _code;
+  void setCode(Code newCode) {
+    _code = newCode;
+
+    analyzer?.emit(_code);
+  }
 
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
