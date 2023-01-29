@@ -27,3 +27,7 @@ export 'src/line_numbers/gutter_style.dart';
 export 'src/named_sections/named_section.dart';
 export 'src/named_sections/parsers/abstract.dart';
 export 'src/named_sections/parsers/brackets_start_end.dart';
+
+export 'src/analyzer/api/analyzer.dart';
+export 'src/analyzer/api/models/issue.dart';
+export 'src/analyzer/api/models/issue_type.dart';

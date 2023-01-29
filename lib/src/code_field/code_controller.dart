@@ -44,6 +44,10 @@ class CodeController extends TextEditingController {
     notifyListeners();
   }
 
+  Analyzer? analyzer;
+
+  List<Issue> issues;
+
   final AbstractNamedSectionParser? namedSectionParser;
   Set<String> _readOnlySectionNames;
 
@@ -102,11 +106,13 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
+    this.analyzer,
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
+    this.issues = const [],
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -140,6 +146,8 @@ class CodeController extends TextEditingController {
     }
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
+    analyzer?.addListener(processIssues);
+
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
 
@@ -158,6 +166,11 @@ class CodeController extends TextEditingController {
       baseOffset: sel.start + len,
       extentOffset: sel.start + len,
     );
+  }
+
+  void processIssues(List<Issue> issues) {
+    this.issues = issues;
+    notifyListeners();
   }
 
   /// Remove the char just before the cursor or the selection
@@ -318,6 +331,7 @@ class CodeController extends TextEditingController {
     super.value = newValue;
 
     if (hasTextChanged) {
+      analyzer?.codeStream.add(_code.text);
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
       unawaited(generateSuggestions());
@@ -776,5 +790,10 @@ class CodeController extends TextEditingController {
 
   CodeThemeData _getTheme(BuildContext context) {
     return CodeTheme.of(context) ?? CodeThemeData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

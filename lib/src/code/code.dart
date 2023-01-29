@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../../src/highlight/result.dart';
+import '../analyzer/api/models/issue.dart';
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
 import '../folding/parsers/parser_factory.dart';
@@ -13,7 +14,6 @@ import '../hidden_ranges/hidden_line_ranges_builder.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
 import '../hidden_ranges/hidden_ranges_builder.dart';
-import '../issues/issue.dart';
 import '../named_sections/named_section.dart';
 import '../named_sections/parsers/abstract.dart';
 import '../service_comment_filter/service_comment_filter.dart';

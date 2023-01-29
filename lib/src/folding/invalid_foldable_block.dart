@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/widgets.dart';
 
-import '../issues/issue.dart';
+import '../analyzer/api/models/issue.dart';
+import '../analyzer/api/models/issue_type.dart';
 import 'foldable_block.dart';
 import 'foldable_block_type.dart';
 
@@ -20,7 +22,15 @@ class InvalidFoldableBlock with EquatableMixin {
           startLine != null || endLine != null,
           'startLine or endLine must be non-null',
         ),
-        issue = Issue(line: startLine ?? endLine ?? 0);
+        issue = Issue(
+          line: startLine ?? endLine ?? 0,
+          message: 'Invalid foldable block',
+          type: IssueType.error,
+          position: TextRange(
+            start: startLine ?? endLine ?? 0,
+            end: startLine ?? endLine ?? 0,
+          ),
+        );
 
   @override
   List<Object?> get props => [

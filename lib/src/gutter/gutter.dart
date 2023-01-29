@@ -96,9 +96,7 @@ class GutterWidget extends StatelessWidget {
   }
 
   void _fillIssues(List<TableRow> tableRows) {
-    final code = codeController.code;
-
-    for (final issue in code.issues) {
+    for (final issue in codeController.issues) {
       final lineIndex = _lineIndexToTableRowIndex(issue.line);
       if (lineIndex == null) {
         continue;
