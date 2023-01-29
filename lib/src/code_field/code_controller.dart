@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../../flutter_code_editor.dart';
+import '../analyzer/impl/default_analyzer.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
@@ -124,6 +125,8 @@ class CodeController extends TextEditingController {
   })  : _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
+    analyzer ??= DefaultAnalyzer();
+
     this.language = language;
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
@@ -147,6 +150,7 @@ class CodeController extends TextEditingController {
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     analyzer?.addListener(processIssues);
+    analyzer?.codeStream.add(code);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }

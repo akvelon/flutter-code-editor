@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 import '../../../flutter_code_editor.dart';
-import '../api/models/issue.dart';
 
 abstract class Analyzer {
   Analyzer() {
