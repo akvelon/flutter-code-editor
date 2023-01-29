@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
+import '../../../flutter_code_editor.dart';
 import '../api/models/issue.dart';
 
 abstract class Analyzer {
@@ -15,10 +16,10 @@ abstract class Analyzer {
   }
 
   @internal
-  final StreamController<String> codeStream = StreamController();
+  final StreamController<Code> codeStream = StreamController();
   final StreamController<List<Issue>> _issueStream = StreamController();
 
-  Future<void> onCodeChanged(String code) async {
+  Future<void> onCodeChanged(Code code) async {
     await analyze(code).then(_issueStream.add);
   }
 
@@ -26,7 +27,7 @@ abstract class Analyzer {
     _issueStream.stream.listen(callback);
   }
 
-  Future<List<Issue>> analyze(String code);
+  Future<List<Issue>> analyze(Code code);
 
   @mustCallSuper
   void dispose() {

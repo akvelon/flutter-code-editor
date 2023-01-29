@@ -42,13 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Code Editor by Akvelon'),
         actions: [
           IconButton(
-              onPressed: () async {
-                final analyzer = AnalyzerImpl();
-                await analyzer.analyze(_codeController.code.text);
-              },
-              icon: Icon(Icons.bookmarks)),
-          //
-          IconButton(
             color: _showNumbers ? toggleButtonActiveColor : toggleButtonColor,
             onPressed: () => setState(() {
               _showNumbers = !_showNumbers;

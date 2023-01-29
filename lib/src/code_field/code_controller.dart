@@ -331,7 +331,7 @@ class CodeController extends TextEditingController {
     super.value = newValue;
 
     if (hasTextChanged) {
-      analyzer?.codeStream.add(_code.text);
+      analyzer?.codeStream.add(_code);
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
       unawaited(generateSuggestions());

@@ -7,7 +7,7 @@ import 'json_converter.dart';
 
 class AnalyzerImpl extends Analyzer {
   @override
-  Future<List<Issue>> analyze(String code) async {
+  Future<List<Issue>> analyze(Code code) async {
     final client = Dio();
     const path = 'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
 
@@ -20,7 +20,7 @@ class AnalyzerImpl extends Analyzer {
     final response = await client.post(
       path,
       data: {
-        'source': code,
+        'source': code.text,
       },
     );
 
