@@ -104,10 +104,7 @@ class GutterWidget extends StatelessWidget {
 
       tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
         issue,
-        style: style.textStyle ??
-            const TextStyle(
-              fontFamily: 'SourceCode',
-            ),
+        style: style.textStyle ?? const TextStyle(fontFamily: 'SourceCode'),
       );
     }
   }

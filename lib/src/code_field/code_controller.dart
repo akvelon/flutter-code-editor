@@ -89,8 +89,6 @@ class CodeController extends TextEditingController {
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
 
-  final _jobRunner = JobRunner();
-
   /// The last [TextSpan] returned from [buildTextSpan].
   ///
   /// This can be used in tests to make sure that the updated text  was actually
@@ -133,12 +131,7 @@ class CodeController extends TextEditingController {
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    analyzer ??= DefaultAnalyzer();
-    analyzer?.init(code: _code, listener: processIssues);
-    _jobRunner.runJob(
-      sendCurrentCodeToAnalyzer,
-      const Duration(seconds: 1),
-    );
+    analyzer?.init(getCode: () => _code, listener: processIssues);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -175,11 +168,6 @@ class CodeController extends TextEditingController {
       baseOffset: sel.start + len,
       extentOffset: sel.start + len,
     );
-  }
-
-  /// Called in the job runner.
-  void sendCurrentCodeToAnalyzer() {
-    analyzer?.emit(_code);
   }
 
   void processIssues(List<Issue> issues) {
@@ -807,8 +795,6 @@ class CodeController extends TextEditingController {
 
   @override
   void dispose() {
-    _jobRunner.dispose();
-
     if (analyzer is DefaultAnalyzer) {
       analyzer?.dispose();
     }

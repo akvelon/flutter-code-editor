@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import '../../../flutter_code_editor.dart';
+import '../../job_runner/job_runner.dart';
 
 abstract class Analyzer {
   Analyzer();
@@ -10,11 +12,16 @@ abstract class Analyzer {
   final StreamController<Code> _codeStream = StreamController();
   final StreamController<List<Issue>> _issueStream =
       StreamController.broadcast();
+  final _jobRunner = JobRunner();
 
   void init({
-    Code? code,
+    required Code Function() getCode,
     void Function(List<Issue> issues)? listener,
   }) {
+    if (listener != null) {
+      addListener(listener);
+    }
+
     _codeStream.stream.listen(
       onCodeChanged,
       onError: (e) {
@@ -22,13 +29,12 @@ abstract class Analyzer {
       },
     );
 
-    if (listener != null) {
-      addListener(listener);
-    }
-
-    if (code != null) {
-      emit(code);
-    }
+    _jobRunner.runJob(
+      () {
+        emit(getCode());
+      },
+      const Duration(seconds: 1),
+    );
   }
 
   Future<void> onCodeChanged(Code code) async {
