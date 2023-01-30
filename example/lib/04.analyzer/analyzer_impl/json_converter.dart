@@ -15,6 +15,7 @@ Issue issueFromJson(Map<String, dynamic> json) {
       end: json['charStart'] + json['charLength'],
     ),
     type: type,
+    url: json['url'],
   );
 }
 
