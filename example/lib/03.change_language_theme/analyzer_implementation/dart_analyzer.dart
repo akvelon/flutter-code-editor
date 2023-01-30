@@ -5,7 +5,8 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import 'json_converter.dart';
 
-class AnalyzerImpl extends Analyzer {
+// Example for implementation of Analyzer for Dart
+class DartAnalyzer extends Analyzer {
   @override
   Future<List<Issue>> analyze(Code code) async {
     final client = Dio();

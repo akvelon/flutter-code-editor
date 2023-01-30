@@ -3,10 +3,11 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import '../common/snippets.dart';
 import '../common/themes.dart';
+import 'analyzer_implementation/dart_analyzer.dart';
 import 'constants.dart';
 import 'widgets/dropdown_selector.dart';
 
-const _defaultLanguage = 'java';
+const _defaultLanguage = 'dart';
 const _defaultTheme = 'monokai-sublime';
 
 const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
@@ -27,9 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
+    analyzer: DartAnalyzer(),
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    text: javaFactorialSnippet,
+    text: dartSnippet,
   );
 
   @override
@@ -39,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Code Editor by Akvelon'),
         actions: [
-          //
           IconButton(
             color: _showNumbers ? toggleButtonActiveColor : toggleButtonColor,
             onPressed: () => setState(() {
@@ -47,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.numbers),
           ),
-
           IconButton(
             color: _showErrors ? toggleButtonActiveColor : toggleButtonColor,
             onPressed: () => setState(() {
@@ -55,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.cancel),
           ),
-
           IconButton(
             color: _showFoldingHandles
                 ? toggleButtonActiveColor

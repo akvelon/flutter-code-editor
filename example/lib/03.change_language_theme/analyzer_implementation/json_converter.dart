@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 
+// converts json to Issue object for the DartAnalyzer
 Issue issueFromJson(Map<String, dynamic> json) {
   final type = mapIssueType(json['kind']);
   return Issue(
