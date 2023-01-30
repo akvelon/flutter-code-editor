@@ -47,7 +47,7 @@ abstract class Analyzer {
 
   @mustCallSuper
   void dispose() {
-    _codeStream.close();
-    _issueStream.close();
+    unawaited(_codeStream.close());
+    unawaited(_issueStream.close());
   }
 }

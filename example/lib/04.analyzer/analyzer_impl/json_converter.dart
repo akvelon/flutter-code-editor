@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:ui';
 
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -9,7 +11,6 @@ Issue issueFromJson(Map<String, dynamic> json) {
     message: json['message'],
     position: TextRange(
       start: json['charStart'],
-      // ignore: avoid_dynamic_calls
       end: json['charStart'] + json['charLength'],
     ),
     type: type,

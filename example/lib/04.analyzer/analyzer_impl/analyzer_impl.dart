@@ -1,4 +1,4 @@
-import 'dart:convert';
+// ignore_for_file: avoid_dynamic_calls
 
 import 'package:dio/dio.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -29,14 +29,12 @@ class AnalyzerImpl extends Analyzer {
       return [];
     }
 
-    // ignore: avoid_dynamic_calls
     final issues = <Issue>[];
 
     for (final issue in response.data['issues']) {
       final instance = issueFromJson(issue);
       issues.add(instance);
     }
-    print('Analyze');
     return issues;
   }
 }
