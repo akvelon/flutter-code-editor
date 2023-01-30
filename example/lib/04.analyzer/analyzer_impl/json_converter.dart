@@ -9,6 +9,7 @@ Issue issueFromJson(Map<String, dynamic> json) {
   return Issue(
     line: json['line'] - 1,
     message: json['message'],
+    suggestion: json['correction'],
     position: TextRange(
       start: json['charStart'],
       end: json['charStart'] + json['charLength'],

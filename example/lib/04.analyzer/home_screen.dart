@@ -48,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.numbers),
           ),
-
           IconButton(
             color: _showErrors ? toggleButtonActiveColor : toggleButtonColor,
             onPressed: () => setState(() {
@@ -56,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.cancel),
           ),
-
           IconButton(
             color: _showFoldingHandles
                 ? toggleButtonActiveColor

@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import '../analyzer/api/models/issue.dart';
+import '../analyzer/api/models/issue_type.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
+
+const errorIcon = Icon(
+  Icons.cancel,
+  color: Colors.red,
+  size: 16,
+);
+
+const warningIcon = Icon(
+  Icons.warning,
+  color: Colors.yellow,
+  size: 16,
+);
+
+const infoIcon = Icon(
+  Icons.info,
+  color: Colors.white,
+  size: 16,
+);
 
 class GutterErrorWidget extends StatefulWidget {
   final Issue issue;
@@ -24,6 +43,19 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Icon icon;
+    switch (widget.issue.type) {
+      case IssueType.error:
+        icon = errorIcon;
+        break;
+      case IssueType.warning:
+        icon = warningIcon;
+        break;
+      case IssueType.info:
+        icon = infoIcon;
+        break;
+    }
+
     final theme = CodeTheme.of(context) ??
         CodeThemeData(
           styles: monokaiSublimeTheme,
@@ -68,11 +100,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
           },
         );
       },
-      child: const Icon(
-        Icons.cancel,
-        color: Colors.red,
-        size: 16,
-      ),
+      child: icon,
     );
   }
 
@@ -116,11 +144,21 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
                       ),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           issue.message,
                         ),
+                        if (issue.url != null) ...[
+                          Text(issue.url!),
+                        ],
+                        if (issue.suggestion != null) ...[
+                          Divider(
+                            color: style.color,
+                          ),
+                          Text(issue.suggestion!),
+                        ],
                       ],
                     ),
                   ),
