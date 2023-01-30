@@ -9,8 +9,8 @@ import '../../job_runner/job_runner.dart';
 /// Service for analzying the code inside CodeField.
 ///
 /// Uses streams to connect incoming new code and outgoing list of issues.
-/// Retrieves code from `CodeController` every second and adds to the stream for analysis.
-/// You can listen to the stream of issues to perform some action when issues are updated.
+/// Retrieves code from `CodeController` every second 
+/// and adds to the stream for analysis.
 ///
 /// Inherit and implement [analyze] method to use in [CodeController].
 abstract class Analyzer {
