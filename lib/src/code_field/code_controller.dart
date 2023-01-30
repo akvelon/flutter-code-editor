@@ -808,6 +808,11 @@ class CodeController extends TextEditingController {
   @override
   void dispose() {
     _jobRunner.dispose();
+
+    if (analyzer is DefaultAnalyzer) {
+      analyzer?.dispose();
+    }
+
     super.dispose();
   }
 }
