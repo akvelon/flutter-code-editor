@@ -50,8 +50,8 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
             style: style,
           );
           final overlay = Overlay.of(context);
-          overlay.insert(entry!);
-          overlay.build(context);
+          overlay?.insert(entry!);
+          overlay?.build(context);
         });
       },
       onExit: (event) {
