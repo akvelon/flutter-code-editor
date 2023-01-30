@@ -13,6 +13,7 @@ import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
+import '../job_runner/job_runner.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
@@ -79,11 +80,6 @@ class CodeController extends TextEditingController {
   String get languageId => _languageId;
 
   Code _code;
-  void setCode(Code newCode) {
-    _code = newCode;
-
-    analyzer?.emit(_code);
-  }
 
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
@@ -92,6 +88,8 @@ class CodeController extends TextEditingController {
   late PopupController popupController;
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
+
+  final _jobRunner = JobRunner();
 
   /// The last [TextSpan] returned from [buildTextSpan].
   ///
@@ -137,6 +135,10 @@ class CodeController extends TextEditingController {
 
     analyzer ??= DefaultAnalyzer();
     analyzer?.init(code: _code, listener: processIssues);
+    _jobRunner.runJob(
+      sendCurrentCodeToAnalyzer,
+      const Duration(seconds: 1),
+    );
 
     // Create modifier map
     for (final el in modifiers) {
@@ -173,6 +175,11 @@ class CodeController extends TextEditingController {
       baseOffset: sel.start + len,
       extentOffset: sel.start + len,
     );
+  }
+
+  /// Called in the job runner.
+  void sendCurrentCodeToAnalyzer() {
+    analyzer?.emit(_code);
   }
 
   void processIssues(List<Issue> issues) {
@@ -338,7 +345,6 @@ class CodeController extends TextEditingController {
     super.value = newValue;
 
     if (hasTextChanged) {
-      analyzer?.emit(_code);
       autocompleter.blacklist = [newValue.wordAtCursor ?? ''];
       autocompleter.setText(this, text);
       unawaited(generateSuggestions());
@@ -354,8 +360,6 @@ class CodeController extends TextEditingController {
       text: code.visibleText,
       selection: record.selection,
     );
-
-    analyzer?.emit(_code);
   }
 
   void outdentSelection() {
@@ -614,8 +618,6 @@ class CodeController extends TextEditingController {
   void _updateCode(String text) {
     final newCode = _createCode(text);
     _code = newCode.foldedAs(_code);
-
-    analyzer?.emit(_code);
   }
 
   Code _createCode(String text) {
@@ -805,6 +807,7 @@ class CodeController extends TextEditingController {
 
   @override
   void dispose() {
+    _jobRunner.dispose();
     super.dispose();
   }
 }
