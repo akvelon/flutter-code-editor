@@ -13,7 +13,6 @@ import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
-import '../job_runner/job_runner.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
