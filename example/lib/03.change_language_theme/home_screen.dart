@@ -9,6 +9,9 @@ import 'widgets/dropdown_selector.dart';
 const _defaultLanguage = 'java';
 const _defaultTheme = 'monokai-sublime';
 
+const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
+const toggleButtonActiveColor = Colors.white;
+
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -17,6 +20,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
+
+  bool _showNumbers = true;
+  bool _showErrors = true;
+  bool _showFoldingHandles = true;
+
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
@@ -31,6 +39,33 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Code Editor by Akvelon'),
         actions: [
+          //
+          IconButton(
+            color: _showNumbers ? toggleButtonActiveColor : toggleButtonColor,
+            onPressed: () => setState(() {
+              _showNumbers = !_showNumbers;
+            }),
+            icon: const Icon(Icons.numbers),
+          ),
+
+          IconButton(
+            color: _showErrors ? toggleButtonActiveColor : toggleButtonColor,
+            onPressed: () => setState(() {
+              _showErrors = !_showErrors;
+            }),
+            icon: const Icon(Icons.cancel),
+          ),
+
+          IconButton(
+            color: _showFoldingHandles
+                ? toggleButtonActiveColor
+                : toggleButtonColor,
+            onPressed: () => setState(() {
+              _showFoldingHandles = !_showFoldingHandles;
+            }),
+            icon: const Icon(Icons.chevron_right),
+          ),
+          const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setLanguage,
             icon: Icons.code,
@@ -44,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _theme,
             values: themeList,
           ),
+          const SizedBox(width: 20),
         ],
       ),
       body: ListView(
@@ -54,10 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
               focusNode: _codeFieldFocusNode,
               controller: _codeController,
               textStyle: const TextStyle(fontFamily: 'SourceCode'),
-              lineNumberStyle: const LineNumberStyle(
-                textStyle: TextStyle(
+              gutterStyle: GutterStyle(
+                textStyle: const TextStyle(
                   color: Colors.purple,
                 ),
+                showLineNumbers: _showNumbers,
+                showErrors: _showErrors,
+                showFoldingHandles: _showFoldingHandles,
               ),
             ),
           ),

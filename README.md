@@ -14,7 +14,7 @@ Flutter Code Editor is a multi-platform code editor supporting:
 - Themes,
 - And many other features.
 
-![Basic Example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/factorial.png)
+![Basic example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/main.gif)
 
 
 ## Basic Usage
@@ -94,6 +94,8 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 - Python
 - Scala
 
+![Foldable blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/foldable_blocks_example.gif)
+
 Code blocks folding may support other languages in experimental mode.
 
 
@@ -127,6 +129,33 @@ return MaterialApp(
 To use a custom theme, create a map of styles under the pre-defined class names.
 See [an example](https://github.com/git-touch/highlight.dart/blob/master/flutter_highlight/lib/themes/monokai-sublime.dart).
 
+
+## Hiding Line Numbers, Errors, and Folding Handles
+
+A lot of styling can be tuned with `GutterStyle` object passed to `CodeField` widget.
+See
+[the example](https://github.com/akvelon/flutter-code-editor/tree/main/example/lib/03.change_language_theme)
+that dynamically changes the properties listed here.
+
+```dart
+CodeField(
+  gutterStyle: GutterStyle(
+    showErrors: false,
+    showFoldingHandles: false,
+    showLineNumbers: false,
+  ),
+  // ...
+),
+```
+
+If you want to hide the entire gutter, use `GutterStyle.none` constant instead:
+
+```dart
+CodeField(
+  gutterStyle: GutterStyle.none,
+  // ...
+),
+```
 
 ## Accessing the Text
 
@@ -204,6 +233,8 @@ programmatically because they have the same effect as the user input,
 and so locking affects them as well.
 
 To change a partially locked controller, set the `fullText` property.
+
+![Readonly blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/readonly-sections-example.gif)
 
 
 ## Advanced Code Blocks Folding
@@ -303,6 +334,21 @@ the method the user is typing. This feature is meant to simplify typing but not 
 when exploring classes and methods.
 
 Autocompletion currently cannot be disabled.
+
+![Suggestions example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/suggestions_example.gif)
+
+
+## Shortcuts
+
+- Indent (Tab)
+- Outdent (Shift-Tab)
+
+![indent outdent example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/tab-shift-tab_example.gif)
+
+- Comment out (Control-/)
+- Uncomment (Control-/)
+
+![comment out uncomment example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/comment_out_example.gif)
 
 
 ## Migration Guides

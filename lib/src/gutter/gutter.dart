@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../code_field/code_controller.dart';
-import '../line_numbers/line_number_style.dart';
+import '../line_numbers/gutter_style.dart';
 import 'error.dart';
 import 'fold_toggle.dart';
 
@@ -19,7 +19,7 @@ class GutterWidget extends StatelessWidget {
   });
 
   final CodeController codeController;
-  final LineNumberStyle style;
+  final GutterStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -32,37 +32,67 @@ class GutterWidget extends StatelessWidget {
   Widget _buildOnChange(BuildContext context, Widget? child) {
     final code = codeController.code;
 
-    final tableRows = [
-      for (final i in code.hiddenLineRanges.visibleLineNumbers)
-        TableRow(
-          children: [
-            Text(
-              '${i + 1}',
-              style: style.textStyle,
-              textAlign: style.textAlign,
-            ),
-            const SizedBox(),
-            const SizedBox(),
-          ],
-        ),
-    ];
+    final gutterWidth = style.width -
+        (style.showErrors ? 0 : _issueColumnWidth) -
+        (style.showFoldingHandles ? 0 : _foldingColumnWidth);
 
-    _fillIssues(tableRows);
-    _fillFoldToggles(tableRows);
+    final issueColumnWidth = style.showErrors ? _issueColumnWidth : 0.0;
+    final foldingColumnWidth =
+        style.showFoldingHandles ? _foldingColumnWidth : 0.0;
+
+    final tableRows = List.generate(
+      code.hiddenLineRanges.visibleLineNumbers.length,
+      // ignore: prefer_const_constructors
+      (i) => TableRow(
+        // ignore: prefer_const_literals_to_create_immutables
+        children: [
+          const SizedBox(),
+          const SizedBox(),
+          const SizedBox(),
+        ],
+      ),
+    );
+
+    _fillLineNumbers(tableRows);
+
+    if (style.showErrors) {
+      _fillIssues(tableRows);
+    }
+    if (style.showFoldingHandles) {
+      _fillFoldToggles(tableRows);
+    }
 
     return Container(
       padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
-      width: style.width,
+      width: style.showLineNumbers ? gutterWidth : null,
       child: Table(
-        columnWidths: const {
-          _lineNumberColumn: FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(_issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(_foldingColumnWidth),
+        columnWidths: {
+          _lineNumberColumn: const FlexColumnWidth(),
+          _issueColumn: FixedColumnWidth(issueColumnWidth),
+          _foldingColumn: FixedColumnWidth(foldingColumnWidth),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
       ),
     );
+  }
+
+  void _fillLineNumbers(List<TableRow> tableRows) {
+    final code = codeController.code;
+
+    for (final i in code.hiddenLineRanges.visibleLineNumbers) {
+      final lineIndex = _lineIndexToTableRowIndex(i);
+
+      if (lineIndex == null) {
+        continue;
+      }
+
+      tableRows[lineIndex].children![_lineNumberColumn] = Text(
+        style.showLineNumbers ? '${i + 1}' : ' ',
+        style: style.textStyle,
+        textAlign: style.textAlign,
+      );
+    }
   }
 
   void _fillIssues(List<TableRow> tableRows) {
