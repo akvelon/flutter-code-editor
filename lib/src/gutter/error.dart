@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_code_editor/src/code_theme/code_theme.dart';
-import 'package:flutter_code_editor/src/code_theme/code_theme_data.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import '../analyzer/api/models/issue.dart';
+import '../code_theme/code_theme.dart';
+import '../code_theme/code_theme_data.dart';
 
 class GutterErrorWidget extends StatefulWidget {
   final Issue issue;
@@ -19,8 +18,9 @@ class GutterErrorWidget extends StatefulWidget {
 }
 
 class _GutterErrorWidgetState extends State<GutterErrorWidget> {
-  Offset? mouseEnter;
   OverlayEntry? entry;
+  bool enteredPopup = false;
+  bool showErrorDetails = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
     final backgroundColor = theme.styles['root']?.backgroundColor;
     final color = theme.styles['root']?.color;
     final style = widget.style.copyWith(
-      fontSize: 16,
+      fontSize: 14,
       color: color,
       backgroundColor: backgroundColor,
       fontStyle: FontStyle.normal,
@@ -39,62 +39,97 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
     return MouseRegion(
       onEnter: (event) {
         setState(() {
-          mouseEnter = event.position;
-          final overlay = Overlay.of(context);
-          final temp = OverlayEntry(
-            builder: (context) {
-              return Positioned(
-                left: mouseEnter?.dx,
-                top: mouseEnter?.dy,
-                child: DefaultTextStyle(
-                  style: style,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        constraints: const BoxConstraints(
-                          minWidth: 100,
-                          maxWidth: 500,
-                        ),
-                        decoration: BoxDecoration(
-                          color: backgroundColor,
-                          border: Border.all(
-                            color: color ??
-                                const Color.fromARGB(107, 255, 255, 255),
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              widget.issue.message,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+          showErrorDetails = true;
+          enteredPopup = false;
+          if (entry != null) {
+            return;
+          }
+          entry = getErrorPopup(
+            widget.issue,
+            offset: event.position.translate(-5, -5),
+            style: style,
           );
-          overlay.insert(temp);
+          final overlay = Overlay.of(context);
+          overlay.insert(entry!);
           overlay.build(context);
-          entry = temp;
         });
       },
       onExit: (event) {
-        setState(() {
-          mouseEnter = null;
-          entry?.remove();
-        });
+        Future.delayed(
+          const Duration(milliseconds: 50),
+          () {
+            setState(() {
+              showErrorDetails = false;
+              if (!enteredPopup) {
+                entry?.remove();
+                entry = null;
+              }
+            });
+          },
+        );
       },
       child: const Icon(
         Icons.cancel,
         color: Colors.red,
         size: 16,
       ),
+    );
+  }
+
+  OverlayEntry getErrorPopup(
+    Issue issue, {
+    required Offset offset,
+    required TextStyle style,
+  }) {
+    final renderBox = context.findRenderObject() as RenderBox?;
+    final width = renderBox?.size.width ?? 16;
+    final newOffset = renderBox?.localToGlobal(Offset.zero) ?? offset;
+    return OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          left: newOffset.dx + width,
+          top: newOffset.dy,
+          child: MouseRegion(
+            onEnter: (event) => setState(() {
+              enteredPopup = true;
+            }),
+            onExit: (event) => setState(() {
+              entry?.remove();
+              entry = null;
+            }),
+            child: DefaultTextStyle(
+              style: style,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    constraints: const BoxConstraints(
+                      minWidth: 100,
+                      maxWidth: 500,
+                    ),
+                    decoration: BoxDecoration(
+                      color: style.backgroundColor,
+                      border: Border.all(
+                        color: style.color ??
+                            const Color.fromARGB(107, 255, 255, 255),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          issue.message,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
