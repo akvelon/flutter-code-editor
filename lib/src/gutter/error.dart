@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import '../analyzer/api/models/issue.dart';
@@ -122,7 +123,13 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
                           issue.message,
                         ),
                         if (issue.url != null) ...[
-                          Text(issue.url!),
+                          RichText(
+                            text: TextSpan(
+                              style: style,
+                              text: issue.url,
+                              recognizer: TapGestureRecognizer()..onTap = () {},
+                            ),
+                          )
                         ],
                         if (issue.suggestion != null) ...[
                           Divider(
