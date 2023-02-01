@@ -81,6 +81,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
     }
     final width = renderBox.size.width;
     final newOffset = renderBox.localToGlobal(Offset.zero);
+
     return OverlayEntry(
       builder: (context) {
         return Positioned(
