@@ -1,7 +1,8 @@
 // ignore_for_file: avoid_dynamic_calls
+import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:http/http.dart' as http;
 
 import 'json_converter.dart';
 
@@ -9,30 +10,32 @@ import 'json_converter.dart';
 class DartAnalyzer extends Analyzer {
   @override
   Future<List<Issue>> analyze(Code code) async {
-    final client = Dio();
-    const path = 'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
-
-    client.options.headers.addAll(
-      {
-        'Content-Type': 'application/json',
-      },
-    );
+    final client = http.Client();
 
     final response = await client.post(
-      path,
-      data: {
+      Uri.https(
+        'stable.api.dartpad.dev',
+        '/api/dartservices/v2/analyze',
+      ),
+      body: json.encode({
         'source': code.text,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
       },
+      encoding: utf8,
     );
+    final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
 
-    if (response.data['issues']?.length == 0 ||
-        response.data['issues'] == null) {
+    if (decodedResponse['issues']?.length == 0 ||
+        decodedResponse['issues'] == null) {
       return [];
     }
 
     final issues = <Issue>[];
 
-    for (final issue in response.data['issues']) {
+    for (final issue in decodedResponse['issues']) {
       final instance = issueFromJson(issue);
       issues.add(instance);
     }

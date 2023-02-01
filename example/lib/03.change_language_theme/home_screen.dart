@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Code Editor by Akvelon'),
         actions: [
+          //
           IconButton(
             color: _showNumbers ? toggleButtonActiveColor : toggleButtonColor,
             onPressed: () => setState(() {
@@ -48,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.numbers),
           ),
+
           IconButton(
             color: _showErrors ? toggleButtonActiveColor : toggleButtonColor,
             onPressed: () => setState(() {
@@ -55,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.cancel),
           ),
+
           IconButton(
             color: _showFoldingHandles
                 ? toggleButtonActiveColor
@@ -64,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.chevron_right),
           ),
+
           const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setLanguage,
@@ -71,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _language,
             values: languageList,
           ),
+
           const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setTheme,
@@ -78,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _theme,
             values: themeList,
           ),
+
           const SizedBox(width: 20),
         ],
       ),
