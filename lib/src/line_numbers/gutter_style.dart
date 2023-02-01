@@ -17,6 +17,9 @@ class GutterStyle {
   /// half the opacity.
   final TextStyle? textStyle;
 
+  /// Style of the error popup.
+  final TextStyle? errorPopupStyle;
+
   /// Background of the line number column.
   final Color? background;
 
@@ -43,6 +46,7 @@ class GutterStyle {
     this.showLineNumbers = true,
     this.width = 80.0,
     this.background,
+    this.errorPopupStyle,
     this.textStyle,
   });
 
@@ -57,12 +61,14 @@ class GutterStyle {
   );
 
   GutterStyle copyWith({
+    TextStyle? errorPopupStyle,
     TextStyle? textStyle,
   }) =>
       GutterStyle(
         width: width,
         textAlign: textAlign,
         textStyle: textStyle ?? this.textStyle,
+        errorPopupStyle: errorPopupStyle,
         background: background,
         margin: margin,
         showErrors: showErrors,

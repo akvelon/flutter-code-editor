@@ -1,9 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import '../analyzer/api/models/issue.dart';
-import '../code_theme/code_theme.dart';
-import '../code_theme/code_theme_data.dart';
 
 const errorIcon = Icon(
   Icons.cancel,
@@ -13,9 +10,11 @@ const errorIcon = Icon(
 
 class GutterErrorWidget extends StatefulWidget {
   final Issue issue;
+  final TextStyle popupTextStyle;
 
   const GutterErrorWidget(
     this.issue,
+    this.popupTextStyle,
   );
 
   @override
@@ -61,16 +60,8 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
   }
 
   OverlayEntry getErrorPopup() {
-    final theme = CodeTheme.of(context)?.styles['root'] ??
-        CodeThemeData(
-          styles: monokaiSublimeTheme,
-        ).styles['root'];
-    final backgroundColor = theme?.backgroundColor;
-    final color = theme?.color;
-    final style = TextStyle(
+    final style = widget.popupTextStyle.copyWith(
       fontSize: 14,
-      color: color,
-      backgroundColor: backgroundColor,
       fontStyle: FontStyle.normal,
     );
     final issue = widget.issue;
@@ -110,8 +101,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
                     decoration: BoxDecoration(
                       color: style.backgroundColor,
                       border: Border.all(
-                        color: style.color ??
-                            const Color.fromARGB(107, 255, 255, 255),
+                        color: style.color!,
                       ),
                     ),
                     child: Column(
