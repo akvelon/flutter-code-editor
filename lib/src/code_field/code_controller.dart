@@ -138,7 +138,7 @@ class CodeController extends TextEditingController {
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    addListener(analyzeCode);
+    // addListener(analyzeCode);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -183,11 +183,6 @@ class CodeController extends TextEditingController {
       baseOffset: sel.start + len,
       extentOffset: sel.start + len,
     );
-  }
-
-  void processIssues(List<Issue> issues) {
-    this.issues = issues;
-    notifyListeners();
   }
 
   /// Remove the char just before the cursor or the selection
