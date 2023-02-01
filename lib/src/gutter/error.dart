@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import '../analyzer/api/models/issue.dart';
-import '../analyzer/api/models/issue_type.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
 
@@ -25,12 +24,44 @@ class GutterErrorWidget extends StatefulWidget {
 }
 
 class _GutterErrorWidgetState extends State<GutterErrorWidget> {
-  OverlayEntry? entry;
-  bool enteredPopup = false;
-  bool showErrorDetails = false;
+  OverlayEntry? _entry;
+  bool _mouseEnteredPopup = false;
 
   @override
   Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (event) {
+        setState(() {
+          _mouseEnteredPopup = false;
+          if (_entry != null) {
+            return;
+          }
+          _entry = getErrorPopup();
+          final overlay = Overlay.of(context);
+          overlay?.insert(_entry!);
+          overlay?.build(context);
+        });
+      },
+      onExit: (event) {
+        // Delay event here to keep overlay
+        // if mouse has exited the icon and entered popup.
+        Future.delayed(
+          const Duration(milliseconds: 50),
+          () {
+            setState(() {
+              if (!_mouseEnteredPopup) {
+                _entry?.remove();
+                _entry = null;
+              }
+            });
+          },
+        );
+      },
+      child: errorIcon,
+    );
+  }
+
+  OverlayEntry getErrorPopup() {
     final theme = CodeTheme.of(context) ??
         CodeThemeData(
           styles: monokaiSublimeTheme,
@@ -43,50 +74,14 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
       backgroundColor: backgroundColor,
       fontStyle: FontStyle.normal,
     );
-    return MouseRegion(
-      onEnter: (event) {
-        setState(() {
-          showErrorDetails = true;
-          enteredPopup = false;
-          if (entry != null) {
-            return;
-          }
-          entry = getErrorPopup(
-            widget.issue,
-            offset: event.position.translate(-5, -5),
-            style: style,
-          );
-          final overlay = Overlay.of(context);
-          overlay?.insert(entry!);
-          overlay?.build(context);
-        });
-      },
-      onExit: (event) {
-        Future.delayed(
-          const Duration(milliseconds: 50),
-          () {
-            setState(() {
-              showErrorDetails = false;
-              if (!enteredPopup) {
-                entry?.remove();
-                entry = null;
-              }
-            });
-          },
-        );
-      },
-      child: errorIcon,
-    );
-  }
+    final issue = widget.issue;
 
-  OverlayEntry getErrorPopup(
-    Issue issue, {
-    required Offset offset,
-    required TextStyle style,
-  }) {
     final renderBox = context.findRenderObject() as RenderBox?;
-    final width = renderBox?.size.width ?? 16;
-    final newOffset = renderBox?.localToGlobal(Offset.zero) ?? offset;
+    if (renderBox == null) {
+      return OverlayEntry(builder: (context) => Container());
+    }
+    final width = renderBox.size.width;
+    final newOffset = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(
       builder: (context) {
         return Positioned(
@@ -94,11 +89,12 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
           top: newOffset.dy,
           child: MouseRegion(
             onEnter: (event) => setState(() {
-              enteredPopup = true;
+              _mouseEnteredPopup = true;
             }),
             onExit: (event) => setState(() {
-              entry?.remove();
-              entry = null;
+              _mouseEnteredPopup = false;
+              _entry?.remove();
+              _entry = null;
             }),
             child: DefaultTextStyle(
               style: style,
