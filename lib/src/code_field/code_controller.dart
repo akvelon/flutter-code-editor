@@ -49,10 +49,10 @@ class CodeController extends TextEditingController {
   /// that are displayed in gutter widget.
   ///
   /// Calls [Analyzer.analyze] after change with 500ms debounce.
-  Analyzer analyzer;
+  final Analyzer analyzer;
 
   /// Whether disposal of `CodeController` should call `analyzer.dispose`.
-  bool disposeAnalyzer;
+  final bool disposeAnalyzer;
   List<Issue> issues;
   Timer? _debounce;
 
