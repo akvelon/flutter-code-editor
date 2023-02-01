@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_dynamic_calls
 
-import 'dart:ui';
-
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 // Converts json to Issue object for the DartAnalyzer.
@@ -11,10 +9,6 @@ Issue issueFromJson(Map<String, dynamic> json) {
     line: json['line'] - 1,
     message: json['message'],
     suggestion: json['correction'],
-    position: TextRange(
-      start: json['charStart'],
-      end: json['charStart'] + json['charLength'],
-    ),
     type: type,
     url: json['url'],
   );
