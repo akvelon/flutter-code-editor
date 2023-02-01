@@ -60,10 +60,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
   }
 
   OverlayEntry getErrorPopup() {
-    final style = widget.popupTextStyle.copyWith(
-      fontSize: 14,
-      fontStyle: FontStyle.normal,
-    );
+    final style = widget.popupTextStyle;
     final issue = widget.issue;
 
     final renderBox = context.findRenderObject() as RenderBox?;

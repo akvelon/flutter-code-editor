@@ -334,7 +334,11 @@ class _CodeFieldState extends State<CodeField> {
     final gutterStyle = widget.gutterStyle.copyWith(
       textStyle: lineNumberTextStyle,
       errorPopupStyle: widget.gutterStyle.errorPopupStyle ??
-          textStyle.copyWith(backgroundColor: backgroundCol),
+          textStyle.copyWith(
+            fontSize: 14,
+            backgroundColor: backgroundCol,
+            fontStyle: FontStyle.normal,
+          ),
     );
 
     Widget? gutter;
