@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'json_converter.dart';
 
-// Example for implementation of Analyzer for Dart
+// Example for implementation of Analyzer for Dart.
 class DartAnalyzer extends Analyzer {
   @override
   Future<List<Issue>> analyze(Code code) async {
