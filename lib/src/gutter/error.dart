@@ -11,18 +11,6 @@ const errorIcon = Icon(
   size: 16,
 );
 
-const warningIcon = Icon(
-  Icons.warning,
-  color: Colors.yellow,
-  size: 16,
-);
-
-const infoIcon = Icon(
-  Icons.info,
-  color: Colors.white,
-  size: 16,
-);
-
 class GutterErrorWidget extends StatefulWidget {
   final Issue issue;
   final TextStyle style;
@@ -43,19 +31,6 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Icon icon;
-    switch (widget.issue.type) {
-      case IssueType.error:
-        icon = errorIcon;
-        break;
-      case IssueType.warning:
-        icon = warningIcon;
-        break;
-      case IssueType.info:
-        icon = infoIcon;
-        break;
-    }
-
     final theme = CodeTheme.of(context) ??
         CodeThemeData(
           styles: monokaiSublimeTheme,
@@ -100,7 +75,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
           },
         );
       },
-      child: icon,
+      child: errorIcon,
     );
   }
 
