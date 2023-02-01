@@ -138,7 +138,7 @@ class CodeController extends TextEditingController {
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    // addListener(analyzeCode);
+    addListener(analyzeCode);
 
     // Create modifier map
     for (final el in modifiers) {
