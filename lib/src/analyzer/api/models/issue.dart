@@ -1,6 +1,8 @@
+import 'dart:core';
+
 import 'issue_type.dart';
 
-class Issue implements Comparable<Issue> {
+class Issue {
   final int line;
   final String message;
   final IssueType type;
@@ -14,11 +16,10 @@ class Issue implements Comparable<Issue> {
     this.suggestion,
     this.url,
   });
-
-  @override
-  int compareTo(Issue other) {
-    if (line > other.line) return 1;
-    if (line == other.line) return 0;
-    return -1;
-  }
 }
+
+Comparator<Issue> issueLineComparator = (issue1, issue2) {
+  if (issue1.line > issue2.line) return 1;
+  if (issue1.line == issue2.line) return 0;
+  return -1;
+};
