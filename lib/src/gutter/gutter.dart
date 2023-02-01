@@ -105,11 +105,7 @@ class GutterWidget extends StatelessWidget {
       if (lineIndex == null || lineIndex >= tableRows.length) {
         continue;
       }
-
-      tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
-        issue,
-        style: style.textStyle ?? const TextStyle(fontFamily: 'SourceCode'),
-      );
+      tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(issue);
     }
   }
 

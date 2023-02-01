@@ -13,12 +13,10 @@ const errorIcon = Icon(
 
 class GutterErrorWidget extends StatefulWidget {
   final Issue issue;
-  final TextStyle style;
 
   const GutterErrorWidget(
-    this.issue, {
-    required this.style,
-  });
+    this.issue,
+  );
 
   @override
   State<GutterErrorWidget> createState() => _GutterErrorWidgetState();
@@ -63,13 +61,13 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
   }
 
   OverlayEntry getErrorPopup() {
-    final theme = CodeTheme.of(context) ??
+    final theme = CodeTheme.of(context)?.styles['root'] ??
         CodeThemeData(
           styles: monokaiSublimeTheme,
-        );
-    final backgroundColor = theme.styles['root']?.backgroundColor;
-    final color = theme.styles['root']?.color;
-    final style = widget.style.copyWith(
+        ).styles['root'];
+    final backgroundColor = theme?.backgroundColor;
+    final color = theme?.color;
+    final style = TextStyle(
       fontSize: 14,
       color: color,
       backgroundColor: backgroundColor,
