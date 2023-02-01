@@ -45,6 +45,10 @@ class CodeController extends TextEditingController {
     notifyListeners();
   }
 
+  /// `CodeController` uses [analyzer] to generate issues
+  /// that are displayed in gutter widget.
+  ///
+  /// Calls [Analyzer.analyze] after change with 500ms debounce.
   Analyzer analyzer;
 
   /// Whether disposal of `CodeController` should call `analyzer.dispose`.
@@ -158,7 +162,7 @@ class CodeController extends TextEditingController {
 
   void analyzeCode() {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 200), () async {
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
       issues = await analyzer.analyze(_code);
       notifyListeners();
     });
