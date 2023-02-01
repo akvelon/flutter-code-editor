@@ -4,6 +4,8 @@ import '../api/analyzer.dart';
 import '../api/models/issue.dart';
 
 class DefaultAnalyzer extends Analyzer {
+  const DefaultAnalyzer();
+
   @override
   Future<List<Issue>> analyze(Code code) async {
     return code.invalidBlocks.map((e) => e.issue).toList(

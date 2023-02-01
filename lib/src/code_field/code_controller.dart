@@ -45,9 +45,12 @@ class CodeController extends TextEditingController {
     notifyListeners();
   }
 
-  Analyzer? analyzer;
+  Analyzer analyzer;
 
+  /// Whether disposal of `CodeController` should call `analyzer.dispose`.
+  bool disposeAnalyzer;
   List<Issue> issues;
+  Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
   Set<String> _readOnlySectionNames;
@@ -107,7 +110,8 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    this.analyzer,
+    this.analyzer = const DefaultAnalyzer(),
+    this.disposeAnalyzer = true,
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
@@ -130,7 +134,7 @@ class CodeController extends TextEditingController {
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    analyzer?.init(getCode: () => _code, listener: processIssues);
+    addListener(analyzeCode);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -150,6 +154,14 @@ class CodeController extends TextEditingController {
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
+  }
+
+  void analyzeCode() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 200), () async {
+      issues = await analyzer.analyze(_code);
+      notifyListeners();
+    });
   }
 
   /// Sets a specific cursor position in the text
@@ -794,8 +806,9 @@ class CodeController extends TextEditingController {
 
   @override
   void dispose() {
-    if (analyzer is DefaultAnalyzer) {
-      analyzer?.dispose();
+    _debounce?.cancel();
+    if (disposeAnalyzer) {
+      analyzer.dispose();
     }
 
     super.dispose();

@@ -8,11 +8,9 @@ FocusNode focusNode = FocusNode();
 
 MaterialApp createApp(CodeController controller, FocusNode focusNode) {
   return MaterialApp(
-    home: Scaffold(
-      body: CodeField(
-        controller: controller,
-        focusNode: focusNode,
-      ),
+    home: TestApp(
+      controller: controller,
+      focusNode: focusNode,
     ),
   );
 }
@@ -38,4 +36,40 @@ CodeController createController(
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
     visibleSectionNames: visibleSectionNames,
   );
+}
+
+class TestApp extends StatefulWidget {
+  final CodeController controller;
+  final FocusNode focusNode;
+
+  const TestApp({
+    super.key,
+    required this.controller,
+    required this.focusNode,
+  });
+
+  @override
+  State<TestApp> createState() => _TestAppState();
+}
+
+class _TestAppState extends State<TestApp> {
+  late final controller = widget.controller;
+  late final focusNode = widget.focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CodeField(
+        controller: controller,
+        focusNode: focusNode,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
 }
