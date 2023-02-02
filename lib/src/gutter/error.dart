@@ -38,10 +38,9 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
           if (_entry != null) {
             return;
           }
-          _entry = getErrorPopup();
+          _entry = _getErrorPopup();
           final overlay = Overlay.of(context);
           overlay?.insert(_entry!);
-          overlay?.build(context);
         });
       },
       onExit: (event) {
@@ -63,7 +62,7 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
     );
   }
 
-  OverlayEntry getErrorPopup() {
+  OverlayEntry _getErrorPopup() {
     final style = widget.popupTextStyle;
     final issue = widget.issue;
 

@@ -107,7 +107,7 @@ class GutterWidget extends StatelessWidget {
       }
       tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
         issue,
-        style.errorPopupStyle ??
+        style.errorPopupTextStyle ??
             (throw Exception('Error popup style should never be null')),
       );
     }
