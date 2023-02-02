@@ -6,6 +6,7 @@ import 'package:highlight/languages/java.dart';
 
 FocusNode focusNode = FocusNode();
 
+/// Passed controller will be disposed with the widget.
 MaterialApp createApp(CodeController controller, FocusNode focusNode) {
   return MaterialApp(
     home: TestApp(
@@ -66,6 +67,9 @@ class _TestAppState extends State<TestApp> {
     );
   }
 
+  /// We need to dispose controller because it has debounce timer inside.
+  /// If we don't dispose it,
+  /// all tests that uses widget tester will start to fail.
   @override
   void dispose() {
     controller.dispose();
