@@ -11,34 +11,28 @@ class DartAnalyzer extends Analyzer {
   @override
   Future<List<Issue>> analyze(Code code) async {
     final client = http.Client();
-
+    const url = 'https:/stable.api.dartpad.dev/api/dartservices/v2/analyze';
     final response = await client.post(
-      Uri.https(
-        'stable.api.dartpad.dev',
-        '/api/dartservices/v2/analyze',
-      ),
+      Uri.parse(url),
       body: json.encode({
         'source': code.text,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-      },
       encoding: utf8,
     );
+
     final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
 
-    if (decodedResponse['issues']?.length == 0 ||
-        decodedResponse['issues'] == null) {
-      return [];
+    final issueMaps = decodedResponse['issues'];
+
+    if (issueMaps is! Iterable || (issueMaps.isEmpty)) {
+      throw Exception(
+        '[issues] field must be an iterable of Map<String, dynamic>',
+      );
     }
 
-    final issues = <Issue>[];
-
-    for (final issue in decodedResponse['issues']) {
-      final instance = issueFromJson(issue);
-      issues.add(instance);
-    }
-    return issues;
+    return issueMaps
+        .cast<Map<String, dynamic>>()
+        .map(issueFromJson)
+        .toList(growable: false);
   }
 }
