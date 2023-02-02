@@ -19,7 +19,5 @@ class Issue {
 }
 
 Comparator<Issue> issueLineComparator = (issue1, issue2) {
-  if (issue1.line > issue2.line) return 1;
-  if (issue1.line == issue2.line) return 0;
-  return -1;
+  return issue1.line - issue2.line;
 };
