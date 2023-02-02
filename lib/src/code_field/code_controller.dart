@@ -51,8 +51,6 @@ class CodeController extends TextEditingController {
   /// Calls [Analyzer.analyze] after change with 500ms debounce.
   final Analyzer analyzer;
 
-  /// Whether disposal of `CodeController` should call `analyzer.dispose`.
-  final bool disposeAnalyzer;
   List<Issue> issues;
   Timer? _debounce;
 
@@ -115,7 +113,6 @@ class CodeController extends TextEditingController {
     String? text,
     Mode? language,
     this.analyzer = const DefaultAnalyzer(),
-    this.disposeAnalyzer = true,
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
@@ -807,9 +804,6 @@ class CodeController extends TextEditingController {
   @override
   void dispose() {
     _debounce?.cancel();
-    if (disposeAnalyzer) {
-      analyzer.dispose();
-    }
 
     super.dispose();
   }
