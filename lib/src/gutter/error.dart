@@ -1,6 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../analyzer/api/models/issue.dart';
+import 'clickable.dart';
 
 const errorIcon = Icon(
   Icons.cancel,
@@ -68,13 +74,13 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
       return OverlayEntry(builder: (context) => Container());
     }
     final width = renderBox.size.width;
-    final newOffset = renderBox.localToGlobal(Offset.zero);
+    final offset = renderBox.localToGlobal(Offset.zero);
 
     return OverlayEntry(
       builder: (context) {
         return Positioned(
-          left: newOffset.dx + width,
-          top: newOffset.dy,
+          left: offset.dx + width,
+          top: offset.dy,
           child: MouseRegion(
             onEnter: (event) => setState(() {
               _mouseEnteredPopup = true;
@@ -109,13 +115,12 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
                           issue.message,
                         ),
                         if (issue.url != null) ...[
-                          RichText(
-                            text: TextSpan(
-                              style: style,
-                              text: issue.url,
-                              recognizer: TapGestureRecognizer()..onTap = () {},
-                            ),
-                          )
+                          ClickableWidget(
+                            child: Text(issue.url!),
+                            onTap: () {
+                              unawaited(launchUrlString(issue.url!));
+                            },
+                          ),
                         ],
                         if (issue.suggestion != null) ...[
                           Divider(
