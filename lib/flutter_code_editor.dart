@@ -6,7 +6,10 @@ export 'src/code/tokens.dart';
 
 export 'src/code_field/code_controller.dart';
 export 'src/code_field/code_field.dart';
+export 'src/code_field/custom_painter.dart';
+
 export 'src/code_field/editor_params.dart';
+export 'src/code_field/rich_text_field/rich_text_field.dart';
 export 'src/code_field/text_editing_value.dart';
 
 export 'src/code_modifiers/close_block_code_modifier.dart';
