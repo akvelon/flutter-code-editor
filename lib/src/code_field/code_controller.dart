@@ -135,7 +135,7 @@ class CodeController extends TextEditingController {
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    addListener(analyzeCode);
+    addListener(_analyzeCode);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -157,7 +157,7 @@ class CodeController extends TextEditingController {
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
 
-  void analyzeCode() {
+  void _analyzeCode() {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       final result = await analyzer.analyze(_code);
