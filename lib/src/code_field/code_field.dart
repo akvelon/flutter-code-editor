@@ -14,6 +14,7 @@ import 'actions/comment_uncomment.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
+import 'default_styles.dart';
 
 final _shortcuts = <ShortcutActivator, Intent>{
   // Copy
@@ -301,20 +302,19 @@ class _CodeFieldState extends State<CodeField> {
   Widget build(BuildContext context) {
     // Default color scheme
     const rootKey = 'root';
-    final defaultBg = Colors.grey.shade900;
-    final defaultText = Colors.grey.shade200;
 
     final themeData = Theme.of(context);
     final styles = CodeTheme.of(context)?.styles;
-    Color? backgroundCol =
-        widget.background ?? styles?[rootKey]?.backgroundColor ?? defaultBg;
+    Color? backgroundCol = widget.background ??
+        styles?[rootKey]?.backgroundColor ??
+        DefaultStyles.backgroundColor;
 
     if (widget.decoration != null) {
       backgroundCol = null;
     }
 
     final defaultTextStyle = TextStyle(
-      color: styles?[rootKey]?.color ?? defaultText,
+      color: styles?[rootKey]?.color ?? DefaultStyles.textColor,
       fontSize: themeData.textTheme.subtitle1?.fontSize,
     );
 
@@ -335,9 +335,9 @@ class _CodeFieldState extends State<CodeField> {
       textStyle: lineNumberTextStyle,
       errorPopupStyle: widget.gutterStyle.errorPopupStyle ??
           textStyle.copyWith(
-            fontSize: 14,
-            backgroundColor: backgroundCol,
-            fontStyle: FontStyle.normal,
+            fontSize: DefaultStyles.errorPopupTextSize,
+            backgroundColor: DefaultStyles.backgroundColor,
+            fontStyle: DefaultStyles.fontStyle,
           ),
     );
 
