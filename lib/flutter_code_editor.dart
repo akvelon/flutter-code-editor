@@ -1,3 +1,8 @@
+export 'src/analyzer/api/analyzer.dart';
+export 'src/analyzer/api/models/analysis_result.dart';
+export 'src/analyzer/api/models/issue.dart';
+export 'src/analyzer/api/models/issue_type.dart';
+
 export 'src/code/code.dart';
 export 'src/code/code_line.dart';
 export 'src/code/string.dart';

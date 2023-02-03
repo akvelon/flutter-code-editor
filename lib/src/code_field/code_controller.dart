@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../../flutter_code_editor.dart';
+import '../analyzer/impl/default_analyzer.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
@@ -43,6 +44,15 @@ class CodeController extends TextEditingController {
     _updateCode(_code.text);
     notifyListeners();
   }
+
+  /// `CodeController` uses [analyzer] to generate issues
+  /// that are displayed in gutter widget.
+  ///
+  /// Calls [Analyzer.analyze] after change with 500ms debounce.
+  final Analyzer analyzer;
+
+  List<Issue> issues;
+  Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
   Set<String> _readOnlySectionNames;
@@ -102,11 +112,13 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
+    this.analyzer = const DefaultAnalyzer(),
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
+    this.issues = const [],
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -122,6 +134,8 @@ class CodeController extends TextEditingController {
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
+
+    addListener(_analyzeCode);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -141,6 +155,20 @@ class CodeController extends TextEditingController {
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
+  }
+
+  void _analyzeCode() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      final text = _code.text;
+      final result = await analyzer.analyze(_code);
+
+      if (text != _code.text) {
+        return;
+      }
+      issues = result.issues;
+      notifyListeners();
+    });
   }
 
   /// Sets a specific cursor position in the text
@@ -776,5 +804,12 @@ class CodeController extends TextEditingController {
 
   CodeThemeData _getTheme(BuildContext context) {
     return CodeTheme.of(context) ?? CodeThemeData();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+
+    super.dispose();
   }
 }

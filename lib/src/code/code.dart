@@ -7,13 +7,13 @@ import 'package:highlight/highlight_core.dart';
 import '../../src/highlight/result.dart';
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
+import '../folding/invalid_foldable_block.dart';
 import '../folding/parsers/parser_factory.dart';
 import '../hidden_ranges/hidden_line_ranges.dart';
 import '../hidden_ranges/hidden_line_ranges_builder.dart';
 import '../hidden_ranges/hidden_range.dart';
 import '../hidden_ranges/hidden_ranges.dart';
 import '../hidden_ranges/hidden_ranges_builder.dart';
-import '../issues/issue.dart';
 import '../named_sections/named_section.dart';
 import '../named_sections/parsers/abstract.dart';
 import '../service_comment_filter/service_comment_filter.dart';
@@ -35,7 +35,7 @@ class Code {
   final HiddenLineRanges hiddenLineRanges;
   final HiddenRanges hiddenRanges;
   final Result? highlighted;
-  final List<Issue> issues;
+  final List<InvalidFoldableBlock> invalidBlocks;
   final CodeLines lines;
   final Map<String, NamedSection> namedSections;
   final Result? visibleHighlighted;
@@ -67,8 +67,8 @@ class Code {
 
     final serviceCommentsNodesSet = serviceComments.sources;
 
-    final issues = <Issue>[];
     final List<FoldableBlock> foldableBlocks;
+    var invalidBlocks = List<InvalidFoldableBlock>.empty();
 
     final lines = CodeLinesBuilder.textToCodeLines(
       text: text,
@@ -87,7 +87,7 @@ class Code {
       );
 
       foldableBlocks = parser.blocks;
-      issues.addAll(parser.invalidBlocks.map((b) => b.issue));
+      invalidBlocks = parser.invalidBlocks;
     }
 
     final sections = namedSectionParser?.parse(
@@ -139,7 +139,7 @@ class Code {
       hiddenRanges: hiddenRanges,
       hiddenRangesBuilder: hiddenRangesBuilder,
       highlighted: highlighted,
-      issues: issues,
+      invalidBlocks: invalidBlocks,
       lines: lines,
       namedSections: sectionsMap,
       visibleHighlighted:
@@ -157,7 +157,7 @@ class Code {
     required this.hiddenRanges,
     required HiddenRangesBuilder hiddenRangesBuilder,
     required this.highlighted,
-    required this.issues,
+    this.invalidBlocks = const [],
     required this.lines,
     required this.namedSections,
     required this.visibleHighlighted,
@@ -173,7 +173,6 @@ class Code {
     hiddenRanges: HiddenRanges.empty,
     hiddenRangesBuilder: HiddenRangesBuilder.empty,
     highlighted: null,
-    issues: [],
     lines: CodeLines.empty,
     namedSections: {},
     visibleHighlighted: null,
@@ -500,7 +499,7 @@ class Code {
       hiddenRanges: hiddenRanges,
       hiddenRangesBuilder: hiddenRangesBuilder,
       highlighted: highlighted,
-      issues: issues,
+      invalidBlocks: invalidBlocks,
       lines: lines,
       namedSections: namedSections,
       visibleHighlighted:

@@ -12,6 +12,7 @@ dependencies:
   flutter_code_editor: { path: ../ }
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test: { sdk: flutter }
