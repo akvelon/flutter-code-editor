@@ -8,12 +8,15 @@ import 'json_converter.dart';
 
 // Example for implementation of Analyzer for Dart.
 class DartAnalyzer extends Analyzer {
+  static const _url =
+      'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
+
   @override
   Future<AnalysisResult> analyze(Code code) async {
     final client = http.Client();
-    const url = 'https:/stable.api.dartpad.dev/api/dartservices/v2/analyze';
+
     final response = await client.post(
-      Uri.parse(url),
+      Uri.parse(_url),
       body: json.encode({
         'source': code.text,
       }),
