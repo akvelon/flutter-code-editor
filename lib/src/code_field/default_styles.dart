@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
+@internal
 class DefaultStyles {
   static final backgroundColor = Colors.grey.shade900;
   static final textColor = Colors.grey.shade200;
