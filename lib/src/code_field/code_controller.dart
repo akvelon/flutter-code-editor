@@ -160,7 +160,12 @@ class CodeController extends TextEditingController {
   void _analyzeCode() {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
+      final text = _code.text;
       final result = await analyzer.analyze(_code);
+
+      if (text != _code.text) {
+        return;
+      }
       issues = result.issues;
       notifyListeners();
     });
