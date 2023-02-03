@@ -1,13 +1,12 @@
-import 'dart:math';
-
-import '../../flutter_code_editor.dart';
 import '../code/code_line.dart';
 import 'foldable_block.dart';
+import 'foldable_block_type.dart';
 
 /// Matches folded blocks from the old code to the new code.
 ///
 /// Basically adds the folded block to the new code
-/// if the content of it is not changed.
+/// if the content of its hidden part is not changed.
+/// IMPORTANT: even if it is no longer a valid block after a change.
 class FoldableBlockMatcher {
   final List<CodeLine> oldLines;
   final List<FoldableBlock> newBlocks;
@@ -27,61 +26,81 @@ class FoldableBlockMatcher {
       return;
     }
 
+    var firstDiffLineIndex = 0;
+    int oldLinesIndex = 0;
+    int newLinesIndex = 0;
+
+    while (lineIndexesAreValid(oldLinesIndex, newLinesIndex)) {
+      if (oldLines[oldLinesIndex].text != newLines[newLinesIndex].text) {
+        break;
+      }
+      firstDiffLineIndex++;
+      oldLinesIndex++;
+      newLinesIndex++;
+    }
+
     // This is basically the line-length of a inserted/removed text.
-    final diff = newLines.length - oldLines.length;
+    final lineDiff = newLines.length - oldLines.length;
 
     for (final foldedBlock in oldFoldedBlocks) {
-      // If the folded block is located before changed part.
-      final added = _addIfMatch(foldedBlock, 0);
-      if (!added) {
-        // If the folded block is located after changed part.
+      if (foldedBlock.firstLine < firstDiffLineIndex) {
+        // If the folded block is located before changed part,
+        // the lines must match perfectly.
+        _addIfMatch(foldedBlock, 0);
+      } else {
+        // If the folded block is located after changed part,
+        // the lines must differ exactly to the lineDiff.
+        // Covers:
         // 1. Paste text with undefined amount of newlines.
         // 2. Remove/Cut text with undefined amount of newlines.
-        _addIfMatch(foldedBlock, diff);
+        // 3. Add new line symbol.
+        _addIfMatch(foldedBlock, lineDiff);
       }
     }
   }
 
-  /// Adds the folded block to newFoldedBlocks if it is a valid match.
+  /// Adds the folded block to newFoldedBlocks
+  /// if its hidden part is not changed.
   ///
   /// A valid match is when the inner content of a folded block is unchanged.
   /// Lines must differ to exactly [lineDiff] lines.
-  bool _addIfMatch(FoldableBlock oldFoldedBlock, int lineDiff) {
+  void _addIfMatch(FoldableBlock oldFoldedBlock, int lineDiff) {
     int newLinesIndex = oldFoldedBlock.firstLine + lineDiff;
     int oldLinesIndex = oldFoldedBlock.firstLine;
 
-    // Allow first lines to differ if there is no lineDiff.
-    if (lineDiff == 0) {
-      newLinesIndex++;
-      oldLinesIndex++;
-    }
+    // Allow blocks content to differ at the first line
+    newLinesIndex++;
+    oldLinesIndex++;
 
     if (newLinesIndex < 0 || oldLinesIndex < 0) {
-      return false;
+      return;
     }
 
     while (oldLinesIndex <= oldFoldedBlock.lastLine &&
-        validateLinesIndex(oldLinesIndex, newLinesIndex)) {
+        lineIndexesAreValid(oldLinesIndex, newLinesIndex)) {
       if (newLines[newLinesIndex].text != oldLines[oldLinesIndex].text) {
-        return false;
+        return;
       }
       newLinesIndex++;
       oldLinesIndex++;
     }
 
+    // If we try to add something below the folded foldable block of type indent
+    // it should open the block.
+    // The only allowed char to enter right below this folded block
+    // is new line char at the end of line.
     if (oldFoldedBlock.type == FoldableBlockType.indent &&
-        validateLinesIndex(oldLinesIndex, newLinesIndex) &&
+        lineIndexesAreValid(oldLinesIndex, newLinesIndex) &&
         lineDiff == 0) {
       if (newLines[newLinesIndex].text != oldLines[oldLinesIndex].text) {
-        return false;
+        return;
       }
     }
 
     newFoldedBlocks.add(oldFoldedBlock.offset(lineDiff));
-    return true;
   }
 
-  bool validateLinesIndex(int oldLinesIndex, int newLinesIndex) {
+  bool lineIndexesAreValid(int oldLinesIndex, int newLinesIndex) {
     return newLinesIndex < newLines.length && oldLinesIndex < oldLines.length;
   }
 }
