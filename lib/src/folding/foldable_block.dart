@@ -68,6 +68,14 @@ class FoldableBlock extends InclusiveRange with EquatableMixin {
     );
   }
 
+  FoldableBlock offset(int offset) {
+    return FoldableBlock(
+      firstLine: firstLine + offset,
+      lastLine: lastLine + offset,
+      type: type,
+    );
+  }
+
   static FoldableBlockType _getJoinType(FoldableBlock a, FoldableBlock b) {
     if (a.type == FoldableBlockType.imports) {
       return FoldableBlockType.imports;

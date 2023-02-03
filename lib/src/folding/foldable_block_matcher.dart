@@ -1,12 +1,13 @@
 import 'dart:math';
 
+import '../../flutter_code_editor.dart';
 import '../code/code_line.dart';
 import 'foldable_block.dart';
 
-/// Matches foldable blocks before and after an edit to preserve their
-/// folding state.
+/// Matches folded blocks from the old code to the new code.
 ///
-/// Blocks match if they go in the same order and have the same content.
+/// Basically adds the folded block to the new code
+/// if the content of it is not changed.
 class FoldableBlockMatcher {
   final List<CodeLine> oldLines;
   final List<FoldableBlock> newBlocks;
@@ -15,77 +16,72 @@ class FoldableBlockMatcher {
   final newFoldedBlocks = <FoldableBlock>{};
 
   FoldableBlockMatcher({
-    required List<FoldableBlock> oldBlocks,
     required this.oldLines,
     required this.newBlocks,
     required this.newLines,
     required Set<FoldableBlock> oldFoldedBlocks,
   }) {
-    if (oldBlocks.isEmpty || newBlocks.isEmpty) {
+    // If no foldable blocks were folded, there is nothing to match.
+    // Because we generate foldable blocks anyway.
+    if (oldFoldedBlocks.isEmpty) {
       return;
     }
 
-    // Walk top to bottom until the first mismatch, if any.
-    final minLength = min(oldBlocks.length, newBlocks.length);
-    int top = 0;
+    // This is basically the line-length of a inserted/removed text.
+    final diff = newLines.length - oldLines.length;
 
-    for (; top < minLength; top++) {
-      final oldBlock = oldBlocks[top];
-      final newBlock = newBlocks[top];
-
-      if (_match(oldBlock: oldBlock, newBlock: newBlock)) {
-        oldToNew[oldBlock] = newBlock;
-      } else {
-        break;
-      }
-    }
-
-    // top is now the first mismatch.
-
-    int oldBottom = oldBlocks.length - 1;
-    int newBottom = newBlocks.length - 1;
-
-    for (; oldBottom >= top && newBottom >= top; oldBottom--, newBottom--) {
-      final oldBlock = oldBlocks[oldBottom];
-      final newBlock = newBlocks[newBottom];
-
-      if (_match(oldBlock: oldBlock, newBlock: newBlock)) {
-        oldToNew[oldBlock] = newBlock;
-      } else {
-        break;
-      }
-    }
-
-    for (final block in oldFoldedBlocks) {
-      final newBlock = oldToNew[block];
-      if (newBlock != null) {
-        newFoldedBlocks.add(newBlock);
+    for (final foldedBlock in oldFoldedBlocks) {
+      // If the folded block is located before changed part.
+      final added = _addIfMatch(foldedBlock, 0);
+      if (!added) {
+        // If the folded block is located after changed part.
+        // 1. Paste text with undefined amount of newlines.
+        // 2. Remove/Cut text with undefined amount of newlines.
+        _addIfMatch(foldedBlock, diff);
       }
     }
   }
 
-  bool _match({
-    required FoldableBlock oldBlock,
-    required FoldableBlock newBlock,
-  }) {
-    if (oldBlock.lineCount != newBlock.lineCount) {
+  /// Adds the folded block to newFoldedBlocks if it is a valid match.
+  ///
+  /// A valid match is when the inner content of a folded block is unchanged.
+  /// Lines must differ to exactly [lineDiff] lines.
+  bool _addIfMatch(FoldableBlock oldFoldedBlock, int lineDiff) {
+    int newLinesIndex = oldFoldedBlock.firstLine + lineDiff;
+    int oldLinesIndex = oldFoldedBlock.firstLine;
+
+    // Allow first lines to differ if there is no lineDiff.
+    if (lineDiff == 0) {
+      newLinesIndex++;
+      oldLinesIndex++;
+    }
+
+    if (newLinesIndex < 0 || oldLinesIndex < 0) {
       return false;
     }
 
-    // Allow the blocks to differ in the first line.
-    // This keeps a block folded when editing its first line.
-    int oldLineIndex = oldBlock.firstLine + 1;
-    int newLineIndex = newBlock.firstLine + 1;
-
-    while (oldLineIndex <= oldBlock.lastLine) {
-      if (oldLines[oldLineIndex].text != newLines[newLineIndex].text) {
+    while (oldLinesIndex <= oldFoldedBlock.lastLine &&
+        validateLinesIndex(oldLinesIndex, newLinesIndex)) {
+      if (newLines[newLinesIndex].text != oldLines[oldLinesIndex].text) {
         return false;
       }
-
-      oldLineIndex++;
-      newLineIndex++;
+      newLinesIndex++;
+      oldLinesIndex++;
     }
 
+    if (oldFoldedBlock.type == FoldableBlockType.indent &&
+        validateLinesIndex(oldLinesIndex, newLinesIndex) &&
+        lineDiff == 0) {
+      if (newLines[newLinesIndex].text != oldLines[oldLinesIndex].text) {
+        return false;
+      }
+    }
+
+    newFoldedBlocks.add(oldFoldedBlock.offset(lineDiff));
     return true;
+  }
+
+  bool validateLinesIndex(int oldLinesIndex, int newLinesIndex) {
+    return newLinesIndex < newLines.length && oldLinesIndex < oldLines.length;
   }
 }

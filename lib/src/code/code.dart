@@ -435,8 +435,9 @@ class Code {
 
   FoldableBlock? _getFoldableBlockByStartLine(int line) {
     return foldableBlocks.firstWhereOrNull(
-      (block) => block.firstLine == line,
-    );
+          (block) => block.firstLine == line,
+        ) ??
+        foldedBlocks.firstWhereOrNull((block) => block.firstLine == line);
   }
 
   HiddenRange foldableBlockToHiddenRange(FoldableBlock block) {
@@ -461,7 +462,6 @@ class Code {
   /// Folds this code at the same blocks as the [oldCode] is.
   Code foldedAs(Code oldCode) {
     final matcher = FoldableBlockMatcher(
-      oldBlocks: oldCode.foldableBlocks,
       oldLines: oldCode.lines.lines,
       newBlocks: foldableBlocks,
       newLines: lines.lines,

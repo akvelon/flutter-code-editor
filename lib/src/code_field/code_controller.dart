@@ -291,6 +291,9 @@ class CodeController extends TextEditingController {
         newValue = newValue.tabsToSpaces(params.tabSpaces);
       }
 
+      print('#1');
+      print(_code.text);
+
       final editResult = _getEditResultNotBreakingReadOnly(newValue);
 
       if (editResult == null) {
@@ -298,6 +301,9 @@ class CodeController extends TextEditingController {
       }
 
       _updateCodeIfChanged(editResult.fullTextAfter);
+
+      print('#1');
+      print(_code.text);
 
       if (newValue.text != _code.visibleText) {
         // Manually typed in a text that has become a hidden range.
