@@ -13,4 +13,9 @@ class TextFieldPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     painter.paint(canvas, Offset.zero);
   }
+
+  @override
+  bool hitTest(Offset position) {
+    return true;
+  }
 }

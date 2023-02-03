@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:highlight/languages/java.dart';
 
 import '../../../flutter_code_editor.dart';
 import 'text_field_painter.dart';
@@ -14,22 +16,26 @@ class RichTextField extends StatefulWidget {
 
 class _RichTextFieldState extends State<RichTextField> {
   ValueNotifier<bool> repaint = ValueNotifier(false);
+  double height = 0.0;
+  double width = 0.0;
 
-  TextEditingController controller = CodeController(text: 'aaaaaaaaaa');
+  TextEditingController controller = CodeController(
+    text: 'aaaaaaaaaa\n' * 500,
+    language: java,
+  );
   late final TextPainter _painter = TextPainter(
-      text: controller.buildTextSpan(
-    context: context,
-    withComposing: false,
-  ))..layout();
+    text: TextSpan(text: ''),
+    textDirection: TextDirection.ltr,
+  );
 
   @override
   void initState() {
     super.initState();
-    Timer.periodic(Duration(seconds: 1), (e) {
+    Timer.periodic(const Duration(seconds: 1), (e) {
       repaint.value = !repaint.value;
 
       controller.value = TextEditingValue(
-        text: '${controller.value.text}\n${controller.value.text}',
+        text: '${controller.value.text}\naaaaaaaaaa',
       );
     });
 
@@ -39,13 +45,21 @@ class _RichTextFieldState extends State<RichTextField> {
         withComposing: false,
       );
       _painter.layout();
+
+      setState(() {
+        height = _painter.height;
+        width = _painter.width;
+      });
     });
+
+    _painter.layout();
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
+      scrollDirection: Axis.horizontal,
+      child: Row(
         children: [
           Container(
             decoration: BoxDecoration(
@@ -53,8 +67,8 @@ class _RichTextFieldState extends State<RichTextField> {
                 color: Colors.black,
               ),
             ),
-            height: _painter.height,
-            width: _painter.width,
+            height: height,
+            width: width,
             child: CustomPaint(
               painter: TextFieldPainter(
                 painter: _painter,
