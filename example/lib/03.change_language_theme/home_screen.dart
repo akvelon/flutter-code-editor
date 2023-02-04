@@ -3,10 +3,11 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import '../common/snippets.dart';
 import '../common/themes.dart';
+import 'analyzer_implementation/dart_analyzer.dart';
 import 'constants.dart';
 import 'widgets/dropdown_selector.dart';
 
-const _defaultLanguage = 'java';
+const _defaultLanguage = 'dart';
 const _defaultTheme = 'monokai-sublime';
 
 const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
@@ -27,9 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
+    analyzer: DartAnalyzer(),
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
-    text: javaFactorialSnippet,
+    text: dartSnippet,
   );
 
   @override
@@ -65,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             icon: const Icon(Icons.chevron_right),
           ),
+
           const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setLanguage,
@@ -72,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _language,
             values: languageList,
           ),
+
           const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setTheme,
@@ -79,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _theme,
             values: themeList,
           ),
+
           const SizedBox(width: 20),
         ],
       ),

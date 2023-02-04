@@ -96,15 +96,20 @@ class GutterWidget extends StatelessWidget {
   }
 
   void _fillIssues(List<TableRow> tableRows) {
-    final code = codeController.code;
-
-    for (final issue in code.issues) {
-      final lineIndex = _lineIndexToTableRowIndex(issue.line);
-      if (lineIndex == null) {
+    for (final issue in codeController.issues) {
+      if (issue.line >= codeController.code.lines.length) {
         continue;
       }
 
-      tableRows[lineIndex].children![_issueColumn] = const GutterErrorWidget();
+      final lineIndex = _lineIndexToTableRowIndex(issue.line);
+      if (lineIndex == null || lineIndex >= tableRows.length) {
+        continue;
+      }
+      tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
+        issue,
+        style.errorPopupTextStyle ??
+            (throw Exception('Error popup style should never be null')),
+      );
     }
   }
 
