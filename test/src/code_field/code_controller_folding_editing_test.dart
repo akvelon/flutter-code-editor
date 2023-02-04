@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/python.dart';
@@ -19,17 +20,18 @@ void main() {
   group('CodeController. Folding.', () {
     group('Editing', () {
       group('Folded block is still recognizable after edit', () {
-        testWidgets('above a folded block', (WidgetTester wt) async {
-          final controller = await pumpController(wt, TwoMethodsSnippet.full);
-          controller.foldAt(1);
-          await wt.selectFromHome(0, offset: 7);
+        group('Java', () {
+          testWidgets('above a folded block', (WidgetTester wt) async {
+            final controller = await pumpController(wt, TwoMethodsSnippet.full);
+            controller.foldAt(1);
+            await wt.selectFromHome(0, offset: 7);
 
-          controller.value = controller.value.replacedSelection('public');
+            controller.value = controller.value.replacedSelection('public');
 
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
+            expect(
+              controller.value,
+              const TextEditingValue(
+                text: '''
 public class MyClass {
   void method1() {
 
@@ -38,16 +40,16 @@ public class MyClass {
   }
 }
 ''',
-              selection: TextSelection(baseOffset: 0, extentOffset: 6),
-            ),
-          );
+                selection: TextSelection(baseOffset: 0, extentOffset: 6),
+              ),
+            );
 
-          controller.unfoldAt(1);
+            controller.unfoldAt(1);
 
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
+            expect(
+              controller.value,
+              const TextEditingValue(
+                text: '''
 public class MyClass {
   void method1() {
     if (false) {
@@ -60,98 +62,149 @@ public class MyClass {
   }
 }
 ''',
-              selection: TextSelection(baseOffset: 0, extentOffset: 6),
-            ),
-          );
+                selection: TextSelection(baseOffset: 0, extentOffset: 6),
+              ),
+            );
+          });
+
+          testWidgets('the first line of a folded block',
+              (WidgetTester wt) async {
+            final controller = await pumpController(wt, TwoMethodsSnippet.full);
+            controller.foldAt(0);
+            await wt.selectFromHome(0, offset: 7);
+
+            controller.value = controller.value.replacedSelection('public');
+
+            expect(
+              controller.value,
+              const TextEditingValue(
+                text: '''
+public class MyClass {
+''',
+                selection: TextSelection(baseOffset: 0, extentOffset: 6),
+              ),
+            );
+
+            controller.unfoldAt(0);
+
+            expect(
+              controller.value,
+              const TextEditingValue(
+                text: '''
+public class MyClass {
+  void method1() {
+    if (false) {
+      return;
+    }
+  }
+
+  void method2() {
+    return;
+  }
+}
+''',
+                selection: TextSelection(baseOffset: 0, extentOffset: 6),
+              ),
+            );
+          });
+
+          testWidgets('between folded blocks', (WidgetTester wt) async {
+            final controller = await pumpController(wt, TwoMethodsSnippet.full);
+            controller.foldAt(1);
+            controller.foldAt(7);
+
+            await wt.selectFromHome(43);
+            controller.value = controller.value.replacedSelection('int n;\n');
+
+            expect(
+              controller.value,
+              const TextEditingValue(
+                text: '''
+private class MyClass {
+  void method1() {
+int n;
+
+  void method2() {
+}
+''',
+                selection: TextSelection.collapsed(offset: 50),
+              ),
+            );
+
+            controller.unfoldAt(1);
+            controller.unfoldAt(8);
+
+            expect(
+              controller.value,
+              const TextEditingValue(
+                text: '''
+private class MyClass {
+  void method1() {
+    if (false) {
+      return;
+    }
+  }
+int n;
+
+  void method2() {
+    return;
+  }
+}
+''',
+                selection: TextSelection.collapsed(offset: 91),
+              ),
+            );
+          });
         });
 
-        testWidgets('the first line of a folded block',
-            (WidgetTester wt) async {
-          final controller = await pumpController(wt, TwoMethodsSnippet.full);
+        group('Python', () {
+          testWidgets(
+              'Indent block is opened '
+              'if the next line is being edited', (wt) async {
+            const example = 'a:\n  aaaa\n';
+            final controller = await pumpController(
+              wt,
+              example,
+              language: python,
+            );
+            controller.foldAt(0);
+
+            expect(controller.value.text, 'a:\n');
+            //                                 \ selection
+            await wt.selectFromHome(3);
+            controller.value = controller.value.replacedSelection('a');
+
+            // selection changed not desirably, so I didn't add it to the test
+            // TODO(yescorp): fix test when selection for such cases will be fixed
+            const expectedText = 'a:\n  aaaa\na';
+
+            expect(controller.value.text, expectedText);
+          });
+        });
+
+        testWidgets(
+            'Indent block is not opened '
+            'if the newline char was inserted to the next line ', (wt) async {
+          const example = 'a:\n  aaaa\n\n';
+          final controller = await pumpController(
+            wt,
+            example,
+            language: python,
+          );
+
           controller.foldAt(0);
-          await wt.selectFromHome(0, offset: 7);
 
-          controller.value = controller.value.replacedSelection('public');
+          expect(controller.value.text, 'a:\n\n');
+          //                                 \ selection
+          await wt.selectFromHome(3);
 
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
-public class MyClass {
-''',
-              selection: TextSelection(baseOffset: 0, extentOffset: 6),
-            ),
-          );
+          controller.value = controller.value.replacedSelection('\n');
 
-          controller.unfoldAt(0);
+          // selection changed not desirably, so I didn't add it to the test
+          // TODO(yescorp): fix test when selection for such cases will be fixed
+          const expectedText = 'a:\n\n\n';
 
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
-public class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-
-  void method2() {
-    return;
-  }
-}
-''',
-              selection: TextSelection(baseOffset: 0, extentOffset: 6),
-            ),
-          );
-        });
-
-        testWidgets('between folded blocks', (WidgetTester wt) async {
-          final controller = await pumpController(wt, TwoMethodsSnippet.full);
-          controller.foldAt(1);
-          controller.foldAt(7);
-
-          await wt.selectFromHome(43);
-          controller.value = controller.value.replacedSelection('int n;\n');
-
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
-private class MyClass {
-  void method1() {
-int n;
-
-  void method2() {
-}
-''',
-              selection: TextSelection.collapsed(offset: 50),
-            ),
-          );
-
-          controller.unfoldAt(1);
-          controller.unfoldAt(8);
-
-          expect(
-            controller.value,
-            const TextEditingValue(
-              text: '''
-private class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-int n;
-
-  void method2() {
-    return;
-  }
-}
-''',
-              selection: TextSelection.collapsed(offset: 91),
-            ),
-          );
+          expect(controller.value.text, expectedText);
         });
       });
 
