@@ -223,7 +223,7 @@ int n;
             controller.value = controller.value.replacedSelection('a');
 
             // selection changed not desirably, so I didn't add it to the test
-            // TODO(yescorp): fix test when selection for such cases will be fixed
+            // TODO(yescorp): fix when selection for such cases will be fixed
             const expectedText = 'a:\n  aaaa\na';
 
             expect(controller.value.text, expectedText);
