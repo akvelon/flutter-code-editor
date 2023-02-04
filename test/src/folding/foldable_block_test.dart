@@ -158,4 +158,12 @@ void main() {
       const FB(firstLine: 5 - 4, lastLine: 7 - 4, type: FBT.braces),
     );
   });
+
+  test('line count getter test', () {
+    const block = FB(firstLine: 5, lastLine: 7, type: FBT.braces);
+
+    final lineCount = block.lineCount;
+
+    expect(lineCount, 7 - (5 - 1));
+  });
 }
