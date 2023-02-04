@@ -17,17 +17,18 @@ private class MyClass {
 void main() {
   group('CodeController. Folding.', () {
     group('Editing', () {
-      testWidgets('above a folded block', (WidgetTester wt) async {
-        final controller = await pumpController(wt, TwoMethodsSnippet.full);
-        controller.foldAt(1);
-        await wt.selectFromHome(0, offset: 7);
+      group('Folded block is still recognizable after edit', () {
+        testWidgets('above a folded block', (WidgetTester wt) async {
+          final controller = await pumpController(wt, TwoMethodsSnippet.full);
+          controller.foldAt(1);
+          await wt.selectFromHome(0, offset: 7);
 
-        controller.value = controller.value.replacedSelection('public');
+          controller.value = controller.value.replacedSelection('public');
 
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
 public class MyClass {
   void method1() {
 
@@ -36,56 +37,16 @@ public class MyClass {
   }
 }
 ''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
-        );
+              selection: TextSelection(baseOffset: 0, extentOffset: 6),
+            ),
+          );
 
-        controller.unfoldAt(1);
+          controller.unfoldAt(1);
 
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-public class MyClass {
-  void method1() {
-    if (false) {
-      return;
-    }
-  }
-
-  void method2() {
-    return;
-  }
-}
-''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
-        );
-      });
-
-      testWidgets('the first line of a folded block', (WidgetTester wt) async {
-        final controller = await pumpController(wt, TwoMethodsSnippet.full);
-        controller.foldAt(0);
-        await wt.selectFromHome(0, offset: 7);
-
-        controller.value = controller.value.replacedSelection('public');
-
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
-public class MyClass {
-''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
-        );
-
-        controller.unfoldAt(0);
-
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
 public class MyClass {
   void method1() {
     if (false) {
@@ -98,23 +59,64 @@ public class MyClass {
   }
 }
 ''',
-            selection: TextSelection(baseOffset: 0, extentOffset: 6),
-          ),
-        );
-      });
+              selection: TextSelection(baseOffset: 0, extentOffset: 6),
+            ),
+          );
+        });
 
-      testWidgets('between folded blocks', (WidgetTester wt) async {
-        final controller = await pumpController(wt, TwoMethodsSnippet.full);
-        controller.foldAt(1);
-        controller.foldAt(7);
+        testWidgets('the first line of a folded block',
+            (WidgetTester wt) async {
+          final controller = await pumpController(wt, TwoMethodsSnippet.full);
+          controller.foldAt(0);
+          await wt.selectFromHome(0, offset: 7);
 
-        await wt.selectFromHome(43);
-        controller.value = controller.value.replacedSelection('int n;\n');
+          controller.value = controller.value.replacedSelection('public');
 
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
+public class MyClass {
+''',
+              selection: TextSelection(baseOffset: 0, extentOffset: 6),
+            ),
+          );
+
+          controller.unfoldAt(0);
+
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
+public class MyClass {
+  void method1() {
+    if (false) {
+      return;
+    }
+  }
+
+  void method2() {
+    return;
+  }
+}
+''',
+              selection: TextSelection(baseOffset: 0, extentOffset: 6),
+            ),
+          );
+        });
+
+        testWidgets('between folded blocks', (WidgetTester wt) async {
+          final controller = await pumpController(wt, TwoMethodsSnippet.full);
+          controller.foldAt(1);
+          controller.foldAt(7);
+
+          await wt.selectFromHome(43);
+          controller.value = controller.value.replacedSelection('int n;\n');
+
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
 private class MyClass {
   void method1() {
 int n;
@@ -122,17 +124,17 @@ int n;
   void method2() {
 }
 ''',
-            selection: TextSelection.collapsed(offset: 50),
-          ),
-        );
+              selection: TextSelection.collapsed(offset: 50),
+            ),
+          );
 
-        controller.unfoldAt(1);
-        controller.unfoldAt(8);
+          controller.unfoldAt(1);
+          controller.unfoldAt(8);
 
-        expect(
-          controller.value,
-          const TextEditingValue(
-            text: '''
+          expect(
+            controller.value,
+            const TextEditingValue(
+              text: '''
 private class MyClass {
   void method1() {
     if (false) {
@@ -146,9 +148,84 @@ int n;
   }
 }
 ''',
-            selection: TextSelection.collapsed(offset: 91),
-          ),
-        );
+              selection: TextSelection.collapsed(offset: 91),
+            ),
+          );
+        });
+      });
+
+      group('Folded block is no longer recognizable', () {
+        group(
+            'Miltiline comment that started before folded block '
+            '1. Doesn\' unfold the block '
+            '2. The block is still unfoldable manually '
+            '3. The block is deletable', () {
+          testWidgets('Braces. 1.', (wt) async {
+            const example = '\na{\n}';
+            //               \ starting selection
+            final controller = await pumpController(wt, example);
+            controller.foldAt(1);
+
+            await wt.selectFromHome(0);
+            controller.value = controller.value.replacedSelection('/*');
+            const expected = TextEditingValue(
+              text: '/*\na{',
+              //       \ selection after insertion
+              selection: TextSelection.collapsed(offset: 2),
+            );
+            expect(controller.value, expected);
+          });
+
+          testWidgets('Braces. 2.', (wt) async {
+            const example = '\na{\n}';
+            //               \ starting selection
+            final controller = await pumpController(wt, example);
+            controller.foldAt(1);
+
+            await wt.selectFromHome(0);
+            controller.value = controller.value.replacedSelection('/*');
+            const expected = TextEditingValue(
+              text: '/*\na{',
+              //       \ selection after insertion
+              selection: TextSelection.collapsed(offset: 2),
+            );
+            expect(controller.value, expected);
+
+            controller.unfoldAt(1);
+            const unfoldedResult = TextEditingValue(
+              text: '/*\na{\n}',
+              //       \ selection
+              selection: TextSelection.collapsed(offset: 2),
+            );
+            expect(controller.value, unfoldedResult);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+
+          testWidgets('Braces. 3.', (wt) async {
+            const example = '\na{\n}';
+            //               \ starting selection
+            final controller = await pumpController(wt, example);
+            controller.foldAt(1);
+
+            await wt.selectFromHome(0);
+            controller.value = controller.value.replacedSelection('/*');
+            const expected = TextEditingValue(
+              text: '/*\na{',
+              //       \ selection after insertion
+              selection: TextSelection.collapsed(offset: 2),
+            );
+            expect(controller.value, expected);
+
+            // select everything
+            await wt.selectFromHome(0, offset: controller.value.text.length);
+            controller.value = controller.value.replacedSelection('');
+            const deletedResult = TextEditingValue(
+              selection: TextSelection.collapsed(offset: 0),
+            );
+            expect(controller.value, deletedResult);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+        });
       });
     });
 
