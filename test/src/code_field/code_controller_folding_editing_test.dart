@@ -155,6 +155,54 @@ int n;
               ),
             );
           });
+
+          testWidgets('Add multiline text before and after a folded block',
+              (wt) async {
+            const visibleText = '\nmethod1(){\n';
+            const example = '\nmethod1(){\n  if (true) return;\n}\n';
+            const insertedText = 'a\na\na\n';
+
+            final controller = await pumpController(wt, example);
+
+            controller.foldAt(1);
+
+            await wt.cursorHome();
+
+            controller.value = controller.value.replacedSelection(insertedText);
+
+            const insertedBeforeExpected = TextEditingValue(
+              text: insertedText + visibleText,
+              selection: TextSelection.collapsed(offset: 6),
+            );
+
+            expect(controller.value, insertedBeforeExpected);
+
+            await wt.cursorEnd();
+            controller.value = controller.value.replacedSelection(insertedText);
+
+            const insertedAfterExpected = TextEditingValue(
+              text: insertedText + visibleText + insertedText,
+              selection: TextSelection.collapsed(offset: 24),
+            );
+
+            expect(controller.value, insertedAfterExpected);
+          });
+
+          testWidgets('Remove multiline text before folded block', (wt) async {
+            const example = 'a\na\na\nmethod1(){\n  if (true) return;\n}\n';
+
+            final controller = await pumpController(wt, example);
+            controller.foldAt(3);
+            await wt.selectFromHome(0, offset: 6);
+
+            const expected = TextEditingValue(
+              text: 'method1(){\n',
+              selection: TextSelection.collapsed(offset: 0),
+            );
+
+            controller.value = controller.value.replacedSelection('');
+            expect(controller.value, expected);
+          });
         });
 
         group('Python', () {
@@ -180,31 +228,30 @@ int n;
 
             expect(controller.value.text, expectedText);
           });
-        });
 
-        testWidgets(
-            'Indent block is not opened '
-            'if the newline char was inserted to the next line ', (wt) async {
-          const example = 'a:\n  aaaa\n\n';
-          final controller = await pumpController(
-            wt,
-            example,
-            language: python,
-          );
+          testWidgets(
+              'Indent block is not opened '
+              'if the newline char was inserted to the next line ', (wt) async {
+            const example = 'a:\n  aaaa\n\n';
+            final controller = await pumpController(
+              wt,
+              example,
+              language: python,
+            );
 
-          controller.foldAt(0);
+            controller.foldAt(0);
 
-          expect(controller.value.text, 'a:\n\n');
-          //                                 \ selection
-          await wt.selectFromHome(3);
+            expect(controller.value.text, 'a:\n\n');
+            //                                 \ selection
+            await wt.selectFromHome(3);
 
-          controller.value = controller.value.replacedSelection('\n');
+            controller.value = controller.value.replacedSelection('\na');
 
-          // selection changed not desirably, so I didn't add it to the test
-          // TODO(yescorp): fix test when selection for such cases will be fixed
-          const expectedText = 'a:\n\n\n';
+            const expectedText = 'a:\n\na\n';
 
-          expect(controller.value.text, expectedText);
+            expect(controller.value.text, expectedText);
+            expect(controller.code.foldedBlocks.length, 1);
+          });
         });
       });
 
