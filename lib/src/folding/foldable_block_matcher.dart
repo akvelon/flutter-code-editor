@@ -1,4 +1,5 @@
 import '../code/code_line.dart';
+import '../code/string.dart';
 import 'foldable_block.dart';
 import 'foldable_block_type.dart';
 
@@ -68,13 +69,14 @@ class FoldableBlockMatcher {
     int newLinesIndex = oldFoldedBlock.firstLine + lineDiff;
     int oldLinesIndex = oldFoldedBlock.firstLine;
 
+    // if the first line is removed completely
+    if (newLines[newLinesIndex].text.hasOnlyWhitespaces()) {
+      return;
+    }
+
     // Allow blocks content to differ at the first line
     newLinesIndex++;
     oldLinesIndex++;
-
-    if (newLinesIndex < 0 || oldLinesIndex < 0) {
-      return;
-    }
 
     while (oldLinesIndex <= oldFoldedBlock.lastLine &&
         lineIndexesAreValid(oldLinesIndex, newLinesIndex)) {
