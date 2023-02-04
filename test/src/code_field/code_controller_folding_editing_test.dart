@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:highlight/languages/python.dart';
 
 import '../common/create_app.dart';
 import '../common/snippets.dart';
@@ -202,7 +203,7 @@ int n;
           });
 
           testWidgets('Braces. 3.', (wt) async {
-            const example = '\na{\n}';
+            const example = '\na{\n}\n';
             //               \ starting selection
             final controller = await pumpController(wt, example);
             controller.foldAt(1);
@@ -210,17 +211,105 @@ int n;
             await wt.selectFromHome(0);
             controller.value = controller.value.replacedSelection('/*');
             const expected = TextEditingValue(
-              text: '/*\na{',
+              text: '/*\na{\n',
               //       \ selection after insertion
               selection: TextSelection.collapsed(offset: 2),
             );
             expect(controller.value, expected);
 
             // select everything
-            await wt.selectFromHome(0, offset: controller.value.text.length);
+            await wt.selectFromHome(
+              2,
+              offset: controller.value.text.length - 2,
+            );
             controller.value = controller.value.replacedSelection('');
             const deletedResult = TextEditingValue(
-              selection: TextSelection.collapsed(offset: 0),
+              text: '/*',
+              selection: TextSelection.collapsed(offset: 2),
+            );
+            expect(controller.value, deletedResult);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+        });
+
+        group('Multiline String', () {
+          testWidgets('Braces. 1.', (wt) async {
+            const example = '\na{\n}';
+            //               \ starting selection
+            final controller = await pumpController(
+              wt,
+              example,
+              language: python,
+            );
+            controller.foldAt(1);
+
+            await wt.selectFromHome(0);
+            controller.value = controller.value.replacedSelection('"""');
+            const expected = TextEditingValue(
+              text: '"""\na{',
+              //       \ selection after insertion
+              selection: TextSelection.collapsed(offset: 3),
+            );
+            expect(controller.value, expected);
+          });
+
+          testWidgets('Braces. 2.', (wt) async {
+            const example = '\na{\n}';
+            //               \ starting selection
+            final controller = await pumpController(
+              wt,
+              example,
+              language: python,
+            );
+            controller.foldAt(1);
+
+            await wt.selectFromHome(0);
+            controller.value = controller.value.replacedSelection('"""');
+            const expected = TextEditingValue(
+              text: '"""\na{',
+              //       \ selection after insertion
+              selection: TextSelection.collapsed(offset: 3),
+            );
+            expect(controller.value, expected);
+
+            controller.unfoldAt(1);
+            const unfoldedResult = TextEditingValue(
+              text: '"""\na{\n}',
+              //       \ selection
+              selection: TextSelection.collapsed(offset: 3),
+            );
+            expect(controller.value, unfoldedResult);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+
+          testWidgets('Braces. 3.', (wt) async {
+            const example = '\na{\n}\n';
+            //               \ starting selection
+            final controller = await pumpController(
+              wt,
+              example,
+              language: python,
+            );
+            controller.foldAt(1);
+
+            await wt.selectFromHome(0);
+            controller.value = controller.value.replacedSelection('"""');
+            const expected = TextEditingValue(
+              text: '"""\na{\n',
+              //       \ selection after insertion
+              selection: TextSelection.collapsed(offset: 3),
+            );
+            expect(controller.value, expected);
+
+            // select everything
+            await wt.selectFromHome(
+              3,
+              offset: controller.value.text.length - 3,
+            );
+            controller.value = controller.value.replacedSelection('');
+            const deletedResult = TextEditingValue(
+              text: '"""',
+              selection: TextSelection.collapsed(offset: 3),
             );
             expect(controller.value, deletedResult);
             expect(controller.code.foldedBlocks.length, 0);

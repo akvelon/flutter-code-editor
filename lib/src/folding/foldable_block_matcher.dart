@@ -69,6 +69,10 @@ class FoldableBlockMatcher {
     int newLinesIndex = oldFoldedBlock.firstLine + lineDiff;
     int oldLinesIndex = oldFoldedBlock.firstLine;
 
+    if (oldLinesIndex < 0 || newLinesIndex < 0) {
+      return;
+    }
+
     // if the first line is removed completely
     if (newLines[newLinesIndex].text.hasOnlyWhitespaces()) {
       return;
