@@ -20,7 +20,7 @@ class _RichTextFieldState extends State<RichTextField> {
   double width = 0.0;
 
   TextEditingController controller = CodeController(
-    text: 'aaaaaaaaaa\n' * 500,
+    text: 'import package return () {} /*   */ // comment\n' * 500,
     language: java,
   );
   late final TextPainter _painter = TextPainter(

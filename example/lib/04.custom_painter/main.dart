@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    RepaintBoundary(child: RichTextField()),
+                    RichTextField(),
                   ],
                 ),
               );
