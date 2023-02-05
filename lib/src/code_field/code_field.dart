@@ -345,7 +345,6 @@ class _CodeFieldState extends State<CodeField> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-
         Widget? gutter;
         if (gutterStyle.showGutter) {
           final List<int> linesInParagraps;
@@ -417,10 +416,10 @@ class _CodeFieldState extends State<CodeField> {
                 return codeField;
               } else {
                 return _wrapInScrollView(
-                      codeField,
-                      textStyle,
-                      constraints.maxWidth,
-                    );
+                  codeField,
+                  textStyle,
+                  constraints.maxWidth,
+                );
               }
             },
           ),

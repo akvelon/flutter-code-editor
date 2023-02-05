@@ -115,7 +115,6 @@ class GutterWidget extends StatelessWidget {
     );
   }
 
-
   void _fillIssues(List<_GutterRowBuilder> tableRowBuilders) {
     for (final issue in codeController.issues) {
       final row = tableRowBuilders.firstWhereOrNull(
