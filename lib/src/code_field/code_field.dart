@@ -353,14 +353,14 @@ class _CodeFieldState extends State<CodeField> {
           if (widget.wrap) {
             // get wrapped line count in each paragraph
             const textFieldPadding =
-                paddingLeft + 3; // TODO: not sure why the 3 is needed!
+                paddingLeft + 3; // TODO(emuell): not sure why the 3 is needed!
             final codeFieldWidth = constraints.maxWidth.floorToDouble() -
                 gutterStyle.totalWidth() -
                 textFieldPadding;
             linesInParagraps = [];
             for (var i = 0; i < codeLines.length; ++i) {
               final codeLine = codeLines[i];
-              // codelines contain an extra newline at the end, except for the last line
+              // codelines contain an extra newline, except for the last line
               final text = (i == codeLines.length - 1)
                   ? codeLine.text
                   : codeLine.text.replaceAll('\n', '');
