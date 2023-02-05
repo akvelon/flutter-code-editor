@@ -433,10 +433,10 @@ class Code {
   }
 
   FoldableBlock? _getFoldableBlockByStartLine(int line) {
+    // It is important that we try to take a block from folded blocks first
+    // and only then from foldable blocks.
     return foldedBlocks.firstWhereOrNull((block) => block.firstLine == line) ??
-        foldableBlocks.firstWhereOrNull(
-          (block) => block.firstLine == line,
-        );
+        foldableBlocks.firstWhereOrNull((block) => block.firstLine == line);
   }
 
   HiddenRange foldableBlockToHiddenRange(FoldableBlock block) {

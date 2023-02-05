@@ -208,7 +208,8 @@ int n;
         group('Python', () {
           testWidgets(
               'Indent block is opened '
-              'if the next line is being edited', (wt) async {
+              'if the next line is being edited to be a part of this block',
+              (wt) async {
             const example = 'a:\n  aaaa\n';
             final controller = await pumpController(
               wt,
@@ -220,13 +221,39 @@ int n;
             expect(controller.value.text, 'a:\n');
             //                                 \ selection
             await wt.selectFromHome(3);
-            controller.value = controller.value.replacedSelection('a');
+            controller.value = controller.value.replacedSelection('  aaaa');
 
-            // selection changed not desirably, so I didn't add it to the test
-            // TODO(yescorp): fix when selection for such cases will be fixed
-            const expectedText = 'a:\n  aaaa\na';
+            const expectedText = 'a:\n  aaaa\n  aaaa';
 
             expect(controller.value.text, expectedText);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+
+          testWidgets(
+              'Indent block is not opened if the next line is edited '
+              'but it is not part of the block yet', (wt) async {
+            const example = 'a:\n  aaaa\n';
+            final controller = await pumpController(
+              wt,
+              example,
+              language: python,
+            );
+            controller.foldAt(0);
+
+            expect(controller.value.text, 'a:\n');
+            //                                 \ selection
+            await wt.selectFromHome(3);
+            controller.value = controller.value.replacedSelection('aaaa');
+
+            const expectedText = 'a:\naaaa';
+
+            expect(controller.value.text, expectedText);
+            expect(controller.code.foldedBlocks.length, 1);
+
+            controller.unfoldAt(0);
+
+            expect(controller.value.text, 'a:\n  aaaa\naaaa');
+            expect(controller.code.foldedBlocks.length, 0);
           });
 
           testWidgets(

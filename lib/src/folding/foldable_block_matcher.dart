@@ -91,16 +91,12 @@ class FoldableBlockMatcher {
       oldLinesIndex++;
     }
 
-    // If we try to add something below the folded foldable block of type indent
-    // it should open the block.
-    // The only allowed char to enter right below this folded block
-    // is new line char at the end of line.
-    if (oldFoldedBlock.type == FoldableBlockType.indent &&
-        lineIndexesAreValid(oldLinesIndex, newLinesIndex) &&
-        lineDiff == 0) {
-      if (newLines[newLinesIndex].text != oldLines[oldLinesIndex].text) {
-        return;
-      }
+    if (newBlocks.any(
+      (newBlock) =>
+          newBlock.firstLine == oldFoldedBlock.firstLine + lineDiff &&
+          newBlock.lineCount != oldFoldedBlock.lineCount,
+    )) {
+      return;
     }
 
     newFoldedBlocks.add(oldFoldedBlock.offset(lineDiff));
