@@ -1,7 +1,6 @@
 import '../code/code_line.dart';
 import '../code/string.dart';
 import 'foldable_block.dart';
-import 'foldable_block_type.dart';
 
 /// Matches folded blocks from the old code to the new code.
 ///
