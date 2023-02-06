@@ -42,7 +42,7 @@ void main() {
 
     test('Setting a language changes analyzer to Default analyzer', () {
       final controller = CodeController(
-        analyzer: TestAnalyzer(),
+        analyzer: analyzer,
         language: java,
       );
 
@@ -63,6 +63,15 @@ void main() {
       expect(controller.analyzer.runtimeType, TestAnalyzer);
       await Future.delayed(const Duration(seconds: 1));
       verify(() => analyzer.analyze(any())).called(greaterThan(0));
+    });
+
+    test('Set language with analyzer', () {
+      final controller = CodeController();
+
+      controller.setLanguageWithAnalyzer(java, analyzer);
+
+      expect(controller.language, java);
+      expect(controller.analyzer.runtimeType, TestAnalyzer);
     });
   });
 }

@@ -182,8 +182,8 @@ class CodeController extends TextEditingController {
   }
 
   void setLanguageWithAnalyzer(Mode language, Analyzer analyzer) {
-    this.analyzer = analyzer;
     this.language = language;
+    this.analyzer = analyzer;
   }
 
   void resetAnalyzer() {
