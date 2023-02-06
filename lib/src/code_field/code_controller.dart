@@ -186,7 +186,7 @@ class CodeController extends TextEditingController {
   }
 
   void resetAnalyzer() {
-    this.analyzer = const DefaultAnalyzer();
+    analyzer = const DefaultAnalyzer();
   }
 
   /// Sets a specific cursor position in the text
