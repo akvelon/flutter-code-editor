@@ -1,5 +1,4 @@
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_code_editor/src/analyzer/impl/default_analyzer.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
@@ -9,48 +8,55 @@ class TestAnalyzer extends Mock implements Analyzer {}
 
 void main() {
   group('CodeController.analyzer', () {
-    late TestAnalyzer analyzer;
+    late TestAnalyzer testAnalyzer;
+    late DefaultLocalAnalyzer defaultAnalyzer;
 
     setUp(() {
-      analyzer = TestAnalyzer();
+      defaultAnalyzer = const DefaultLocalAnalyzer();
+      testAnalyzer = TestAnalyzer();
+
       registerFallbackValue(Code.empty);
       // ignore: discarded_futures
-      when(() => analyzer.analyze(any()))
-          .thenAnswer((_) async => const AnalysisResult(issues: []));
+      when(() => testAnalyzer.analyze(any())).thenAnswer(
+        (_) async => const AnalysisResult(
+          issues: [],
+          analyzedCode: Code.empty,
+        ),
+      );
     });
 
-    test('Reset analyzer sets analyzer to default', () async {
+    test('Set analyzer to Default Analyzer', () async {
       final controller = CodeController(
-        analyzer: analyzer,
+        analyzer: testAnalyzer,
       );
 
-      expect(controller.analyzer.runtimeType, TestAnalyzer);
+      expect(controller.analyzer, same(testAnalyzer));
 
-      controller.resetAnalyzer();
+      controller.analyzer = defaultAnalyzer;
 
-      expect(controller.analyzer.runtimeType, DefaultAnalyzer);
+      expect(controller.analyzer, same(defaultAnalyzer));
     });
 
     test('Passing an analyzer to the controller with the language', () {
       final controller = CodeController(
-        analyzer: analyzer,
+        analyzer: testAnalyzer,
         language: java,
       );
 
-      expect(controller.analyzer.runtimeType, TestAnalyzer);
+      expect(controller.analyzer, same(testAnalyzer));
     });
 
     test('Setting a language changes analyzer to Default analyzer', () {
       final controller = CodeController(
-        analyzer: analyzer,
+        analyzer: testAnalyzer,
         language: java,
       );
 
-      expect(controller.analyzer.runtimeType, TestAnalyzer);
+      expect(controller.analyzer, same(testAnalyzer));
 
       controller.language = python;
 
-      expect(controller.analyzer.runtimeType, DefaultAnalyzer);
+      expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
     });
 
     test('Set analyzer calls analyze method', () async {
@@ -58,20 +64,20 @@ void main() {
         language: java,
       );
 
-      controller.analyzer = analyzer;
+      controller.analyzer = testAnalyzer;
 
-      expect(controller.analyzer.runtimeType, TestAnalyzer);
+      expect(controller.analyzer, same(testAnalyzer));
       await Future.delayed(const Duration(seconds: 1));
-      verify(() => analyzer.analyze(any())).called(greaterThan(0));
+      verify(() => testAnalyzer.analyze(any())).called(1);
     });
 
     test('Set language with analyzer', () {
       final controller = CodeController();
 
-      controller.setLanguageWithAnalyzer(java, analyzer);
+      controller.setLanguage(java, analyzer: testAnalyzer);
 
       expect(controller.language, java);
-      expect(controller.analyzer.runtimeType, TestAnalyzer);
+      expect(controller.analyzer, same(testAnalyzer));
     });
   });
 }

@@ -53,7 +53,7 @@ class CodeController extends TextEditingController {
     }
 
     _analyzer = analyzer;
-    notifyListeners();
+    unawaited(analyzeCode());
   }
 
   AnalysisResult analysisResult;
@@ -143,7 +143,7 @@ class CodeController extends TextEditingController {
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    addListener(_analyzeCode);
+    addListener(_codeAnalysisCallback);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -165,7 +165,7 @@ class CodeController extends TextEditingController {
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
 
-  void _analyzeCode() {
+  void _codeAnalysisCallback() {
     _debounce?.cancel();
 
     if (analysisResult.analyzedCode.text == _code.text) {
@@ -173,16 +173,19 @@ class CodeController extends TextEditingController {
     }
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final text = _code.text;
-      final result = await _analyzer.analyze(_code);
-
-      if (text != _code.text) {
-        return;
-      }
-
-      analysisResult = result;
-      notifyListeners();
+      await analyzeCode();
     });
+  }
+
+  Future<void> analyzeCode() async {
+    final result = await _analyzer.analyze(_code);
+
+    if (_code.text != result.analyzedCode.text) {
+      return;
+    }
+
+    analysisResult = result;
+    notifyListeners();
   }
 
   void setLanguage(
@@ -199,12 +202,8 @@ class CodeController extends TextEditingController {
     autocompleter.mode = language;
 
     _updateCode(_code.text);
-    _setDefaultAnalyzer();
+    this.analyzer = analyzer;
     notifyListeners();
-  }
-
-  void _setDefaultAnalyzer() {
-    analyzer = const DefaultLocalAnalyzer();
   }
 
   /// Sets a specific cursor position in the text
