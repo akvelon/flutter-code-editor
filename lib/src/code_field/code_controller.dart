@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../../flutter_code_editor.dart';
-import '../analyzer/impl/default_analyzer.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
