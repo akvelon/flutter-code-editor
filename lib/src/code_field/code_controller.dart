@@ -32,13 +32,7 @@ class CodeController extends TextEditingController {
   Mode? get language => _language;
 
   set language(Mode? language) {
-    if (language == _language) {
-      return;
-    }
-
     if (language != null) {
-      _languageId = language.hashCode.toString();
-      highlight.registerLanguage(_languageId, language);
       setLanguage(language, analyzer: const DefaultLocalAnalyzer());
       return;
     }
@@ -195,6 +189,12 @@ class CodeController extends TextEditingController {
     Mode language, {
     required Analyzer analyzer,
   }) {
+    if (language == _language) {
+      return;
+    }
+
+    _languageId = language.hashCode.toString();
+    highlight.registerLanguage(_languageId, language);
     _language = language;
     autocompleter.mode = language;
 
