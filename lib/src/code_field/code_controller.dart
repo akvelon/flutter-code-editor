@@ -39,13 +39,12 @@ class CodeController extends TextEditingController {
     if (language != null) {
       _languageId = language.hashCode.toString();
       highlight.registerLanguage(_languageId, language);
+      setLanguage(language, analyzer: const DefaultLocalAnalyzer());
+      return;
     }
 
     _language = language;
-    autocompleter.mode = language;
     _updateCode(_code.text);
-    _setDefaultAnalyzer();
-    notifyListeners();
   }
 
   /// `CodeController` uses [analyzer] to generate issues
@@ -59,7 +58,7 @@ class CodeController extends TextEditingController {
     notifyListeners();
   }
 
-  List<Issue> issues;
+  AnalysisResult analysisResult;
   Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
@@ -126,7 +125,8 @@ class CodeController extends TextEditingController {
     Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
-    this.issues = const [],
+    this.analysisResult =
+        const AnalysisResult(issues: [], analyzedCode: Code.empty),
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -169,6 +169,11 @@ class CodeController extends TextEditingController {
 
   void _analyzeCode() {
     _debounce?.cancel();
+
+    if (analysisResult.analyzedCode.text == _code.text) {
+      return;
+    }
+
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       final text = _code.text;
       final result = await _analyzer.analyze(_code);
@@ -176,14 +181,22 @@ class CodeController extends TextEditingController {
       if (text != _code.text) {
         return;
       }
-      issues = result.issues;
+
+      analysisResult = result;
       notifyListeners();
     });
   }
 
-  void setLanguageWithAnalyzer(Mode language, Analyzer analyzer) {
-    this.language = language;
-    this.analyzer = analyzer;
+  void setLanguage(
+    Mode language, {
+    required Analyzer analyzer,
+  }) {
+    _language = language;
+    autocompleter.mode = language;
+
+    _updateCode(_code.text);
+    _setDefaultAnalyzer();
+    notifyListeners();
   }
 
   void _setDefaultAnalyzer() {
