@@ -54,6 +54,10 @@ class CodeController extends TextEditingController {
   Analyzer get analyzer => _analyzer;
   Analyzer _analyzer;
   set analyzer(Analyzer analyzer) {
+    if (_analyzer == analyzer) {
+      return;
+    }
+
     _analyzer = analyzer;
     notifyListeners();
   }
