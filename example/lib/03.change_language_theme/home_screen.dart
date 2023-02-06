@@ -9,13 +9,18 @@ import 'widgets/dropdown_selector.dart';
 
 const _defaultLanguage = 'dart';
 const _defaultTheme = 'monokai-sublime';
-const _defaultAnalyzer = 'Default Analyzer';
-const _dartAnalyzer = 'Dart Analyzer';
+
+final _defaultAnalyzer = (DefaultLocalAnalyzer).toString();
+final _dartAnalyzer = (DartPadAnalyzer).toString();
 
 const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
 const toggleButtonActiveColor = Colors.white;
 
-const _analyzersList = [_defaultAnalyzer, _dartAnalyzer];
+final _analyzersNameList = [_defaultAnalyzer, _dartAnalyzer];
+final _analyzersMap = {
+  _defaultAnalyzer: const DefaultLocalAnalyzer(),
+  _dartAnalyzer: DartPadAnalyzer(),
+};
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -85,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onChanged: _setAnalyzer,
             icon: Icons.search,
             value: _analyzer,
-            values: _analyzersList,
+            values: _analyzersNameList,
           ),
 
           const SizedBox(width: 20),
@@ -126,6 +131,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _codeController.dispose();
     _codeFieldFocusNode.dispose();
+
+    for (final analyzer in _analyzersMap.values) {
+      analyzer.dispose();
+    }
+
     super.dispose();
   }
 
@@ -140,23 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _setAnalyzer(String value) {
-    if (value == _defaultAnalyzer) {
-      setState(() {
-        _codeController.resetAnalyzer();
-        _analyzer = _defaultAnalyzer;
-      });
-
-      return;
-    }
-
-    if (value == _dartAnalyzer) {
-      setState(() {
-        _codeController.analyzer = DartAnalyzer();
-        _analyzer = _dartAnalyzer;
-      });
-
-      return;
-    }
+    setState(() {
+      _codeController.analyzer = _analyzersMap[value]!;
+      _analyzer = value;
+    });
   }
 
   void _setTheme(String value) {

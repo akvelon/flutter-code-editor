@@ -44,7 +44,7 @@ class CodeController extends TextEditingController {
     _language = language;
     autocompleter.mode = language;
     _updateCode(_code.text);
-    resetAnalyzer();
+    _setDefaultAnalyzer();
     notifyListeners();
   }
 
@@ -120,7 +120,7 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    Analyzer analyzer = const DefaultAnalyzer(),
+    Analyzer analyzer = const DefaultLocalAnalyzer(),
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
@@ -186,8 +186,8 @@ class CodeController extends TextEditingController {
     this.analyzer = analyzer;
   }
 
-  void resetAnalyzer() {
-    analyzer = const DefaultAnalyzer();
+  void _setDefaultAnalyzer() {
+    analyzer = const DefaultLocalAnalyzer();
   }
 
   /// Sets a specific cursor position in the text

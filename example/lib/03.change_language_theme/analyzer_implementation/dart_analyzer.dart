@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'json_converter.dart';
 
 // Example for implementation of Analyzer for Dart.
-class DartAnalyzer extends Analyzer {
+class DartPadAnalyzer extends Analyzer {
   static const _url =
       'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
 
