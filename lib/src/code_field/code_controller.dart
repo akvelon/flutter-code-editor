@@ -44,7 +44,7 @@ class CodeController extends TextEditingController {
     _language = language;
     autocompleter.mode = language;
     _updateCode(_code.text);
-    analyzer = const DefaultAnalyzer();
+    resetAnalyzer();
     notifyListeners();
   }
 
@@ -140,6 +140,7 @@ class CodeController extends TextEditingController {
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
+    _analyzer = analyzer;
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';

@@ -18,6 +18,7 @@ dependencies:
   highlight: ^0.7.0
   linked_scroll_controller: ^0.2.0
   meta: ^1.7.0
+  mocktail: ^0.3.0
   scrollable_positioned_list: ^0.3.5
   tuple: ^2.0.1
   url_launcher: ^6.1.8
