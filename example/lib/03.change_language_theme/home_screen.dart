@@ -9,9 +9,13 @@ import 'widgets/dropdown_selector.dart';
 
 const _defaultLanguage = 'dart';
 const _defaultTheme = 'monokai-sublime';
+const _defaultAnalyzer = 'Default Analyzer';
+const _dartAnalyzer = 'Dart Analyzer';
 
 const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
 const toggleButtonActiveColor = Colors.white;
+
+const _analyzersList = [_defaultAnalyzer, _dartAnalyzer];
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -21,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
+  String _analyzer = _defaultAnalyzer;
 
   bool _showNumbers = true;
   bool _showErrors = true;
@@ -28,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
-    analyzer: DartAnalyzer(),
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
     text: dartSnippet,
@@ -78,6 +82,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(width: 20),
           DropdownSelector(
+            onChanged: _setAnalyzer,
+            icon: Icons.search,
+            value: _analyzer,
+            values: _analyzersList,
+          ),
+
+          const SizedBox(width: 20),
+          DropdownSelector(
             onChanged: _setTheme,
             icon: Icons.color_lens,
             value: _theme,
@@ -121,8 +133,25 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _language = value;
       _codeController.language = builtinLanguages[value];
+      _analyzer = _defaultAnalyzer;
+
       _codeFieldFocusNode.requestFocus();
     });
+  }
+
+  void _setAnalyzer(String value) {
+    if (value == _defaultAnalyzer) {
+      setState(() {
+        _codeController.resetAnalyzer();
+        _analyzer = _defaultAnalyzer;
+      });
+    }
+    if (value == 'Dart Analyzer') {
+      setState(() {
+        _codeController.analyzer = DartAnalyzer();
+        _analyzer = _dartAnalyzer;
+      });
+    }
   }
 
   void _setTheme(String value) {

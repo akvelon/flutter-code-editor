@@ -27,6 +27,8 @@ class CodeController extends TextEditingController {
   Mode? _language;
 
   /// A highlight language to parse the text with
+  ///
+  /// Setting a language will change the analyzer to DefaultAnalyzer.
   Mode? get language => _language;
 
   set language(Mode? language) {
@@ -42,6 +44,7 @@ class CodeController extends TextEditingController {
     _language = language;
     autocompleter.mode = language;
     _updateCode(_code.text);
+    analyzer = const DefaultAnalyzer();
     notifyListeners();
   }
 
@@ -49,7 +52,12 @@ class CodeController extends TextEditingController {
   /// that are displayed in gutter widget.
   ///
   /// Calls [Analyzer.analyze] after change with 500ms debounce.
-  final Analyzer analyzer;
+  Analyzer _analyzer;
+  Analyzer get analyzer => _analyzer;
+  set analyzer(Analyzer analyzer) {
+    _analyzer = analyzer;
+    notifyListeners();
+  }
 
   List<Issue> issues;
   Timer? _debounce;
@@ -112,7 +120,7 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    this.analyzer = const DefaultAnalyzer(),
+    Analyzer analyzer = const DefaultAnalyzer(),
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
@@ -127,7 +135,8 @@ class CodeController extends TextEditingController {
       CloseBlockModifier(),
       TabModifier(),
     ],
-  })  : _readOnlySectionNames = readOnlySectionNames,
+  })  : _analyzer = analyzer,
+        _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
     this.language = language;
@@ -161,7 +170,7 @@ class CodeController extends TextEditingController {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       final text = _code.text;
-      final result = await analyzer.analyze(_code);
+      final result = await _analyzer.analyze(_code);
 
       if (text != _code.text) {
         return;
@@ -169,6 +178,15 @@ class CodeController extends TextEditingController {
       issues = result.issues;
       notifyListeners();
     });
+  }
+
+  void setLanguageWithAnalyzer(Mode language, Analyzer analyzer) {
+    this.analyzer = analyzer;
+    this.language = language;
+  }
+
+  void resetAnalyzer() {
+    this.analyzer = const DefaultAnalyzer();
   }
 
   /// Sets a specific cursor position in the text
