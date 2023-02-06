@@ -7,7 +7,7 @@ on:
     branches: [ '**' ]
 
 env:
-  flutter_version: 3.3.10
+  flutter_version: 3.7.1
 
 jobs:
   build:
@@ -26,6 +26,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.flutter_version }}
+
+      - run: flutter --version
 
       - name: Install Dependencies
         run: flutter pub get

@@ -10,7 +10,7 @@ class GutterStyle {
   /// Style of the numbers.
   ///
   /// [TextStyle.fontSize] and [TextStyle.fontFamily] are ignored
-  /// and taken from the widget style or [TextTheme.subtitle1] for consistency
+  /// and taken from the widget style or [TextTheme.titleMedium] for consistency
   /// with lines. Everything else applies.
   ///
   /// Of omitted, the widget or theme value is used with the color of

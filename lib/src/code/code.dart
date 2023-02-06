@@ -405,6 +405,7 @@ class Code {
   Code foldedAt(int line) {
     final block = _getFoldableBlockByStartLine(line);
     if (block == null || foldedBlocks.contains(block)) {
+      // ignore: avoid_returning_this
       return this;
     }
 
@@ -423,6 +424,7 @@ class Code {
   Code unfoldedAt(int line) {
     final block = _getFoldableBlockByStartLine(line);
     if (block == null || !foldedBlocks.contains(block)) {
+      // ignore: avoid_returning_this
       return this;
     }
 
