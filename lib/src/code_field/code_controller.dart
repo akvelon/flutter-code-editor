@@ -52,8 +52,8 @@ class CodeController extends TextEditingController {
   /// that are displayed in gutter widget.
   ///
   /// Calls [Analyzer.analyze] after change with 500ms debounce.
-  Analyzer _analyzer;
   Analyzer get analyzer => _analyzer;
+  Analyzer _analyzer;
   set analyzer(Analyzer analyzer) {
     _analyzer = analyzer;
     notifyListeners();
