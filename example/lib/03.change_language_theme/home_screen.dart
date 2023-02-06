@@ -145,12 +145,17 @@ class _HomeScreenState extends State<HomeScreen> {
         _codeController.resetAnalyzer();
         _analyzer = _defaultAnalyzer;
       });
+
+      return;
     }
-    if (value == 'Dart Analyzer') {
+
+    if (value == _dartAnalyzer) {
       setState(() {
         _codeController.analyzer = DartAnalyzer();
         _analyzer = _dartAnalyzer;
       });
+
+      return;
     }
   }
 
