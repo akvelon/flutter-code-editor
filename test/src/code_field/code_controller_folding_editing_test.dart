@@ -203,6 +203,77 @@ int n;
             controller.value = controller.value.replacedSelection('');
             expect(controller.value, expected);
           });
+
+          testWidgets('Add new import after folded imports block', (wt) async {
+            const example = 'package example;\nimport java.util.date;\n';
+            const inserted = 'import java.util.ArrayList;';
+            final controller = await pumpController(wt, example);
+
+            controller.foldImports();
+            expect(controller.code.foldedBlocks.length, 1);
+
+            await wt.cursorEnd();
+            controller.value = controller.value.replacedSelection(inserted);
+            // TODO(yescorp): Fix selection, then fix tests
+            //  https://github.com/akvelon/flutter-code-editor/issues/182
+            expect(controller.value.text, example + inserted);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+
+          testWidgets(
+              'Add anything but imports line after folded imports block',
+              (wt) async {
+            const example = 'package example;\nimport java.util.date;\n';
+            const visible = 'package example;\n';
+            const inserted = 'a';
+            final controller = await pumpController(wt, example);
+
+            controller.foldImports();
+            expect(controller.code.foldedBlocks.length, 1);
+
+            await wt.cursorEnd();
+            controller.value = controller.value.replacedSelection(inserted);
+
+            expect(controller.value.text, visible + inserted);
+            expect(controller.code.foldedBlocks.length, 1);
+            await wt.moveCursor(-1); // reset timer
+          });
+
+          testWidgets('Add new comment after folded comments block',
+              (wt) async {
+            const example = '// comment 1\n// comment 2\n';
+            const inserted = '// comment 3';
+            final controller = await pumpController(wt, example);
+
+            controller.foldAt(0);
+            expect(controller.code.foldedBlocks.length, 1);
+
+            await wt.cursorEnd();
+            controller.value = controller.value.replacedSelection(inserted);
+            // TODO(yescorp): Fix selection, then fix tests
+            //  https://github.com/akvelon/flutter-code-editor/issues/182
+            expect(controller.value.text, example + inserted);
+            expect(controller.code.foldedBlocks.length, 0);
+          });
+
+          testWidgets(
+              'Add anything but single line comment '
+              'after folded comments block', (wt) async {
+            const example = '// comment 1\n// comment 2\n';
+            const visible = '// comment 1\n';
+            const inserted = 'a';
+            final controller = await pumpController(wt, example);
+
+            controller.foldAt(0);
+            expect(controller.code.foldedBlocks.length, 1);
+
+            await wt.cursorEnd();
+            controller.value = controller.value.replacedSelection(inserted);
+            expect(controller.value.text, visible + inserted);
+            expect(controller.code.foldedBlocks.length, 1);
+
+            await wt.moveCursor(-1); // reset timer
+          });
         });
 
         group('Python', () {
