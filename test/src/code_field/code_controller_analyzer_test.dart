@@ -67,7 +67,6 @@ void main() {
       controller.analyzer = testAnalyzer;
 
       expect(controller.analyzer, same(testAnalyzer));
-      await Future.delayed(const Duration(seconds: 1));
       verify(() => testAnalyzer.analyze(any())).called(1);
     });
 
