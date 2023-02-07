@@ -221,9 +221,9 @@ int n;
             expect(controller.value.text, 'a:\n');
             //                                 \ selection
             await wt.selectFromHome(3);
-            controller.value = controller.value.replacedSelection('  aaaa');
+            controller.value = controller.value.replacedSelection('  bbbb');
 
-            const expectedText = 'a:\n  aaaa\n  aaaa';
+            const expectedText = 'a:\n  aaaa\n  bbbb';
 
             expect(controller.value.text, expectedText);
             expect(controller.code.foldedBlocks.length, 0);
@@ -243,22 +243,22 @@ int n;
             expect(controller.value.text, 'a:\n');
             //                                 \ selection
             await wt.selectFromHome(3);
-            controller.value = controller.value.replacedSelection('aaaa');
+            controller.value = controller.value.replacedSelection('bbbb');
 
-            const expectedText = 'a:\naaaa';
+            const expectedText = 'a:\nbbbb';
 
             expect(controller.value.text, expectedText);
             expect(controller.code.foldedBlocks.length, 1);
 
             controller.unfoldAt(0);
 
-            expect(controller.value.text, 'a:\n  aaaa\naaaa');
+            expect(controller.value.text, 'a:\n  aaaa\nbbbb');
             expect(controller.code.foldedBlocks.length, 0);
           });
 
           testWidgets(
               'Indent block is not opened '
-              'if the newline char was inserted to the next line ', (wt) async {
+              'if the newline char was inserted to the next line', (wt) async {
             const example = 'a:\n  aaaa\n\n';
             final controller = await pumpController(
               wt,
@@ -272,12 +272,13 @@ int n;
             //                                 \ selection
             await wt.selectFromHome(3);
 
-            controller.value = controller.value.replacedSelection('\na');
+            controller.value = controller.value.replacedSelection('\n');
 
-            const expectedText = 'a:\n\na\n';
+            const expectedText = 'a:\n\n\n';
 
             expect(controller.value.text, expectedText);
             expect(controller.code.foldedBlocks.length, 1);
+            await wt.moveCursor(-1); // reset timer
           });
         });
       });
