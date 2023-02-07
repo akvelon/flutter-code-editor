@@ -38,6 +38,7 @@ class CodeController extends TextEditingController {
 
     _language = language;
     _updateCode(_code.text);
+    notifyListeners();
   }
 
   /// `CodeController` uses [analyzer] to generate issues
@@ -168,6 +169,8 @@ class CodeController extends TextEditingController {
     _debounce?.cancel();
 
     if (analysisResult.analyzedCode.text == _code.text) {
+      // If the last analyzed code is the same as current code
+      // we don't need to analyze it again.
       return;
     }
 
@@ -180,6 +183,9 @@ class CodeController extends TextEditingController {
     final result = await _analyzer.analyze(_code);
 
     if (_code.text != result.analyzedCode.text) {
+      // If the code has been changed before we got analysis results
+      // the results are not actual.
+      // This happens when several requests happened simultaneously.
       return;
     }
 
