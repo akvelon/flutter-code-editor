@@ -13,6 +13,7 @@ class FoldableBlockMatcher {
   final List<CodeLine> newLines;
   final oldToNew = <FoldableBlock, FoldableBlock>{};
   final newFoldedBlocks = <FoldableBlock>{};
+  final newFoldableBlocksMap = <int, FoldableBlock>{};
 
   FoldableBlockMatcher({
     required this.oldLines,
@@ -26,11 +27,17 @@ class FoldableBlockMatcher {
       return;
     }
 
+    for (final block in newBlocks) {
+      newFoldableBlocksMap.addAll({
+        block.firstLine: block,
+      });
+    }
+
     var firstDiffLineIndex = 0;
     int oldLinesIndex = 0;
     int newLinesIndex = 0;
 
-    while (lineIndexesAreValid(oldLinesIndex, newLinesIndex)) {
+    while (oldLinesIndex < oldLines.length && newLinesIndex < newLines.length) {
       if (oldLines[oldLinesIndex].text != newLines[newLinesIndex].text) {
         break;
       }
@@ -40,7 +47,7 @@ class FoldableBlockMatcher {
     }
 
     // This is basically the line-length of a inserted/removed text.
-    final lineDiff = newLines.length - oldLines.length;
+    final lineCountDelta = newLines.length - oldLines.length;
 
     for (final foldedBlock in oldFoldedBlocks) {
       if (foldedBlock.firstLine < firstDiffLineIndex) {
@@ -49,12 +56,12 @@ class FoldableBlockMatcher {
         _addIfMatch(foldedBlock, 0);
       } else {
         // If the folded block is located after changed part,
-        // the lines must differ exactly to the lineDiff.
+        // the lines must differ exactly to the lineCountDelta.
         // Covers:
         // 1. Paste text with undefined amount of newlines.
         // 2. Remove/Cut text with undefined amount of newlines.
         // 3. Add new line symbol.
-        _addIfMatch(foldedBlock, lineDiff);
+        _addIfMatch(foldedBlock, lineCountDelta);
       }
     }
   }
@@ -63,16 +70,16 @@ class FoldableBlockMatcher {
   /// if its hidden part is not changed.
   ///
   /// A valid match is when the inner content of a folded block is unchanged.
-  /// Lines must differ to exactly [lineDiff] lines.
-  void _addIfMatch(FoldableBlock oldFoldedBlock, int lineDiff) {
-    int newLinesIndex = oldFoldedBlock.firstLine + lineDiff;
+  /// Lines must differ to exactly [lineCountDelta] lines.
+  void _addIfMatch(FoldableBlock oldFoldedBlock, int lineCountDelta) {
+    int newLinesIndex = oldFoldedBlock.firstLine + lineCountDelta;
     int oldLinesIndex = oldFoldedBlock.firstLine;
 
     if (oldLinesIndex < 0 || newLinesIndex < 0) {
       return;
     }
 
-    // if the first line is removed completely
+    // If the first line is removed completely, destroy the block.
     if (newLines[newLinesIndex].text.hasOnlyWhitespaces()) {
       return;
     }
@@ -82,7 +89,7 @@ class FoldableBlockMatcher {
     oldLinesIndex++;
 
     while (oldLinesIndex <= oldFoldedBlock.lastLine &&
-        lineIndexesAreValid(oldLinesIndex, newLinesIndex)) {
+        newLinesIndex < newLines.length) {
       if (newLines[newLinesIndex].text != oldLines[oldLinesIndex].text) {
         return;
       }
@@ -90,18 +97,13 @@ class FoldableBlockMatcher {
       oldLinesIndex++;
     }
 
-    if (newBlocks.any(
-      (newBlock) =>
-          newBlock.firstLine == oldFoldedBlock.firstLine + lineDiff &&
-          newBlock.lineCount != oldFoldedBlock.lineCount,
-    )) {
+    final newBlockFirstLine = oldFoldedBlock.firstLine + lineCountDelta;
+    if (newFoldableBlocksMap[newBlockFirstLine]?.lineCount != null &&
+        newFoldableBlocksMap[newBlockFirstLine]?.lineCount !=
+            oldFoldedBlock.lineCount) {
       return;
     }
 
-    newFoldedBlocks.add(oldFoldedBlock.offset(lineDiff));
-  }
-
-  bool lineIndexesAreValid(int oldLinesIndex, int newLinesIndex) {
-    return newLinesIndex < newLines.length && oldLinesIndex < oldLines.length;
+    newFoldedBlocks.add(oldFoldedBlock.offset(lineCountDelta));
   }
 }

@@ -68,10 +68,10 @@ class FoldableBlock extends InclusiveRange with EquatableMixin {
     );
   }
 
-  FoldableBlock offset(int offset) {
+  FoldableBlock offset(int line) {
     return FoldableBlock(
-      firstLine: firstLine + offset,
-      lastLine: lastLine + offset,
+      firstLine: firstLine + line,
+      lastLine: lastLine + line,
       type: type,
     );
   }
