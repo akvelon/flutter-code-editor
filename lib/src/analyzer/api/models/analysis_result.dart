@@ -2,11 +2,11 @@ import '../../../code/code.dart';
 import 'issue.dart';
 
 class AnalysisResult {
-  final List<Issue> issues;
   final Code analyzedCode;
+  final List<Issue> issues;
 
   const AnalysisResult({
-    required this.issues,
     required this.analyzedCode,
+    required this.issues,
   });
 }

@@ -36,6 +36,6 @@ class DartPadAnalyzer extends Analyzer {
         .cast<Map<String, dynamic>>()
         .map(issueFromJson)
         .toList(growable: false);
-    return AnalysisResult(issues: issues, analyzedCode: code);
+    return AnalysisResult(analyzedCode: code, issues: issues);
   }
 }
