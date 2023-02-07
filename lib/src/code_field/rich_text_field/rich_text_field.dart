@@ -20,7 +20,7 @@ class _RichTextFieldState extends State<RichTextField> {
   double width = 0.0;
 
   TextEditingController controller = CodeController(
-    text: 'import package return () {} /*   */ // comment\n' * 500,
+    text: 'import package return () {} /*   */ // comment\n',
     language: java,
   );
   late final TextPainter _painter = TextPainter(
@@ -40,14 +40,19 @@ class _RichTextFieldState extends State<RichTextField> {
     });
 
     controller.addListener(() {
-      _painter.text = controller.buildTextSpan(
+      var textSpan = _painter.text = controller.buildTextSpan(
         context: context,
         withComposing: false,
       );
       _painter.layout();
 
+      textSpan.visitChildren((span) {
+        print((span as TextSpan).text);
+        return true;
+      });
+
       setState(() {
-        height = _painter.height;
+        height = _painter.height * 500;
         width = _painter.width;
       });
     });

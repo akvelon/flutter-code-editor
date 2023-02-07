@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class TextFieldPainter extends CustomPainter {
@@ -11,7 +13,11 @@ class TextFieldPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    painter.paint(canvas, Offset.zero);
+    var offset = Offset.zero;
+    for (int i = 0; i < 500; i++) {
+      painter.paint(canvas, offset);
+      offset = Offset(0, offset.dy + painter.height);
+    }
   }
 
   @override
