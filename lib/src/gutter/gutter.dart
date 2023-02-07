@@ -136,10 +136,6 @@ class GutterWidget extends StatelessWidget {
     // Add folded blocks that are not considered as a valid foldable block,
     // but should be folded because they were folded before becoming invalid.
     for (final block in code.foldedBlocks) {
-      if (code.lines.length <= block.lastLine) {
-        continue;
-      }
-
       final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
       if (lineIndex == null || lineIndex >= tableRows.length) {
         continue;
