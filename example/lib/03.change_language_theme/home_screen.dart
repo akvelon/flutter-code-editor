@@ -10,17 +10,13 @@ import 'widgets/dropdown_selector.dart';
 const _defaultLanguage = 'dart';
 const _defaultTheme = 'monokai-sublime';
 
-final _defaultAnalyzer = (DefaultLocalAnalyzer).toString();
-final _dartAnalyzer = (DartPadAnalyzer).toString();
+const _defaultAnalyzer = DefaultLocalAnalyzer();
+final _dartAnalyzer = DartPadAnalyzer();
 
 const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
 const toggleButtonActiveColor = Colors.white;
 
-final _analyzersNameList = [_defaultAnalyzer, _dartAnalyzer];
-final _analyzersMap = {
-  _defaultAnalyzer: const DefaultLocalAnalyzer(),
-  _dartAnalyzer: DartPadAnalyzer(),
-};
+final _analyzers = [_defaultAnalyzer, _dartAnalyzer];
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -30,7 +26,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
-  String _analyzer = _defaultAnalyzer;
+  Analyzer _analyzer = _defaultAnalyzer;
 
   bool _showNumbers = true;
   bool _showErrors = true;
@@ -86,11 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           const SizedBox(width: 20),
-          DropdownSelector(
+          DropdownSelector<Analyzer>(
             onChanged: _setAnalyzer,
-            icon: Icons.search,
+            icon: Icons.timeline,
             value: _analyzer,
-            values: _analyzersNameList,
+            values: _analyzers,
           ),
 
           const SizedBox(width: 20),
@@ -132,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _codeController.dispose();
     _codeFieldFocusNode.dispose();
 
-    for (final analyzer in _analyzersMap.values) {
+    for (final analyzer in _analyzers) {
       analyzer.dispose();
     }
 
@@ -149,9 +145,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _setAnalyzer(String value) {
+  void _setAnalyzer(Analyzer value) {
     setState(() {
-      _codeController.analyzer = _analyzersMap[value]!;
+      _codeController.analyzer = value;
       _analyzer = value;
     });
   }

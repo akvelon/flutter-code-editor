@@ -11,6 +11,6 @@ class DefaultLocalAnalyzer extends Analyzer {
     final issues = code.invalidBlocks.map((e) => e.issue).toList(
           growable: false,
         );
-    return AnalysisResult(issues: issues, analyzedCode: code);
+    return AnalysisResult(issues: issues);
   }
 }

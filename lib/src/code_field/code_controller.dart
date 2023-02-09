@@ -31,14 +31,7 @@ class CodeController extends TextEditingController {
   Mode? get language => _language;
 
   set language(Mode? language) {
-    if (language != null) {
-      setLanguage(language, analyzer: const DefaultLocalAnalyzer());
-      return;
-    }
-
-    _language = language;
-    _updateCode(_code.text);
-    notifyListeners();
+    setLanguage(language);
   }
 
   /// `CodeController` uses [analyzer] to generate issues
@@ -57,6 +50,7 @@ class CodeController extends TextEditingController {
   }
 
   AnalysisResult analysisResult;
+  Code _lastAnalyzedCode = Code.empty;
   Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
@@ -123,8 +117,7 @@ class CodeController extends TextEditingController {
     Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
-    this.analysisResult =
-        const AnalysisResult(issues: [], analyzedCode: Code.empty),
+    this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -137,13 +130,12 @@ class CodeController extends TextEditingController {
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
-    this.language = language;
-    _analyzer = analyzer;
+    setLanguage(language, analyzer: analyzer);
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    addListener(_codeAnalysisCallback);
+    addListener(_scheduleAnalysis);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -165,10 +157,10 @@ class CodeController extends TextEditingController {
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
   }
 
-  void _codeAnalysisCallback() {
+  void _scheduleAnalysis() {
     _debounce?.cancel();
 
-    if (analysisResult.analyzedCode.text == _code.text) {
+    if (_lastAnalyzedCode.text == _code.text) {
       // If the last analyzed code is the same as current code
       // we don't need to analyze it again.
       return;
@@ -180,32 +172,35 @@ class CodeController extends TextEditingController {
   }
 
   Future<void> analyzeCode() async {
-    final result = await _analyzer.analyze(_code);
+    final codeSentToAnalysis = _code;
+    final result = await _analyzer.analyze(codeSentToAnalysis);
 
-    if (_code.text != result.analyzedCode.text) {
-      // If the code has been changed before we got analysis results
-      // the results are not actual.
-      // This happens when several requests happened simultaneously.
+    if (_code.text != codeSentToAnalysis.text) {
+      // If the code has been changed before we got analysis result, discard it.
+      // This happens on request race condition.
       return;
     }
 
     analysisResult = result;
+    _lastAnalyzedCode = codeSentToAnalysis;
     notifyListeners();
   }
 
   void setLanguage(
-    Mode language, {
-    required Analyzer analyzer,
+    Mode? language, {
+    Analyzer analyzer = const DefaultLocalAnalyzer(),
   }) {
     if (language == _language) {
       return;
     }
 
-    _languageId = language.hashCode.toString();
-    highlight.registerLanguage(_languageId, language);
+    if (language != null) {
+      _languageId = language.hashCode.toString();
+      highlight.registerLanguage(_languageId, language);
+    }
+
     _language = language;
     autocompleter.mode = language;
-
     _updateCode(_code.text);
     this.analyzer = analyzer;
     notifyListeners();

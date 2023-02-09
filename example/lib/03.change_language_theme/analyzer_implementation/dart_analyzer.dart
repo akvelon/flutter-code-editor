@@ -27,15 +27,13 @@ class DartPadAnalyzer extends Analyzer {
     final issueMaps = decodedResponse['issues'];
 
     if (issueMaps is! Iterable || (issueMaps.isEmpty)) {
-      throw Exception(
-        '[issues] field must be an iterable of Map<String, dynamic>',
-      );
+      return const AnalysisResult(issues: []);
     }
 
     final issues = issueMaps
         .cast<Map<String, dynamic>>()
         .map(issueFromJson)
         .toList(growable: false);
-    return AnalysisResult(analyzedCode: code, issues: issues);
+    return AnalysisResult(issues: issues);
   }
 }

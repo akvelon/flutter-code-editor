@@ -18,10 +18,7 @@ void main() {
       registerFallbackValue(Code.empty);
       // ignore: discarded_futures
       when(() => testAnalyzer.analyze(any())).thenAnswer(
-        (_) async => const AnalysisResult(
-          issues: [],
-          analyzedCode: Code.empty,
-        ),
+        (_) async => const AnalysisResult(issues: []),
       );
     });
 

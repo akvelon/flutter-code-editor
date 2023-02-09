@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class DropdownSelector extends StatelessWidget {
+class DropdownSelector<T> extends StatelessWidget {
   final IconData icon;
-  final ValueChanged<String> onChanged;
-  final String value;
-  final Iterable<String> values;
+  final ValueChanged<T> onChanged;
+  final T value;
+  final Iterable<T> values;
 
   const DropdownSelector({
     required this.icon,
@@ -15,12 +15,15 @@ class DropdownSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(
+    return DropdownButton<T>(
       value: value,
-      items: values.map((String value) {
-        return DropdownMenuItem<String>(
+      items: values.map((T value) {
+        return DropdownMenuItem<T>(
           value: value,
-          child: Text(value, style: const TextStyle(color: Colors.white)),
+          child: Text(
+            value is String ? value : value.runtimeType.toString(),
+            style: const TextStyle(color: Colors.white),
+          ),
         );
       }).toList(growable: false),
       icon: Icon(icon, color: Colors.white),
