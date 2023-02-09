@@ -20,7 +20,7 @@ void main() {
       );
     });
 
-    test('Initialize', () {
+    test('Initialize', () async {
       final languages = [null, /*   */ java];
       final analyzers = [testAnalyzer, testAnalyzer];
 
@@ -29,7 +29,6 @@ void main() {
             CodeController(language: languages[i], analyzer: analyzers[i]);
 
         expect(controller.analyzer, same(analyzers[i]));
-
         expect(controller.language, same(languages[i]));
       }
 
@@ -37,7 +36,7 @@ void main() {
       expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
     });
 
-    test('Change with set analyzer', () {
+    test('Change with set analyzer', () async {
       final languages = [null, java];
 
       for (final language in languages) {
@@ -46,10 +45,11 @@ void main() {
 
         controller.analyzer = testAnalyzer;
         expect(controller.analyzer, same(testAnalyzer));
+        verify(() => testAnalyzer.analyze(any())).called(1);
       }
     });
 
-    test('Change with setLanguage', () {
+    test('Change with setLanguage', () async {
       final languages = [null, java];
       final changedLanguage = python;
 
@@ -60,6 +60,7 @@ void main() {
         controller.setLanguage(changedLanguage, analyzer: testAnalyzer);
         expect(controller.language, changedLanguage);
         expect(controller.analyzer, same(testAnalyzer));
+        verify(() => testAnalyzer.analyze(any())).called(1);
       }
 
       // Doesn't provide analyzer => reset to DefaultLocalAnalyzer.
