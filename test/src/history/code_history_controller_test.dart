@@ -19,12 +19,7 @@ void main() {
 
         expect(
           controller.historyController.stack,
-          [
-            CodeHistoryRecord(
-              code: controller.code,
-              selection: const TextSelection.collapsed(offset: -1),
-            ),
-          ],
+          [],
         );
       });
 
@@ -32,7 +27,13 @@ void main() {
         'Typing, Same value, Folding/Unfolding do not create',
         (WidgetTester wt) async {
           final controller = await pumpController(wt, MethodSnippet.full);
-          await wt.cursorEnd();
+          controller.value = controller.value.copyWith(
+            selection: TextSelection.collapsed(
+              offset: controller.value.text.length,
+            ),
+          );
+
+          expect(controller.historyController.stack.length, 1);
 
           controller.value = controller.value;
           controller.value = controller.value.typed('a');
@@ -42,82 +43,70 @@ void main() {
           controller.unfoldAt(0);
 
           expect(controller.historyController.stack.length, 1);
-          await wt.moveCursor(-1); // Clear timer.
         },
       );
 
-      testWidgets('Selection change does not create', (WidgetTester wt) async {
+      testWidgets('Empty stack -> any change creates record',
+          (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
+        expect(controller.historyController.stack.length, 0);
 
         await wt.moveCursor(-1);
-        await wt.moveCursor(1);
+        expect(controller.historyController.stack.length, 1);
+      });
 
+      testWidgets('Only selection change -> does not create',
+          (WidgetTester wt) async {
+        final controller = await pumpController(wt, MethodSnippet.full);
+        expect(controller.historyController.stack.length, 0);
+
+        await wt.moveCursor(-1); // Creates because empty stack
+        expect(controller.historyController.stack.length, 1);
+
+        await wt.moveCursor(-5);
         expect(controller.historyController.stack.length, 1);
       });
 
       testWidgets('Typing + Selection change', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-        await wt.cursorEnd();
+        expect(controller.historyController.stack.length, 0);
+
+        await wt.cursorEnd(); // Creates because stack is empty.
+
+        expect(controller.historyController.stack.length, 1);
 
         controller.value = controller.value.typed('a');
         final code1 = controller.code;
         await wt.moveCursor(-1); // Creates.
+        expect(controller.historyController.stack.length, 2);
 
         controller.value = controller.value.typed('b');
         final code2 = controller.code;
         await wt.moveCursor(1); // Creates.
-
         expect(controller.historyController.stack.length, 3);
-        expect(
-          controller.historyController.stack[1],
-          CodeHistoryRecord(
-            code: code1,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 1,
-            ),
-          ),
-        );
-        expect(
-          controller.historyController.stack[2],
-          CodeHistoryRecord(
-            code: code2,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 1,
-            ),
-          ),
-        );
+
+        expect(controller.historyController.stack[1].code, code1);
+        expect(controller.historyController.stack[2].code, code2);
       });
 
       testWidgets('Line count change', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-        await wt.cursorEnd();
 
-        controller.value = controller.value.typed('\n');
-        final code1 = controller.code;
+        await wt.cursorEnd(); // Creates.
+
+        expect(controller.historyController.stack.length, 1);
+
         controller.value = controller.value.typed('\n'); // Creates.
+        final code1 = controller.code;
 
+        controller.value = controller.value.typed('\n'); // Creates.
         final code2 = controller.code;
+
         await wt.sendKeyEvent(LogicalKeyboardKey.backspace); // Creates.
 
-        expect(controller.historyController.stack.length, 3);
-        expect(
-          controller.historyController.stack[1],
-          CodeHistoryRecord(
-            code: code1,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 1,
-            ),
-          ),
-        );
-        expect(
-          controller.historyController.stack[2],
-          CodeHistoryRecord(
-            code: code2,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 2,
-            ),
-          ),
-        );
+        expect(controller.historyController.stack.length, 4);
+        expect(controller.historyController.stack[1].code, code1);
+        expect(controller.historyController.stack[2].code, code2);
       });
 
       testWidgets('Typing + Timeout', (WidgetTester wt) async {
@@ -125,6 +114,8 @@ void main() {
         Code? code1;
         int? recordCountAfterFirstIdle;
         await wt.cursorEnd();
+
+        expect(controller.historyController.stack.length, 1);
 
         fakeAsync((async) {
           controller.value = controller.value.typed('a');
@@ -159,7 +150,7 @@ void main() {
     group('Undo/Redo.', () {
       testWidgets('Cannot initially', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-        await wt.cursorEnd();
+        expect(controller.historyController.stack.length, 0);
 
         await wt.sendUndo(); // No effect.
 
@@ -168,7 +159,6 @@ void main() {
           controller.selection,
           const TextSelection.collapsed(
             offset: MethodSnippet.visible.length,
-            affinity: TextAffinity.upstream,
           ),
         );
 
@@ -179,7 +169,6 @@ void main() {
           controller.selection,
           const TextSelection.collapsed(
             offset: MethodSnippet.visible.length,
-            affinity: TextAffinity.upstream,
           ),
         );
       });
@@ -188,11 +177,17 @@ void main() {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
+        expect(controller.historyController.stack.length, 1);
+
         controller.value = controller.value.typed('a');
         await wt.moveCursor(-1); // Creates.
 
+        expect(controller.historyController.stack.length, 2);
+
         controller.value = controller.value.typed('b');
         await wt.moveCursor(-1); // Creates.
+
+        expect(controller.historyController.stack.length, 3);
 
         controller.value = controller.value.typed('c');
 
@@ -200,6 +195,7 @@ void main() {
 
         expect(controller.historyController.stack.length, 4);
         expect(controller.fullText, MethodSnippet.full + 'ba');
+        //                                                 \ selection
         expect(
           controller.selection,
           const TextSelection.collapsed(
@@ -210,22 +206,31 @@ void main() {
         await wt.sendUndo();
 
         expect(controller.fullText, MethodSnippet.full + 'a');
-
-        await wt.sendUndo(); // To initial.
-
-        expect(controller.fullText, MethodSnippet.full);
+        //                                                 \ selection
         expect(
           controller.selection,
-          const TextSelection.collapsed(offset: -1),
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length + 1,
+          ),
         );
 
-        await wt.sendUndo(); // No effect.
+        await wt.sendUndo();
+
+        expect(controller.fullText, MethodSnippet.full);
+        //                                            \ selection
+        expect(
+          controller.selection,
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length,
+          ),
+        );
 
         expect(controller.fullText, MethodSnippet.full);
 
         await wt.sendRedo();
 
         expect(controller.fullText, MethodSnippet.full + 'a');
+        //                                                 \ selection
         expect(
           controller.selection,
           const TextSelection.collapsed(
@@ -236,28 +241,55 @@ void main() {
         await wt.sendRedo();
 
         expect(controller.fullText, MethodSnippet.full + 'ba');
+        //                                                 \ selection
+        expect(
+          controller.selection,
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length + 1,
+          ),
+        );
 
         await wt.sendRedo();
 
         expect(controller.fullText, MethodSnippet.full + 'cba');
+        //                                                 \ selection
+        expect(
+          controller.selection,
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length + 1,
+          ),
+        );
 
-        await wt.sendRedo(); // No effect.
+        await wt.sendRedo(); // does nothing
 
         expect(controller.fullText, MethodSnippet.full + 'cba');
+        //                                                 \ selection
+        expect(
+          controller.selection,
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length + 1,
+          ),
+        );
       });
 
       testWidgets('Changing text disables redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
+        expect(controller.historyController.stack.length, 1);
+
         controller.value = controller.value.typed('a');
         await wt.moveCursor(-1); // Creates.
+        expect(controller.historyController.stack.length, 2);
 
         controller.value = controller.value.typed('b');
+        expect(controller.historyController.stack.length, 2);
 
         await wt.sendUndo(); // Creates.
+        expect(controller.historyController.stack.length, 3);
 
         expect(controller.fullText, MethodSnippet.full + 'a');
+        //                                                 \ selection
         expect(
           controller.selection,
           const TextSelection.collapsed(
@@ -266,16 +298,34 @@ void main() {
         );
 
         controller.value = controller.value.typed('b'); // Deletes redo records.
+        expect(controller.fullText, MethodSnippet.full + 'ab');
+        //                                                  \ selection
+        expect(
+          controller.selection,
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length + 2,
+          ),
+        );
 
         expect(controller.historyController.stack.length, 2);
 
         await wt.sendRedo(); // No effect.
+        expect(controller.fullText, MethodSnippet.full + 'ab');
+        //                                                  \ selection
+        expect(
+          controller.selection,
+          const TextSelection.collapsed(
+            offset: MethodSnippet.visible.length + 2,
+          ),
+        );
 
         expect(controller.historyController.stack.length, 2);
 
         await wt.moveCursor(-1); // Creates.
+        expect(controller.historyController.stack.length, 3);
 
         expect(controller.fullText, MethodSnippet.full + 'ab');
+        //                                                 \ selection
         expect(
           controller.selection,
           const TextSelection.collapsed(
@@ -294,10 +344,12 @@ void main() {
         expect(controller.fullText, MethodSnippet.full + 'ab');
       });
 
-      testWidgets('Selection does not disable redo', (WidgetTester wt) async {
+      testWidgets('Selection disables redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
 
         await wt.cursorEnd();
+        controller.historyController.deleteHistory();
+
         controller.value = controller.value.typed('a');
         await wt.sendUndo(); // Creates.
         await wt.pumpAndSettle();

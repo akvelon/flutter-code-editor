@@ -809,6 +809,7 @@ class CodeController extends TextEditingController {
   @override
   void dispose() {
     _debounce?.cancel();
+    historyController.dispose();
 
     super.dispose();
   }

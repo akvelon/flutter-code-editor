@@ -36,9 +36,7 @@ class CodeHistoryController {
   CodeHistoryController({
     required this.codeController,
   })  : lastCode = codeController.code,
-        lastSelection = codeController.value.selection {
-    _push();
-  }
+        lastSelection = codeController.value.selection;
 
   void beforeChanged({
     required Code code,
@@ -50,19 +48,30 @@ class CodeHistoryController {
     }
 
     bool shouldSave = false;
+    bool isNewLineAdded = false;
+    bool onlySelectionChanged = false;
 
-    if (!shouldSave && _wasTextChanged) {
-      // Inserting and deleting lines are significant enough
-      // to save a record without waiting for idle.
-      shouldSave = code.lines.lines.length != lastCode.lines.lines.length;
+    if (stack.isEmpty) {
+      shouldSave = true;
     }
 
-    if (!shouldSave) {
+    if (_wasTextChanged) {
+      // Inserting and deleting lines are significant enough
+      // to save a record without waiting for idle.
+      if (code.lines.lines.length != lastCode.lines.lines.length) {
+        shouldSave = true;
+        isNewLineAdded = true;
+      }
+    }
+
+    if (!isTextChanging && lastSelection != selection && selection.isValid) {
+      onlySelectionChanged = true;
+    }
+
+    if (!shouldSave && !onlySelectionChanged) {
       if (isTextChanging) {
         _wasTextChanged = true;
-      }
 
-      if (_wasTextChanged) {
         final isText1CharLonger = code.text.length == lastCode.text.length + 1;
         final isTypingContinuous = isText1CharLonger &&
             selection.hasMovedOneCharacterRight(lastSelection);
@@ -75,16 +84,26 @@ class CodeHistoryController {
       }
     }
 
-    if (shouldSave) {
+    final shouldAddRecordBefore =
+        _wasTextChanged && (onlySelectionChanged || isNewLineAdded);
+
+    if (shouldAddRecordBefore) {
       _push();
     }
 
     lastCode = code;
     lastSelection = selection;
+
+    if (shouldSave) {
+      _push();
+    }
   }
 
   void _dropRedoIfAny() {
-    stack.removeStartingAt(_currentRecordIndex + 1);
+    final startIndex = _currentRecordIndex + 1;
+    if (startIndex < stack.length) {
+      stack.removeStartingAt(startIndex);
+    }
   }
 
   void undo() {
@@ -116,6 +135,7 @@ class CodeHistoryController {
 
   void _push() {
     _debounceTimer?.cancel();
+    _dropRedoIfAny();
     _pushRecord(_createRecord());
     _wasTextChanged = false;
   }
@@ -141,5 +161,9 @@ class CodeHistoryController {
     stack.clear();
     _push();
     _currentRecordIndex = 0;
+  }
+
+  void dispose() {
+    _debounceTimer?.cancel();
   }
 }
