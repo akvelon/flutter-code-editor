@@ -98,9 +98,12 @@ class FoldableBlockMatcher {
     }
 
     final newBlockFirstLine = oldFoldedBlock.firstLine + lineCountDelta;
-    if (newFoldableBlocksMap[newBlockFirstLine]?.lineCount != null &&
-        newFoldableBlocksMap[newBlockFirstLine]?.lineCount !=
-            oldFoldedBlock.lineCount) {
+    final newBlockOnSameLine = newFoldableBlocksMap[newBlockFirstLine];
+    if (newBlockOnSameLine?.lineCount != null &&
+        newBlockOnSameLine?.lineCount != oldFoldedBlock.lineCount) {
+      // If the new code has foldable block on the same line,
+      // that differs in lineCount with old folded block.
+      // E.g. add new import after folded imports block.
       return;
     }
 

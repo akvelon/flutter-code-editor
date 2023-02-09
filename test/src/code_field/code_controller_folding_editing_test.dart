@@ -204,8 +204,9 @@ int n;
             expect(controller.value, expected);
           });
 
-          testWidgets('Add new import after folded imports block', (wt) async {
-            const example = 'package example;\nimport java.util.date;\n';
+          testWidgets('Adding an import after folded imports -> Unfold',
+              (wt) async {
+            const example = 'package example;\nimport java.util.Date;\n';
             const inserted = 'import java.util.ArrayList;';
             final controller = await pumpController(wt, example);
 
@@ -221,9 +222,9 @@ int n;
           });
 
           testWidgets(
-              'Add anything but imports line after folded imports block',
+              'Adding non-import after folded imports -> Does not unfold',
               (wt) async {
-            const example = 'package example;\nimport java.util.date;\n';
+            const example = 'package example;\nimport java.util.Date;\n';
             const visible = 'package example;\n';
             const inserted = 'a';
             final controller = await pumpController(wt, example);
@@ -236,10 +237,10 @@ int n;
 
             expect(controller.value.text, visible + inserted);
             expect(controller.code.foldedBlocks.length, 1);
-            await wt.moveCursor(-1); // reset timer
+            await wt.moveCursor(-1); // Reset timer.
           });
 
-          testWidgets('Add new comment after folded comments block',
+          testWidgets('Add comment after folded comments block -> Unfold',
               (wt) async {
             const example = '// comment 1\n// comment 2\n';
             const inserted = '// comment 3';
@@ -257,8 +258,8 @@ int n;
           });
 
           testWidgets(
-              'Add anything but single line comment '
-              'after folded comments block', (wt) async {
+              'Add non-comment after folded comments -> Does not unfold',
+              (wt) async {
             const example = '// comment 1\n// comment 2\n';
             const visible = '// comment 1\n';
             const inserted = 'a';
@@ -272,7 +273,7 @@ int n;
             expect(controller.value.text, visible + inserted);
             expect(controller.code.foldedBlocks.length, 1);
 
-            await wt.moveCursor(-1); // reset timer
+            await wt.moveCursor(-1); // Reset timer.
           });
         });
 
@@ -349,18 +350,14 @@ int n;
 
             expect(controller.value.text, expectedText);
             expect(controller.code.foldedBlocks.length, 1);
-            await wt.moveCursor(-1); // reset timer
+            await wt.moveCursor(-1); // Reset timer.
           });
         });
       });
 
       group('Folded block is no longer recognizable', () {
-        group(
-            'Miltiline comment that started before folded block '
-            '1. Doesn\' unfold the block '
-            '2. The block is still unfoldable manually '
-            '3. The block is deletable', () {
-          testWidgets('Braces. 1.', (wt) async {
+        group('Miltiline comment that started before folded block', () {
+          testWidgets('1. Doesn\' unfold the block', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(wt, example);
@@ -376,7 +373,7 @@ int n;
             expect(controller.value, expected);
           });
 
-          testWidgets('Braces. 2.', (wt) async {
+          testWidgets('2. The block is still unfoldable manually', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(wt, example);
@@ -401,7 +398,7 @@ int n;
             expect(controller.code.foldedBlocks.length, 0);
           });
 
-          testWidgets('Braces. 3.', (wt) async {
+          testWidgets('3. The block is deletable', (wt) async {
             const example = '\na{\n}\n';
             //               \ starting selection
             final controller = await pumpController(wt, example);
@@ -432,7 +429,7 @@ int n;
         });
 
         group('Multiline String', () {
-          testWidgets('Braces. 1.', (wt) async {
+          testWidgets('1. Doesn\' unfold the block', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(
@@ -452,7 +449,7 @@ int n;
             expect(controller.value, expected);
           });
 
-          testWidgets('Braces. 2.', (wt) async {
+          testWidgets('2. The block is still unfoldable manually', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(
@@ -481,7 +478,7 @@ int n;
             expect(controller.code.foldedBlocks.length, 0);
           });
 
-          testWidgets('Braces. 3.', (wt) async {
+          testWidgets('3. The block is deletable', (wt) async {
             const example = '\na{\n}\n';
             //               \ starting selection
             final controller = await pumpController(
