@@ -8,11 +8,9 @@ class TestAnalyzer extends Mock implements Analyzer {}
 
 void main() {
   group('CodeController.analyzer', () {
-    late TestAnalyzer testAnalyzer;
-    late DefaultLocalAnalyzer defaultAnalyzer;
+    TestAnalyzer testAnalyzer = TestAnalyzer();
 
     setUp(() {
-      defaultAnalyzer = const DefaultLocalAnalyzer();
       testAnalyzer = TestAnalyzer();
 
       registerFallbackValue(Code.empty);
@@ -22,58 +20,67 @@ void main() {
       );
     });
 
-    test('Set analyzer to Default Analyzer', () async {
-      final controller = CodeController(
-        analyzer: testAnalyzer,
-      );
+    test('Initialize', () {
+      final languages = [null, /*   */ java];
+      final analyzers = [testAnalyzer, testAnalyzer];
 
-      expect(controller.analyzer, same(testAnalyzer));
+      for (int i = 0; i < languages.length; i++) {
+        final controller =
+            CodeController(language: languages[i], analyzer: analyzers[i]);
 
-      controller.analyzer = defaultAnalyzer;
+        expect(controller.analyzer, same(analyzers[i]));
 
-      expect(controller.analyzer, same(defaultAnalyzer));
-    });
+        expect(controller.language, same(languages[i]));
+      }
 
-    test('Passing an analyzer to the controller with the language', () {
-      final controller = CodeController(
-        analyzer: testAnalyzer,
-        language: java,
-      );
-
-      expect(controller.analyzer, same(testAnalyzer));
-    });
-
-    test('Setting a language changes analyzer to Default analyzer', () {
-      final controller = CodeController(
-        analyzer: testAnalyzer,
-        language: java,
-      );
-
-      expect(controller.analyzer, same(testAnalyzer));
-
-      controller.language = python;
-
+      final controller = CodeController(language: java);
       expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
     });
 
-    test('Set analyzer calls analyze method', () async {
-      final controller = CodeController(
-        language: java,
-      );
+    test('Change with set analyzer', () {
+      final languages = [null, java];
 
-      controller.analyzer = testAnalyzer;
+      for (final language in languages) {
+        final controller = CodeController(language: language);
+        expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
 
-      expect(controller.analyzer, same(testAnalyzer));
-      verify(() => testAnalyzer.analyze(any())).called(1);
+        controller.analyzer = testAnalyzer;
+        expect(controller.analyzer, same(testAnalyzer));
+      }
     });
 
-    test('Set language with analyzer', () {
-      final controller = CodeController();
+    test('Change with setLanguage', () {
+      final languages = [null, java];
+      final changedLanguage = python;
 
-      controller.setLanguage(java, analyzer: testAnalyzer);
+      for (final language in languages) {
+        final controller = CodeController(language: language);
+        expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
 
-      expect(controller.language, java);
+        controller.setLanguage(changedLanguage, analyzer: testAnalyzer);
+        expect(controller.language, changedLanguage);
+        expect(controller.analyzer, same(testAnalyzer));
+      }
+
+      // Doesn't provide analyzer => reset to DefaultLocalAnalyzer.
+      final controller = CodeController(language: java, analyzer: testAnalyzer);
       expect(controller.analyzer, same(testAnalyzer));
+
+      controller.setLanguage(changedLanguage);
+      expect(controller.language, changedLanguage);
+      expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
+    });
+
+    test('Set language resets analyzer', () {
+      final languages = [python, null];
+      for (final language in languages) {
+        final controller =
+            CodeController(language: java, analyzer: testAnalyzer);
+        expect(controller.analyzer, same(testAnalyzer));
+
+        controller.language = language;
+        expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
+      }
     });
   });
 }
