@@ -27,11 +27,7 @@ void main() {
         'Typing, Same value, Folding/Unfolding do not create',
         (WidgetTester wt) async {
           final controller = await pumpController(wt, MethodSnippet.full);
-          controller.value = controller.value.copyWith(
-            selection: TextSelection.collapsed(
-              offset: controller.value.text.length,
-            ),
-          );
+          await wt.cursorEnd();
 
           expect(controller.historyController.stack.length, 1);
 
@@ -344,11 +340,10 @@ void main() {
         expect(controller.fullText, MethodSnippet.full + 'ab');
       });
 
-      testWidgets('Selection disables redo', (WidgetTester wt) async {
+      testWidgets('Selection does not disable redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
 
         await wt.cursorEnd();
-        controller.historyController.deleteHistory();
 
         controller.value = controller.value.typed('a');
         await wt.sendUndo(); // Creates.
