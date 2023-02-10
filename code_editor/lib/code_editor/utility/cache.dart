@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class TextPainterCache {
-  Map<TextSpan, TextPainter> _map = {};
+  static Map<TextSpan, TextPainter> _map = {};
 
   TextPainter get(TextSpan key) {
     final value = _map[key];

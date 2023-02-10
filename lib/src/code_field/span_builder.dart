@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/widgets.dart';
 import 'package:highlight/highlight_core.dart';
 
@@ -56,7 +58,9 @@ class SpanBuilder {
     required CodeThemeData? theme,
     TextStyle? ancestorStyle,
   }) {
-    final style = theme?.styles[node.className] ?? ancestorStyle;
+    var style = theme?.styles[node.className] ?? ancestorStyle;
+    style = style?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]);
+    style ??= const TextStyle(fontFeatures: [FontFeature.tabularFigures()]);
     final processedStyle = _paleIfRequired(style);
 
     _updateLineIndex(node);

@@ -58,38 +58,41 @@ class _CodeEditorState extends State<CodeEditor> {
         linesCount = controller.code.lines.length;
       });
     });
-
-    return SingleChildScrollView(
-      child: Row(
-        children: [
-          Expanded(
-            child: FocusableActionDetector(
-              focusNode: parentFocusNode,
-              actions: controller.actions,
-              shortcuts: shortcuts,
-              child: Focus(
-                onKey: (node, event) {
-                  if (event.logicalKey == LogicalKeyboardKey.keyV &&
-                      event.isMetaPressed) {
-                    final data = Clipboard.getData(Clipboard.kTextPlain)
-                        .then((value) => controller.value = TextEditingValue(
-                              text: controller.value.text + (value?.text ?? ''),
-                            ));
-                  }
-                  if (event.logicalKey == LogicalKeyboardKey.enter) {
-                    controller.value = TextEditingValue(
-                      text: controller.value.text + '\n',
-                    );
-                  }
-                  if (event.character != null) {
-                    controller.value = controller.value.copyWith(
-                      text: controller.value.text + event.character!,
-                    );
-                  }
-                  return KeyEventResult.ignored;
-                },
-                focusNode: focusNode,
-                child: GestureDetector(
+    return GestureDetector(
+      onTap: () {
+        focusNode.requestFocus();
+      },
+      child: SingleChildScrollView(
+        child: Row(
+          children: [
+            Expanded(
+              child: FocusableActionDetector(
+                focusNode: parentFocusNode,
+                actions: controller.actions,
+                shortcuts: shortcuts,
+                child: Focus(
+                  onKey: (node, event) {
+                    if (event.logicalKey == LogicalKeyboardKey.keyV &&
+                        event.isMetaPressed) {
+                      final data = Clipboard.getData(Clipboard.kTextPlain)
+                          .then((value) => controller.value = TextEditingValue(
+                                text:
+                                    controller.value.text + (value?.text ?? ''),
+                              ));
+                    }
+                    if (event.logicalKey == LogicalKeyboardKey.enter) {
+                      controller.value = TextEditingValue(
+                        text: controller.value.text + '\n',
+                      );
+                    }
+                    if (event.character != null) {
+                      controller.value = controller.value.copyWith(
+                        text: controller.value.text + event.character!,
+                      );
+                    }
+                    return KeyEventResult.ignored;
+                  },
+                  focusNode: focusNode,
                   child: AnimatedBuilder(
                     animation: notifier,
                     builder: (BuildContext context, Widget? child) {
@@ -113,8 +116,8 @@ class _CodeEditorState extends State<CodeEditor> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

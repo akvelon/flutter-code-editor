@@ -1,6 +1,7 @@
 // ignore_for_file: parameter_assignments
 
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -729,7 +730,8 @@ class CodeController extends TextEditingController {
       return SpanBuilder(
         code: _code,
         theme: _getTheme(context),
-        rootStyle: style,
+        rootStyle:
+            style?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
       ).build();
     }
 
