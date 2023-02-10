@@ -357,7 +357,7 @@ int n;
 
       group('Folded block is no longer recognizable', () {
         group('Miltiline comment that started before folded block', () {
-          testWidgets('1. Doesn\' unfold the block', (wt) async {
+          testWidgets('Does not unfold the block', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(wt, example);
@@ -373,7 +373,7 @@ int n;
             expect(controller.value, expected);
           });
 
-          testWidgets('2. The block is still unfoldable manually', (wt) async {
+          testWidgets('The block is still unfoldable manually', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(wt, example);
@@ -398,7 +398,7 @@ int n;
             expect(controller.code.foldedBlocks.length, 0);
           });
 
-          testWidgets('3. The block is deletable', (wt) async {
+          testWidgets('The block is deletable', (wt) async {
             const example = '\na{\n}\n';
             //               \ starting selection
             final controller = await pumpController(wt, example);
@@ -429,7 +429,7 @@ int n;
         });
 
         group('Multiline String', () {
-          testWidgets('1. Doesn\' unfold the block', (wt) async {
+          testWidgets('Does not unfold the block', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(
@@ -449,7 +449,7 @@ int n;
             expect(controller.value, expected);
           });
 
-          testWidgets('2. The block is still unfoldable manually', (wt) async {
+          testWidgets('The block is still unfoldable manually', (wt) async {
             const example = '\na{\n}';
             //               \ starting selection
             final controller = await pumpController(
@@ -478,7 +478,7 @@ int n;
             expect(controller.code.foldedBlocks.length, 0);
           });
 
-          testWidgets('3. The block is deletable', (wt) async {
+          testWidgets('The block is deletable', (wt) async {
             const example = '\na{\n}\n';
             //               \ starting selection
             final controller = await pumpController(
