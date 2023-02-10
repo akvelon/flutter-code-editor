@@ -1,3 +1,9 @@
+## 0.2.10
+
+* Added pluggable analyzers support ([Issue 139](https://github.com/akvelon/flutter-code-editor/issues/139)).
+* Added `DartPadAnalyzer`.
+* Fixed linter issues ([Issue 164](https://github.com/akvelon/flutter-code-editor/issues/164)).
+
 ## 0.2.9
 
 * Hiding line numbers, errors, and folding handles ([Issue 159](https://github.com/akvelon/flutter-code-editor/issues/159)).

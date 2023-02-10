@@ -81,7 +81,7 @@ final controller = CodeController(
 Language can be dynamically changed on a controller:
 
 ```dart
-controller.language = go;
+controller.setLanguage(go, DefaultLocalAnalyzer());
 ```
 
 
@@ -97,6 +97,36 @@ Flutter Code Editor can detect and fold code blocks. Code blocks folding is supp
 ![Foldable blocks example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/foldable_blocks_example.gif)
 
 Code blocks folding may support other languages in experimental mode.
+
+
+## Code Analysis
+
+The editor supports pluggable analyzers to highlight errors and show error messages:
+
+![DartPadAnalyzer](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/foldable_blocks_example.gif)
+
+
+We ship the following analyzers:
+
+- `DefaultLocalAnalyzer` highlights unmatched pair characters for supported languages.
+  It works on the client locally.
+  It is selected by default on `CodeController` if no other analyzer is specified.
+- `DartPadAnalyzer` for Dart language, calls the [DartPad](https://dartpad.dev) backend for analysis.
+
+For other languages you can write custom analyzers that access your backend.
+See the code for `DartPadAnalyzer` for the implementation example.
+
+To set the analyzer call any of the following:
+
+```dart
+codeController = CodeController(language: dart, analyzer: DartPadAnalyzer());
+codeController.analyzer = DartPadAnalyzer();
+codeController.setLanguage(dart, analyzer: DartPadAnalyzer());
+```
+
+**Note:** Code analysis is an experimental feature.
+We may introduce breaking changes to `Analyzer` subclasses without following semver contract.
+If you only use the analyzers we ship then this will not affect you.
 
 
 ## Themes

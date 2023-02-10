@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import '../../code/code.dart';
+import '../../code_field/code_controller.dart';
+import '../../code_field/code_field.dart';
 import 'models/analysis_result.dart';
 
-/// Service for analzying the code inside CodeField.
+/// Service for analyzing the code inside [CodeField].
 ///
-/// Inherit and implement [analyze] method to use in `CodeController`.
+/// Inherit and implement [analyze] method to use in [CodeController].
 abstract class Analyzer {
   const Analyzer();
 
