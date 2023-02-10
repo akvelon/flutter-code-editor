@@ -23,7 +23,7 @@ class DropdownSelector<T> extends StatelessWidget {
         return DropdownMenuItem<T>(
           value: value,
           child: Text(
-            itemToString != null ? itemToString!.call(value) : value.toString(),
+            itemToString?.call(value) ?? value.toString(),
             style: const TextStyle(color: Colors.white),
           ),
         );

@@ -27,7 +27,7 @@ class CodeController extends TextEditingController {
 
   /// A highlight language to parse the text with
   ///
-  /// Setting a language will change the analyzer to DefaultAnalyzer.
+  /// Setting a language will change the analyzer to [DefaultLocalAnalyzer].
   Mode? get language => _language;
 
   set language(Mode? language) {
