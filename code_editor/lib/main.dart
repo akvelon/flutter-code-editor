@@ -19,6 +19,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ValueNotifier<bool> repaint = ValueNotifier(true);
+  final focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     Timer.periodic(Duration(milliseconds: 50), (e) {});
@@ -31,13 +33,17 @@ class _MyAppState extends State<MyApp> {
             builder: (context) {
               return SingleChildScrollView(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CodeEditor(
-                      controller: CodeController(
-                        language: java,
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: CodeEditor(
+                        controller: CodeController(
+                          language: java,
+                        ),
+                        focusNode: focusNode,
                       ),
-                      focusNode: FocusNode(),
                     ),
                   ],
                 ),

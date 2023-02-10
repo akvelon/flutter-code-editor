@@ -4,6 +4,13 @@ export 'src/code/string.dart';
 export 'src/code/text_range.dart';
 export 'src/code/tokens.dart';
 
+export 'src/code_field/actions/comment_uncomment.dart';
+export 'src/code_field/actions/copy.dart';
+export 'src/code_field/actions/indent.dart';
+export 'src/code_field/actions/outdent.dart';
+export 'src/code_field/actions/redo.dart';
+export 'src/code_field/actions/undo.dart';
+
 export 'src/code_field/code_controller.dart';
 export 'src/code_field/code_field.dart';
 export 'src/code_field/custom_painter.dart';

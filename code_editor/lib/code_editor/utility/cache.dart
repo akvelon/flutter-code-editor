@@ -6,7 +6,8 @@ class TextPainterCache {
   TextPainter get(TextSpan key) {
     final value = _map[key];
     if (value == null) {
-      return _map[key] = TextPainter(text: key, textDirection: TextDirection.ltr)..layout();
+      return _map[key] =
+          TextPainter(text: key, textDirection: TextDirection.ltr)..layout();
     }
 
     return value;

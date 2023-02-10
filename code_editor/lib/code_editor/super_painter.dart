@@ -20,8 +20,7 @@ class SuperPainter extends CustomPainter {
     required PaintedTextNotifier repaint,
     required this.lineHeight,
     required this.letterWidth,
-  })  : repaint = repaint,
-        super(repaint: repaint);
+  })  : repaint = repaint;
 
   @override
   void paint(Canvas canvas, Size size) {
