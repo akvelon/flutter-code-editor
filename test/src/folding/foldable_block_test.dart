@@ -141,4 +141,29 @@ void main() {
       expect(actual, expected);
     });
   });
+
+  test('Offset method', () {
+    const block = FB(firstLine: 5, lastLine: 7, type: FBT.braces);
+
+    final positiveOffset = block.offset(3);
+    final negativeOffset = block.offset(-4);
+
+    expect(
+      positiveOffset,
+      const FB(firstLine: 5 + 3, lastLine: 7 + 3, type: FBT.braces),
+    );
+
+    expect(
+      negativeOffset,
+      const FB(firstLine: 5 - 4, lastLine: 7 - 4, type: FBT.braces),
+    );
+  });
+
+  test('line count getter test', () {
+    const block = FB(firstLine: 5, lastLine: 7, type: FBT.braces);
+
+    final lineCount = block.lineCount;
+
+    expect(lineCount, 7 - (5 - 1));
+  });
 }
