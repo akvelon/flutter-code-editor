@@ -3,7 +3,6 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import '../common/snippets.dart';
 import '../common/themes.dart';
-import 'analyzer_implementation/dart_analyzer.dart';
 import 'constants.dart';
 import 'widgets/dropdown_selector.dart';
 
@@ -26,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
-  Analyzer _analyzer = _defaultAnalyzer;
+  AbstractAnalyzer _analyzer = _defaultAnalyzer;
 
   bool _showNumbers = true;
   bool _showErrors = true;
@@ -82,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           const SizedBox(width: 20),
-          DropdownSelector<Analyzer>(
+          DropdownSelector<AbstractAnalyzer>(
             onChanged: _setAnalyzer,
             icon: Icons.bug_report,
             value: _analyzer,
@@ -146,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _setAnalyzer(Analyzer value) {
+  void _setAnalyzer(AbstractAnalyzer value) {
     setState(() {
       _codeController.analyzer = value;
       _analyzer = value;

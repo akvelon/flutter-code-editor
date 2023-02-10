@@ -1,8 +1,9 @@
-export 'src/analyzer/api/analyzer.dart';
-export 'src/analyzer/api/models/analysis_result.dart';
-export 'src/analyzer/api/models/issue.dart';
-export 'src/analyzer/api/models/issue_type.dart';
-export 'src/analyzer/impl/default_analyzer.dart';
+export 'src/analyzer/abstract.dart';
+export 'src/analyzer/dartpad_analyzer.dart';
+export 'src/analyzer/default_analyzer.dart';
+export 'src/analyzer/models/analysis_result.dart';
+export 'src/analyzer/models/issue.dart';
+export 'src/analyzer/models/issue_type.dart';
 
 export 'src/code/code.dart';
 export 'src/code/code_line.dart';

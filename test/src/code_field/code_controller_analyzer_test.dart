@@ -4,7 +4,7 @@ import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:mocktail/mocktail.dart';
 
-class TestAnalyzer extends Mock implements Analyzer {}
+class TestAnalyzer extends Mock implements AbstractAnalyzer {}
 
 void main() {
   group('CodeController.analyzer', () {

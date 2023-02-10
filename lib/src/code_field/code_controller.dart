@@ -37,10 +37,10 @@ class CodeController extends TextEditingController {
   /// `CodeController` uses [analyzer] to generate issues
   /// that are displayed in gutter widget.
   ///
-  /// Calls [Analyzer.analyze] after change with 500ms debounce.
-  Analyzer get analyzer => _analyzer;
-  Analyzer _analyzer;
-  set analyzer(Analyzer analyzer) {
+  /// Calls [AbstractAnalyzer.analyze] after change with 500ms debounce.
+  AbstractAnalyzer get analyzer => _analyzer;
+  AbstractAnalyzer _analyzer;
+  set analyzer(AbstractAnalyzer analyzer) {
     if (_analyzer == analyzer) {
       return;
     }
@@ -111,7 +111,7 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    Analyzer analyzer = const DefaultLocalAnalyzer(),
+    AbstractAnalyzer analyzer = const DefaultLocalAnalyzer(),
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
@@ -190,7 +190,7 @@ class CodeController extends TextEditingController {
 
   void setLanguage(
     Mode? language, {
-    required Analyzer analyzer,
+    required AbstractAnalyzer analyzer,
   }) {
     if (language == _language) {
       return;

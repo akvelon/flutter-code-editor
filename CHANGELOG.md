@@ -1,4 +1,4 @@
-## 0.2.10
+## 0.2.10 (Retracted)
 
 * Added pluggable analyzers support ([Issue 139](https://github.com/akvelon/flutter-code-editor/issues/139)).
 * Added `DartPadAnalyzer`.
