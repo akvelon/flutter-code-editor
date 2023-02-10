@@ -96,7 +96,7 @@ class GutterWidget extends StatelessWidget {
   }
 
   void _fillIssues(List<TableRow> tableRows) {
-    for (final issue in codeController.issues) {
+    for (final issue in codeController.analysisResult.issues) {
       if (issue.line >= codeController.code.lines.length) {
         continue;
       }

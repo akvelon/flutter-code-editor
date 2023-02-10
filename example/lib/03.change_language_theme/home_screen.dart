@@ -10,8 +10,13 @@ import 'widgets/dropdown_selector.dart';
 const _defaultLanguage = 'dart';
 const _defaultTheme = 'monokai-sublime';
 
+const _defaultAnalyzer = DefaultLocalAnalyzer();
+final _dartAnalyzer = DartPadAnalyzer();
+
 const toggleButtonColor = Color.fromARGB(124, 255, 255, 255);
 const toggleButtonActiveColor = Colors.white;
+
+final _analyzers = [_defaultAnalyzer, _dartAnalyzer];
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -21,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _language = _defaultLanguage;
   String _theme = _defaultTheme;
+  Analyzer _analyzer = _defaultAnalyzer;
 
   bool _showNumbers = true;
   bool _showErrors = true;
@@ -28,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _codeFieldFocusNode = FocusNode();
   late final _codeController = CodeController(
-    analyzer: DartAnalyzer(),
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
     text: dartSnippet,
@@ -77,6 +82,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           const SizedBox(width: 20),
+          DropdownSelector<Analyzer>(
+            onChanged: _setAnalyzer,
+            icon: Icons.bug_report,
+            value: _analyzer,
+            values: _analyzers,
+            itemToString: (item) => item.runtimeType.toString(),
+          ),
+
+          const SizedBox(width: 20),
           DropdownSelector(
             onChanged: _setTheme,
             icon: Icons.color_lens,
@@ -114,6 +128,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _codeController.dispose();
     _codeFieldFocusNode.dispose();
+
+    for (final analyzer in _analyzers) {
+      analyzer.dispose();
+    }
+
     super.dispose();
   }
 
@@ -121,7 +140,16 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _language = value;
       _codeController.language = builtinLanguages[value];
+      _analyzer = _defaultAnalyzer;
+
       _codeFieldFocusNode.requestFocus();
+    });
+  }
+
+  void _setAnalyzer(Analyzer value) {
+    setState(() {
+      _codeController.analyzer = value;
+      _analyzer = value;
     });
   }
 

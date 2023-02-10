@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'json_converter.dart';
 
 // Example for implementation of Analyzer for Dart.
-class DartAnalyzer extends Analyzer {
+class DartPadAnalyzer extends Analyzer {
   static const _url =
       'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
 
@@ -27,9 +27,7 @@ class DartAnalyzer extends Analyzer {
     final issueMaps = decodedResponse['issues'];
 
     if (issueMaps is! Iterable || (issueMaps.isEmpty)) {
-      throw Exception(
-        '[issues] field must be an iterable of Map<String, dynamic>',
-      );
+      return const AnalysisResult(issues: []);
     }
 
     final issues = issueMaps
