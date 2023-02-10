@@ -21,7 +21,7 @@ void main() {
     });
 
     test('Initialize', () async {
-      final languages = [null, /*   */ java];
+      final languages = [null, java];
       final analyzers = [testAnalyzer, testAnalyzer];
 
       for (int i = 0; i < languages.length; i++) {
@@ -30,6 +30,8 @@ void main() {
 
         expect(controller.analyzer, same(analyzers[i]));
         expect(controller.language, same(languages[i]));
+
+        verify(() => testAnalyzer.analyze(any())).called(1);
       }
 
       final controller = CodeController(language: java);
@@ -62,14 +64,6 @@ void main() {
         expect(controller.analyzer, same(testAnalyzer));
         verify(() => testAnalyzer.analyze(any())).called(1);
       }
-
-      // Doesn't provide analyzer => reset to DefaultLocalAnalyzer.
-      final controller = CodeController(language: java, analyzer: testAnalyzer);
-      expect(controller.analyzer, same(testAnalyzer));
-
-      controller.setLanguage(changedLanguage);
-      expect(controller.language, changedLanguage);
-      expect(controller.analyzer.runtimeType, DefaultLocalAnalyzer);
     });
 
     test('Set language resets analyzer', () {

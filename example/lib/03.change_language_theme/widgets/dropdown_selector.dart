@@ -5,12 +5,14 @@ class DropdownSelector<T> extends StatelessWidget {
   final ValueChanged<T> onChanged;
   final T value;
   final Iterable<T> values;
+  final String Function(T item)? itemToString;
 
   const DropdownSelector({
     required this.icon,
     required this.onChanged,
     required this.value,
     required this.values,
+    this.itemToString,
   });
 
   @override
@@ -21,7 +23,7 @@ class DropdownSelector<T> extends StatelessWidget {
         return DropdownMenuItem<T>(
           value: value,
           child: Text(
-            value is String ? value : value.runtimeType.toString(),
+            itemToString != null ? itemToString!.call(value) : value.toString(),
             style: const TextStyle(color: Colors.white),
           ),
         );

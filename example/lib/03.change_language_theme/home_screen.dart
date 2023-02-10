@@ -84,9 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 20),
           DropdownSelector<Analyzer>(
             onChanged: _setAnalyzer,
-            icon: Icons.timeline,
+            icon: Icons.bug_report,
             value: _analyzer,
             values: _analyzers,
+            itemToString: (item) => item.runtimeType.toString(),
           ),
 
           const SizedBox(width: 20),

@@ -31,7 +31,7 @@ class CodeController extends TextEditingController {
   Mode? get language => _language;
 
   set language(Mode? language) {
-    setLanguage(language);
+    setLanguage(language, analyzer: const DefaultLocalAnalyzer());
   }
 
   /// `CodeController` uses [analyzer] to generate issues
@@ -50,7 +50,7 @@ class CodeController extends TextEditingController {
   }
 
   AnalysisResult analysisResult;
-  Code _lastAnalyzedCode = Code.empty;
+  String _lastAnalyzedText = '';
   Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
@@ -155,12 +155,14 @@ class CodeController extends TextEditingController {
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
+
+    unawaited(analyzeCode());
   }
 
   void _scheduleAnalysis() {
     _debounce?.cancel();
 
-    if (_lastAnalyzedCode.text == _code.text) {
+    if (_lastAnalyzedText == _code.text) {
       // If the last analyzed code is the same as current code
       // we don't need to analyze it again.
       return;
@@ -182,13 +184,13 @@ class CodeController extends TextEditingController {
     }
 
     analysisResult = result;
-    _lastAnalyzedCode = codeSentToAnalysis;
+    _lastAnalyzedText = codeSentToAnalysis.text;
     notifyListeners();
   }
 
   void setLanguage(
     Mode? language, {
-    Analyzer analyzer = const DefaultLocalAnalyzer(),
+    required Analyzer analyzer,
   }) {
     if (language == _language) {
       return;
