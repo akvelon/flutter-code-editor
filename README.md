@@ -103,7 +103,7 @@ Code blocks folding may support other languages in experimental mode.
 
 The editor supports pluggable analyzers to highlight errors and show error messages:
 
-![DartPadAnalyzer](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/foldable_blocks_example.gif)
+![DartPadAnalyzer](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/dartpad-analyzer.png)
 
 
 We ship the following analyzers:
