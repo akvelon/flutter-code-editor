@@ -20,26 +20,37 @@ class SuperPainter extends CustomPainter {
     required PaintedTextNotifier repaint,
     required this.lineHeight,
     required this.letterWidth,
-  })  : repaint = repaint;
+  }) : repaint = repaint;
 
   @override
   void paint(Canvas canvas, Size size) {
     _offsetManager.reset();
 
-    repaint.textSpan.visitChildren((span) {
-      assert(span is TextSpan, 'Only TextSpans are acceptable');
-
+    for (final span in repaint.textSpan.children ?? []) {
       if ((span as TextSpan).text == '') {
-        return true;
+        continue;
       }
 
       var offset = _offsetManager.offset;
       final painter = _cache.get(span as TextSpan);
       painter.paint(canvas, offset);
       _offsetManager.updateOffset(painter);
+    }
 
-      return true;
-    });
+    // repaint.textSpan.visitChildren((span) {
+    //   assert(span is TextSpan, 'Only TextSpans are acceptable');
+
+    // if ((span as TextSpan).text == '') {
+    //   return true;
+    // }
+
+    // var offset = _offsetManager.offset;
+    // final painter = _cache.get(span as TextSpan);
+    // painter.paint(canvas, offset);
+    // _offsetManager.updateOffset(painter);
+
+    // return true;
+    // });
   }
 
   @override
