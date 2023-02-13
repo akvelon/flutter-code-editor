@@ -1,13 +1,16 @@
 // ignore_for_file: avoid_dynamic_calls
 import 'dart:convert';
 
-import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:http/http.dart' as http;
 
-import 'json_converter.dart';
+import '../code/code.dart';
+import 'abstract.dart';
+import 'models/analysis_result.dart';
+import 'models/issue.dart';
+import 'models/issue_type.dart';
 
 // Example for implementation of Analyzer for Dart.
-class DartAnalyzer extends Analyzer {
+class DartPadAnalyzer extends AbstractAnalyzer {
   static const _url =
       'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
 
@@ -27,9 +30,7 @@ class DartAnalyzer extends Analyzer {
     final issueMaps = decodedResponse['issues'];
 
     if (issueMaps is! Iterable || (issueMaps.isEmpty)) {
-      throw Exception(
-        '[issues] field must be an iterable of Map<String, dynamic>',
-      );
+      return const AnalysisResult(issues: []);
     }
 
     final issues = issueMaps
@@ -37,5 +38,30 @@ class DartAnalyzer extends Analyzer {
         .map(issueFromJson)
         .toList(growable: false);
     return AnalysisResult(issues: issues);
+  }
+}
+
+// Converts json to Issue object for the DartAnalyzer.
+Issue issueFromJson(Map<String, dynamic> json) {
+  final type = mapIssueType(json['kind']);
+  return Issue(
+    line: json['line'] - 1,
+    message: json['message'],
+    suggestion: json['correction'],
+    type: type,
+    url: json['url'],
+  );
+}
+
+IssueType mapIssueType(String type) {
+  switch (type) {
+    case 'error':
+      return IssueType.error;
+    case 'warning':
+      return IssueType.warning;
+    case 'info':
+      return IssueType.info;
+    default:
+      return IssueType.warning;
   }
 }

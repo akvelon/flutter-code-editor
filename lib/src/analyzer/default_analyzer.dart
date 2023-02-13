@@ -1,10 +1,10 @@
-import '../../code/code.dart';
+import '../code/code.dart';
 
-import '../api/analyzer.dart';
-import '../api/models/analysis_result.dart';
+import 'abstract.dart';
+import 'models/analysis_result.dart';
 
-class DefaultAnalyzer extends Analyzer {
-  const DefaultAnalyzer();
+class DefaultLocalAnalyzer extends AbstractAnalyzer {
+  const DefaultLocalAnalyzer();
 
   @override
   Future<AnalysisResult> analyze(Code code) async {

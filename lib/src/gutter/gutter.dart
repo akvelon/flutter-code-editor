@@ -96,7 +96,7 @@ class GutterWidget extends StatelessWidget {
   }
 
   void _fillIssues(List<TableRow> tableRows) {
-    for (final issue in codeController.issues) {
+    for (final issue in codeController.analysisResult.issues) {
       if (issue.line >= codeController.code.lines.length) {
         continue;
       }
@@ -130,6 +130,21 @@ class GutterWidget extends StatelessWidget {
         onTap: isFolded
             ? () => codeController.unfoldAt(block.firstLine)
             : () => codeController.foldAt(block.firstLine),
+      );
+    }
+
+    // Add folded blocks that are not considered as a valid foldable block,
+    // but should be folded because they were folded before becoming invalid.
+    for (final block in code.foldedBlocks) {
+      final lineIndex = _lineIndexToTableRowIndex(block.firstLine);
+      if (lineIndex == null || lineIndex >= tableRows.length) {
+        continue;
+      }
+
+      tableRows[lineIndex].children![_foldingColumn] = FoldToggle(
+        color: style.textStyle?.color,
+        isFolded: true,
+        onTap: () => codeController.unfoldAt(block.firstLine),
       );
     }
   }

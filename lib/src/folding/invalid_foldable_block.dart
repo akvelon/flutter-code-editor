@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../analyzer/api/models/issue.dart';
-import '../analyzer/api/models/issue_type.dart';
+import '../analyzer/models/issue.dart';
+import '../analyzer/models/issue_type.dart';
 import 'foldable_block.dart';
 import 'foldable_block_type.dart';
 

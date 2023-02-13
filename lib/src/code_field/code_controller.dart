@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../../flutter_code_editor.dart';
-import '../analyzer/impl/default_analyzer.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
@@ -27,31 +26,31 @@ class CodeController extends TextEditingController {
   Mode? _language;
 
   /// A highlight language to parse the text with
+  ///
+  /// Setting a language will change the analyzer to [DefaultLocalAnalyzer].
   Mode? get language => _language;
 
   set language(Mode? language) {
-    if (language == _language) {
-      return;
-    }
-
-    if (language != null) {
-      _languageId = language.hashCode.toString();
-      highlight.registerLanguage(_languageId, language);
-    }
-
-    _language = language;
-    autocompleter.mode = language;
-    _updateCode(_code.text);
-    notifyListeners();
+    setLanguage(language, analyzer: const DefaultLocalAnalyzer());
   }
 
   /// `CodeController` uses [analyzer] to generate issues
   /// that are displayed in gutter widget.
   ///
-  /// Calls [Analyzer.analyze] after change with 500ms debounce.
-  final Analyzer analyzer;
+  /// Calls [AbstractAnalyzer.analyze] after change with 500ms debounce.
+  AbstractAnalyzer get analyzer => _analyzer;
+  AbstractAnalyzer _analyzer;
+  set analyzer(AbstractAnalyzer analyzer) {
+    if (_analyzer == analyzer) {
+      return;
+    }
 
-  List<Issue> issues;
+    _analyzer = analyzer;
+    unawaited(analyzeCode());
+  }
+
+  AnalysisResult analysisResult;
+  String _lastAnalyzedText = '';
   Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
@@ -112,13 +111,13 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    this.analyzer = const DefaultAnalyzer(),
+    AbstractAnalyzer analyzer = const DefaultLocalAnalyzer(),
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
         Map<String, TextStyle>? theme,
-    this.issues = const [],
+    this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -127,15 +126,16 @@ class CodeController extends TextEditingController {
       CloseBlockModifier(),
       TabModifier(),
     ],
-  })  : _readOnlySectionNames = readOnlySectionNames,
+  })  : _analyzer = analyzer,
+        _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
-    this.language = language;
+    setLanguage(language, analyzer: analyzer);
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
 
-    addListener(_analyzeCode);
+    addListener(_scheduleAnalysis);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -155,20 +155,57 @@ class CodeController extends TextEditingController {
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
+
+    unawaited(analyzeCode());
   }
 
-  void _analyzeCode() {
+  void _scheduleAnalysis() {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final text = _code.text;
-      final result = await analyzer.analyze(_code);
 
-      if (text != _code.text) {
-        return;
-      }
-      issues = result.issues;
-      notifyListeners();
+    if (_lastAnalyzedText == _code.text) {
+      // If the last analyzed code is the same as current code
+      // we don't need to analyze it again.
+      return;
+    }
+
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      await analyzeCode();
     });
+  }
+
+  Future<void> analyzeCode() async {
+    final codeSentToAnalysis = _code;
+    final result = await _analyzer.analyze(codeSentToAnalysis);
+
+    if (_code.text != codeSentToAnalysis.text) {
+      // If the code has been changed before we got analysis result, discard it.
+      // This happens on request race condition.
+      return;
+    }
+
+    analysisResult = result;
+    _lastAnalyzedText = codeSentToAnalysis.text;
+    notifyListeners();
+  }
+
+  void setLanguage(
+    Mode? language, {
+    required AbstractAnalyzer analyzer,
+  }) {
+    if (language == _language) {
+      return;
+    }
+
+    if (language != null) {
+      _languageId = language.hashCode.toString();
+      highlight.registerLanguage(_languageId, language);
+    }
+
+    _language = language;
+    autocompleter.mode = language;
+    _updateCode(_code.text);
+    this.analyzer = analyzer;
+    notifyListeners();
   }
 
   /// Sets a specific cursor position in the text

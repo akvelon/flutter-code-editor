@@ -16,8 +16,12 @@ MaterialApp createApp(CodeController controller, FocusNode focusNode) {
   );
 }
 
-Future<CodeController> pumpController(WidgetTester wt, String text) async {
-  final controller = createController(text);
+Future<CodeController> pumpController(
+  WidgetTester wt,
+  String text, {
+  Mode? language,
+}) async {
+  final controller = createController(text, language: language);
 
   focusNode = FocusNode();
   await wt.pumpWidget(createApp(controller, focusNode));
