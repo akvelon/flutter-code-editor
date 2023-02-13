@@ -4,6 +4,7 @@ import 'package:example/code_editor/code_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/java.dart';
       
 void main() {
@@ -40,7 +41,7 @@ class _MyAppState extends State<MyApp> {
                       fit: FlexFit.loose,
                       child: CodeEditor(
                         controller: CodeController(
-                          language: java,
+                          language: dart,
                         ),
                         focusNode: focusNode,
                       ),

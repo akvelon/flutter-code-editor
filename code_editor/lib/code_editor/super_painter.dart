@@ -26,31 +26,17 @@ class SuperPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     _offsetManager.reset();
 
-    for (final span in repaint.textSpan.children ?? []) {
-      if ((span as TextSpan).text == '') {
-        continue;
+    repaint.textSpan.visitChildren((span) {
+      final textSpan = span as TextSpan?;
+      if (textSpan == null || textSpan.text == '') {
+        return true;
       }
-
-      var offset = _offsetManager.offset;
-      final painter = _cache.get(span as TextSpan);
-      painter.paint(canvas, offset);
-      _offsetManager.updateOffset(painter);
-    }
-
-    // repaint.textSpan.visitChildren((span) {
-    //   assert(span is TextSpan, 'Only TextSpans are acceptable');
-
-    // if ((span as TextSpan).text == '') {
-    //   return true;
-    // }
-
-    // var offset = _offsetManager.offset;
-    // final painter = _cache.get(span as TextSpan);
-    // painter.paint(canvas, offset);
-    // _offsetManager.updateOffset(painter);
-
-    // return true;
-    // });
+        var offset = _offsetManager.offset;
+        final painter = _cache.get(textSpan);
+        painter.paint(canvas, offset);
+        _offsetManager.updateOffset(painter);
+      return true;
+    });
   }
 
   @override
