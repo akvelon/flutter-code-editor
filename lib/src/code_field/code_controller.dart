@@ -362,11 +362,21 @@ class CodeController extends TextEditingController {
         return;
       }
 
+      final selectionSnapshot =
+          code.hiddenRanges.recoverSelection(newValue.selection);
       _updateCodeIfChanged(editResult.fullTextAfter);
 
       if (newValue.text != _code.visibleText) {
-        // Manually typed in a text that has become a hidden range.
-        newValue = newValue.replacedText(_code.visibleText);
+        if (newValue.text.length > _code.visibleText.length) {
+          // Manually typed in a text that has become a hidden range.
+          newValue = newValue.replacedText(_code.visibleText);
+        } else {
+          // Some folded block is unfolded.
+          newValue = TextEditingValue(
+            text: _code.visibleText,
+            selection: _code.hiddenRanges.cutSelection(selectionSnapshot),
+          );
+        }
       }
 
       // Uncomment this to see the hidden text in the console

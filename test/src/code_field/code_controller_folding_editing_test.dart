@@ -215,9 +215,11 @@ int n;
 
             await wt.cursorEnd();
             controller.value = controller.value.replacedSelection(inserted);
-            // TODO(yescorp): Fix selection, then fix tests
-            //  https://github.com/akvelon/flutter-code-editor/issues/182
             expect(controller.value.text, example + inserted);
+            expect(
+              controller.value.selection,
+              TextSelection.collapsed(offset: controller.value.text.length),
+            );
             expect(controller.code.foldedBlocks.length, 0);
           });
 
@@ -251,9 +253,11 @@ int n;
 
             await wt.cursorEnd();
             controller.value = controller.value.replacedSelection(inserted);
-            // TODO(yescorp): Fix selection, then fix tests
-            //  https://github.com/akvelon/flutter-code-editor/issues/182
             expect(controller.value.text, example + inserted);
+            expect(
+              controller.value.selection,
+              TextSelection.collapsed(offset: controller.value.text.length),
+            );
             expect(controller.code.foldedBlocks.length, 0);
           });
 
@@ -296,8 +300,12 @@ int n;
             controller.value = controller.value.replacedSelection('  bbbb');
 
             const expectedText = 'a:\n  aaaa\n  bbbb';
-
+            //                                      \ selection
             expect(controller.value.text, expectedText);
+            expect(
+              controller.value.selection,
+              TextSelection.collapsed(offset: controller.value.text.length),
+            );
             expect(controller.code.foldedBlocks.length, 0);
           });
 
