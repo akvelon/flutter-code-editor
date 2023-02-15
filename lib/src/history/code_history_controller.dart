@@ -226,4 +226,8 @@ class CodeHistoryController {
     _push();
     _currentRecordIndex = 0;
   }
+
+  void dispose() {
+    _debounceTimer?.cancel();
+  }
 }
