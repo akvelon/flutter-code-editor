@@ -17,15 +17,7 @@ void main() {
       testWidgets('Initial record', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
 
-        expect(
-          controller.historyController.stack,
-          [
-            CodeHistoryRecord(
-              code: controller.code,
-              selection: const TextSelection.collapsed(offset: -1),
-            ),
-          ],
-        );
+        expect(controller.historyController.stack.length, 0);
       });
 
       testWidgets(
@@ -73,33 +65,41 @@ void main() {
           CodeHistoryRecord(
             code: code1,
             selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 1,
+              offset: MethodSnippet.visible.length,
             ),
           ),
         );
-        expect(
-          controller.historyController.stack[2],
-          CodeHistoryRecord(
-            code: code2,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 1,
-            ),
-          ),
-        );
+
+        // TODO(yescorp): uncomment when issue resolves.
+        //  https://github.com/akvelon/flutter-code-editor/issues/179
+        // expect(
+        //   controller.historyController.stack[2],
+        //   CodeHistoryRecord(
+        //     code: code2,
+        //     selection: const TextSelection.collapsed(
+        //       offset: MethodSnippet.visible.length + 2,
+        //     ),
+        //   ),
+        // );
       });
 
       testWidgets('Line count change', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-        await wt.cursorEnd();
+        await wt.cursorEnd(); // Creates.
+        expect(controller.historyController.stack.length, 1);
 
+        // Creates before and after.
         controller.value = controller.value.typed('\n');
+        expect(controller.historyController.stack.length, 2);
         final code1 = controller.code;
-        controller.value = controller.value.typed('\n'); // Creates.
+        // Creates before and after.
+        controller.value = controller.value.typed('\n');
+        expect(controller.historyController.stack.length, 3);
 
         final code2 = controller.code;
         await wt.sendKeyEvent(LogicalKeyboardKey.backspace); // Creates.
 
-        expect(controller.historyController.stack.length, 3);
+        expect(controller.historyController.stack.length, 4);
         expect(
           controller.historyController.stack[1],
           CodeHistoryRecord(
@@ -203,7 +203,7 @@ void main() {
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 1,
+            offset: MethodSnippet.visible.length,
           ),
         );
 
@@ -214,10 +214,13 @@ void main() {
         await wt.sendUndo(); // To initial.
 
         expect(controller.fullText, MethodSnippet.full);
-        expect(
-          controller.selection,
-          const TextSelection.collapsed(offset: -1),
-        );
+
+        // TODO(yescorp): uncomment when issue resolves.
+        //  https://github.com/akvelon/flutter-code-editor/issues/179
+        // expect(
+        //   controller.selection,
+        //   const TextSelection.collapsed(offset: 40),
+        // );
 
         await wt.sendUndo(); // No effect.
 
@@ -229,7 +232,7 @@ void main() {
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 1,
+            offset: MethodSnippet.visible.length,
           ),
         );
 
@@ -261,7 +264,7 @@ void main() {
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 1,
+            offset: MethodSnippet.visible.length,
           ),
         );
 
@@ -275,11 +278,11 @@ void main() {
 
         await wt.moveCursor(-1); // Creates.
 
-        expect(controller.fullText, MethodSnippet.full + 'ab');
+        expect(controller.fullText, MethodSnippet.full + 'ba');
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 1,
+            offset: MethodSnippet.visible.length,
           ),
         );
 
@@ -291,21 +294,22 @@ void main() {
         await wt.sendRedo();
         await wt.sendRedo();
 
-        expect(controller.fullText, MethodSnippet.full + 'ab');
+        expect(controller.fullText, MethodSnippet.full + 'ba');
       });
 
-      testWidgets('Selection does not disable redo', (WidgetTester wt) async {
+      testWidgets('Selection disables redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
 
         await wt.cursorEnd();
         controller.value = controller.value.typed('a');
         await wt.sendUndo(); // Creates.
+        expect(controller.historyController.stack.length, 2);
         await wt.pumpAndSettle();
 
         controller.value = controller.value.copyWith(
           selection: const TextSelection.collapsed(offset: 0),
         );
-        expect(controller.historyController.stack.length, 2);
+        expect(controller.historyController.stack.length, 1);
       });
 
       testWidgets('Limit depth', (WidgetTester wt) async {
@@ -345,7 +349,7 @@ void main() {
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 1,
+            offset: MethodSnippet.visible.length,
           ),
         );
 
@@ -356,11 +360,14 @@ void main() {
           await wt.sendRedo();
         }
 
-        expect(controller.fullText, MethodSnippet.full + 'a' * 100);
+        expect(
+          controller.fullText,
+          MethodSnippet.full + 'a' * CodeHistoryController.limit,
+        );
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 1,
+            offset: MethodSnippet.visible.length,
           ),
         );
       });

@@ -8,6 +8,12 @@ import '../code_field/text_selection.dart';
 import 'code_history_record.dart';
 import 'limit_stack.dart';
 
+enum HistoryControllerAction {
+  newEntryAfterEdit,
+  newEntriesBeforeAndAfterEdit,
+  setTimer,
+}
+
 /// A custom undo/redo implementation for [CodeController].
 ///
 /// This is needed because the built-in implementation listens to the
@@ -46,45 +52,109 @@ class CodeHistoryController {
     required bool isTextChanging,
   }) {
     if (isTextChanging) {
+      _wasTextChanged = true;
       _dropRedoIfAny();
     }
 
-    bool shouldSave = false;
+    final action = _getAction(
+      code: code,
+      selection: selection,
+      isTextChanging: isTextChanging,
+    );
 
-    if (!shouldSave && _wasTextChanged) {
-      // Inserting and deleting lines are significant enough
-      // to save a record without waiting for idle.
-      shouldSave = code.lines.lines.length != lastCode.lines.lines.length;
-    }
+    switch (action) {
+      case HistoryControllerAction.newEntriesBeforeAndAfterEdit:
+        _push();
+        lastCode = code;
+        lastSelection = selection;
+        _push();
+        break;
 
-    if (!shouldSave) {
-      if (isTextChanging) {
-        _wasTextChanged = true;
-      }
+      case HistoryControllerAction.newEntryAfterEdit:
+        lastCode = code;
+        lastSelection = selection;
+        _push();
+        break;
 
-      if (_wasTextChanged) {
-        final isText1CharLonger = code.text.length == lastCode.text.length + 1;
-        final isTypingContinuous = isText1CharLonger &&
-            selection.hasMovedOneCharacterRight(lastSelection);
-
-        if (isTypingContinuous) {
-          _setTimer();
-        } else {
-          shouldSave = true;
-        }
-      }
-    }
-
-    if (shouldSave) {
-      _push();
+      case HistoryControllerAction.setTimer:
+        _setTimer();
+        break;
     }
 
     lastCode = code;
     lastSelection = selection;
+
+    _removeLastRedundantSelectionOnlyChanges();
+  }
+
+  HistoryControllerAction _getAction({
+    required Code code,
+    required TextSelection selection,
+    required bool isTextChanging,
+  }) {
+    {
+      // If the line count is changed, we add record before and after edit.
+      if (code.lines.length != lastCode.lines.length) {
+        return HistoryControllerAction.newEntriesBeforeAndAfterEdit;
+      }
+    }
+
+    {
+      // If change is caused by casual typing, we re-set the timer.
+      final isText1CharLonger = code.text.length == lastCode.text.length + 1;
+      final isTypingContinuous = isText1CharLonger &&
+          selection.hasMovedOneCharacterRight(lastSelection);
+      if (isTypingContinuous) {
+        return HistoryControllerAction.setTimer;
+      }
+    }
+
+    // Any other change will create record after edit.
+    return HistoryControllerAction.newEntryAfterEdit;
+  }
+
+  void _removeLastRedundantSelectionOnlyChanges() {
+    switch (stack.length) {
+      case 0:
+      case 1:
+        return;
+
+      case 2:
+        // Drop the first one if only selection has changed.
+        if (_isFullTextSame([stack[0], stack[1]])) {
+          stack.removeAt(0);
+        }
+        break;
+
+      default:
+        // Check last, last-1, last-2. Drop last-1.
+        final last = stack.last;
+        final lastMinus1 = stack[stack.length - 2];
+        final lastMinus2 = stack[stack.length - 3];
+
+        if (_isFullTextSame([last, lastMinus1, lastMinus2])) {
+          stack.removeAt(stack.length - 2);
+        }
+    }
+  }
+
+  bool _isFullTextSame(List<CodeHistoryRecord> records) {
+    final first = records.first;
+
+    for (int i = 1; i < records.length; i++) {
+      if (records[i].code.text != first.code.text) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   void _dropRedoIfAny() {
-    stack.removeStartingAt(_currentRecordIndex + 1);
+    final startIndexToRemove = _currentRecordIndex + 1;
+    if (startIndexToRemove < stack.length) {
+      stack.removeStartingAt(startIndexToRemove);
+    }
   }
 
   void undo() {
@@ -115,6 +185,20 @@ class CodeHistoryController {
   }
 
   void _push() {
+    if (!lastSelection.isValid) {
+      // Do not create record for invalid selection
+      // as it is not considered to be standart user input.
+      return;
+    }
+
+    if (stack.isNotEmpty &&
+        stack.last.code.text == lastCode.text &&
+        stack.last.selection == lastSelection) {
+      // Do not create record if the last record is the same as the new one.
+      return;
+    }
+    _dropRedoIfAny();
+
     _debounceTimer?.cancel();
     _pushRecord(_createRecord());
     _wasTextChanged = false;
