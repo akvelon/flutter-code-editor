@@ -17,26 +17,27 @@ void main() {
       testWidgets('Initial record', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
 
-        expect(controller.historyController.stack.length, 0);
+        expect(
+          controller.historyController.stack,
+          [
+            CodeHistoryRecord(
+              code: controller.code,
+              selection: const TextSelection.collapsed(offset: -1),
+            ),
+          ],
+        );
       });
 
-      testWidgets('Selection change creates 1 record after change', (wt) async {
+      testWidgets('Only selection change', (wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-
-        // The stack is empty -> Selection change creates.
-        await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 1);
-        expect(
-          controller.historyController.stack.last.selection,
-          TextSelection.collapsed(offset: controller.value.text.length),
-        );
 
         // Stack has 1 record, new change is only selection change -> replace
         await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 1);
         expect(
           controller.historyController.stack.last.selection,
-          TextSelection.collapsed(offset: controller.value.text.length - 1),
+          TextSelection.collapsed(offset: controller.value.text.length),
         );
 
         controller.value = controller.value.copyWith(
@@ -49,28 +50,24 @@ void main() {
         // Removing inbetween ones.
         controller.value = controller.value.typed('a');
 
-        // First selection change.
-        await wt.moveCursor(-1);
-        expect(controller.historyController.stack.length, 2);
-
-        // Selection change inbetween.
+        // First selection change creates record before and after.
         await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 3);
 
-        // Last selection change.
+        // Selection change removes record inbetween.
         await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 3);
 
         expect(
           controller.historyController.stack.last.selection,
-          TextSelection.collapsed(offset: controller.value.text.length - 3),
+          TextSelection.collapsed(offset: controller.value.text.length - 2),
         );
 
         final stack = controller.historyController.stack;
         final preLastRecord = stack[stack.length - 2];
         expect(
           preLastRecord.selection,
-          TextSelection.collapsed(offset: controller.value.text.length - 1),
+          TextSelection.collapsed(offset: controller.value.text.length),
         );
       });
 
@@ -95,36 +92,35 @@ void main() {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
+        expect(controller.historyController.stack.length, 1);
+
         controller.value = controller.value.typed('a');
         final code1 = controller.code;
-        await wt.moveCursor(-1); // Creates.
+        final selection1 = controller.selection;
+        await wt.moveCursor(-1);
+        final code2 = controller.code;
+        final selection2 = controller.selection;
 
         controller.value = controller.value.typed('b');
-        // final code2 = controller.code;
-        await wt.moveCursor(1); // Creates.
+        final code3 = controller.code;
+        final selection3 = controller.selection;
+        await wt.moveCursor(-1);
+        final code4 = controller.code;
+        final selection4 = controller.selection;
 
-        expect(controller.historyController.stack.length, 3);
-        expect(
-          controller.historyController.stack[1],
-          CodeHistoryRecord(
-            code: code1,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length,
-            ),
-          ),
-        );
+        expect(controller.historyController.stack.length, 5);
 
-        // TODO(yescorp): uncomment when issue resolves.
-        //  https://github.com/akvelon/flutter-code-editor/issues/179
-        // expect(
-        //   controller.historyController.stack[2],
-        //   CodeHistoryRecord(
-        //     code: code2,
-        //     selection: const TextSelection.collapsed(
-        //       offset: MethodSnippet.visible.length + 2,
-        //     ),
-        //   ),
-        // );
+        expect(controller.historyController.stack[1].code, code1);
+        expect(controller.historyController.stack[1].selection, selection1);
+
+        expect(controller.historyController.stack[2].code, code2);
+        expect(controller.historyController.stack[2].selection, selection2);
+
+        expect(controller.historyController.stack[3].code, code3);
+        expect(controller.historyController.stack[3].selection, selection3);
+
+        expect(controller.historyController.stack[4].code, code4);
+        expect(controller.historyController.stack[4].selection, selection4);
       });
 
       testWidgets('Line count change after text change',
@@ -288,66 +284,90 @@ void main() {
       testWidgets('Undo to bottom, then redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
+        expect(controller.historyController.stack.length, 1);
+
+        final code0 = controller.code;
+        final selection0 = controller.selection;
 
         controller.value = controller.value.typed('a');
+        final code1 = controller.code;
+        final selection1 = controller.selection;
         await wt.moveCursor(-1); // Creates.
+        final code2 = controller.code;
+        final selection2 = controller.selection;
 
         controller.value = controller.value.typed('b');
+        final code3 = controller.code;
+        final selection3 = controller.selection;
         await wt.moveCursor(-1); // Creates.
+        final code4 = controller.code;
+        final selection4 = controller.selection;
 
         controller.value = controller.value.typed('c');
+        final code5 = controller.code;
+        final selection5 = controller.selection;
+
+        expect(controller.historyController.stack.length, 5);
 
         await wt.sendUndo(); // Creates.
-
-        expect(controller.historyController.stack.length, 4);
-        expect(controller.fullText, MethodSnippet.full + 'ba');
-        expect(
-          controller.selection,
-          const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length,
-          ),
-        );
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code4);
+        expect(controller.selection, selection4);
 
         await wt.sendUndo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code3);
+        expect(controller.selection, selection3);
 
-        expect(controller.fullText, MethodSnippet.full + 'a');
+        await wt.sendUndo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code2);
+        expect(controller.selection, selection2);
 
-        await wt.sendUndo(); // To initial.
+        await wt.sendUndo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code1);
+        expect(controller.selection, selection1);
 
-        expect(controller.fullText, MethodSnippet.full);
-
-        // TODO(yescorp): uncomment when issue resolves.
-        //  https://github.com/akvelon/flutter-code-editor/issues/179
-        // expect(
-        //   controller.selection,
-        //   const TextSelection.collapsed(offset: 40),
-        // );
+        await wt.sendUndo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code0);
+        expect(controller.selection, selection0);
 
         await wt.sendUndo(); // No effect.
-
-        expect(controller.fullText, MethodSnippet.full);
-
-        await wt.sendRedo();
-
-        expect(controller.fullText, MethodSnippet.full + 'a');
-        expect(
-          controller.selection,
-          const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length,
-          ),
-        );
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code0);
+        expect(controller.selection, selection0);
 
         await wt.sendRedo();
-
-        expect(controller.fullText, MethodSnippet.full + 'ba');
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code1);
+        expect(controller.selection, selection1);
 
         await wt.sendRedo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code2);
+        expect(controller.selection, selection2);
 
-        expect(controller.fullText, MethodSnippet.full + 'cba');
+        await wt.sendRedo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code3);
+        expect(controller.selection, selection3);
+
+        await wt.sendRedo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code4);
+        expect(controller.selection, selection4);
+
+        await wt.sendRedo();
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code5);
+        expect(controller.selection, selection5);
 
         await wt.sendRedo(); // No effect.
-
-        expect(controller.fullText, MethodSnippet.full + 'cba');
+        expect(controller.historyController.stack.length, 6);
+        expect(controller.code, code5);
+        expect(controller.selection, selection5);
       });
 
       testWidgets('Changing text disables redo', (WidgetTester wt) async {
@@ -356,46 +376,29 @@ void main() {
 
         controller.value = controller.value.typed('a');
         await wt.moveCursor(-1); // Creates.
+        final code2 = controller.code;
+        final selection2 = controller.selection;
 
         controller.value = controller.value.typed('b');
 
         await wt.sendUndo(); // Creates.
 
-        expect(controller.fullText, MethodSnippet.full + 'a');
-        expect(
-          controller.selection,
-          const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length,
-          ),
-        );
+        expect(controller.code, code2);
+        expect(controller.selection, selection2);
+
+        expect(controller.historyController.stack.length, 4);
 
         controller.value = controller.value.typed('b'); // Deletes redo records.
+        final code4 = controller.code;
+        final selection4 = controller.selection;
 
-        expect(controller.historyController.stack.length, 2);
+        expect(controller.historyController.stack.length, 3);
 
         await wt.sendRedo(); // No effect.
-
-        expect(controller.historyController.stack.length, 2);
-
-        await wt.moveCursor(-1); // Creates.
-
-        expect(controller.fullText, MethodSnippet.full + 'ba');
-        expect(
-          controller.selection,
-          const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length,
-          ),
-        );
-
-        await wt.sendUndo();
-        await wt.sendUndo();
-
-        expect(controller.fullText, MethodSnippet.full);
-
-        await wt.sendRedo();
-        await wt.sendRedo();
-
-        expect(controller.fullText, MethodSnippet.full + 'ba');
+        expect(controller.code, code4);
+        expect(controller.selection, selection4);
+        expect(controller.historyController.stack.last.code, code2);
+        expect(controller.historyController.stack.last.selection, selection2);
       });
 
       testWidgets('Selection disables redo', (WidgetTester wt) async {
@@ -418,11 +421,17 @@ void main() {
         await wt.cursorEnd();
 
         // 1. Fill the limit.
-
-        for (int i = 0; i < CodeHistoryController.limit - 1; i++) {
+        for (int i = 0; i < CodeHistoryController.limit / 2 - 1; i++) {
           controller.value = controller.value.typed('a');
           await wt.moveCursor(-1); // Creates.
         }
+
+        expect(
+          controller.historyController.stack.length,
+          CodeHistoryController.limit - 1,
+        );
+
+        controller.value = controller.value.typed('aa');
 
         expect(
           controller.historyController.stack.length,
@@ -463,12 +472,14 @@ void main() {
 
         expect(
           controller.fullText,
-          MethodSnippet.full + 'a' * CodeHistoryController.limit,
+          MethodSnippet.full +
+              'a' * (CodeHistoryController.limit / 2).floor() +
+              'aa',
         );
         expect(
           controller.selection,
           const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length,
+            offset: MethodSnippet.visible.length + 2,
           ),
         );
       });

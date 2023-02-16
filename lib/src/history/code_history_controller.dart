@@ -83,8 +83,6 @@ class CodeHistoryController {
 
     lastCode = code;
     lastSelection = selection;
-
-    _removeLastRedundantSelectionOnlyChanges();
   }
 
   HistoryControllerAction _getAction({
@@ -92,21 +90,22 @@ class CodeHistoryController {
     required TextSelection selection,
     required bool isTextChanging,
   }) {
-    {
-      // If the line count is changed, we add record before and after edit.
-      if (code.lines.length != lastCode.lines.length) {
-        return HistoryControllerAction.newEntriesBeforeAndAfterEdit;
-      }
+    // If the line count is changed, we add record before and after edit.
+    if (code.lines.length != lastCode.lines.length) {
+      return HistoryControllerAction.newEntriesBeforeAndAfterEdit;
     }
 
-    {
-      // If change is caused by casual typing, we re-set the timer.
-      final isText1CharLonger = code.text.length == lastCode.text.length + 1;
-      final isTypingContinuous = isText1CharLonger &&
-          selection.hasMovedOneCharacterRight(lastSelection);
-      if (isTypingContinuous) {
-        return HistoryControllerAction.setTimer;
-      }
+    // If only selection changed, we add record before and after edit.
+    if (!isTextChanging && selection != lastSelection) {
+      return HistoryControllerAction.newEntriesBeforeAndAfterEdit;
+    }
+
+    // If change is caused by casual typing, we re-set the timer.
+    final isText1CharLonger = code.text.length == lastCode.text.length + 1;
+    final isTypingContinuous =
+        isText1CharLonger && selection.hasMovedOneCharacterRight(lastSelection);
+    if (isTypingContinuous) {
+      return HistoryControllerAction.setTimer;
     }
 
     // Any other change will create record after edit.
@@ -134,7 +133,21 @@ class CodeHistoryController {
 
         if (_isFullTextSame([last, lastMinus1, lastMinus2])) {
           stack.removeAt(stack.length - 2);
+          _currentRecordIndex--;
         }
+    }
+  }
+
+  void _removeLastIdenticalChanges() {
+    if (stack.length < 2) {
+      return;
+    }
+
+    final last = stack.last;
+    final preLast = stack[stack.length - 2];
+    if (last.code == preLast.code && last.selection == preLast.selection) {
+      stack.removeAt(stack.length - 1);
+      _currentRecordIndex--;
     }
   }
 
@@ -151,10 +164,7 @@ class CodeHistoryController {
   }
 
   void _dropRedoIfAny() {
-    final startIndexToRemove = _currentRecordIndex + 1;
-    if (startIndexToRemove < stack.length) {
-      stack.removeStartingAt(startIndexToRemove);
-    }
+    stack.removeStartingAt(_currentRecordIndex + 1);
   }
 
   void undo() {
@@ -185,23 +195,14 @@ class CodeHistoryController {
   }
 
   void _push() {
-    if (!lastSelection.isValid) {
-      // Do not create record for invalid selection
-      // as it is not considered to be standart user input.
-      return;
-    }
-
-    if (stack.isNotEmpty &&
-        stack.last.code.text == lastCode.text &&
-        stack.last.selection == lastSelection) {
-      // Do not create record if the last record is the same as the new one.
-      return;
-    }
     _dropRedoIfAny();
 
     _debounceTimer?.cancel();
     _pushRecord(_createRecord());
     _wasTextChanged = false;
+
+    _removeLastRedundantSelectionOnlyChanges();
+    _removeLastIdenticalChanges();
   }
 
   void _setTimer() {
