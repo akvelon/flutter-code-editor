@@ -31,8 +31,10 @@ void main() {
       testWidgets('Only selection change', (wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         expect(controller.historyController.stack.length, 1);
+        // Right now cursor is not inside of a TextField,
+        // but the focusNode has focus.
 
-        // Stack has 1 record, new change is only selection change -> replace
+        // Stack has 1 record, new change is only selection change -> replace.
         await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 1);
         expect(
