@@ -18,9 +18,7 @@ class LimitStack<T> extends Iterable<T> {
   }
 
   void removeStartingAt(int n) {
-    if (n <= _items.length) {
-      _items.removeRange(n, _items.length);
-    }
+    _items.removeRange(n, _items.length);
   }
 
   void removeAt(int index) {

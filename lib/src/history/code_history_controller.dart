@@ -53,6 +53,9 @@ class CodeHistoryController {
   }) {
     if (isTextChanging) {
       _wasTextChanged = true;
+    }
+
+    if (isTextChanging || selection != lastSelection) {
       _dropRedoIfAny();
     }
 
@@ -122,12 +125,13 @@ class CodeHistoryController {
         // Drop the first one if only selection has changed.
         if (_isFullTextSame([stack[0], stack[1]])) {
           stack.removeAt(0);
+          _currentRecordIndex--;
         }
         break;
 
       default:
         // Check last, last-1, last-2. Drop last-1.
-        final last = stack.last;
+        final last = stack[stack.length - 1];
         final lastMinus1 = stack[stack.length - 2];
         final lastMinus2 = stack[stack.length - 3];
 
@@ -143,7 +147,7 @@ class CodeHistoryController {
       return;
     }
 
-    final last = stack.last;
+    final last = stack[stack.length - 1];
     final preLast = stack[stack.length - 2];
     if (last.code == preLast.code && last.selection == preLast.selection) {
       stack.removeAt(stack.length - 1);
@@ -195,8 +199,6 @@ class CodeHistoryController {
   }
 
   void _push() {
-    _dropRedoIfAny();
-
     _debounceTimer?.cancel();
     _pushRecord(_createRecord());
     _wasTextChanged = false;

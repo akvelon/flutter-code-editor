@@ -294,15 +294,20 @@ class CodeController extends TextEditingController {
     final startPosition = value.wordAtCursorStart;
 
     if (startPosition != null) {
-      text = text.replaceRange(
+      final replacedText = text.replaceRange(
         startPosition,
         selection.baseOffset,
         selectedWord,
       );
 
-      selection = previousSelection.copyWith(
+      final adjustedSelection = previousSelection.copyWith(
         baseOffset: startPosition + selectedWord.length,
         extentOffset: startPosition + selectedWord.length,
+      );
+
+      value = TextEditingValue(
+        text: replacedText,
+        selection: adjustedSelection,
       );
     }
 
