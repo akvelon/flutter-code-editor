@@ -75,6 +75,7 @@ class CodeController extends TextEditingController {
   String get languageId => _languageId;
 
   Code _code;
+  List<TextSpan> lineTexts = [];
 
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
@@ -719,6 +720,34 @@ class CodeController extends TextEditingController {
   }) {
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
     return lastTextSpan = _createTextSpan(context: context, style: style);
+  }
+
+  void setLineTextSpans(BuildContext context) {
+    final full = buildTextSpan(context: context);
+    var children = <TextSpan>[];
+    var isLastAdded = false;
+
+    full.visitChildren((span) {
+      final textSpan = span as TextSpan;
+      if (textSpan.text == null) {
+        return true;
+      }
+
+      if (textSpan.text!.contains('\n')) {
+        children.add(textSpan);
+        lineTexts.add(TextSpan(children: children));
+        children = [];
+        isLastAdded = true;
+      } else {
+        children.add(textSpan);
+        isLastAdded = false;
+      }
+
+      if (!isLastAdded) {
+        lineTexts.add(TextSpan(children: children));
+      }
+      return true;
+    });
   }
 
   TextSpan _createTextSpan({
