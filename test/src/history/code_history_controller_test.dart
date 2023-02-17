@@ -34,7 +34,7 @@ void main() {
         // but the focusNode has focus.
 
         // Stack has 1 record, new change is only selection change -> replace.
-        await wt.moveCursor(-1); // +before +after
+        await wt.moveCursor(-1); // +after
         expect(controller.historyController.stack.length, 1);
         expect(
           controller.historyController.stack.last.selection,
@@ -54,7 +54,7 @@ void main() {
         expect(controller.historyController.stack.length, 3);
 
         // Selection change removes record inbetween.
-        await wt.moveCursor(-1); // +before +after
+        await wt.moveCursor(-1); // -before +after
         expect(controller.historyController.stack.length, 3);
 
         expect(
@@ -401,13 +401,13 @@ void main() {
         await wt.cursorEnd();
 
         controller.value = controller.value.typed('b'); // Schedules.
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         expect(controller.historyController.stack.length, 3);
 
         controller.foldAt(1);
 
         controller.value = controller.value.typed('a'); // Schedules.
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         expect(controller.historyController.stack.length, 5);
 
         await wt.sendUndo();
