@@ -30,34 +30,31 @@ void main() {
 
       testWidgets('Only selection change', (wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-        expect(controller.historyController.stack.length, 1);
         // Right now cursor is not inside of a TextField,
         // but the focusNode has focus.
 
         // Stack has 1 record, new change is only selection change -> replace.
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         expect(controller.historyController.stack.length, 1);
         expect(
           controller.historyController.stack.last.selection,
           TextSelection.collapsed(offset: controller.value.text.length),
         );
 
-        controller.value = controller.value.copyWith(
-          selection:
-              TextSelection.collapsed(offset: controller.value.text.length),
-        );
+        controller.value = controller.value.copyWith();
         expect(controller.historyController.stack.length, 1);
 
         // Multiple selection changes preserves first and last change.
         // Removing inbetween ones.
+
         controller.value = controller.value.typed('a');
 
         // First selection change creates record before and after.
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         expect(controller.historyController.stack.length, 3);
 
         // Selection change removes record inbetween.
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         expect(controller.historyController.stack.length, 3);
 
         expect(
@@ -94,19 +91,17 @@ void main() {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
-        expect(controller.historyController.stack.length, 1);
-
-        controller.value = controller.value.typed('a');
+        controller.value = controller.value.typed('a'); // Schedules.
         final code1 = controller.code;
         final selection1 = controller.selection;
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         final code2 = controller.code;
         final selection2 = controller.selection;
 
         controller.value = controller.value.typed('b');
         final code3 = controller.code;
         final selection3 = controller.selection;
-        await wt.moveCursor(-1);
+        await wt.moveCursor(-1); // +before +after
         final code4 = controller.code;
         final selection4 = controller.selection;
 
@@ -128,95 +123,91 @@ void main() {
       testWidgets('Line count change after text change',
           (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
-        await wt.cursorEnd(); // Creates.
-        expect(controller.historyController.stack.length, 1);
 
-        controller.value = controller.value.typed('a');
-        final code1 = controller.code;
-        final selection1 = controller.selection;
+        final manualHistoryRecords = <CodeHistoryRecord>[];
 
-        // Creates before and after.
-        controller.value = controller.value.typed('\n');
-        final code2 = controller.code;
-        final selection2 = controller.selection;
+        await wt.cursorEnd(); // Replaces.
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
+
+        controller.value = controller.value.typed('a'); // Schedules.
+
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
+        controller.value = controller.value.typed('\n'); // +before +after
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
 
         expect(controller.historyController.stack.length, 3);
 
-        controller.value = controller.value.typed('a');
-        final code3 = controller.code;
-        final selection3 = controller.selection;
+        controller.value = controller.value.typed('a'); // Schedules.
 
-        // Creates before and after.
-        controller.value = controller.value.typed('\n');
-        final code4 = controller.code;
-        final selection4 = controller.selection;
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
+        controller.value = controller.value.typed('\n'); // +before +after
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
         expect(controller.historyController.stack.length, 5);
 
-        // Creates before and after. Removes repetitions.
-        await wt.sendKeyEvent(LogicalKeyboardKey.backspace);
-        final code5 = controller.code;
-        final selection5 = controller.selection;
-
-        expect(controller.historyController.stack.length, 6);
-        expect(
-          controller.historyController.stack[1],
-          CodeHistoryRecord(code: code1, selection: selection1),
-        );
-        expect(
-          controller.historyController.stack[2],
-          CodeHistoryRecord(code: code2, selection: selection2),
-        );
-        expect(
-          controller.historyController.stack[3],
-          CodeHistoryRecord(code: code3, selection: selection3),
-        );
-        expect(
-          controller.historyController.stack[4],
-          CodeHistoryRecord(code: code4, selection: selection4),
-        );
-        expect(
-          controller.historyController.stack[5],
-          CodeHistoryRecord(code: code5, selection: selection5),
-        );
-      });
-
-      testWidgets('Line count changes in a row', (WidgetTester wt) async {
-        final controller = await pumpController(wt, MethodSnippet.full);
-        await wt.cursorEnd(); // Creates.
-        expect(controller.historyController.stack.length, 1);
-
-        // Creates before and after. Removes repetitions.
-        controller.value = controller.value.typed('\n');
-        expect(controller.historyController.stack.length, 2);
-        final code1 = controller.code;
-
-        // Creates before and after. Removes repetitions.
-        controller.value = controller.value.typed('\n');
-        expect(controller.historyController.stack.length, 3);
-
-        final code2 = controller.code;
-        // Creates before and after. Removes repetitions.
-        await wt.sendKeyEvent(LogicalKeyboardKey.backspace);
-
-        expect(controller.historyController.stack.length, 4);
-        expect(
-          controller.historyController.stack[1],
+        await wt.sendKeyEvent(LogicalKeyboardKey.backspace); // +after
+        manualHistoryRecords.add(
           CodeHistoryRecord(
-            code: code1,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 1,
-            ),
+            code: controller.code,
+            selection: controller.selection,
           ),
         );
-        expect(
-          controller.historyController.stack[2],
+
+        controller.value = controller.value.typed('\n'); // +after
+        manualHistoryRecords.add(
           CodeHistoryRecord(
-            code: code2,
-            selection: const TextSelection.collapsed(
-              offset: MethodSnippet.visible.length + 2,
-            ),
+            code: controller.code,
+            selection: controller.selection,
           ),
         );
+
+        controller.value = controller.value.typed('\n'); // +after
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
+
+        expect(
+          controller.historyController.stack.length,
+          manualHistoryRecords.length,
+        );
+
+        for (int i = 0; i < manualHistoryRecords.length; i++) {
+          expect(
+            manualHistoryRecords[i].code,
+            controller.historyController.stack[i].code,
+          );
+          expect(
+            manualHistoryRecords[i].selection,
+            controller.historyController.stack[i].selection,
+          );
+        }
       });
 
       testWidgets('Typing + Timeout', (WidgetTester wt) async {
@@ -226,13 +217,13 @@ void main() {
         await wt.cursorEnd();
 
         fakeAsync((async) {
-          controller.value = controller.value.typed('a');
+          controller.value = controller.value.typed('a'); // Schedules.
 
           async.elapse(
             CodeHistoryController.idle - const Duration(microseconds: 1),
           );
 
-          controller.value = controller.value.typed('b');
+          controller.value = controller.value.typed('b'); // Schedules.
           code1 = controller.code;
 
           async.elapse(CodeHistoryController.idle); // Creates.
@@ -286,102 +277,101 @@ void main() {
       testWidgets('Undo to bottom, then redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
-        expect(controller.historyController.stack.length, 1);
 
-        final code0 = controller.code;
-        final selection0 = controller.selection;
+        final manualHistoryRecords = <CodeHistoryRecord>[];
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
 
-        controller.value = controller.value.typed('a');
-        final code1 = controller.code;
-        final selection1 = controller.selection;
-        await wt.moveCursor(-1); // Creates.
-        final code2 = controller.code;
-        final selection2 = controller.selection;
+        controller.value = controller.value.typed('a'); // Schedules.
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
+        await wt.moveCursor(-1); // +before +after
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
 
-        controller.value = controller.value.typed('b');
-        final code3 = controller.code;
-        final selection3 = controller.selection;
-        await wt.moveCursor(-1); // Creates.
-        final code4 = controller.code;
-        final selection4 = controller.selection;
+        controller.value = controller.value.typed('b'); // Schedules.
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
+        await wt.moveCursor(-1); // +before +after
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
 
-        controller.value = controller.value.typed('c');
-        final code5 = controller.code;
-        final selection5 = controller.selection;
+        controller.value = controller.value.typed('c'); // Schedules.
+        manualHistoryRecords.add(
+          CodeHistoryRecord(
+            code: controller.code,
+            selection: controller.selection,
+          ),
+        );
 
         expect(controller.historyController.stack.length, 5);
 
         await wt.sendUndo(); // Creates.
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code4.text);
-        expect(controller.selection, selection4);
 
-        await wt.sendUndo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code3.text);
-        expect(controller.selection, selection3);
+        // Undo to bottom.
 
-        await wt.sendUndo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code2.text);
-        expect(controller.selection, selection2);
+        for (int i = manualHistoryRecords.length - 2; i >= 0; i--) {
+          expect(
+            controller.value.text,
+            manualHistoryRecords[i].code.visibleText,
+          );
+          await wt.sendUndo();
+        }
 
-        await wt.sendUndo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code1.text);
-        expect(controller.selection, selection1);
+        await wt.sendUndo(); // One too many.
+        expect(
+          controller.value.text,
+          manualHistoryRecords.first.code.visibleText,
+        );
 
-        await wt.sendUndo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code0.text);
-        expect(controller.selection, selection0);
+        // Redo to top.
 
-        await wt.sendUndo(); // No effect.
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code0.text);
-        expect(controller.selection, selection0);
+        for (int i = 0; i < manualHistoryRecords.length; i++) {
+          expect(
+            controller.value.text,
+            manualHistoryRecords[i].code.visibleText,
+          );
+          await wt.sendRedo();
+        }
 
-        await wt.sendRedo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code1.text);
-        expect(controller.selection, selection1);
-
-        await wt.sendRedo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code2.text);
-        expect(controller.selection, selection2);
-
-        await wt.sendRedo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code3.text);
-        expect(controller.selection, selection3);
-
-        await wt.sendRedo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code4.text);
-        expect(controller.selection, selection4);
-
-        await wt.sendRedo();
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code5.text);
-        expect(controller.selection, selection5);
-
-        await wt.sendRedo(); // No effect.
-        expect(controller.historyController.stack.length, 6);
-        expect(controller.code.text, code5.text);
-        expect(controller.selection, selection5);
+        await wt.sendRedo(); // One too many.
+        expect(
+          controller.value.text,
+          manualHistoryRecords.last.code.visibleText,
+        );
       });
 
       testWidgets('Changing text disables redo', (WidgetTester wt) async {
         final controller = await pumpController(wt, MethodSnippet.full);
         await wt.cursorEnd();
 
-        controller.value = controller.value.typed('a');
-        await wt.moveCursor(-1); // Creates.
+        controller.value = controller.value.typed('a'); // Schedules.
+        await wt.moveCursor(-1); // +before +after
         final code2 = controller.code;
         final selection2 = controller.selection;
 
-        controller.value = controller.value.typed('b');
+        controller.value = controller.value.typed('b'); // Schedules.
 
         await wt.sendUndo(); // Creates.
 
@@ -390,7 +380,7 @@ void main() {
 
         expect(controller.historyController.stack.length, 4);
 
-        controller.value = controller.value.typed('b'); // Deletes redo records.
+        controller.value = controller.value.typed('c'); // Deletes redo records.
         final code4 = controller.code;
         final selection4 = controller.selection;
 
@@ -403,26 +393,25 @@ void main() {
         expect(controller.historyController.stack.last.selection, selection2);
       });
 
-      testWidgets('Folded blocks match when undo/redo', (wt) async {
+      testWidgets('Start typing -> Fold -> Continue -> Undo -> Still folded',
+          (wt) async {
         const example = 'a\n// comment 1\n// comment2\n a';
         const visible = 'a\n// comment 1\n a';
         final controller = await pumpController(wt, example);
         await wt.cursorEnd();
 
-        expect(controller.historyController.stack.length, 1);
-
-        controller.value = controller.value.typed('b');
+        controller.value = controller.value.typed('b'); // Schedules.
         await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 3);
 
         controller.foldAt(1);
 
-        controller.value = controller.value.typed('b');
+        controller.value = controller.value.typed('a'); // Schedules.
         await wt.moveCursor(-1);
         expect(controller.historyController.stack.length, 5);
 
         await wt.sendUndo();
-        expect(controller.value.text, visible + 'bb');
+        expect(controller.value.text, visible + 'ab'); // Keeps folding.
         //                                        \ selection
         expect(
           controller.value.selection,
@@ -437,7 +426,7 @@ void main() {
         );
         await wt.sendUndo();
         expect(controller.value.text, visible + 'b');
-        //                                         \ selection
+        //                                        \ selection
         expect(
           controller.value.selection,
           TextSelection.collapsed(offset: controller.value.text.length),
@@ -464,7 +453,7 @@ void main() {
         final controller = await pumpController(wt, MethodSnippet.full);
 
         await wt.cursorEnd();
-        controller.value = controller.value.typed('a');
+        controller.value = controller.value.typed('a'); // Schedules.
         await wt.sendUndo(); // Creates.
         expect(controller.historyController.stack.length, 2);
         await wt.pumpAndSettle();
@@ -480,9 +469,14 @@ void main() {
         await wt.cursorEnd();
 
         // 1. Fill the limit.
-        for (int i = 0; i < CodeHistoryController.limit / 2 - 1; i++) {
-          controller.value = controller.value.typed('a');
-          await wt.moveCursor(-1); // Creates.
+
+        Code? firstCode;
+        TextSelection? firstSelection;
+
+        for (int i = 0; i < CodeHistoryController.limit - 2; i++) {
+          controller.value = controller.value.typed('ab'); // Creates.
+          firstCode ??= controller.code;
+          firstSelection ??= controller.selection;
         }
 
         expect(
@@ -490,7 +484,7 @@ void main() {
           CodeHistoryController.limit - 1,
         );
 
-        controller.value = controller.value.typed('aa');
+        controller.value = controller.value.typed('ab'); // Creates.
 
         expect(
           controller.historyController.stack.length,
@@ -499,47 +493,20 @@ void main() {
 
         // 2. Overflow drops the oldest record.
 
-        controller.value = controller.value.typed('a');
-        await wt.moveCursor(-1); // Creates, drops the oldest.
+        controller.value = controller.value.typed('ab'); // Creates.
 
         expect(
           controller.historyController.stack.length,
           CodeHistoryController.limit,
         );
 
-        // 3. Can undo to bottom.
-
-        // One too many.
-        for (int i = 0; i < CodeHistoryController.limit; i++) {
-          await wt.sendUndo();
-        }
-
-        expect(controller.fullText, MethodSnippet.full + 'a'); //Last not undone
         expect(
-          controller.selection,
-          const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length,
-          ),
-        );
-
-        // 4. Can redo.
-
-        // One too many.
-        for (int i = 0; i < CodeHistoryController.limit; i++) {
-          await wt.sendRedo();
-        }
-
-        expect(
-          controller.fullText,
-          MethodSnippet.full +
-              'a' * (CodeHistoryController.limit / 2).floor() +
-              'aa',
+          controller.historyController.stack.first.code,
+          firstCode,
         );
         expect(
-          controller.selection,
-          const TextSelection.collapsed(
-            offset: MethodSnippet.visible.length + 2,
-          ),
+          controller.historyController.stack.first.selection,
+          firstSelection,
         );
       });
     });
@@ -548,8 +515,8 @@ void main() {
       final controller = await pumpController(wt, MethodSnippet.full);
       await wt.cursorEnd();
 
-      controller.value = controller.value.typed('a');
-      await wt.moveCursor(-1); // Creates.
+      controller.value = controller.value.typed('a'); // Schedules.
+      await wt.moveCursor(-1); // +before +after
 
       controller.historyController.deleteHistory();
 

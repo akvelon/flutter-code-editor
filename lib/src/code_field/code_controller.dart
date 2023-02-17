@@ -389,7 +389,7 @@ class CodeController extends TextEditingController {
       //print('\n\n${_code.text}');
     }
 
-    historyController.beforeChanged(
+    historyController.beforeCodeControllerValueChanged(
       code: _code,
       selection: newValue.selection,
       isTextChanging: hasTextChanged,
@@ -622,7 +622,7 @@ class CodeController extends TextEditingController {
 
     // TODO(yescorp): move to the listener both here and in `set value`
     //  or come up with a different approach
-    historyController.beforeChanged(
+    historyController.beforeCodeControllerValueChanged(
       code: _code,
       selection: finalVisibleSelection,
       isTextChanging: true,

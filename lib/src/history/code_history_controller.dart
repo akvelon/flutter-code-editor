@@ -46,7 +46,7 @@ class CodeHistoryController {
     _push();
   }
 
-  void beforeChanged({
+  void beforeCodeControllerValueChanged({
     required Code code,
     required TextSelection selection,
     required bool isTextChanging,
@@ -81,11 +81,10 @@ class CodeHistoryController {
 
       case HistoryControllerAction.setTimer:
         _setTimer();
+        lastCode = code;
+        lastSelection = selection;
         break;
     }
-
-    lastCode = code;
-    lastSelection = selection;
   }
 
   HistoryControllerAction _getAction({
