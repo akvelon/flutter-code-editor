@@ -313,62 +313,62 @@ void main() {
 
         await wt.sendUndo(); // Creates.
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code4);
+        expect(controller.code.text, code4.text);
         expect(controller.selection, selection4);
 
         await wt.sendUndo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code3);
+        expect(controller.code.text, code3.text);
         expect(controller.selection, selection3);
 
         await wt.sendUndo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code2);
+        expect(controller.code.text, code2.text);
         expect(controller.selection, selection2);
 
         await wt.sendUndo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code1);
+        expect(controller.code.text, code1.text);
         expect(controller.selection, selection1);
 
         await wt.sendUndo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code0);
+        expect(controller.code.text, code0.text);
         expect(controller.selection, selection0);
 
         await wt.sendUndo(); // No effect.
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code0);
+        expect(controller.code.text, code0.text);
         expect(controller.selection, selection0);
 
         await wt.sendRedo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code1);
+        expect(controller.code.text, code1.text);
         expect(controller.selection, selection1);
 
         await wt.sendRedo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code2);
+        expect(controller.code.text, code2.text);
         expect(controller.selection, selection2);
 
         await wt.sendRedo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code3);
+        expect(controller.code.text, code3.text);
         expect(controller.selection, selection3);
 
         await wt.sendRedo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code4);
+        expect(controller.code.text, code4.text);
         expect(controller.selection, selection4);
 
         await wt.sendRedo();
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code5);
+        expect(controller.code.text, code5.text);
         expect(controller.selection, selection5);
 
         await wt.sendRedo(); // No effect.
         expect(controller.historyController.stack.length, 6);
-        expect(controller.code, code5);
+        expect(controller.code.text, code5.text);
         expect(controller.selection, selection5);
       });
 
@@ -385,7 +385,7 @@ void main() {
 
         await wt.sendUndo(); // Creates.
 
-        expect(controller.code, code2);
+        expect(controller.code.text, code2.text);
         expect(controller.selection, selection2);
 
         expect(controller.historyController.stack.length, 4);
@@ -397,10 +397,67 @@ void main() {
         expect(controller.historyController.stack.length, 3);
 
         await wt.sendRedo(); // No effect.
-        expect(controller.code, code4);
+        expect(controller.code.text, code4.text);
         expect(controller.selection, selection4);
         expect(controller.historyController.stack.last.code, code2);
         expect(controller.historyController.stack.last.selection, selection2);
+      });
+
+      testWidgets('Folded blocks match when undo/redo', (wt) async {
+        const example = 'a\n// comment 1\n// comment2\n a';
+        const visible = 'a\n// comment 1\n a';
+        final controller = await pumpController(wt, example);
+        await wt.cursorEnd();
+
+        expect(controller.historyController.stack.length, 1);
+
+        controller.value = controller.value.typed('b');
+        await wt.moveCursor(-1);
+        expect(controller.historyController.stack.length, 3);
+
+        controller.foldAt(1);
+
+        controller.value = controller.value.typed('b');
+        await wt.moveCursor(-1);
+        expect(controller.historyController.stack.length, 5);
+
+        await wt.sendUndo();
+        expect(controller.value.text, visible + 'bb');
+        //                                        \ selection
+        expect(
+          controller.value.selection,
+          TextSelection.collapsed(offset: controller.value.text.length - 1),
+        );
+        await wt.sendUndo();
+        expect(controller.value.text, visible + 'b');
+        //                                       \ selection
+        expect(
+          controller.value.selection,
+          TextSelection.collapsed(offset: controller.value.text.length - 1),
+        );
+        await wt.sendUndo();
+        expect(controller.value.text, visible + 'b');
+        //                                         \ selection
+        expect(
+          controller.value.selection,
+          TextSelection.collapsed(offset: controller.value.text.length),
+        );
+        await wt.sendUndo();
+        expect(controller.value.text, visible);
+        //                                   \ selection
+        expect(
+          controller.value.selection.start,
+          controller.value.text.length,
+        );
+
+        expect(controller.code.foldedBlocks.length, 1);
+
+        await wt.sendRedo();
+        await wt.sendRedo();
+        await wt.sendRedo();
+        await wt.sendRedo();
+
+        expect(controller.code.foldedBlocks.length, 1);
       });
 
       testWidgets('Selection disables redo', (WidgetTester wt) async {

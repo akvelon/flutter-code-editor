@@ -407,11 +407,14 @@ class CodeController extends TextEditingController {
   }
 
   void applyHistoryRecord(CodeHistoryRecord record) {
-    _code = record.code;
+    _code = record.code.foldedAs(_code);
+    final fullSelection =
+        record.code.hiddenRanges.recoverSelection(record.selection);
+    final cutSelection = _code.hiddenRanges.cutSelection(fullSelection);
 
     super.value = TextEditingValue(
       text: code.visibleText,
-      selection: record.selection,
+      selection: cutSelection,
     );
   }
 
