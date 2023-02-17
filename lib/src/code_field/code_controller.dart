@@ -726,6 +726,7 @@ class CodeController extends TextEditingController {
     final full = buildTextSpan(context: context);
     var children = <TextSpan>[];
     var isLastAdded = false;
+    lineTexts = [];
 
     full.visitChildren((span) {
       final textSpan = span as TextSpan;
