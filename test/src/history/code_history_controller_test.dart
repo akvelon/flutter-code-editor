@@ -331,7 +331,7 @@ void main() {
 
         // Undo to bottom.
 
-        for (int i = manualHistoryRecords.length - 2; i >= 0; i--) {
+        for (int i = manualHistoryRecords.length - 1; --i >= 0;) {
           expect(
             controller.value.text,
             manualHistoryRecords[i].code.visibleText,
@@ -470,13 +470,15 @@ void main() {
 
         // 1. Fill the limit.
 
-        Code? firstCode;
-        TextSelection? firstSelection;
+        Code? codeAfterFirstEdit;
+        TextSelection? selectionAfterFirstEdit;
 
         for (int i = 0; i < CodeHistoryController.limit - 2; i++) {
           controller.value = controller.value.typed('ab'); // Creates.
-          firstCode ??= controller.code;
-          firstSelection ??= controller.selection;
+
+          // Set after the first change.
+          codeAfterFirstEdit ??= controller.code;
+          selectionAfterFirstEdit ??= controller.selection;
         }
 
         expect(
@@ -502,11 +504,11 @@ void main() {
 
         expect(
           controller.historyController.stack.first.code,
-          firstCode,
+          codeAfterFirstEdit,
         );
         expect(
           controller.historyController.stack.first.selection,
-          firstSelection,
+          selectionAfterFirstEdit,
         );
       });
     });
