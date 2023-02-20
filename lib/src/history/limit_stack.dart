@@ -21,6 +21,10 @@ class LimitStack<T> extends Iterable<T> {
     _items.removeRange(n, _items.length);
   }
 
+  void removeAt(int index) {
+    _items.removeAt(index);
+  }
+
   void clear() {
     _items.clear();
   }

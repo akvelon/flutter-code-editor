@@ -294,15 +294,20 @@ class CodeController extends TextEditingController {
     final startPosition = value.wordAtCursorStart;
 
     if (startPosition != null) {
-      text = text.replaceRange(
+      final replacedText = text.replaceRange(
         startPosition,
         selection.baseOffset,
         selectedWord,
       );
 
-      selection = previousSelection.copyWith(
+      final adjustedSelection = previousSelection.copyWith(
         baseOffset: startPosition + selectedWord.length,
         extentOffset: startPosition + selectedWord.length,
+      );
+
+      value = TextEditingValue(
+        text: replacedText,
+        selection: adjustedSelection,
       );
     }
 
@@ -384,7 +389,7 @@ class CodeController extends TextEditingController {
       //print('\n\n${_code.text}');
     }
 
-    historyController.beforeChanged(
+    historyController.beforeCodeControllerValueChanged(
       code: _code,
       selection: newValue.selection,
       isTextChanging: hasTextChanged,
@@ -402,11 +407,14 @@ class CodeController extends TextEditingController {
   }
 
   void applyHistoryRecord(CodeHistoryRecord record) {
-    _code = record.code;
+    _code = record.code.foldedAs(_code);
+    final fullSelection =
+        record.code.hiddenRanges.recoverSelection(record.selection);
+    final cutSelection = _code.hiddenRanges.cutSelection(fullSelection);
 
     super.value = TextEditingValue(
       text: code.visibleText,
-      selection: record.selection,
+      selection: cutSelection,
     );
   }
 
@@ -614,7 +622,7 @@ class CodeController extends TextEditingController {
 
     // TODO(yescorp): move to the listener both here and in `set value`
     //  or come up with a different approach
-    historyController.beforeChanged(
+    historyController.beforeCodeControllerValueChanged(
       code: _code,
       selection: finalVisibleSelection,
       isTextChanging: true,
@@ -856,6 +864,7 @@ class CodeController extends TextEditingController {
   @override
   void dispose() {
     _debounce?.cancel();
+    historyController.dispose();
 
     super.dispose();
   }

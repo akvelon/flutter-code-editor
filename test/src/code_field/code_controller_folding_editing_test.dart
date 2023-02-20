@@ -239,7 +239,6 @@ int n;
 
             expect(controller.value.text, visible + inserted);
             expect(controller.code.foldedBlocks.length, 1);
-            await wt.moveCursor(-1); // Reset timer.
           });
 
           testWidgets('Add comment after folded comments block -> Unfold',
@@ -276,8 +275,6 @@ int n;
             controller.value = controller.value.replacedSelection(inserted);
             expect(controller.value.text, visible + inserted);
             expect(controller.code.foldedBlocks.length, 1);
-
-            await wt.moveCursor(-1); // Reset timer.
           });
         });
 
@@ -358,7 +355,6 @@ int n;
 
             expect(controller.value.text, expectedText);
             expect(controller.code.foldedBlocks.length, 1);
-            await wt.moveCursor(-1); // Reset timer.
           });
         });
       });
