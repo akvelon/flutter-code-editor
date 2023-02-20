@@ -1,4 +1,9 @@
-## 0.2.10 (Retracted)
+## 0.2.12
+
+* Fix undo/redo bugs (Issues [132](https://github.com/akvelon/flutter-code-editor/issues/132), [186](https://github.com/akvelon/flutter-code-editor/issues/186), [193](https://github.com/akvelon/flutter-code-editor/issues/193)).
+* Fix cursor jumping bug ([Issue 182](https://github.com/akvelon/flutter-code-editor/issues/182)).
+
+## 0.2.10
 
 * Added pluggable analyzers support ([Issue 139](https://github.com/akvelon/flutter-code-editor/issues/139)).
 * Added `DartPadAnalyzer`.
