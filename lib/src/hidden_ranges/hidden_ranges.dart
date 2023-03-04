@@ -138,14 +138,13 @@ class HiddenRanges {
     Node cutHighlightedNode(Node node) {
       final value = cutHighlightedString(node.value);
       final children =
-          node.children?.map(cutHighlightedNode).toList(growable: false);
+          node.children.map(cutHighlightedNode).toList(growable: false);
 
       return Node(
         className: node.className,
         value: value,
-        children: children,
         noPrefix: node.noPrefix,
-      );
+      )..children = children;
     }
 
     final nodes =

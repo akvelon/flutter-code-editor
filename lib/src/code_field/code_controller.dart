@@ -198,7 +198,6 @@ class CodeController extends TextEditingController {
 
     if (language != null) {
       _languageId = language.hashCode.toString();
-      highlight.registerLanguage(_languageId, language);
     }
 
     _language = language;
@@ -680,7 +679,7 @@ class CodeController extends TextEditingController {
     return Code(
       text: text,
       language: language,
-      highlighted: highlight.parse(text, language: _languageId),
+      highlighted: highlight.highlight('python', text, true),
       namedSectionParser: namedSectionParser,
       readOnlySectionNames: _readOnlySectionNames,
       visibleSectionNames: _visibleSectionNames,

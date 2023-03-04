@@ -14,8 +14,6 @@ dependencies:
   collection: ^1.16.0
   equatable: ^2.0.5
   flutter: { sdk: flutter }
-  flutter_highlight: ^0.7.0
-  highlight: ^0.7.0
   http: ^0.13.5
   linked_scroll_controller: ^0.2.0
   meta: ^1.7.0
@@ -23,6 +21,16 @@ dependencies:
   scrollable_positioned_list: ^0.3.5
   tuple: ^2.0.1
   url_launcher: ^6.1.8
+  flutter_highlight:
+    git:
+      url: https://github.com/yescorp/highlight.dart.git
+      ref: f7e4b268123e390fb82cf79e9436d0ba32f440c8
+      path: flutter_highlight/
+  highlight:
+    git:
+      url: https://github.com/yescorp/highlight.dart.git
+      ref: a21d02d067797bf1e8b4ce5190529c39afd26a85
+      path: highlight/
 
 dev_dependencies:
   fake_async: ^1.3.1

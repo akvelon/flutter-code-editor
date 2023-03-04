@@ -97,8 +97,7 @@ extension MyNode on Node {
         className: className ?? this.className,
         value: value ?? this.value,
         noPrefix: noPrefix ?? this.noPrefix,
-        children: children ?? this.children,
-      );
+      )..children = children ?? this.children;
 }
 
 extension NodeListExtension on List<Node> {
