@@ -24,12 +24,12 @@ dependencies:
   flutter_highlight:
     git:
       url: https://github.com/yescorp/highlight.dart.git
-      ref: f7e4b268123e390fb82cf79e9436d0ba32f440c8
+      ref: 06f8a5eac88554647c7a181b74e41bfc839215cf
       path: flutter_highlight/
   highlight:
     git:
       url: https://github.com/yescorp/highlight.dart.git
-      ref: a21d02d067797bf1e8b4ce5190529c39afd26a85
+      ref: 1138baf588ae306dde538cccb4fb0483d401b2fb
       path: highlight/
 
 dev_dependencies:

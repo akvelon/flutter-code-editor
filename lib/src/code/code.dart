@@ -142,8 +142,8 @@ class Code {
       invalidBlocks: invalidBlocks,
       lines: lines,
       namedSections: sectionsMap,
-      visibleHighlighted: highlighted,
-      // hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
+      visibleHighlighted:
+          hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
       visibleText: text,
       visibleSectionNames: visibleSectionNames,
     );
@@ -462,7 +462,6 @@ class Code {
 
   /// Folds this code at the same blocks as the [oldCode] is.
   Code foldedAs(Code oldCode) {
-    return this;
     final matcher = FoldableBlockMatcher(
       oldLines: oldCode.lines.lines,
       newBlocks: foldableBlocks,

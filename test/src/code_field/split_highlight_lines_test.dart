@@ -2,6 +2,7 @@ import 'package:flutter_code_editor/src/highlight/node.dart';
 import 'package:flutter_code_editor/src/highlight/result.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/dart.dart';
 
 const examples = {
