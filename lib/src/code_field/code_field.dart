@@ -1,6 +1,9 @@
 import 'dart:async';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:js' as js;
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
@@ -15,6 +18,7 @@ import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
 import 'default_styles.dart';
+import 'disable_spell_check.dart';
 
 final _shortcuts = <ShortcutActivator, Intent>{
   // Copy
@@ -204,6 +208,12 @@ class _CodeFieldState extends State<CodeField> {
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
+
+    if (kIsWeb) {
+      // Workaround for disabling spellchecks on FireFox
+      // https://github.com/akvelon/flutter-code-editor/issues/197
+      js.context.callMethod('eval', [jsDisableSpellCheck]);
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final double width = _codeFieldKey.currentContext!.size!.width;
