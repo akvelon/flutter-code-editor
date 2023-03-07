@@ -1,4 +1,9 @@
-const jsDisableSpellCheck = '''
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:js' as js;
+
+import 'package:flutter/foundation.dart';
+
+const _jsSetDisableSpellCheckTimer = '''
 var disableSpellCheck = setInterval(function () {
       var elements = document.getElementsByTagName('flt-glass-pane');
       for (let child of elements[0].shadowRoot.children) {
@@ -11,3 +16,14 @@ var disableSpellCheck = setInterval(function () {
       }
     }, 1000);
 ''';
+
+bool _isTimerSet = false;
+
+void disableSpellCheckIfWeb() {
+  if (kIsWeb) {
+    if (!_isTimerSet) {
+      js.context.callMethod('eval', [_jsSetDisableSpellCheckTimer]);
+      _isTimerSet = true;
+    }
+  }
+}
