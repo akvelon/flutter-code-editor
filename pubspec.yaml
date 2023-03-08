@@ -21,15 +21,10 @@ dependencies:
   scrollable_positioned_list: ^0.3.5
   tuple: ^2.0.1
   url_launcher: ^6.1.8
-  flutter_highlight:
-    git:
-      url: https://github.com/yescorp/highlight.dart.git
-      ref: 06f8a5eac88554647c7a181b74e41bfc839215cf
-      path: flutter_highlight/
   highlight:
     git:
       url: https://github.com/yescorp/highlight.dart.git
-      ref: 1138baf588ae306dde538cccb4fb0483d401b2fb
+      ref: 2094b6cc0cf3cff33f4e3f2efc930326575672e1
       path: highlight/
 
 dev_dependencies:

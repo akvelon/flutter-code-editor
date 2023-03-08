@@ -149,7 +149,7 @@ class HiddenRanges {
 
     final nodes =
         highlighted.nodes?.map(cutHighlightedNode).toList(growable: false) ??
-              <Node>[];
+            <Node>[];
 
     return Result(
       relevance: highlighted.relevance,

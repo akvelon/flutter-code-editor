@@ -3,7 +3,6 @@ import 'package:flutter_code_editor/src/hidden_ranges/hidden_range.dart';
 import 'package:flutter_code_editor/src/hidden_ranges/hidden_ranges.dart';
 import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_end.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highlight/highlight.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:highlight/languages/java.dart';
 
