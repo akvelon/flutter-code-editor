@@ -1,8 +1,6 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js;
 
-import 'package:flutter/foundation.dart';
-
 const _jsSetDisableSpellCheckTimer = '''
 var disableSpellCheck = setInterval(function () {
       var elements = document.getElementsByTagName('flt-glass-pane');
@@ -20,10 +18,8 @@ var disableSpellCheck = setInterval(function () {
 bool _isTimerSet = false;
 
 void disableSpellCheck() {
-  if (kIsWeb) {
-    if (!_isTimerSet) {
-      js.context.callMethod('eval', [_jsSetDisableSpellCheckTimer]);
-      _isTimerSet = true;
-    }
+  if (!_isTimerSet) {
+    js.context.callMethod('eval', [_jsSetDisableSpellCheckTimer]);
+    _isTimerSet = true;
   }
 }
