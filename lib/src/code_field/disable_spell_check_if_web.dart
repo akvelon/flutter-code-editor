@@ -19,7 +19,7 @@ var disableSpellCheck = setInterval(function () {
 
 bool _isTimerSet = false;
 
-void disableSpellCheckIfWeb() {
+void disableSpellCheck() {
   if (kIsWeb) {
     if (!_isTimerSet) {
       js.context.callMethod('eval', [_jsSetDisableSpellCheckTimer]);

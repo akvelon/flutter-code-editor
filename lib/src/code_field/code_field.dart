@@ -15,8 +15,7 @@ import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
 import 'default_styles.dart';
-import 'disable_spell_check_if_web_stub.dart'
-    if (dart.library.js) 'disable_spell_check_if_web.g.dart';
+import 'disable_spell_check.dart';
 
 final _shortcuts = <ShortcutActivator, Intent>{
   // Copy

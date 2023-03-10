@@ -1,1 +1,1 @@
-void disableSpellCheckIfWeb() {}
+void disableSpellCheck() {}
