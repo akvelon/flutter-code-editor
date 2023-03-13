@@ -1,3 +1,7 @@
+## 0.2.13
+
+* Workaround to disable spellcheck in Firefox (Issue [197](https://github.com/akvelon/flutter-code-editor/issues/197)).
+
 ## 0.2.12
 
 * Fix undo/redo bugs (Issues [132](https://github.com/akvelon/flutter-code-editor/issues/132), [186](https://github.com/akvelon/flutter-code-editor/issues/186), [193](https://github.com/akvelon/flutter-code-editor/issues/193)).
