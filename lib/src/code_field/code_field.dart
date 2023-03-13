@@ -15,6 +15,7 @@ import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'code_controller.dart';
 import 'default_styles.dart';
+import 'disable_spell_check/disable_spell_check.dart';
 
 final _shortcuts = <ShortcutActivator, Intent>{
   // Copy
@@ -204,6 +205,10 @@ class _CodeFieldState extends State<CodeField> {
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
+
+    // Workaround for disabling spellchecks in FireFox
+    // https://github.com/akvelon/flutter-code-editor/issues/197
+    disableSpellCheckIfWeb();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final double width = _codeFieldKey.currentContext!.size!.width;
