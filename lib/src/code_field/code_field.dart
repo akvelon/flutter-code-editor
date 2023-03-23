@@ -190,7 +190,7 @@ class _CodeFieldState extends State<CodeField> {
   FocusNode? _focusNode;
   String? lines;
   String longestLine = '';
-  late Size windowSize;
+  Size? windowSize;
   late TextStyle textStyle;
 
   @override
@@ -406,12 +406,13 @@ class _CodeFieldState extends State<CodeField> {
               child: Stack(
                 children: [
                   editingField,
-                  if (widget.controller.popupController.isPopupShown)
+                  if (widget.controller.popupController.isPopupShown &&
+                      windowSize != null)
                     Popup(
                       normalOffset: _normalPopupOffset,
                       flippedOffset: _flippedPopupOffset,
                       controller: widget.controller.popupController,
-                      editingWindowSize: windowSize,
+                      editingWindowSize: windowSize!,
                       style: textStyle,
                       backgroundColor: backgroundCol,
                       parentFocusNode: _focusNode!,
@@ -426,12 +427,12 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   void _updatePopupOffset() {
-    final TextPainter textPainter = _getTextPainter(widget.controller.text);
+    final textPainter = _getTextPainter(widget.controller.text);
     final caretHeight = _getCaretHeight(textPainter);
 
-    final double leftOffset = _getPopupLeftOffset(textPainter);
-    final double normalTopOffset = _getPopupTopOffset(textPainter, caretHeight);
-    final double flippedTopOffset = normalTopOffset -
+    final leftOffset = _getPopupLeftOffset(textPainter);
+    final normalTopOffset = _getPopupTopOffset(textPainter, caretHeight);
+    final flippedTopOffset = normalTopOffset -
         (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
     setState(() {
