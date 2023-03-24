@@ -1,3 +1,7 @@
+## 0.2.14
+
+* Fixed "Field 'windowSize' has not been initialized" bug (Issue [203](https://github.com/akvelon/flutter-code-editor/issues/203)).
+
 ## 0.2.13
 
 * Workaround to disable spellcheck in Firefox (Issue [197](https://github.com/akvelon/flutter-code-editor/issues/197)).
