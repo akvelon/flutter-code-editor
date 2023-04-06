@@ -86,7 +86,6 @@ class CodeController extends TextEditingController {
 
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
-  bool isPopupShown = false;
   RegExp? _styleRegExp;
   late PopupController popupController;
   final autocompleter = Autocompleter();

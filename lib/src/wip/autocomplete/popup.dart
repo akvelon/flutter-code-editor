@@ -14,8 +14,8 @@ class Popup extends StatefulWidget {
   final PopupController controller;
   final FocusNode parentFocusNode;
 
-  Popup({
-    Key? key,
+  const Popup({
+    super.key,
     required this.normalOffset,
     required this.flippedOffset,
     required this.controller,
@@ -23,13 +23,14 @@ class Popup extends StatefulWidget {
     required this.style,
     required this.parentFocusNode,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   PopupState createState() => PopupState();
 }
 
 class PopupState extends State<Popup> {
+  final pageStorageBucket = PageStorageBucket();
   @override
   void initState() {
     widget.controller.addListener(rebuild);
@@ -54,36 +55,39 @@ class PopupState extends State<Popup> {
         // TODO(nausharipov): find where 100 comes from
         widget.editingWindowSize.width - Sizes.autocompletePopupMaxWidth - 100;
 
-    return Positioned(
-      left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
-      top: verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
-      child: Container(
-        alignment:
-            verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
-        constraints: const BoxConstraints(
-          maxHeight: Sizes.autocompletePopupMaxHeight,
-          maxWidth: Sizes.autocompletePopupMaxWidth,
-        ),
-        // Container is used because the vertical borders
-        // in DecoratedBox are hidden under scroll.
-        // ignore: use_decorated_box
+    return PageStorage(
+      bucket: pageStorageBucket,
+      child: Positioned(
+        left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
+        top: verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
         child: Container(
-          decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            border: Border.all(
-              color: widget.style.color!,
-              width: 0.5,
-            ),
+          alignment:
+              verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
+          constraints: const BoxConstraints(
+            maxHeight: Sizes.autocompletePopupMaxHeight,
+            maxWidth: Sizes.autocompletePopupMaxWidth,
           ),
-          child: ScrollablePositionedList.builder(
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            itemScrollController: widget.controller.itemScrollController,
-            itemPositionsListener: widget.controller.itemPositionsListener,
-            itemCount: widget.controller.suggestions.length,
-            itemBuilder: (context, index) {
-              return _buildListItem(index);
-            },
+          // Container is used because the vertical borders
+          // in DecoratedBox are hidden under scroll.
+          // ignore: use_decorated_box
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.backgroundColor,
+              border: Border.all(
+                color: widget.style.color!,
+                width: 0.5,
+              ),
+            ),
+            child: ScrollablePositionedList.builder(
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              itemScrollController: widget.controller.itemScrollController,
+              itemPositionsListener: widget.controller.itemPositionsListener,
+              itemCount: widget.controller.suggestions.length,
+              itemBuilder: (context, index) {
+                return _buildListItem(index);
+              },
+            ),
           ),
         ),
       ),

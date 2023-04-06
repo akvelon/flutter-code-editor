@@ -31,10 +31,12 @@ class PopupController extends ChangeNotifier {
         itemScrollController.jumpTo(index: 0);
       }
     });
+    notifyListeners();
   }
 
   void hide() {
     isPopupShown = false;
+    notifyListeners();
   }
 
   /// Changes the selected item and scrolls through the list of completions on keyboard arrows pressed
