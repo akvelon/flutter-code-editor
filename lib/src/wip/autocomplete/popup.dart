@@ -13,6 +13,7 @@ class Popup extends StatefulWidget {
   final Color? backgroundColor;
   final PopupController controller;
   final FocusNode parentFocusNode;
+  final Offset? offset;
 
   const Popup({
     super.key,
@@ -22,6 +23,7 @@ class Popup extends StatefulWidget {
     required this.editingWindowSize,
     required this.style,
     required this.parentFocusNode,
+    required this.offset,
     this.backgroundColor,
   });
 
@@ -45,10 +47,15 @@ class PopupState extends State<Popup> {
 
   @override
   Widget build(BuildContext context) {
-    final bool verticalOverflow = (widget.normalOffset.dy +
-                Sizes.autocompletePopupMaxHeight >
-            widget.editingWindowSize.height) &&
-        (Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height);
+    final isPopupSmallerThanWindow =
+        Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height;
+    final isPopupOverflowingHeight = widget.normalOffset.dy +
+            Sizes.autocompletePopupMaxHeight -
+            (widget.offset?.dy ?? 0) >
+        widget.editingWindowSize.height;
+      
+    final bool verticalFlipRequired =
+        isPopupOverflowingHeight && isPopupSmallerThanWindow;
     final bool horizontalOverflow =
         widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
             widget.editingWindowSize.width;
@@ -61,10 +68,10 @@ class PopupState extends State<Popup> {
       child: Positioned(
         left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
         top:
-            verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
+            verticalFlipRequired ? widget.flippedOffset.dy : widget.normalOffset.dy,
         child: Container(
           alignment:
-              verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
+              verticalFlipRequired ? Alignment.bottomCenter : Alignment.topCenter,
           constraints: const BoxConstraints(
             maxHeight: Sizes.autocompletePopupMaxHeight,
             maxWidth: Sizes.autocompletePopupMaxWidth,

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:highlight/languages/fix.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../code_theme/code_theme.dart';
@@ -218,9 +219,6 @@ class _CodeFieldState extends State<CodeField> {
       final double width = _codeFieldKey.currentContext!.size!.width;
       final double height = _codeFieldKey.currentContext!.size!.height;
       windowSize = Size(width, height);
-
-      final box = editorKey.currentContext!.findRenderObject() as RenderBox?;
-      editorOffset = box?.localToGlobal(Offset.zero);
     });
     _onTextChanged();
   }
@@ -269,6 +267,16 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.text.split('\n').forEach((line) {
       if (line.length > longestLine.length) longestLine = line;
     });
+
+    if (_codeScroll != null && editorKey.currentContext != null) {
+      final box = editorKey.currentContext!.findRenderObject() as RenderBox?;
+      editorOffset = box?.localToGlobal(Offset.zero);
+      if (editorOffset != null) {
+        var fixedOffset = editorOffset!;
+        fixedOffset += Offset(0, _codeScroll!.offset);
+        editorOffset = fixedOffset;
+      }
+    }
 
     rebuild();
   }
@@ -500,6 +508,7 @@ class _CodeFieldState extends State<CodeField> {
           style: textStyle,
           backgroundColor: backgroundCol,
           parentFocusNode: _focusNode!,
+          offset: editorOffset,
         );
       },
     );
