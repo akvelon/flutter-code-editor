@@ -268,7 +268,7 @@ class CodeController extends TextEditingController {
   }
 
   KeyEventResult _onKeyDownRepeat(KeyEvent event) {
-    if (popupController.isPopupShown) {
+    if (popupController.shouldShow) {
       if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         popupController.scrollByArrow(ScrollDirection.up);
         return KeyEventResult.handled;

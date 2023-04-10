@@ -47,7 +47,7 @@ class PopupState extends State<Popup> {
 
   @override
   Widget build(BuildContext context) {
-    final isPopupSmallerThanWindow =
+    final isPopupShorterThanWindow =
         Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height;
     final isPopupOverflowingHeight = widget.normalOffset.dy +
             Sizes.autocompletePopupMaxHeight -
@@ -55,7 +55,7 @@ class PopupState extends State<Popup> {
         widget.editingWindowSize.height;
       
     final bool verticalFlipRequired =
-        isPopupOverflowingHeight && isPopupSmallerThanWindow;
+        isPopupOverflowingHeight && isPopupShorterThanWindow;
     final bool horizontalOverflow =
         widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
             widget.editingWindowSize.width;

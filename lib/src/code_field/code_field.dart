@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:highlight/languages/fix.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../code_theme/code_theme.dart';
@@ -181,7 +180,7 @@ class _CodeFieldState extends State<CodeField> {
   ScrollController? _horizontalCodeScroll;
   final _codeFieldKey = GlobalKey();
 
-  OverlayEntry? suggestionsPopup;
+  OverlayEntry? _suggestionsPopup;
   Offset _normalPopupOffset = Offset.zero;
   Offset _flippedPopupOffset = Offset.zero;
   double painterWidth = 0;
@@ -192,10 +191,10 @@ class _CodeFieldState extends State<CodeField> {
   String longestLine = '';
   Size? windowSize;
   late TextStyle textStyle;
-  Color? backgroundCol;
+  Color? _backgroundCol;
 
-  final editorKey = GlobalKey();
-  Offset? editorOffset;
+  final _editorKey = GlobalKey();
+  Offset? _editorOffset;
 
   @override
   void initState() {
@@ -238,6 +237,13 @@ class _CodeFieldState extends State<CodeField> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant CodeField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    widget.controller.popupController.removeListener(_onPopupStateChanged);
+    widget.controller.popupController.addListener(_onPopupStateChanged);
+  }
+
   void rebuild() {
     setState(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -268,13 +274,13 @@ class _CodeFieldState extends State<CodeField> {
       if (line.length > longestLine.length) longestLine = line;
     });
 
-    if (_codeScroll != null && editorKey.currentContext != null) {
-      final box = editorKey.currentContext!.findRenderObject() as RenderBox?;
-      editorOffset = box?.localToGlobal(Offset.zero);
-      if (editorOffset != null) {
-        var fixedOffset = editorOffset!;
+    if (_codeScroll != null && _editorKey.currentContext != null) {
+      final box = _editorKey.currentContext!.findRenderObject() as RenderBox?;
+      _editorOffset = box?.localToGlobal(Offset.zero);
+      if (_editorOffset != null) {
+        var fixedOffset = _editorOffset!;
         fixedOffset += Offset(0, _codeScroll!.offset);
-        editorOffset = fixedOffset;
+        _editorOffset = fixedOffset;
       }
     }
 
@@ -302,7 +308,7 @@ class _CodeFieldState extends State<CodeField> {
               child: Text(longestLine, style: textStyle),
             ), // Add extra padding
           ),
-          if (widget.expands) Expanded(child: codeField) else codeField,
+          widget.expands ? Expanded(child: codeField) : codeField,
         ],
       ),
     );
@@ -324,12 +330,12 @@ class _CodeFieldState extends State<CodeField> {
 
     final themeData = Theme.of(context);
     final styles = CodeTheme.of(context)?.styles;
-    backgroundCol = widget.background ??
+    _backgroundCol = widget.background ??
         styles?[rootKey]?.backgroundColor ??
         DefaultStyles.backgroundColor;
 
     if (widget.decoration != null) {
-      backgroundCol = null;
+      _backgroundCol = null;
     }
 
     final defaultTextStyle = TextStyle(
@@ -380,14 +386,14 @@ class _CodeFieldState extends State<CodeField> {
       shortcuts: _shortcuts,
       child: Container(
         decoration: widget.decoration,
-        color: backgroundCol,
+        color: _backgroundCol,
         key: _codeFieldKey,
         padding: const EdgeInsets.only(left: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget.gutterStyle.showGutter) _buildGutter(),
-            Expanded(key: editorKey, child: editingField),
+            Expanded(key: _editorKey, child: editingField),
           ],
         ),
       ),
@@ -464,7 +470,7 @@ class _CodeFieldState extends State<CodeField> {
       _getCaretOffset(textPainter).dx +
           widget.padding.left -
           _horizontalCodeScroll!.offset +
-          (editorOffset?.dx ?? 0),
+          (_editorOffset?.dx ?? 0),
       0,
     );
   }
@@ -476,24 +482,24 @@ class _CodeFieldState extends State<CodeField> {
           16 +
           widget.padding.top -
           _codeScroll!.offset +
-          (editorOffset?.dy ?? 0),
+          (_editorOffset?.dy ?? 0),
       0,
     );
   }
 
   void _onPopupStateChanged() {
-    final isShown =
-        widget.controller.popupController.isPopupShown && windowSize != null;
-    if (isShown) {
-      if (suggestionsPopup == null) {
-        suggestionsPopup = _buildSuggestionOverlay();
-        Overlay.of(context).insert(suggestionsPopup!);
+    final shouldShow =
+        widget.controller.popupController.shouldShow && windowSize != null;
+    if (shouldShow) {
+      if (_suggestionsPopup == null) {
+        _suggestionsPopup = _buildSuggestionOverlay();
+        Overlay.of(context).insert(_suggestionsPopup!);
       } else {
-        suggestionsPopup!.markNeedsBuild();
+        _suggestionsPopup!.markNeedsBuild();
       }
     } else {
-      suggestionsPopup?.remove();
-      suggestionsPopup = null;
+      _suggestionsPopup?.remove();
+      _suggestionsPopup = null;
     }
   }
 
@@ -506,9 +512,9 @@ class _CodeFieldState extends State<CodeField> {
           controller: widget.controller.popupController,
           editingWindowSize: windowSize!,
           style: textStyle,
-          backgroundColor: backgroundCol,
+          backgroundColor: _backgroundCol,
           parentFocusNode: _focusNode!,
-          offset: editorOffset,
+          offset: _editorOffset,
         );
       },
     );

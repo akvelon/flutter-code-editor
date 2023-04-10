@@ -4,7 +4,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 class PopupController extends ChangeNotifier {
   late List<String> suggestions;
   int _selectedIndex = 0;
-  bool isPopupShown = false;
+  bool shouldShow = false;
 
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
@@ -25,7 +25,7 @@ class PopupController extends ChangeNotifier {
   void show(List<String> suggestions) {
     this.suggestions = suggestions;
     _selectedIndex = 0;
-    isPopupShown = true;
+    shouldShow = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (itemScrollController.isAttached) {
         itemScrollController.jumpTo(index: 0);
@@ -35,7 +35,7 @@ class PopupController extends ChangeNotifier {
   }
 
   void hide() {
-    isPopupShown = false;
+    shouldShow = false;
     notifyListeners();
   }
 
