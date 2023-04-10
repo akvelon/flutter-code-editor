@@ -45,9 +45,10 @@ class PopupState extends State<Popup> {
 
   @override
   Widget build(BuildContext context) {
-    final bool verticalOverflow =
-        widget.normalOffset.dy + Sizes.autocompletePopupMaxHeight >
-            widget.editingWindowSize.height;
+    final bool verticalOverflow = (widget.normalOffset.dy +
+                Sizes.autocompletePopupMaxHeight >
+            widget.editingWindowSize.height) &&
+        (Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height);
     final bool horizontalOverflow =
         widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
             widget.editingWindowSize.width;
@@ -59,7 +60,8 @@ class PopupState extends State<Popup> {
       bucket: pageStorageBucket,
       child: Positioned(
         left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
-        top: verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
+        top:
+            verticalOverflow ? widget.flippedOffset.dy : widget.normalOffset.dy,
         child: Container(
           alignment:
               verticalOverflow ? Alignment.bottomCenter : Alignment.topCenter,
