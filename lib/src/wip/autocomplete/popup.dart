@@ -12,8 +12,11 @@ class Popup extends StatefulWidget {
   /// The window coordinates of the top-left corner of the editor widget.
   final Offset? editorOffset;
 
-  ///Represents the position of the popup window in the coordinate system
-  ///of the application's window when the popup is displayed above the editor.
+  /// The window coordinates of the highest allowed top-left corner
+  /// of the popup if shown above the caret.
+  ///
+  /// Since the popup is pushed to the bottom of the allowed rectangle
+  /// the actual position may be lower.
   final Offset flippedOffset;
 
   /// The window coordinates of the top-left corner of the popup
