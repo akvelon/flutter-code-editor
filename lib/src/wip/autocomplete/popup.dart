@@ -9,8 +9,7 @@ class Popup extends StatefulWidget {
   final PopupController controller;
   final Size editingWindowSize;
 
-  /// Represents the position of the editor widget in the coordinate system
-  /// of the application's window.
+  /// The window coordinates of the top-left corner of the editor widget.
   final Offset? editorOffset;
 
   ///Represents the position of the popup window in the coordinate system
