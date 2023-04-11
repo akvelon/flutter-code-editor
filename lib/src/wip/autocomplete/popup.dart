@@ -6,24 +6,34 @@ import 'popup_controller.dart';
 
 /// Popup window displaying the list of possible completions
 class Popup extends StatefulWidget {
-  final Offset normalOffset;
-  final Offset flippedOffset;
+  final PopupController controller;
   final Size editingWindowSize;
+
+  /// Represents the position of the editor widget in the coordinate system
+  /// of the application's window.
+  final Offset? editorOffset;
+
+  ///Represents the position of the popup window in the coordinate system
+  ///of the application's window when the popup is displayed above the editor.
+  final Offset flippedOffset;
+
+  /// Represents the position of the popup window in the coordinate system
+  /// of the application's window when the popup is displayed below the editor.
+  final Offset normalOffset;
+
+  final FocusNode parentFocusNode;
   final TextStyle style;
   final Color? backgroundColor;
-  final PopupController controller;
-  final FocusNode parentFocusNode;
-  final Offset? offset;
 
   const Popup({
     super.key,
-    required this.normalOffset,
-    required this.flippedOffset,
     required this.controller,
     required this.editingWindowSize,
-    required this.style,
+    required this.editorOffset,
+    required this.flippedOffset,
+    required this.normalOffset,
     required this.parentFocusNode,
-    required this.offset,
+    required this.style,
     this.backgroundColor,
   });
 
@@ -47,15 +57,7 @@ class PopupState extends State<Popup> {
 
   @override
   Widget build(BuildContext context) {
-    final isPopupShorterThanWindow =
-        Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height;
-    final isPopupOverflowingHeight = widget.normalOffset.dy +
-            Sizes.autocompletePopupMaxHeight -
-            (widget.offset?.dy ?? 0) >
-        widget.editingWindowSize.height;
-      
-    final bool verticalFlipRequired =
-        isPopupOverflowingHeight && isPopupShorterThanWindow;
+    final verticalFlipRequired = _isVerticalFlipRequired();
     final bool horizontalOverflow =
         widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
             widget.editingWindowSize.width;
@@ -67,11 +69,13 @@ class PopupState extends State<Popup> {
       bucket: pageStorageBucket,
       child: Positioned(
         left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
-        top:
-            verticalFlipRequired ? widget.flippedOffset.dy : widget.normalOffset.dy,
+        top: verticalFlipRequired
+            ? widget.flippedOffset.dy
+            : widget.normalOffset.dy,
         child: Container(
-          alignment:
-              verticalFlipRequired ? Alignment.bottomCenter : Alignment.topCenter,
+          alignment: verticalFlipRequired
+              ? Alignment.bottomCenter
+              : Alignment.topCenter,
           constraints: const BoxConstraints(
             maxHeight: Sizes.autocompletePopupMaxHeight,
             maxWidth: Sizes.autocompletePopupMaxWidth,
@@ -101,6 +105,17 @@ class PopupState extends State<Popup> {
         ),
       ),
     );
+  }
+
+  bool _isVerticalFlipRequired() {
+    final isPopupShorterThanWindow =
+        Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height;
+    final isPopupOverflowingHeight = widget.normalOffset.dy +
+            Sizes.autocompletePopupMaxHeight -
+            (widget.editorOffset?.dy ?? 0) >
+        widget.editingWindowSize.height;
+
+    return isPopupOverflowingHeight && isPopupShorterThanWindow;
   }
 
   Widget _buildListItem(int index) {

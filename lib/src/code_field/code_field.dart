@@ -240,7 +240,12 @@ class _CodeFieldState extends State<CodeField> {
   @override
   void didUpdateWidget(covariant CodeField oldWidget) {
     super.didUpdateWidget(oldWidget);
+    widget.controller.removeListener(_onTextChanged);
+    widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
+
+    widget.controller.addListener(_onTextChanged);
+    widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
   }
 
@@ -514,7 +519,7 @@ class _CodeFieldState extends State<CodeField> {
           style: textStyle,
           backgroundColor: _backgroundCol,
           parentFocusNode: _focusNode!,
-          offset: _editorOffset,
+          editorOffset: _editorOffset,
         );
       },
     );
