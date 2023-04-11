@@ -3,3 +3,7 @@ include: package:total_lints/app.yaml
 analyzer:
   exclude:
     - lib/src/wip
+
+linter: 
+  rules:
+    prefer_if_elements_to_conditional_expressions: false
