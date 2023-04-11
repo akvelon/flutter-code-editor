@@ -16,8 +16,8 @@ class Popup extends StatefulWidget {
   ///of the application's window when the popup is displayed above the editor.
   final Offset flippedOffset;
 
-  /// Represents the position of the popup window in the coordinate system
-  /// of the application's window when the popup is displayed below the editor.
+  /// The window coordinates of the top-left corner of the popup
+  /// if shown below the caret.
   final Offset normalOffset;
 
   final FocusNode parentFocusNode;
