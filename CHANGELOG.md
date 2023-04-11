@@ -1,3 +1,7 @@
+## 0.2.15
+
+* Suggestion box is shown in an `OverlayEntry` instead of `Stack` (Issue [207](https://github.com/akvelon/flutter-code-editor/issues/207)).
+
 ## 0.2.14
 
 * Fixed "Field 'windowSize' has not been initialized" bug (Issue [203](https://github.com/akvelon/flutter-code-editor/issues/203)).
