@@ -186,8 +186,7 @@ extension TextEditingValueExtension on TextEditingValue {
     );
   }
 
-  /// Checks if the newValue is most likely
-  /// to be caused by the `delete` button.
+  /// Checks if the newValue is most likely caused by the `delete` button.
   bool isDelete(TextEditingValue newValue) {
     return _isCollapsedAndOneCharShort(newValue) &&
         selection.start == newValue.selection.start &&
@@ -196,8 +195,7 @@ extension TextEditingValueExtension on TextEditingValue {
             newValue.afterSelection;
   }
 
-  /// Checks if the newValue is most likely
-  /// to be caused by the `backspace` button.
+  /// Checks if the newValue is most likely caused by the `backspace` button.
   bool isBackspace(TextEditingValue newValue) {
     return _isCollapsedAndOneCharShort(newValue) &&
         selection.start == newValue.selection.start + 1 &&

@@ -4,11 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../common/create_app.dart';
 
 void main() {
-  testWidgets('Backspace or delete through folded block', (wt) async {
+  testWidgets(
+      'Backspace or delete through folded block '
+      '=> Do nothing.', (wt) async {
     final examples = [
       //
       const _Example(
-        '',
+        'Backspace right after folded block',
         initialFullText: 'int main(){\n}\n',
         //                                \
         initialSelection: TextSelection.collapsed(offset: 12),
@@ -18,7 +20,7 @@ void main() {
       ),
 
       const _Example(
-        '',
+        'Delete right before folded block',
         initialFullText: 'int main(){\n}\n',
         //                           \
         initialSelection: TextSelection.collapsed(offset: 11),
