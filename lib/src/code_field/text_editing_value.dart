@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../code/reg_exp.dart';
@@ -184,5 +185,31 @@ extension TextEditingValueExtension on TextEditingValue {
       ),
       text: text,
     );
+  }
+
+  /// Checks if the newValue is most likely
+  /// to be caused by the `delete` button.
+  bool isDelete(TextEditingValue newValue) {
+    return _isCollapsedAndOneCharShort(newValue) &&
+        selection.start == newValue.selection.start &&
+        beforeSelection == newValue.beforeSelection &&
+        (afterSelection.isEmpty ? '' : afterSelection.substring(1)) ==
+            newValue.afterSelection;
+  }
+
+  /// Checks if the newValue is most likely
+  /// to be caused by the `backspace` button.
+  bool isBackspace(TextEditingValue newValue) {
+    return _isCollapsedAndOneCharShort(newValue) &&
+        selection.start == newValue.selection.start + 1 &&
+        beforeSelection.substring(0, selection.start - 1) ==
+            newValue.beforeSelection &&
+        afterSelection == newValue.afterSelection;
+  }
+
+  bool _isCollapsedAndOneCharShort(TextEditingValue newValue) {
+    return newValue.selection.isCollapsed &&
+        selection.isCollapsed &&
+        text.length == newValue.text.length + 1;
   }
 }
