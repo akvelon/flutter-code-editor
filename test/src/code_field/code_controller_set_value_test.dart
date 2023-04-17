@@ -2,11 +2,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
-import '../common/widget_tester.dart';
 
 void main() {
   testWidgets('Backspace or delete through folded block', (wt) async {
     final examples = [
+      //
       const _Example(
         '',
         initialFullText: 'int main(){\n}\n',
@@ -16,6 +16,7 @@ void main() {
         finalVisibleText: 'int main(){\n',
         key: LogicalKeyboardKey.backspace,
       ),
+
       const _Example(
         '',
         initialFullText: 'int main(){\n}\n',
