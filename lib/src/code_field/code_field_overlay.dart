@@ -103,7 +103,8 @@ class _CodeFieldOverlayState extends State<CodeFieldOverlay> {
   double _getPopupLeftOffset(TextPainter textPainter) {
     return max(
       _getCaretOffset(textPainter).dx +
-          widget.child.padding.left -
+          widget.child.padding.left +
+          (widget.child.focusNode?.offset.dx ?? 0) +
           (_editorOffset?.dx ?? 0),
       0,
     );
@@ -114,7 +115,7 @@ class _CodeFieldOverlayState extends State<CodeFieldOverlay> {
       _getCaretOffset(textPainter).dy +
           caretHeight +
           16 +
-          widget.child.padding.top -
+          widget.child.padding.top +
           (_editorOffset?.dy ?? 0),
       0,
     );
