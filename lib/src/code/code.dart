@@ -375,6 +375,23 @@ class Code {
       ),
     );
 
+    final firstChangedLine = lines.characterIndexToLineIndex(rangeBefore.start);
+    final lastChangedLine = lines.characterIndexToLineIndex(rangeBefore.end);
+
+    // If there is any folded block that is going to be removed
+    // because of `backspace` or `delete`, return unchanged text.
+    if (oldSelection.isCollapsed &&
+        foldedBlocks.any(
+          (element) =>
+              element.lastLine >= firstChangedLine &&
+              element.lastLine <= lastChangedLine,
+        )) {
+      return CodeEditResult(
+        fullTextAfter: text,
+        linesChanged: const TextRange(start: 0, end: 0),
+      );
+    }
+
     final fullTextAfter = rangeBefore.textBefore(text) +
         visibleRangeAfter.textInside(visibleAfter.text) +
         rangeBefore.textAfter(text);

@@ -1,7 +1,6 @@
 // ignore_for_file: parameter_assignments
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -656,43 +655,7 @@ class CodeController extends TextEditingController {
 
   Code get code => _code;
 
-  bool changeDestroysFoldedBlockIllegally(TextEditingValue newValue) {
-    final isDelete = value.isDelete(newValue);
-    final isBackspace = value.isBackspace(newValue);
-
-    final oldSelectionFull = _code.hiddenRanges.recoverPosition(
-      value.selection.start,
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-
-    final newSelectionFull = _code.hiddenRanges.recoverPosition(
-      newValue.selection.start + (isDelete ? 1 : 0),
-      placeHiddenRanges: TextAffinity.downstream,
-    );
-
-    final max = math.max(oldSelectionFull, newSelectionFull);
-    final min = math.min(oldSelectionFull, newSelectionFull);
-
-    if (isDelete || isBackspace) {
-      final startLine = _code.lines.characterIndexToLineIndex(min);
-      final endLine = _code.lines.characterIndexToLineIndex(max);
-
-      if (_code.foldedBlocks.any(
-        (element) =>
-            element.lastLine >= startLine && element.lastLine <= endLine,
-      )) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
-    if (changeDestroysFoldedBlockIllegally(newValue)) {
-      return null;
-    }
-
     final editResult = _code.getEditResult(value.selection, newValue);
     if (!_code.isReadOnlyInLineRange(editResult.linesChanged)) {
       return editResult;
