@@ -281,6 +281,10 @@ class CodeController extends TextEditingController {
         insertSelectedWord();
         return KeyEventResult.handled;
       }
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        popupController.hide();
+        return KeyEventResult.handled;
+      }
     }
 
     return KeyEventResult.ignored; // The framework will handle.
