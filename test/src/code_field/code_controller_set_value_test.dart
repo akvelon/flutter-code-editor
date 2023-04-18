@@ -5,12 +5,12 @@ import '../common/create_app.dart';
 
 void main() {
   testWidgets(
-      'Backspace or delete through folded block '
+      'Backspace or delete at a folded block collapse point '
       '=> Do nothing.', (wt) async {
     final examples = [
       //
       const _Example(
-        'Backspace right after folded block',
+        'Backspace after newline after folded block',
         initialFullText: 'int main(){\n}\n',
         //                                \
         initialSelection: TextSelection.collapsed(offset: 12),
@@ -20,7 +20,7 @@ void main() {
       ),
 
       const _Example(
-        'Delete right before folded block',
+        'Delete at the collapsed position of a folded block',
         initialFullText: 'int main(){\n}\n',
         //                           \
         initialSelection: TextSelection.collapsed(offset: 11),
