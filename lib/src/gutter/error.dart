@@ -100,9 +100,11 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
                     ),
                     decoration: BoxDecoration(
                       color: style.backgroundColor,
-                      border: Border.all(
-                        color: style.color!,
-                      ),
+                      border: style.color != null
+                          ? Border.all(
+                              color: style.color!,
+                            )
+                          : null,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
