@@ -5,6 +5,7 @@ class PopupController extends ChangeNotifier {
   late List<String> suggestions;
   int _selectedIndex = 0;
   bool shouldShow = false;
+  bool enabled = true;
 
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
@@ -23,6 +24,10 @@ class PopupController extends ChangeNotifier {
   int get selectedIndex => _selectedIndex;
 
   void show(List<String> suggestions) {
+    if (enabled == false) {
+      return;
+    }
+
     this.suggestions = suggestions;
     _selectedIndex = 0;
     shouldShow = true;

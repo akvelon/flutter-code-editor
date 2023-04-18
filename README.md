@@ -363,7 +363,11 @@ The editor performs no syntax analysis and so cannot tell if a given class reall
 the method the user is typing. This feature is meant to simplify typing but not to be relied on
 when exploring classes and methods.
 
-Autocompletion currently cannot be disabled.
+To disable autocompletion:
+
+```dart
+controller.popupController.enabled = false;
+```
 
 ![Suggestions example](https://raw.githubusercontent.com/akvelon/flutter-code-editor/main/example/images/suggestions_example.gif)
 
