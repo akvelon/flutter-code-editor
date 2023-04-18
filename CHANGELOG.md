@@ -1,3 +1,8 @@
+## 0.2.17
+
+* Allow to disable autocompletion (Issue [206](https://github.com/akvelon/flutter-code-editor/issues/206)).
+* Close suggestions with Escape key (Issue [219](https://github.com/akvelon/flutter-code-editor/issues/219)).
+
 ## 0.2.16
 
 * Do not delete folded blocks by backspace or delete keys (Issue [210](https://github.com/akvelon/flutter-code-editor/issues/210)).
