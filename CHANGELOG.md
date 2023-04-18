@@ -1,3 +1,8 @@
+## 0.2.16
+
+* Do not delete folded blocks by backspace or delete keys (Issue [210](https://github.com/akvelon/flutter-code-editor/issues/210)).
+* Use theme colors in error message overlays (Issue [212](https://github.com/akvelon/flutter-code-editor/issues/212)).
+
 ## 0.2.15
 
 * Suggestion box is shown in an `OverlayEntry` instead of `Stack` (Issue [207](https://github.com/akvelon/flutter-code-editor/issues/207)).
