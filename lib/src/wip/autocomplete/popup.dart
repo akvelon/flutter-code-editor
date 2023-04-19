@@ -60,17 +60,18 @@ class PopupState extends State<Popup> {
   @override
   Widget build(BuildContext context) {
     final verticalFlipRequired = _isVerticalFlipRequired();
-    final bool horizontalOverflow =
-        widget.normalOffset.dx + Sizes.autocompletePopupMaxWidth >
-            widget.editingWindowSize.width;
+    final bool isHorizontalOverflowed = _isHorizontallyOverflowed();
     final double leftOffsetLimit =
         // TODO(nausharipov): find where 100 comes from
-        widget.editingWindowSize.width - Sizes.autocompletePopupMaxWidth - 100;
+        widget.editingWindowSize.width -
+            Sizes.autocompletePopupMaxWidth +
+            (widget.editorOffset?.dx ?? 0) -
+            100;
 
     return PageStorage(
       bucket: pageStorageBucket,
       child: Positioned(
-        left: horizontalOverflow ? leftOffsetLimit : widget.normalOffset.dx,
+        left: isHorizontalOverflowed ? leftOffsetLimit : widget.normalOffset.dx,
         top: verticalFlipRequired
             ? widget.flippedOffset.dy
             : widget.normalOffset.dy,
@@ -118,6 +119,13 @@ class PopupState extends State<Popup> {
         widget.editingWindowSize.height;
 
     return isPopupOverflowingHeight && isPopupShorterThanWindow;
+  }
+
+  bool _isHorizontallyOverflowed() {
+    return widget.normalOffset.dx -
+            (widget.editorOffset?.dx ?? 0) +
+            Sizes.autocompletePopupMaxWidth >
+        widget.editingWindowSize.width;
   }
 
   Widget _buildListItem(int index) {
