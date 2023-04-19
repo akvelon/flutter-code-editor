@@ -65,7 +65,8 @@ class PopupState extends State<Popup> {
         // TODO(nausharipov): find where 100 comes from
         widget.editingWindowSize.width -
             Sizes.autocompletePopupMaxWidth +
-            (widget.editorOffset?.dx ?? 0) - 100;
+            (widget.editorOffset?.dx ?? 0) -
+            100;
 
     return PageStorage(
       bucket: pageStorageBucket,
