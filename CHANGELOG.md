@@ -1,3 +1,7 @@
+## 0.2.18
+
+* Fixed the suggestion box horizontal offset (Issue [224](https://github.com/akvelon/flutter-code-editor/issues/224)).
+
 ## 0.2.17
 
 * Allow to disable autocompletion (Issue [206](https://github.com/akvelon/flutter-code-editor/issues/206)).
