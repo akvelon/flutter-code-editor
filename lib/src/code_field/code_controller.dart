@@ -12,6 +12,10 @@ import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
+import '../search/controller.dart';
+import '../search/result.dart';
+import '../search/settings.dart';
+import '../search/settings_controller.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
@@ -90,6 +94,10 @@ class CodeController extends TextEditingController {
   late PopupController popupController;
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
+
+  final searchSettingsController = SearchSettingsController();
+  final searchController = SearchController();
+  SearchResult searchResult = SearchResult.empty;
 
   /// The last [TextSpan] returned from [buildTextSpan].
   ///
