@@ -885,12 +885,35 @@ class CodeController extends TextEditingController {
         return true;
       }
 
+      final endTextPos = currentIndex + text.length;
+
       final plain = span.toPlainText();
 
-      if (text.length + currentIndex < currentMatch.start ||
+      if (endTextPos < currentMatch.start ||
           currentIndex > currentMatch.end ||
           isLastMatchProcessed) {
         result.add(span);
+        currentIndex += text.length;
+        return true;
+      }
+
+      if (currentIndex <= currentMatch.start &&
+          currentIndex + text.length > currentMatch.start &&
+          currentIndex + text.length < currentMatch.end) {
+        result.add(
+          TextSpan(
+            text: text.substring(0, currentMatch.start - currentIndex),
+            style: span.style,
+          ),
+        );
+
+        result.add(
+          TextSpan(
+            text:
+                text.substring(currentMatch.start - currentIndex, text.length),
+            style: searchStyle,
+          ),
+        );
         currentIndex += text.length;
         return true;
       }
@@ -954,13 +977,13 @@ class CodeController extends TextEditingController {
           ),
         );
 
-        currentIndex = currentMatch.end;
         if (currentIndex + text.length == currentMatch.end) {
           isLastMatchProcessed = !searchMatches.moveNext();
           if (!isLastMatchProcessed) {
             currentMatch = searchMatches.current;
           }
         }
+        currentIndex += text.length;
         return true;
       } else {
         result.add(

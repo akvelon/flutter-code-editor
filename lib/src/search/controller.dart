@@ -15,6 +15,9 @@ class SearchController extends ChangeNotifier {
     // if (!isEnabled) {
     //   return SearchResult.empty;
     // }
+    if (settings.pattern.isEmpty) {
+      return SearchResult.empty;
+    }
 
     final strategy = getSearchStrategy(settings);
     final result = strategy.searchPlain(code.text, settings: settings);
