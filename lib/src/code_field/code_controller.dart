@@ -895,34 +895,41 @@ class CodeController extends TextEditingController {
         return true;
       }
 
-      if (currentIndex + text.length <= currentMatch.end) {
+      if (currentIndex >= currentMatch.start &&
+          currentIndex + text.length <= currentMatch.end) {
         result.add(
           TextSpan(
-            text: text.substring(0, currentMatch.end - currentIndex),
+            text: text.substring(0, text.length),
             style: searchStyle,
           ),
         );
 
-        currentIndex = currentMatch.end;
         if (currentIndex + text.length == currentMatch.end) {
           isLastMatchProcessed = !searchMatches.moveNext();
           if (!isLastMatchProcessed) {
             currentMatch = searchMatches.current;
           }
         }
+        currentIndex += text.length;
         return true;
       }
 
-      while (currentIndex + text.length > currentMatch.start &&
-          currentIndex + text.length > currentMatch.end &&
+      while (currentIndex + text.length >= currentMatch.start &&
+          currentIndex + text.length >= currentMatch.end &&
           !isLastMatchProcessed) {
         result.add(
           TextSpan(
-            text: text.substring(localIndex, currentMatch.start - currentIndex),
+            text: text.substring(
+              localIndex,
+              math.max(
+                localIndex,
+                currentMatch.start - currentIndex,
+              ),
+            ),
             style: span.style,
           ),
         );
-        localIndex = currentMatch.start - currentIndex;
+        localIndex = math.max(localIndex, currentMatch.start - currentIndex);
 
         result.add(
           TextSpan(
