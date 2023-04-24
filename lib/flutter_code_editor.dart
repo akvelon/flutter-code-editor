@@ -34,3 +34,10 @@ export 'src/line_numbers/gutter_style.dart';
 export 'src/named_sections/named_section.dart';
 export 'src/named_sections/parsers/abstract.dart';
 export 'src/named_sections/parsers/brackets_start_end.dart';
+
+export 'src/search/controller.dart';
+export 'src/search/match.dart';
+export 'src/search/result.dart';
+export 'src/search/search_widget.dart';
+export 'src/search/settings.dart';
+export 'src/search/settings_controller.dart';

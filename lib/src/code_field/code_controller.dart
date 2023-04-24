@@ -1,6 +1,7 @@
 // ignore_for_file: parameter_assignments
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -143,6 +144,7 @@ class CodeController extends TextEditingController {
     fullText = text ?? '';
 
     addListener(_scheduleAnalysis);
+    searchSettingsController.addListener(_onSearchSettingsChange);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -164,6 +166,20 @@ class CodeController extends TextEditingController {
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
 
     unawaited(analyzeCode());
+  }
+
+  void _onSearchSettingsChange() {
+    final result = searchController.search(
+      code,
+      settings: searchSettingsController.value,
+    );
+
+    for (final match in result.matches) {
+      print('${match.start} ${match.end}');
+    }
+
+    searchResult = result;
+    notifyListeners();
   }
 
   void _scheduleAnalysis() {
@@ -811,7 +827,14 @@ class CodeController extends TextEditingController {
     bool? withComposing,
   }) {
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
-    return lastTextSpan = _createTextSpan(context: context, style: style);
+    lastTextSpan = _wrapWithSearch(
+      _createTextSpan(
+        context: context,
+        style: style,
+      ),
+    );
+
+    return lastTextSpan!;
   }
 
   TextSpan _createTextSpan({
@@ -832,6 +855,128 @@ class CodeController extends TextEditingController {
     }
 
     return TextSpan(text: text, style: style);
+  }
+
+  TextSpan _wrapWithSearch(TextSpan textSpan) {
+    if (searchResult.matches.isEmpty) {
+      return textSpan;
+    }
+
+    int currentIndex = 0;
+    final searchMatches = searchResult.matches.iterator;
+    bool isLastMatchProcessed = !searchMatches.moveNext();
+    var currentMatch = searchMatches.current;
+    final result = <InlineSpan>[];
+    bool isCurrentMatchHandled = false;
+
+    textSpan.visitChildren((span) {
+      var localIndex = 0;
+      final searchStyle = span.style?.copyWith(
+            backgroundColor: Colors.yellow,
+            color: Colors.black,
+          ) ??
+          const TextStyle(
+            backgroundColor: Colors.yellow,
+            color: Colors.black,
+          );
+
+      final text = (span as TextSpan).text;
+      if (text == null || text.isEmpty) {
+        return true;
+      }
+
+      final plain = span.toPlainText();
+
+      if (text.length + currentIndex < currentMatch.start ||
+          currentIndex > currentMatch.end ||
+          isLastMatchProcessed) {
+        result.add(span);
+        currentIndex += text.length;
+        return true;
+      }
+
+      if (currentIndex + text.length <= currentMatch.end) {
+        result.add(
+          TextSpan(
+            text: text.substring(0, currentMatch.end - currentIndex),
+            style: searchStyle,
+          ),
+        );
+
+        currentIndex = currentMatch.end;
+        if (currentIndex + text.length == currentMatch.end) {
+          isLastMatchProcessed = !searchMatches.moveNext();
+          if (!isLastMatchProcessed) {
+            currentMatch = searchMatches.current;
+          }
+        }
+        return true;
+      }
+
+      while (currentIndex + text.length > currentMatch.start &&
+          currentIndex + text.length > currentMatch.end &&
+          !isLastMatchProcessed) {
+        result.add(
+          TextSpan(
+            text: text.substring(localIndex, currentMatch.start - currentIndex),
+            style: span.style,
+          ),
+        );
+        localIndex = currentMatch.start - currentIndex;
+
+        result.add(
+          TextSpan(
+            text: text.substring(localIndex, currentMatch.end - currentIndex),
+            style: searchStyle,
+          ),
+        );
+        localIndex = currentMatch.end - currentIndex;
+        isLastMatchProcessed = !searchMatches.moveNext();
+        if (!isLastMatchProcessed) {
+          currentMatch = searchMatches.current;
+        }
+      }
+
+      if (currentIndex >= currentMatch.start &&
+          currentIndex + text.length <= currentMatch.end &&
+          !isLastMatchProcessed) {
+        result.add(
+          TextSpan(
+            text: text.substring(localIndex, currentMatch.end - currentIndex),
+            style: searchStyle,
+          ),
+        );
+
+        currentIndex = currentMatch.end;
+        if (currentIndex + text.length == currentMatch.end) {
+          isLastMatchProcessed = !searchMatches.moveNext();
+          if (!isLastMatchProcessed) {
+            currentMatch = searchMatches.current;
+          }
+        }
+        return true;
+      } else {
+        result.add(
+          TextSpan(
+            text: text.substring(localIndex, text.length),
+            style: span.style,
+          ),
+        );
+      }
+
+      if (isCurrentMatchHandled) {
+        isLastMatchProcessed = !searchMatches.moveNext();
+        if (!isLastMatchProcessed) {
+          currentMatch = searchMatches.current;
+        }
+        isCurrentMatchHandled = false;
+      }
+
+      currentIndex += text.length;
+      return true;
+    });
+
+    return TextSpan(children: result);
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {

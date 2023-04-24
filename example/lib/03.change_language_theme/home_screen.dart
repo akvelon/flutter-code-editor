@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import '../common/snippets.dart';
@@ -102,6 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView(
         children: [
+          SearchWidget(
+            controller: _codeController.searchSettingsController,
+          ),
           CodeTheme(
             data: CodeThemeData(styles: themes[_theme]),
             child: CodeField(
