@@ -103,9 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView(
         children: [
-          SearchWidget(
-            controller: _codeController.searchSettingsController,
-          ),
           CodeTheme(
             data: CodeThemeData(styles: themes[_theme]),
             child: CodeField(

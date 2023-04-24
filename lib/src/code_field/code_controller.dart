@@ -24,6 +24,7 @@ import 'actions/copy.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/redo.dart';
+import 'actions/search.dart';
 import 'actions/undo.dart';
 import 'span_builder.dart';
 
@@ -114,6 +115,7 @@ class CodeController extends TextEditingController {
     OutdentIntent: OutdentIntentAction(controller: this),
     RedoTextIntent: RedoAction(controller: this),
     UndoTextIntent: UndoAction(controller: this),
+    SearchIntent: SearchAction(controller: this),
   };
 
   CodeController({

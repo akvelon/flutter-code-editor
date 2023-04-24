@@ -16,6 +16,7 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   late final settingsController = widget.controller;
+  final FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _SearchWidgetState extends State<SearchWidget> {
         );
       },
     );
+    focusNode.requestFocus();
     super.initState();
   }
 
@@ -48,10 +50,16 @@ class _SearchWidgetState extends State<SearchWidget> {
             onPressed: () {},
           ),
         ),
-        focusNode: FocusNode(),
+        focusNode: focusNode,
         enabled: true,
         controller: settingsController.patternController,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
   }
 }
