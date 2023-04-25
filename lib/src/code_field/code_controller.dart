@@ -10,6 +10,7 @@ import 'package:highlight/highlight_core.dart';
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
+import '../code_modifiers/paired_symbols.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
@@ -124,6 +125,12 @@ class CodeController extends TextEditingController {
       IndentModifier(),
       CloseBlockModifier(),
       TabModifier(),
+      PairedSymbolsCodeModifier(openChar: '(', closeChar: ')'),
+      PairedSymbolsCodeModifier(openChar: '{', closeChar: '}'),
+      PairedSymbolsCodeModifier(openChar: '[', closeChar: ']'),
+      PairedSymbolsCodeModifier(openChar: '"', closeChar: '"'),
+      PairedSymbolsCodeModifier(openChar: '`', closeChar: '`'),
+      PairedSymbolsCodeModifier(openChar: '\'', closeChar: '\''),
     ],
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
