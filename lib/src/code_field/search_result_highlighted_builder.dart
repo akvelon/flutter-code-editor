@@ -1,20 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../flutter_code_editor.dart';
 
 class SearchResultHighlightedBuilder {
-  int _currentIndex = 0;
-  bool _isLastMatchProcessed = false;
-  bool _isCurrentMatchHandled = false;
-  late SearchMatch _currentMatch;
-  late Iterator<SearchMatch> _matches;
-  final _result = <InlineSpan>[];
-  String? _currentText = '';
-
-  final SearchResult searchResult;
-
   SearchResultHighlightedBuilder({
     required this.searchResult,
   }) {
@@ -22,30 +10,57 @@ class SearchResultHighlightedBuilder {
       return;
     }
 
-    _matches = searchResult.matches.iterator;
-    _isLastMatchProcessed = !_matches.moveNext();
-    _currentMatch = _matches.current;
+    // searchResult.matches.sort((a, b) {
+    //   return a.start - b.start;
+    // });
+
+    matchIndexes = searchResult.matches
+        .expand<int>((e) => [e.start, e.end])
+        .toList(growable: false);
   }
 
-  int get _currentEnd => _currentIndex + (_currentText?.length ?? 0);
-  bool get _isCurrentMatchOutOfRange =>
-      _currentEnd < _currentMatch.start ||
-      _currentIndex > _currentMatch.end ||
-      _isLastMatchProcessed;
+  /// List of spans to be added to the result.
+  final _spans = <InlineSpan>[];
 
-  bool get _isMatchFromMiddleTillEnd =>
-      _currentIndex <= _currentMatch.start &&
-      _currentEnd > _currentMatch.start &&
-      _currentEnd < _currentMatch.end;
+  final SearchResult searchResult;
 
-  bool get _isTextInsideMatchCompletely =>
-      _currentIndex >= _currentMatch.start &&
-      _currentIndex + _currentText!.length <= _currentMatch.end;
+  /// Indexes of [searchResult] in ascending order.
+  /// Every element under even index is the start,
+  /// and every element under odd index is the end of the searchMatch.
+  late final List<int> matchIndexes;
 
-  bool get _isMatchFullyInsideText =>
-      _currentIndex + _currentText!.length >= _currentMatch.start &&
-      _currentIndex + _currentText!.length >= _currentMatch.end &&
-      !_isLastMatchProcessed;
+  /// Current index of [matchIndexes] that is being processed.
+  int _currentMatchIndex = 0;
+
+  /// Whether the text before [_currentMatchIndex]
+  /// should have search or regular style.
+  bool get _isCurrentMatchIndexSearch => _currentMatchIndex.isOdd;
+
+  /// Whether we finished to process all of the search matches.
+  bool get _isLastMatchProcessed => _currentMatchIndex >= matchIndexes.length;
+
+  /// Number of characters that are already processed.
+  /// Or the current position in the text that we are about to process.
+  int _currentWindowStart = 0;
+
+  /// `TextStyle` of current span that is being processed.
+  TextStyle? _currentSpanStyle;
+
+  /// Overrides `TextStyle` of span to highlight search result.
+  TextStyle get searchStyle =>
+      _currentSpanStyle?.copyWith(
+        backgroundColor: Colors.yellow,
+        color: Colors.black,
+      ) ??
+      const TextStyle(
+        backgroundColor: Colors.yellow,
+        color: Colors.black,
+      );
+
+  /// Get actual style based on
+  /// whether the current processing index is inside search or not.
+  TextStyle? get _actualStyle =>
+      _isCurrentMatchIndexSearch ? searchStyle : _currentSpanStyle;
 
   TextSpan build(TextSpan span) {
     if (searchResult.matches.isEmpty) {
@@ -53,136 +68,60 @@ class SearchResultHighlightedBuilder {
     }
 
     span.visitChildren((span) {
-      var localIndex = 0;
-      final searchStyle = span.style?.copyWith(
-            backgroundColor: Colors.yellow,
-            color: Colors.black,
-          ) ??
-          const TextStyle(
-            backgroundColor: Colors.yellow,
-            color: Colors.black,
-          );
-
-      _currentText = (span as TextSpan).text;
-      if (_currentText == null || _currentText!.isEmpty) {
+      final currentText = (span as TextSpan).text;
+      if (currentText == null || currentText.isEmpty) {
         return true;
       }
+      _currentSpanStyle = span.style;
 
-      if (_isCurrentMatchOutOfRange) {
-        _result.add(span);
-        _currentIndex += _currentText!.length;
-        return true;
-      }
+      _processText(currentText);
 
-      if (_isMatchFromMiddleTillEnd) {
-        _result.add(
-          TextSpan(
-            text: _currentText!.substring(
-              0,
-              _currentMatch.start - _currentIndex,
-            ),
-            style: span.style,
-          ),
-        );
-
-        _result.add(
-          TextSpan(
-            text: _currentText!.substring(
-                _currentMatch.start - _currentIndex, _currentText!.length),
-            style: searchStyle,
-          ),
-        );
-        _currentIndex += _currentText!.length;
-        return true;
-      }
-
-      if (_isTextInsideMatchCompletely) {
-        _result.add(
-          TextSpan(
-            text: _currentText!.substring(0, _currentText!.length),
-            style: searchStyle,
-          ),
-        );
-
-        if (_currentIndex + _currentText!.length == _currentMatch.end) {
-          _isLastMatchProcessed = !_matches.moveNext();
-          if (!_isLastMatchProcessed) {
-            _currentMatch = _matches.current;
-          }
-        }
-        _currentIndex += _currentText!.length;
-        return true;
-      }
-
-      while (_isMatchFullyInsideText) {
-        _result.add(
-          TextSpan(
-            text: _currentText!.substring(
-              localIndex,
-              math.max(
-                localIndex,
-                _currentMatch.start - _currentIndex,
-              ),
-            ),
-            style: span.style,
-          ),
-        );
-        localIndex = math.max(localIndex, _currentMatch.start - _currentIndex);
-
-        _result.add(
-          TextSpan(
-            text: _currentText!
-                .substring(localIndex, _currentMatch.end - _currentIndex),
-            style: searchStyle,
-          ),
-        );
-        localIndex = _currentMatch.end - _currentIndex;
-        _isLastMatchProcessed = !_matches.moveNext();
-        if (!_isLastMatchProcessed) {
-          _currentMatch = _matches.current;
-        }
-      }
-
-      if (_currentIndex >= _currentMatch.start &&
-          _currentIndex + _currentText!.length <= _currentMatch.end &&
-          !_isLastMatchProcessed) {
-        _result.add(
-          TextSpan(
-            text: _currentText!
-                .substring(localIndex, _currentMatch.end - _currentIndex),
-            style: searchStyle,
-          ),
-        );
-
-        if (_currentIndex + _currentText!.length == _currentMatch.end) {
-          _isLastMatchProcessed = !_matches.moveNext();
-          if (!_isLastMatchProcessed) {
-            _currentMatch = _matches.current;
-          }
-        }
-        _currentIndex += _currentText!.length;
-        return true;
-      } else {
-        _result.add(
-          TextSpan(
-            text: _currentText!.substring(localIndex, _currentText!.length),
-            style: span.style,
-          ),
-        );
-      }
-
-      if (_isCurrentMatchHandled) {
-        _isLastMatchProcessed = !_matches.moveNext();
-        if (!_isLastMatchProcessed) {
-          _currentMatch = _matches.current;
-        }
-        _isCurrentMatchHandled = false;
-      }
-
-      _currentIndex += _currentText!.length;
       return true;
     });
 
-    return TextSpan(children: _result);
+    return TextSpan(children: _spans);
+  }
+
+  /// Recursively processes the text and adds TextSpans
+  /// with proper styling to the [_spans]
+  void _processText(String text) {
+    if (_isLastMatchProcessed) {
+      _spans.add(
+        TextSpan(
+          text: text,
+          style: _currentSpanStyle,
+        ),
+      );
+      return;
+    }
+
+    final sliceIndex = matchIndexes[_currentMatchIndex] - _currentWindowStart;
+
+    if (sliceIndex >= 0 && sliceIndex <= text.length) {
+      _spans.add(
+        TextSpan(
+          text: text.substring(0, sliceIndex),
+          style: _actualStyle,
+        ),
+      );
+      _currentWindowStart = matchIndexes[_currentMatchIndex];
+      _currentMatchIndex++;
+      if (sliceIndex == text.length) {
+        return;
+      }
+
+      final textAfter = text.substring(sliceIndex, text.length);
+      if (textAfter.isNotEmpty) {
+        _processText(textAfter);
+      }
+    } else {
+      _spans.add(
+        TextSpan(
+          text: text,
+          style: _actualStyle,
+        ),
+      );
+      _currentWindowStart += text.length;
+    }
   }
 }
