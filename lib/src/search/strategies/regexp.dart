@@ -4,7 +4,10 @@ import 'abstract.dart';
 class RegExpSearchStrategy extends SearchStrategy {
   @override
   SearchResult searchPlain(String text, {required SearchSettings settings}) {
-    final regex = RegExp(settings.pattern);
+    final regex = RegExp(
+      settings.pattern,
+      multiLine: true,
+    );
     final matches = regex.allMatches(text);
     final searchMatches = matches
         .map<SearchMatch>(
