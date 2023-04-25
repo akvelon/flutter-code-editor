@@ -218,19 +218,10 @@ class _CodeFieldState extends State<CodeField> {
     _numberScroll = _controllers?.addAndGet();
     _codeScroll = _controllers?.addAndGet();
 
-    widget.controller.searchController.addListener(() {
-      if (widget.controller.searchController.isEnabled) {
-        _searchPopup = _buildSearchOverlay();
-        Overlay.of(context).insert(_searchPopup!);
-      } else {
-        _searchPopup?.remove();
-        _searchPopup = null;
-      }
-    });
-
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
+    widget.controller.searchController.addListener(_onSearchControllerChanged);
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
@@ -256,6 +247,8 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
+    widget.controller.searchController
+        .removeListener(_onSearchControllerChanged);
     _numberScroll?.dispose();
     _codeScroll?.dispose();
     _horizontalCodeScroll?.dispose();
@@ -268,16 +261,7 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
-
-    widget.controller.searchController.addListener(() {
-      if (widget.controller.searchController.isEnabled) {
-        _searchPopup = _buildSearchOverlay();
-        Overlay.of(context).insert(_searchPopup!);
-      } else {
-        _searchPopup?.remove();
-        _searchPopup = null;
-      }
-    });
+    widget.controller.searchController.addListener(_onSearchControllerChanged);
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
@@ -543,6 +527,16 @@ class _CodeFieldState extends State<CodeField> {
     }
 
     _suggestionsPopup!.markNeedsBuild();
+  }
+
+  void _onSearchControllerChanged() {
+    if (widget.controller.searchController.isEnabled) {
+      _searchPopup = _buildSearchOverlay();
+      Overlay.of(context).insert(_searchPopup!);
+    } else {
+      _searchPopup?.remove();
+      _searchPopup = null;
+    }
   }
 
   OverlayEntry _buildSearchOverlay() {
