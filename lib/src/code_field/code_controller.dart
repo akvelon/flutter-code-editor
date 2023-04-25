@@ -149,6 +149,7 @@ class CodeController extends TextEditingController {
 
     addListener(_scheduleAnalysis);
     searchSettingsController.addListener(_onSearchSettingsChange);
+    searchController.addListener(_onSearchControllerChange);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -183,6 +184,14 @@ class CodeController extends TextEditingController {
     }
 
     searchResult = result;
+    notifyListeners();
+  }
+
+  void _onSearchControllerChange() {
+    searchResult = searchController.search(
+      code,
+      settings: searchSettingsController.value,
+    );
     notifyListeners();
   }
 
@@ -1061,6 +1070,7 @@ class CodeController extends TextEditingController {
     }
     if (searchController.isEnabled) {
       searchController.isEnabled = false;
+      searchResult = SearchResult.empty;
     }
   }
 }

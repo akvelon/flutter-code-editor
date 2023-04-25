@@ -125,7 +125,7 @@ class _SearchWidgetState extends State<SearchWidget> {
       return KeyEventResult.handled;
     }
 
-    return KeyEventResult.handled;
+    return KeyEventResult.ignored;
   }
 
   @override
