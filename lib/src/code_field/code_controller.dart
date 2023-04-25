@@ -144,6 +144,7 @@ class CodeController extends TextEditingController {
     fullText = text ?? '';
 
     addListener(_scheduleAnalysis);
+    addListener(_updateSearchResult);
     searchSettingsController.addListener(_onSearchSettingsChange);
     searchController.addListener(_onSearchControllerChange);
 
@@ -184,6 +185,20 @@ class CodeController extends TextEditingController {
       code,
       settings: searchSettingsController.value,
     );
+    notifyListeners();
+  }
+
+  void _updateSearchResult() {
+    final result = searchController.search(
+      code,
+      settings: searchSettingsController.value,
+    );
+
+    if (result == searchResult) {
+      return;
+    }
+
+    searchResult = result;
     notifyListeners();
   }
 

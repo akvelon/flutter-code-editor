@@ -1,6 +1,8 @@
+import 'package:equatable/equatable.dart';
+
 import 'match.dart';
 
-class SearchResult {
+class SearchResult extends Equatable {
   const SearchResult({
     required this.matches,
   });
@@ -10,4 +12,7 @@ class SearchResult {
   static const empty = SearchResult(
     matches: [],
   );
+
+  @override
+  List<Object?> get props => [matches];
 }
