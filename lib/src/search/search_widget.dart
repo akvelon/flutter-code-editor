@@ -52,7 +52,7 @@ class _SearchWidgetState extends State<SearchWidget> {
     //   return Container();
     // }
 
-    return Container(
+    return SizedBox(
       height: 50,
       width: 250,
       child: Row(
@@ -60,12 +60,13 @@ class _SearchWidgetState extends State<SearchWidget> {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: TextField(
                 decoration: const InputDecoration(
-                    hintText: _hintText,
-                    isCollapsed: true,
-                    border: InputBorder.none),
+                  hintText: _hintText,
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                ),
                 focusNode: focusNode,
                 enabled: true,
                 controller: settingsController.patternController,

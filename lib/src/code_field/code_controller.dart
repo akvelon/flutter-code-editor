@@ -13,10 +13,6 @@ import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
-import '../search/controller.dart';
-import '../search/result.dart';
-import '../search/settings.dart';
-import '../search/settings_controller.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
@@ -178,10 +174,6 @@ class CodeController extends TextEditingController {
       code,
       settings: searchSettingsController.value,
     );
-
-    for (final match in result.matches) {
-      print('${match.start} ${match.end}');
-    }
 
     searchResult = result;
     notifyListeners();
@@ -895,8 +887,6 @@ class CodeController extends TextEditingController {
       }
 
       final endTextPos = currentIndex + text.length;
-
-      final plain = span.toPlainText();
 
       if (endTextPos < currentMatch.start ||
           currentIndex > currentMatch.end ||

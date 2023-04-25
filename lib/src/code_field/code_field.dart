@@ -5,16 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../../flutter_code_editor.dart';
-import '../code_theme/code_theme.dart';
 import '../gutter/gutter.dart';
-import '../line_numbers/gutter_style.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/search.dart';
-import 'code_controller.dart';
 import 'default_styles.dart';
 import 'disable_spell_check/disable_spell_check.dart';
 
@@ -273,7 +270,6 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.popupController.removeListener(_onPopupStateChanged);
 
     widget.controller.searchController.addListener(() {
-      print('Hello');
       if (widget.controller.searchController.isEnabled) {
         _searchPopup = _buildSearchOverlay();
         Overlay.of(context).insert(_searchPopup!);
