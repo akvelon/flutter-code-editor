@@ -3,6 +3,7 @@ import 'package:highlight/languages/go.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
+import 'package:highlight/languages/yaml.dart';
 
 final builtinLanguages = {
   'dart': dart,
@@ -10,6 +11,7 @@ final builtinLanguages = {
   'java': java,
   'python': python,
   'scala': scala,
+  'yaml': yaml,
 };
 
 const languageList = <String>[
@@ -18,6 +20,7 @@ const languageList = <String>[
   'java',
   'python',
   'scala',
+  'yaml'
 ];
 
 const themeList = <String>[
