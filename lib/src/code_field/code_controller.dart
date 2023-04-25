@@ -21,6 +21,7 @@ import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/copy.dart';
+import 'actions/dismiss.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/redo.dart';
@@ -116,6 +117,7 @@ class CodeController extends TextEditingController {
     RedoTextIntent: RedoAction(controller: this),
     UndoTextIntent: UndoAction(controller: this),
     SearchIntent: SearchAction(controller: this),
+    DismissIntent: CustomDismissAction(controller: this),
   };
 
   CodeController({
@@ -305,10 +307,6 @@ class CodeController extends TextEditingController {
       }
       if (event.logicalKey == LogicalKeyboardKey.enter) {
         insertSelectedWord();
-        return KeyEventResult.handled;
-      }
-      if (event.logicalKey == LogicalKeyboardKey.escape) {
-        popupController.hide();
         return KeyEventResult.handled;
       }
     }
@@ -1055,5 +1053,14 @@ class CodeController extends TextEditingController {
     historyController.dispose();
 
     super.dispose();
+  }
+
+  void dismiss() {
+    if (popupController.enabled) {
+      popupController.hide();
+    }
+    if (searchController.isEnabled) {
+      searchController.isEnabled = false;
+    }
   }
 }

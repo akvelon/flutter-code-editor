@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'settings.dart';
-import 'settings_controller.dart';
+import '../../flutter_code_editor.dart';
+
+const _selectedColor = Colors.black;
+const _unselectedColor = Color.fromARGB(88, 0, 0, 0);
+const _hintText = 'Search...';
 
 class SearchWidget extends StatefulWidget {
   final SearchSettingsController controller;
+  final SearchController searchController;
+  final FocusNode focusNode;
   const SearchWidget({
     super.key,
     required this.controller,
+    required this.searchController,
+    required this.focusNode,
   });
 
   @override
@@ -16,15 +24,20 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   late final settingsController = widget.controller;
-  final FocusNode focusNode = FocusNode();
+  late final searchController = widget.searchController;
+  late final focusNode = FocusNode(onKeyEvent: _onkey);
+  late final parentFocus = widget.focusNode;
+
+  bool _isCaseSensitive = false;
+  bool _isRegex = false;
 
   @override
   void initState() {
     settingsController.patternController.addListener(
       () {
         settingsController.value = SearchSettings(
-          isCaseSensitive: false,
-          isRegExp: false,
+          isCaseSensitive: _isCaseSensitive,
+          isRegExp: _isRegex,
           pattern: settingsController.patternController.text,
         );
       },
@@ -40,21 +53,79 @@ class _SearchWidgetState extends State<SearchWidget> {
     // }
 
     return Container(
-      color: Colors.amber,
       height: 50,
-      width: 200,
-      child: TextField(
-        decoration: InputDecoration(
-          suffix: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {},
+      width: 250,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: const InputDecoration(
+                    hintText: _hintText,
+                    isCollapsed: true,
+                    border: InputBorder.none),
+                focusNode: focusNode,
+                enabled: true,
+                controller: settingsController.patternController,
+              ),
+            ),
           ),
-        ),
-        focusNode: focusNode,
-        enabled: true,
-        controller: settingsController.patternController,
+          IconButton(
+            color: _isCaseSensitive ? _selectedColor : _unselectedColor,
+            isSelected: _isCaseSensitive,
+            onPressed: () {
+              setState(() {
+                _isCaseSensitive = !_isCaseSensitive;
+                settingsController.value = SearchSettings(
+                  pattern: settingsController.patternController.text,
+                  isCaseSensitive: _isCaseSensitive,
+                  isRegExp: _isRegex,
+                );
+              });
+            },
+            icon: const Icon(Icons.abc),
+          ),
+          IconButton(
+            color: _isRegex ? _selectedColor : _unselectedColor,
+            isSelected: _isRegex,
+            onPressed: () {
+              setState(() {
+                _isRegex = !_isRegex;
+                settingsController.value = SearchSettings(
+                  pattern: settingsController.patternController.text,
+                  isCaseSensitive: _isCaseSensitive,
+                  isRegExp: _isRegex,
+                );
+              });
+            },
+            icon: const Icon(Icons.r_mobiledata),
+          ),
+          IconButton(
+            color: _unselectedColor,
+            onPressed: _dismiss,
+            icon: const Icon(
+              Icons.close,
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _dismiss() {
+    searchController.isEnabled = false;
+    parentFocus.requestFocus();
+  }
+
+  KeyEventResult _onkey(FocusNode node, KeyEvent event) {
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _dismiss();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.handled;
   }
 
   @override

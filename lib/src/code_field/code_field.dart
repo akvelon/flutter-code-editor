@@ -99,6 +99,11 @@ final _shortcuts = <ShortcutActivator, Intent>{
     LogicalKeyboardKey.keyF,
     meta: true,
   ): const SearchIntent(),
+
+  // Dismiss
+  LogicalKeySet(
+    LogicalKeyboardKey.escape,
+  ): const DismissIntent(),
 };
 
 class CodeField extends StatefulWidget {
@@ -548,11 +553,13 @@ class _CodeFieldState extends State<CodeField> {
     return OverlayEntry(
       builder: (context) {
         return Positioned(
-          bottom: 0,
-          right: 0,
+          bottom: 10,
+          right: 10,
           child: Material(
             child: SearchWidget(
               controller: widget.controller.searchSettingsController,
+              searchController: widget.controller.searchController,
+              focusNode: _focusNode!,
             ),
           ),
         );
