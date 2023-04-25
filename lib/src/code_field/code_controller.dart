@@ -830,6 +830,7 @@ class CodeController extends TextEditingController {
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
     lastTextSpan = SearchResultHighlightedBuilder(
       searchResult: searchResult,
+      rootStyle: style,
     ).build(
       _createTextSpan(
         context: context,

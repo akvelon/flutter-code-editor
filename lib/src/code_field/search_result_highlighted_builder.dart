@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import '../../flutter_code_editor.dart';
 
 class SearchResultHighlightedBuilder {
+  final SearchResult searchResult;
+  final TextStyle? rootStyle;
+
   SearchResultHighlightedBuilder({
     required this.searchResult,
+    required this.rootStyle,
   }) {
     if (searchResult.matches.isEmpty) {
       return;
@@ -21,8 +25,6 @@ class SearchResultHighlightedBuilder {
 
   /// List of spans to be added to the result.
   final _spans = <InlineSpan>[];
-
-  final SearchResult searchResult;
 
   /// Indexes of [searchResult] in ascending order.
   /// Every element under even index is the start,
@@ -79,7 +81,10 @@ class SearchResultHighlightedBuilder {
       return true;
     });
 
-    return TextSpan(children: _spans);
+    return TextSpan(
+      children: _spans,
+      style: rootStyle,
+    );
   }
 
   /// Recursively processes the text and adds TextSpans
