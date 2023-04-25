@@ -23,6 +23,7 @@ import 'actions/outdent.dart';
 import 'actions/redo.dart';
 import 'actions/search.dart';
 import 'actions/undo.dart';
+import 'search_result_highlighted_builder.dart';
 import 'span_builder.dart';
 
 class CodeController extends TextEditingController {
@@ -828,7 +829,9 @@ class CodeController extends TextEditingController {
     bool? withComposing,
   }) {
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
-    lastTextSpan = _wrapWithSearch(
+    lastTextSpan = SearchResultHighlightedBuilder(
+      searchResult: searchResult,
+    ).build(
       _createTextSpan(
         context: context,
         style: style,
@@ -856,156 +859,6 @@ class CodeController extends TextEditingController {
     }
 
     return TextSpan(text: text, style: style);
-  }
-
-  TextSpan _wrapWithSearch(TextSpan textSpan) {
-    if (searchResult.matches.isEmpty) {
-      return textSpan;
-    }
-
-    int currentIndex = 0;
-    final searchMatches = searchResult.matches.iterator;
-    bool isLastMatchProcessed = !searchMatches.moveNext();
-    var currentMatch = searchMatches.current;
-    final result = <InlineSpan>[];
-    bool isCurrentMatchHandled = false;
-
-    textSpan.visitChildren((span) {
-      var localIndex = 0;
-      final searchStyle = span.style?.copyWith(
-            backgroundColor: Colors.yellow,
-            color: Colors.black,
-          ) ??
-          const TextStyle(
-            backgroundColor: Colors.yellow,
-            color: Colors.black,
-          );
-
-      final text = (span as TextSpan).text;
-      if (text == null || text.isEmpty) {
-        return true;
-      }
-
-      final endTextPos = currentIndex + text.length;
-
-      if (endTextPos < currentMatch.start ||
-          currentIndex > currentMatch.end ||
-          isLastMatchProcessed) {
-        result.add(span);
-        currentIndex += text.length;
-        return true;
-      }
-
-      if (currentIndex <= currentMatch.start &&
-          currentIndex + text.length > currentMatch.start &&
-          currentIndex + text.length < currentMatch.end) {
-        result.add(
-          TextSpan(
-            text: text.substring(0, currentMatch.start - currentIndex),
-            style: span.style,
-          ),
-        );
-
-        result.add(
-          TextSpan(
-            text:
-                text.substring(currentMatch.start - currentIndex, text.length),
-            style: searchStyle,
-          ),
-        );
-        currentIndex += text.length;
-        return true;
-      }
-
-      if (currentIndex >= currentMatch.start &&
-          currentIndex + text.length <= currentMatch.end) {
-        result.add(
-          TextSpan(
-            text: text.substring(0, text.length),
-            style: searchStyle,
-          ),
-        );
-
-        if (currentIndex + text.length == currentMatch.end) {
-          isLastMatchProcessed = !searchMatches.moveNext();
-          if (!isLastMatchProcessed) {
-            currentMatch = searchMatches.current;
-          }
-        }
-        currentIndex += text.length;
-        return true;
-      }
-
-      while (currentIndex + text.length >= currentMatch.start &&
-          currentIndex + text.length >= currentMatch.end &&
-          !isLastMatchProcessed) {
-        result.add(
-          TextSpan(
-            text: text.substring(
-              localIndex,
-              math.max(
-                localIndex,
-                currentMatch.start - currentIndex,
-              ),
-            ),
-            style: span.style,
-          ),
-        );
-        localIndex = math.max(localIndex, currentMatch.start - currentIndex);
-
-        result.add(
-          TextSpan(
-            text: text.substring(localIndex, currentMatch.end - currentIndex),
-            style: searchStyle,
-          ),
-        );
-        localIndex = currentMatch.end - currentIndex;
-        isLastMatchProcessed = !searchMatches.moveNext();
-        if (!isLastMatchProcessed) {
-          currentMatch = searchMatches.current;
-        }
-      }
-
-      if (currentIndex >= currentMatch.start &&
-          currentIndex + text.length <= currentMatch.end &&
-          !isLastMatchProcessed) {
-        result.add(
-          TextSpan(
-            text: text.substring(localIndex, currentMatch.end - currentIndex),
-            style: searchStyle,
-          ),
-        );
-
-        if (currentIndex + text.length == currentMatch.end) {
-          isLastMatchProcessed = !searchMatches.moveNext();
-          if (!isLastMatchProcessed) {
-            currentMatch = searchMatches.current;
-          }
-        }
-        currentIndex += text.length;
-        return true;
-      } else {
-        result.add(
-          TextSpan(
-            text: text.substring(localIndex, text.length),
-            style: span.style,
-          ),
-        );
-      }
-
-      if (isCurrentMatchHandled) {
-        isLastMatchProcessed = !searchMatches.moveNext();
-        if (!isLastMatchProcessed) {
-          currentMatch = searchMatches.current;
-        }
-        isCurrentMatchHandled = false;
-      }
-
-      currentIndex += text.length;
-      return true;
-    });
-
-    return TextSpan(children: result);
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
