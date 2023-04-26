@@ -10,18 +10,6 @@ import 'strategies/plain_case_sensitive.dart';
 import 'strategies/regexp.dart';
 
 class SearchController extends ChangeNotifier {
-  bool get isEnabled => _isEnabled;
-  bool _isEnabled = false;
-  set isEnabled(bool value) {
-    _isEnabled = value;
-
-    if (value == false) {
-      _result = SearchResult.empty;
-    }
-
-    notifyListeners();
-  }
-
   SearchResult get result => _result;
   SearchResult _result = SearchResult.empty;
   set result(SearchResult value) {
@@ -69,8 +57,8 @@ class SearchController extends ChangeNotifier {
       return result;
     }
 
-    if (!isEnabled) {
-      return SearchResult.empty;
+    if (!settings.isEnabled) {
+      return result = SearchResult.empty;
     }
 
     if (settings.pattern.isEmpty) {

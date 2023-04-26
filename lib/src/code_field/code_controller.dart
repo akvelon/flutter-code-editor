@@ -171,12 +171,6 @@ class CodeController extends TextEditingController {
   }
 
   void _onSearchSettingsChange() {
-    // if (searchSettingsController.value.pattern.isEmpty) {
-    //   searchResult = SearchResult.empty;
-    //   notifyListeners();
-    //   return;
-    // }
-
     searchController.search(
       code,
       settings: searchSettingsController.value,
@@ -199,7 +193,6 @@ class CodeController extends TextEditingController {
       );
 
       selection = TextSelection(baseOffset: start, extentOffset: end);
-      print(selection);
     }
 
     notifyListeners();
@@ -931,20 +924,28 @@ class CodeController extends TextEditingController {
     return CodeTheme.of(context) ?? CodeThemeData();
   }
 
+  void dismiss() {
+    if (popupController.enabled) {
+      popupController.hide();
+    }
+    if (searchSettingsController.value.isEnabled) {
+      searchSettingsController.value = searchSettingsController.value.copyWith(
+        isEnabled: false,
+      );
+    }
+  }
+
+  void enableSearch() {
+    searchSettingsController.value = searchSettingsController.value.copyWith(
+      isEnabled: true,
+    );
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
     historyController.dispose();
 
     super.dispose();
-  }
-
-  void dismiss() {
-    if (popupController.enabled) {
-      popupController.hide();
-    }
-    if (searchController.isEnabled) {
-      searchController.isEnabled = false;
-    }
   }
 }

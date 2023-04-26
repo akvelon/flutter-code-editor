@@ -221,7 +221,9 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
-    widget.controller.searchController.addListener(_onSearchControllerChanged);
+    widget.controller.searchSettingsController.addListener(
+      _onSearchSettingsChanged,
+    );
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
@@ -247,8 +249,9 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
-    widget.controller.searchController
-        .removeListener(_onSearchControllerChanged);
+    widget.controller.searchSettingsController.removeListener(
+      _onSearchSettingsChanged,
+    );
     _numberScroll?.dispose();
     _codeScroll?.dispose();
     _horizontalCodeScroll?.dispose();
@@ -261,7 +264,9 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
-    widget.controller.searchController.addListener(_onSearchControllerChanged);
+    widget.controller.searchSettingsController.addListener(
+      _onSearchSettingsChanged,
+    );
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
@@ -529,8 +534,8 @@ class _CodeFieldState extends State<CodeField> {
     _suggestionsPopup!.markNeedsBuild();
   }
 
-  void _onSearchControllerChanged() {
-    if (widget.controller.searchController.isEnabled) {
+  void _onSearchSettingsChanged() {
+    if (widget.controller.searchSettingsController.value.isEnabled) {
       if (_searchPopup != null) {
         return;
       }

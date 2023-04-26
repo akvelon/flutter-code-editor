@@ -77,10 +77,8 @@ class _SearchWidgetState extends State<SearchWidget> {
             onTap: () {
               setState(() {
                 _isCaseSensitive = !_isCaseSensitive;
-                settingsController.value = SearchSettings(
-                  pattern: settingsController.patternController.text,
+                settingsController.value = settingsController.value.copyWith(
                   isCaseSensitive: _isCaseSensitive,
-                  isRegExp: _isRegex,
                 );
               });
             },
@@ -95,9 +93,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             onTap: () {
               setState(() {
                 _isRegex = !_isRegex;
-                settingsController.value = SearchSettings(
-                  pattern: settingsController.patternController.text,
-                  isCaseSensitive: _isCaseSensitive,
+                settingsController.value = settingsController.value.copyWith(
                   isRegExp: _isRegex,
                 );
               });
@@ -146,7 +142,9 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   void _dismiss() {
-    searchController.isEnabled = false;
+    settingsController.value = settingsController.value.copyWith(
+      isEnabled: false,
+    );
     parentFocus.requestFocus();
   }
 
