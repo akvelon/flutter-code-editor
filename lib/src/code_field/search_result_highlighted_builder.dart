@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../flutter_code_editor.dart';
 
+const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
+const searchTextColor = Colors.black;
+
 class SearchResultHighlightedBuilder {
   final SearchResult searchResult;
   final TextStyle? rootStyle;
@@ -51,12 +54,12 @@ class SearchResultHighlightedBuilder {
   /// Overrides `TextStyle` of span to highlight search result.
   TextStyle get searchStyle =>
       _currentSpanStyle?.copyWith(
-        backgroundColor: Colors.yellow,
-        color: Colors.black,
+        backgroundColor: searchBackgroundColor,
+        color: searchTextColor,
       ) ??
       const TextStyle(
-        backgroundColor: Colors.yellow,
-        color: Colors.black,
+        backgroundColor: searchBackgroundColor,
+        color: searchTextColor,
       );
 
   /// Get actual style based on

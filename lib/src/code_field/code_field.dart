@@ -531,6 +531,10 @@ class _CodeFieldState extends State<CodeField> {
 
   void _onSearchControllerChanged() {
     if (widget.controller.searchController.isEnabled) {
+      if (_searchPopup != null) {
+        return;
+      }
+
       _searchPopup = _buildSearchOverlay();
       Overlay.of(context).insert(_searchPopup!);
     } else {

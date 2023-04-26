@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,6 +8,7 @@ import '../../flutter_code_editor.dart';
 const _selectedColor = Colors.black;
 const _unselectedColor = Color.fromARGB(88, 0, 0, 0);
 const _hintText = 'Search...';
+const _iconSize = 24.0;
 
 class SearchWidget extends StatefulWidget {
   final SearchSettingsController controller;
@@ -35,7 +38,7 @@ class _SearchWidgetState extends State<SearchWidget> {
   void initState() {
     settingsController.patternController.addListener(
       () {
-        settingsController.value = SearchSettings(
+        settingsController.value = settingsController.value.copyWith(
           isCaseSensitive: _isCaseSensitive,
           isRegExp: _isRegex,
           pattern: settingsController.patternController.text,
@@ -48,10 +51,6 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // if (!controller.isEnabled) {
-    //   return Container();
-    // }
-
     return SizedBox(
       height: 50,
       width: 250,
@@ -73,10 +72,9 @@ class _SearchWidgetState extends State<SearchWidget> {
               ),
             ),
           ),
-          IconButton(
-            color: _isCaseSensitive ? _selectedColor : _unselectedColor,
-            isSelected: _isCaseSensitive,
-            onPressed: () {
+          InkWell(
+            hoverColor: Colors.transparent,
+            onTap: () {
               setState(() {
                 _isCaseSensitive = !_isCaseSensitive;
                 settingsController.value = SearchSettings(
@@ -86,12 +84,15 @@ class _SearchWidgetState extends State<SearchWidget> {
                 );
               });
             },
-            icon: const Icon(Icons.abc),
+            child: Icon(
+              Icons.abc,
+              color: _isCaseSensitive ? _selectedColor : _unselectedColor,
+              size: _iconSize,
+            ),
           ),
-          IconButton(
-            color: _isRegex ? _selectedColor : _unselectedColor,
-            isSelected: _isRegex,
-            onPressed: () {
+          InkWell(
+            hoverColor: Colors.transparent,
+            onTap: () {
               setState(() {
                 _isRegex = !_isRegex;
                 settingsController.value = SearchSettings(
@@ -101,13 +102,42 @@ class _SearchWidgetState extends State<SearchWidget> {
                 );
               });
             },
-            icon: const Icon(Icons.r_mobiledata),
+            child: Icon(
+              Icons.r_mobiledata,
+              color: _isRegex ? _selectedColor : _unselectedColor,
+              size: _iconSize,
+            ),
           ),
-          IconButton(
-            color: _unselectedColor,
-            onPressed: _dismiss,
-            icon: const Icon(
+          InkWell(
+            hoverColor: Colors.transparent,
+            onTap: () {
+              focusNode.unfocus();
+              parentFocus.requestFocus();
+              searchController.movePreviousMatch();
+            },
+            child: const Icon(
+              Icons.arrow_upward,
+              size: _iconSize,
+            ),
+          ),
+          InkWell(
+            hoverColor: Colors.transparent,
+            onTap: () {
+              focusNode.unfocus();
+              parentFocus.requestFocus();
+              searchController.moveNextMatch();
+            },
+            child: const Icon(
+              Icons.arrow_downward,
+              size: _iconSize,
+            ),
+          ),
+          InkWell(
+            hoverColor: Colors.transparent,
+            onTap: _dismiss,
+            child: const Icon(
               Icons.close,
+              size: _iconSize,
             ),
           ),
         ],

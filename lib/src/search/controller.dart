@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../code/code.dart';
+import 'match.dart';
 import 'result.dart';
 import 'settings.dart';
 import 'strategies/abstract.dart';
@@ -13,21 +14,74 @@ class SearchController extends ChangeNotifier {
   bool _isEnabled = false;
   set isEnabled(bool value) {
     _isEnabled = value;
+
+    if (value == false) {
+      _result = SearchResult.empty;
+    }
+
     notifyListeners();
   }
 
+  SearchResult get result => _result;
+  SearchResult _result = SearchResult.empty;
+  set result(SearchResult value) {
+    if (_result == value) {
+      return;
+    }
+
+    _result = value;
+    notifyListeners();
+  }
+
+  String lastSearchedText = '';
+  SearchSettings? lastSearchSettings;
+
+  void moveNextMatch() {
+    if (result.matches.isEmpty) {
+      return;
+    }
+
+    if (result.currentMatchIndex == result.matches.length - 1) {
+      result = result.copyWith(currentMatchIndex: 0);
+      return;
+    }
+
+    result = result.copyWith(currentMatchIndex: result.currentMatchIndex + 1);
+  }
+
+  void movePreviousMatch() {
+    if (result.matches.isEmpty) {
+      return;
+    }
+
+    if (result.currentMatchIndex == 0) {
+      result = result.copyWith(currentMatchIndex: result.matches.length - 1);
+      return;
+    }
+
+    result = result.copyWith(currentMatchIndex: result.currentMatchIndex - 1);
+  }
+
   SearchResult search(Code code, {required SearchSettings settings}) {
+    if (lastSearchedText == code.text &&
+        lastSearchSettings == settings &&
+        result.matches.isNotEmpty) {
+      return result;
+    }
+
     if (!isEnabled) {
       return SearchResult.empty;
     }
 
     if (settings.pattern.isEmpty) {
-      return SearchResult.empty;
+      return result = SearchResult.empty;
     }
 
+    lastSearchedText = code.text;
+    lastSearchSettings = settings;
     final strategy = getSearchStrategy(settings);
-    final result = strategy.searchPlain(code.text, settings: settings);
-    return result;
+
+    return result = strategy.searchPlain(code.text, settings: settings);
   }
 
   @visibleForTesting

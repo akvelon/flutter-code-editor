@@ -171,20 +171,37 @@ class CodeController extends TextEditingController {
   }
 
   void _onSearchSettingsChange() {
-    final result = searchController.search(
+    // if (searchSettingsController.value.pattern.isEmpty) {
+    //   searchResult = SearchResult.empty;
+    //   notifyListeners();
+    //   return;
+    // }
+
+    searchController.search(
       code,
       settings: searchSettingsController.value,
     );
-
-    searchResult = result;
-    notifyListeners();
   }
 
   void _onSearchControllerChange() {
-    searchResult = searchController.search(
-      code,
-      settings: searchSettingsController.value,
-    );
+    if (searchResult == searchController.result) {
+      return;
+    }
+
+    searchResult = searchController.result;
+
+    if (searchResult.currentMatch != null) {
+      final start = _code.hiddenRanges.cutPosition(
+        searchResult.currentMatch!.start,
+      );
+      final end = _code.hiddenRanges.cutPosition(
+        searchResult.currentMatch!.end,
+      );
+
+      selection = TextSelection(baseOffset: start, extentOffset: end);
+      print(selection);
+    }
+
     notifyListeners();
   }
 
@@ -928,7 +945,6 @@ class CodeController extends TextEditingController {
     }
     if (searchController.isEnabled) {
       searchController.isEnabled = false;
-      searchResult = SearchResult.empty;
     }
   }
 }

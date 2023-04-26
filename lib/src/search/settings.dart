@@ -17,6 +17,18 @@ class SearchSettings extends Equatable {
     pattern: '',
   );
 
+  SearchSettings copyWith({
+    bool? isCaseSensitive,
+    bool? isRegExp,
+    String? pattern,
+  }) {
+    return SearchSettings(
+      isCaseSensitive: isCaseSensitive ?? this.isCaseSensitive,
+      isRegExp: isRegExp ?? this.isRegExp,
+      pattern: pattern ?? this.pattern,
+    );
+  }
+
   @override
   List<Object?> get props => [isCaseSensitive, isRegExp, pattern];
 }
