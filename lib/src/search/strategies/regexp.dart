@@ -1,4 +1,6 @@
-import '../../../flutter_code_editor.dart';
+import '../match.dart';
+import '../result.dart';
+import '../settings.dart';
 import 'abstract.dart';
 
 class RegExpSearchStrategy extends SearchStrategy {

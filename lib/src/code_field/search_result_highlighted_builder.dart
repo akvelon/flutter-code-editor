@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../flutter_code_editor.dart';
+import '../search/result.dart';
 
 const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
 const searchTextColor = Colors.black;
@@ -8,10 +8,12 @@ const searchTextColor = Colors.black;
 class SearchResultHighlightedBuilder {
   final SearchResult searchResult;
   final TextStyle? rootStyle;
+  final TextSpan textSpan;
 
   SearchResultHighlightedBuilder({
     required this.searchResult,
     required this.rootStyle,
+    required this.textSpan,
   }) {
     if (searchResult.matches.isEmpty) {
       return;
@@ -67,12 +69,12 @@ class SearchResultHighlightedBuilder {
   TextStyle? get _actualStyle =>
       _isCurrentMatchIndexSearch ? searchStyle : _currentSpanStyle;
 
-  TextSpan build(TextSpan span) {
+  TextSpan build() {
     if (searchResult.matches.isEmpty) {
-      return span;
+      return textSpan;
     }
 
-    span.visitChildren((span) {
+    textSpan.visitChildren((span) {
       final currentText = (span as TextSpan).text;
       if (currentText == null || currentText.isEmpty) {
         return true;

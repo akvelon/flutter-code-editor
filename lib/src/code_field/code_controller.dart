@@ -6,12 +6,16 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
+import 'package:meta/meta.dart';
 
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
+import '../search/controller.dart';
+import '../search/result.dart';
+import '../search/settings_controller.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
@@ -94,8 +98,13 @@ class CodeController extends TextEditingController {
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
 
+  @internal
   final searchSettingsController = SearchSettingsController();
+
+  @internal
   final searchController = SearchController();
+
+  @internal
   SearchResult searchResult = SearchResult.empty;
 
   /// The last [TextSpan] returned from [buildTextSpan].
@@ -852,16 +861,17 @@ class CodeController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
+    final spanBeforeSearch = _createTextSpan(
+      context: context,
+      style: style,
+    );
+
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
     lastTextSpan = SearchResultHighlightedBuilder(
       searchResult: searchResult,
       rootStyle: style,
-    ).build(
-      _createTextSpan(
-        context: context,
-        style: style,
-      ),
-    );
+      textSpan: spanBeforeSearch,
+    ).build();
 
     return lastTextSpan!;
   }
@@ -925,9 +935,17 @@ class CodeController extends TextEditingController {
   }
 
   void dismiss() {
+    _dismissSuggestions();
+    _dismissSearch();
+  }
+
+  void _dismissSuggestions() {
     if (popupController.enabled) {
       popupController.hide();
     }
+  }
+
+  void _dismissSearch() {
     if (searchSettingsController.value.isEnabled) {
       searchSettingsController.value = searchSettingsController.value.copyWith(
         isEnabled: false,

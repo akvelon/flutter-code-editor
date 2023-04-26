@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
-import '../../flutter_code_editor.dart';
+import '../code_theme/code_theme.dart';
 import '../gutter/gutter.dart';
+import '../line_numbers/gutter_style.dart';
+import '../search/search_widget.dart';
 import '../sizes.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/search.dart';
+import 'code_controller.dart';
 import 'default_styles.dart';
 import 'disable_spell_check/disable_spell_check.dart';
 
@@ -261,16 +264,19 @@ class _CodeFieldState extends State<CodeField> {
   @override
   void didUpdateWidget(covariant CodeField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    widget.controller.removeListener(_onTextChanged);
-    widget.controller.removeListener(_updatePopupOffset);
-    widget.controller.popupController.removeListener(_onPopupStateChanged);
-    widget.controller.searchSettingsController.addListener(
+    oldWidget.controller.removeListener(_onTextChanged);
+    oldWidget.controller.removeListener(_updatePopupOffset);
+    oldWidget.controller.popupController.removeListener(_onPopupStateChanged);
+    oldWidget.controller.searchSettingsController.removeListener(
       _onSearchSettingsChanged,
     );
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
+    widget.controller.searchSettingsController.addListener(
+      _onSearchSettingsChanged,
+    );
   }
 
   void rebuild() {
@@ -535,16 +541,18 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   void _onSearchSettingsChanged() {
-    if (widget.controller.searchSettingsController.value.isEnabled) {
-      if (_searchPopup != null) {
-        return;
-      }
+    final shouldShow =
+        widget.controller.searchSettingsController.value.isEnabled;
 
-      _searchPopup = _buildSearchOverlay();
-      Overlay.of(context).insert(_searchPopup!);
-    } else {
+    if (!shouldShow) {
       _searchPopup?.remove();
       _searchPopup = null;
+      return;
+    }
+
+    if (_searchPopup == null) {
+      _searchPopup = _buildSearchOverlay();
+      Overlay.of(context).insert(_searchPopup!);
     }
   }
 

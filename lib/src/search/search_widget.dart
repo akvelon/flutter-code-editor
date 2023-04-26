@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../flutter_code_editor.dart';
+import 'controller.dart';
+import 'settings_controller.dart';
 
 const _selectedColor = Colors.black;
 const _unselectedColor = Color.fromARGB(88, 0, 0, 0);

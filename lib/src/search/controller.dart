@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 
 import '../code/code.dart';
-import 'match.dart';
 import 'result.dart';
 import 'settings.dart';
 import 'strategies/abstract.dart';
