@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'controller.dart';
+import 'search_navigation_controller.dart';
 import 'settings_controller.dart';
 
 const _selectedColor = Colors.black;
@@ -10,14 +11,17 @@ const _hintText = 'Search...';
 const _iconSize = 24.0;
 
 class SearchWidget extends StatefulWidget {
-  final SearchSettingsController controller;
+  final SearchSettingsController searchSettingsController;
   final SearchController searchController;
-  final FocusNode focusNode;
+  final SearchNavigationController searchNavigationController;
+  final FocusNode parentFocusNode;
+
   const SearchWidget({
     super.key,
-    required this.controller,
+    required this.parentFocusNode,
     required this.searchController,
-    required this.focusNode,
+    required this.searchNavigationController,
+    required this.searchSettingsController,
   });
 
   @override
@@ -25,10 +29,11 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  late final settingsController = widget.controller;
+  late final settingsController = widget.searchSettingsController;
   late final searchController = widget.searchController;
+  late final searchNavigationController = widget.searchNavigationController;
   late final focusNode = FocusNode(onKeyEvent: _onkey);
-  late final parentFocus = widget.focusNode;
+  late final parentFocus = widget.parentFocusNode;
 
   bool _isCaseSensitive = false;
   bool _isRegex = false;
@@ -108,7 +113,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             onTap: () {
               focusNode.unfocus();
               parentFocus.requestFocus();
-              searchController.movePreviousMatch();
+              searchNavigationController.movePrevious();
             },
             child: const Icon(
               Icons.arrow_upward,
@@ -120,7 +125,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             onTap: () {
               focusNode.unfocus();
               parentFocus.requestFocus();
-              searchController.moveNextMatch();
+              searchNavigationController.moveNext();
             },
             child: const Icon(
               Icons.arrow_downward,

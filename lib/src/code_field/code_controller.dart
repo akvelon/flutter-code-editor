@@ -15,6 +15,7 @@ import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../search/controller.dart';
 import '../search/result.dart';
+import '../search/search_navigation_controller.dart';
 import '../search/settings_controller.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
 import '../wip/autocomplete/popup_controller.dart';
@@ -105,6 +106,11 @@ class CodeController extends TextEditingController {
   final searchController = SearchController();
 
   @internal
+  late final searchNavigationController = SearchNavigationController(
+    codeController: this,
+  );
+
+  @internal
   SearchResult searchResult = SearchResult.empty;
 
   /// The last [TextSpan] returned from [buildTextSpan].
@@ -154,8 +160,7 @@ class CodeController extends TextEditingController {
 
     addListener(_scheduleAnalysis);
     addListener(_updateSearchResult);
-    searchSettingsController.addListener(_onSearchSettingsChange);
-    searchController.addListener(_onSearchControllerChange);
+    searchSettingsController.addListener(_updateSearchResult);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -177,34 +182,6 @@ class CodeController extends TextEditingController {
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
 
     unawaited(analyzeCode());
-  }
-
-  void _onSearchSettingsChange() {
-    searchController.search(
-      code,
-      settings: searchSettingsController.value,
-    );
-  }
-
-  void _onSearchControllerChange() {
-    if (searchResult == searchController.result) {
-      return;
-    }
-
-    searchResult = searchController.result;
-
-    if (searchResult.currentMatch != null) {
-      final start = _code.hiddenRanges.cutPosition(
-        searchResult.currentMatch!.start,
-      );
-      final end = _code.hiddenRanges.cutPosition(
-        searchResult.currentMatch!.end,
-      );
-
-      selection = TextSelection(baseOffset: start, extentOffset: end);
-    }
-
-    notifyListeners();
   }
 
   void _updateSearchResult() {

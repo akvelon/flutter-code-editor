@@ -564,9 +564,12 @@ class _CodeFieldState extends State<CodeField> {
           right: 10,
           child: Material(
             child: SearchWidget(
-              controller: widget.controller.searchSettingsController,
+              parentFocusNode: _focusNode!,
               searchController: widget.controller.searchController,
-              focusNode: _focusNode!,
+              searchNavigationController:
+                  widget.controller.searchNavigationController,
+              searchSettingsController:
+                  widget.controller.searchSettingsController,
             ),
           ),
         );
