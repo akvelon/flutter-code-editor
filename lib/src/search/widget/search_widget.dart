@@ -7,9 +7,6 @@ import '../settings_controller.dart';
 import 'search_navigation_widget.dart';
 import 'search_settings_widget.dart';
 
-const _selectedColor = Colors.black;
-const _unselectedColor = Color.fromARGB(88, 0, 0, 0);
-const _hintText = 'Search...';
 const _iconSize = 24.0;
 
 class SearchWidget extends StatefulWidget {
@@ -31,24 +28,10 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  late final settingsController = widget.searchSettingsController;
-  late final searchController = widget.searchController;
-  late final searchNavigationController = widget.searchNavigationController;
   late final focusNode = FocusNode(onKeyEvent: _onkey);
-  late final codeFieldFocusNode = widget.codeFieldFocusNode;
-
-  bool _isCaseSensitive = false;
-  bool _isRegex = false;
 
   @override
   void initState() {
-    settingsController.patternController.addListener(
-      () {
-        settingsController.value = settingsController.value.copyWith(
-          pattern: settingsController.patternController.text,
-        );
-      },
-    );
     focusNode.requestFocus();
     super.initState();
   }
@@ -65,15 +48,15 @@ class _SearchWidgetState extends State<SearchWidget> {
             flex: 6,
             child: SearchSettingsWidget(
               patternFocusNode: focusNode,
-              settingsController: settingsController,
+              settingsController: widget.searchSettingsController,
             ),
           ),
           Expanded(
             flex: 2,
             child: SearchNavigationWidget(
               patternFocusNode: focusNode,
-              codeFieldFocusNode: codeFieldFocusNode,
-              searchNavigationController: searchNavigationController,
+              codeFieldFocusNode: widget.codeFieldFocusNode,
+              searchNavigationController: widget.searchNavigationController,
             ),
           ),
           Expanded(
@@ -92,8 +75,8 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   void _dismiss() {
-    searchController.disableSearch();
-    codeFieldFocusNode.requestFocus();
+    widget.searchController.disableSearch();
+    widget.codeFieldFocusNode.requestFocus();
   }
 
   KeyEventResult _onkey(FocusNode node, KeyEvent event) {

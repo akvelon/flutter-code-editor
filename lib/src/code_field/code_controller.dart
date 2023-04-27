@@ -14,7 +14,6 @@ import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../search/controller.dart';
-import '../search/match.dart';
 import '../search/result.dart';
 import '../search/search_navigation_controller.dart';
 import '../search/settings_controller.dart';

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class SearchNavigationState {
   final int currentMatchIndex;
   final int totalMatchesCount;

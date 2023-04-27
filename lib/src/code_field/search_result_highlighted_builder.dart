@@ -155,6 +155,8 @@ class SearchResultHighlightedBuilder {
 }
 
 int _searchMatchStartAscendingComparator(
-    SearchMatch first, SearchMatch second) {
+  SearchMatch first,
+  SearchMatch second,
+) {
   return first.start - second.start;
 }

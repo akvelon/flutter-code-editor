@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../settings_controller.dart';
 
-const _selectedColor = Colors.black;
-const _unselectedColor = Color.fromARGB(88, 0, 0, 0);
 const _hintText = 'Search...';
 const _iconSize = 24.0;
 
@@ -41,7 +39,7 @@ class SearchSettingsWidget extends StatelessWidget {
             ),
             ToggleButtons(
               onPressed: (index) {
-                // TODO: Use keyed_collection_widgets when this lands:
+                // TODO(yescorp): Use keyed_collection_widgets when this lands:
                 //  https://github.com/alexeyinkin/flutter-keyed-collection-widgets/issues/2
                 switch (index) {
                   case 0:
