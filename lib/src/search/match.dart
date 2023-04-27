@@ -10,5 +10,8 @@ class SearchMatch extends Equatable {
   final int end;
 
   @override
-  List<Object?> get props => [start, end];
+  List<Object?> get props => [
+        start,
+        end,
+      ];
 }

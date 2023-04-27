@@ -5,6 +5,7 @@ import '../code_field/code_controller.dart';
 import 'match.dart';
 import 'result.dart';
 import 'search_navigation_state.dart';
+import 'widget/search_navigation_widget.dart';
 
 /// Controller that navigates through the [SearchResult].
 ///
@@ -19,11 +20,13 @@ import 'search_navigation_state.dart';
 /// When the text of a [CodeController] is changed with non-empty [SearchResult]
 /// enters the editing mode where it doesn't advance the [value] to currentMatch
 /// nor change the selection of the [CodeController].
+///
+/// Also used to manage the state of [SearchNavigationWidget]
 class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   final CodeController codeController;
 
-  SearchResult searchResult = SearchResult.empty;
-  String lastText = '';
+  SearchResult _searchResult = SearchResult.empty;
+  String _lastText = '';
   bool _isEditing = false;
 
   SearchNavigationController({
@@ -31,16 +34,16 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     SearchNavigationState? state,
   }) : super(state ?? SearchNavigationState()) {
     codeController.addListener(_updateState);
-    lastText = codeController.code.text;
+    _lastText = codeController.code.text;
   }
 
   void moveNext() {
     _isEditing = false;
-    if (searchResult.matches.isEmpty) {
+    if (_searchResult.matches.isEmpty) {
       return;
     }
 
-    if (value.currentMatchIndex == searchResult.matches.length - 1) {
+    if (value.currentMatchIndex == _searchResult.matches.length - 1) {
       value = value.copyWith(currentMatchIndex: 0);
     } else {
       value = value.copyWith(currentMatchIndex: value.currentMatchIndex + 1);
@@ -51,13 +54,13 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
 
   void movePrevious() {
     _isEditing = false;
-    if (searchResult.matches.isEmpty) {
+    if (_searchResult.matches.isEmpty) {
       return;
     }
 
     if (value.currentMatchIndex == 0) {
       value = value.copyWith(
-        currentMatchIndex: searchResult.matches.length - 1,
+        currentMatchIndex: _searchResult.matches.length - 1,
       );
     } else {
       value = value.copyWith(currentMatchIndex: value.currentMatchIndex - 1);
@@ -67,9 +70,9 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   }
 
   void _updateState() {
-    if (codeController.code.text != lastText) {
+    if (codeController.code.text != _lastText) {
       _isEditing = true;
-      lastText = codeController.code.text;
+      _lastText = codeController.code.text;
     }
 
     if (_isEditing) {
@@ -82,11 +85,11 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return;
     }
 
-    if (codeController.fullSearchResult == searchResult) {
+    if (codeController.fullSearchResult == _searchResult) {
       return;
     }
 
-    searchResult = codeController.fullSearchResult;
+    _searchResult = codeController.fullSearchResult;
 
     final visibleSelectionEnd = codeController.selection.end;
     final fullSelectionEnd = codeController.code.hiddenRanges.recoverPosition(
@@ -94,26 +97,26 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       placeHiddenRanges: TextAffinity.downstream,
     );
 
-    var closestMatchIndex = searchResult.matches.indexWhere(
+    var closestMatchIndex = _searchResult.matches.indexWhere(
       (element) => element.start >= fullSelectionEnd,
     );
 
     if (closestMatchIndex == -1) {
-      closestMatchIndex = searchResult.matches.length - 1;
+      closestMatchIndex = _searchResult.matches.length - 1;
     }
 
     moveSelectionToMatch(closestMatchIndex);
   }
 
   void moveSelectionToMatch(int matchIndex) {
-    final match = searchResult.matches[matchIndex];
+    final match = _searchResult.matches[matchIndex];
 
     expandFoldedBlockIfNeeded(match);
 
     codeController.selection = matchToSelection(match);
     value = value.copyWith(
       currentMatchIndex: matchIndex,
-      totalMatchesCount: searchResult.matches.length,
+      totalMatchesCount: _searchResult.matches.length,
     );
   }
 
