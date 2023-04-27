@@ -74,16 +74,16 @@ class SearchNavigationController {
       return;
     }
 
-    if (codeController.searchResult.matches.isEmpty) {
+    if (codeController.fullSearchResult.matches.isEmpty) {
       state.value = -1;
       return;
     }
 
-    if (codeController.searchResult == searchResult) {
+    if (codeController.fullSearchResult == searchResult) {
       return;
     }
 
-    searchResult = codeController.searchResult;
+    searchResult = codeController.fullSearchResult;
 
     final visibleSelectionEnd = codeController.selection.end;
     final fullSelectionEnd = codeController.code.hiddenRanges.recoverPosition(

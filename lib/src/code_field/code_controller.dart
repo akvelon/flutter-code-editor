@@ -112,7 +112,7 @@ class CodeController extends TextEditingController {
   );
 
   @internal
-  SearchResult searchResult = SearchResult.empty;
+  SearchResult fullSearchResult = SearchResult.empty;
 
   /// The last [TextSpan] returned from [buildTextSpan].
   ///
@@ -192,11 +192,11 @@ class CodeController extends TextEditingController {
       settings: searchSettingsController.value,
     );
 
-    if (result == searchResult) {
+    if (result == fullSearchResult) {
       return;
     }
 
-    searchResult = result;
+    fullSearchResult = result;
     notifyListeners();
   }
 
@@ -845,16 +845,7 @@ class CodeController extends TextEditingController {
       style: style,
     );
 
-    final cutSearchResult = SearchResult(
-      matches: searchResult.matches
-          .map<SearchMatch>(
-            (e) => SearchMatch(
-              start: _code.hiddenRanges.cutPosition(e.start),
-              end: _code.hiddenRanges.cutPosition(e.end),
-            ),
-          )
-          .toList(growable: false),
-    );
+    final cutSearchResult = _code.hiddenRanges.cutSearchResult(fullSearchResult);
 
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
     lastTextSpan = SearchResultHighlightedBuilder(
