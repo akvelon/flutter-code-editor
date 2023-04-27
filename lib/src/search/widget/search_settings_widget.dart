@@ -7,78 +7,69 @@ const _unselectedColor = Color.fromARGB(88, 0, 0, 0);
 const _hintText = 'Search...';
 const _iconSize = 24.0;
 
-class SearchSettingsWidget extends StatefulWidget {
-  final FocusNode focusNode;
+class SearchSettingsWidget extends StatelessWidget {
+  final FocusNode patternFocusNode;
   final SearchSettingsController settingsController;
 
   const SearchSettingsWidget({
     super.key,
-    required this.focusNode,
+    required this.patternFocusNode,
     required this.settingsController,
   });
 
   @override
-  State<SearchSettingsWidget> createState() => _SearchSettingsWidgetState();
-}
-
-class _SearchSettingsWidgetState extends State<SearchSettingsWidget> {
-  late final focusNode = widget.focusNode;
-  late final settingsController = widget.settingsController;
-  bool _isCaseSensitive = false;
-  bool _isRegex = false;
-
-  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: _hintText,
-                isCollapsed: true,
-                border: InputBorder.none,
+    return AnimatedBuilder(
+      animation: settingsController,
+      builder: (context, child) {
+        return Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    hintText: _hintText,
+                    isCollapsed: true,
+                    border: InputBorder.none,
+                  ),
+                  focusNode: patternFocusNode,
+                  enabled: true,
+                  controller: settingsController.patternController,
+                ),
               ),
-              focusNode: focusNode,
-              enabled: true,
-              controller: settingsController.patternController,
             ),
-          ),
-        ),
-        InkWell(
-          hoverColor: Colors.transparent,
-          onTap: () {
-            setState(() {
-              _isCaseSensitive = !_isCaseSensitive;
-              settingsController.value = settingsController.value.copyWith(
-                isCaseSensitive: _isCaseSensitive,
-              );
-            });
-          },
-          child: Icon(
-            Icons.abc,
-            color: _isCaseSensitive ? _selectedColor : _unselectedColor,
-            size: _iconSize,
-          ),
-        ),
-        InkWell(
-          hoverColor: Colors.transparent,
-          onTap: () {
-            setState(() {
-              _isRegex = !_isRegex;
-              settingsController.value = settingsController.value.copyWith(
-                isRegExp: _isRegex,
-              );
-            });
-          },
-          child: Icon(
-            Icons.r_mobiledata,
-            color: _isRegex ? _selectedColor : _unselectedColor,
-            size: _iconSize,
-          ),
-        ),
-      ],
+            ToggleButtons(
+              onPressed: (index) {
+                // TODO: Use keyed_collection_widgets when this lands:
+                //  https://github.com/alexeyinkin/flutter-keyed-collection-widgets/issues/2
+                switch (index) {
+                  case 0:
+                    settingsController.toggleCaseSensitivity();
+                    break;
+                  case 1:
+                    settingsController.toggleIsRegExp();
+                    break;
+                }
+              },
+              isSelected: [
+                settingsController.value.isCaseSensitive,
+                settingsController.value.isRegExp,
+              ],
+              children: const [
+                Icon(
+                  Icons.abc,
+                  size: _iconSize,
+                ),
+                Icon(
+                  Icons.r_mobiledata,
+                  size: _iconSize,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

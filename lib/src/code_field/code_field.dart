@@ -561,14 +561,22 @@ class _CodeFieldState extends State<CodeField> {
         return Positioned(
           bottom: 10,
           right: 10,
-          child: Material(
-            child: SearchWidget(
-              parentFocusNode: _focusNode!,
-              searchController: widget.controller.searchController,
-              searchNavigationController:
-                  widget.controller.searchNavigationController,
-              searchSettingsController:
-                  widget.controller.searchSettingsController,
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5),
+              ),
+            ),
+            child: Material(
+              child: SearchWidget(
+                codeFieldFocusNode: _focusNode!,
+                searchController: widget.controller.searchController,
+                searchNavigationController:
+                    widget.controller.searchNavigationController,
+                searchSettingsController:
+                    widget.controller.searchSettingsController,
+              ),
             ),
           ),
         );

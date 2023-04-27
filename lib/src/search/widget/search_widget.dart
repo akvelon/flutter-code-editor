@@ -16,11 +16,11 @@ class SearchWidget extends StatefulWidget {
   final SearchSettingsController searchSettingsController;
   final SearchController searchController;
   final SearchNavigationController searchNavigationController;
-  final FocusNode parentFocusNode;
+  final FocusNode codeFieldFocusNode;
 
   const SearchWidget({
     super.key,
-    required this.parentFocusNode,
+    required this.codeFieldFocusNode,
     required this.searchController,
     required this.searchNavigationController,
     required this.searchSettingsController,
@@ -35,7 +35,7 @@ class _SearchWidgetState extends State<SearchWidget> {
   late final searchController = widget.searchController;
   late final searchNavigationController = widget.searchNavigationController;
   late final focusNode = FocusNode(onKeyEvent: _onkey);
-  late final parentFocus = widget.parentFocusNode;
+  late final codeFieldFocusNode = widget.codeFieldFocusNode;
 
   bool _isCaseSensitive = false;
   bool _isRegex = false;
@@ -57,22 +57,22 @@ class _SearchWidgetState extends State<SearchWidget> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50,
-      width: 250,
+      width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
             flex: 6,
             child: SearchSettingsWidget(
-              focusNode: focusNode,
+              patternFocusNode: focusNode,
               settingsController: settingsController,
             ),
           ),
           Expanded(
             flex: 2,
             child: SearchNavigationWidget(
-              focusNode: focusNode,
-              parentFocus: parentFocus,
+              patternFocusNode: focusNode,
+              codeFieldFocusNode: codeFieldFocusNode,
               searchNavigationController: searchNavigationController,
             ),
           ),
@@ -93,7 +93,7 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   void _dismiss() {
     searchController.disableSearch();
-    parentFocus.requestFocus();
+    codeFieldFocusNode.requestFocus();
   }
 
   KeyEventResult _onkey(FocusNode node, KeyEvent event) {
