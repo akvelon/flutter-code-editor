@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../search/match.dart';
 import '../search/result.dart';
 
 const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
@@ -10,21 +11,19 @@ class SearchResultHighlightedBuilder {
   final SearchResult searchResult;
   final TextStyle? rootStyle;
   final TextSpan textSpan;
-  late final int currentMatch;
+  late final int highlightedMatchIndex;
 
   SearchResultHighlightedBuilder({
     required this.searchResult,
     required this.rootStyle,
     required this.textSpan,
-    required int currentMatch,
-  }) : currentMatch = currentMatch * 2 + 1 {
+    required int selectedMatch,
+  }) : highlightedMatchIndex = selectedMatch * 2 + 1 {
     if (searchResult.matches.isEmpty) {
       return;
     }
 
-    // searchResult.matches.sort((a, b) {
-    //   return a.start - b.start;
-    // });
+    searchResult.matches.sort(_searchMatchStartAscendingComparator);
 
     matchIndexes = searchResult.matches
         .expand<int>((e) => [e.start, e.end])
@@ -37,6 +36,8 @@ class SearchResultHighlightedBuilder {
   /// Indexes of [searchResult] in ascending order.
   /// Every element under even index is the start,
   /// and every element under odd index is the end of the searchMatch.
+  ///
+  /// SearchMatches are grouped this way and look like this: 0-1 2-3 4-5
   late final List<int> matchIndexes;
 
   /// Current index of [matchIndexes] that is being processed.
@@ -58,9 +59,10 @@ class SearchResultHighlightedBuilder {
 
   /// Returns the background color either for regular match,
   /// or currently highlighted match.
-  Color get searchMatchBackgroundColor => currentMatch == _currentMatchIndex
-      ? currentMatchBackgroundColor
-      : searchBackgroundColor;
+  Color get searchMatchBackgroundColor =>
+      highlightedMatchIndex == _currentMatchIndex
+          ? currentMatchBackgroundColor
+          : searchBackgroundColor;
 
   /// Overrides `TextStyle` of span to highlight search result.
   TextStyle get searchStyle =>
@@ -103,6 +105,12 @@ class SearchResultHighlightedBuilder {
 
   /// Recursively processes the text and adds TextSpans
   /// with proper styling to the [_spans]
+  ///
+  /// Slices the text according to the [_currentMatchIndex] and applies styling.
+  /// Then advances the [_currentWindowStart] and [_currentMatchIndex].
+  ///
+  /// If all of the matches are prcoessed,
+  /// adds the whole text to the [_spans] with regular styling.
   void _processText(String text) {
     if (_isLastMatchProcessed) {
       _spans.add(
@@ -143,4 +151,9 @@ class SearchResultHighlightedBuilder {
       _currentWindowStart += text.length;
     }
   }
+}
+
+int _searchMatchStartAscendingComparator(
+    SearchMatch first, SearchMatch second) {
+  return first.start - second.start;
 }
