@@ -84,20 +84,6 @@ class SearchNavigationController {
   }
 
   void expandFoldedBlockIfNeeded(SearchMatch match) {
-    final matchStart = match.start;
-    final matchEnd = match.end;
-
-    // final isMatchHidden = codeController.code.hiddenRanges.ranges.any(
-    //   (element) =>
-    //       (matchStart <= element.start && element.start <= matchEnd) ||
-    //       (matchStart <= element.end && element.end <= matchEnd) ||
-    //       (element.start <= matchStart && matchStart <= element.end),
-    // );
-
-    // if (!isMatchHidden) {
-    //   return;
-    // }
-
     final firstLine = codeController.code.lines.characterIndexToLineIndex(
       match.start,
     );
@@ -116,10 +102,6 @@ class SearchNavigationController {
     if (foldedBlock != null) {
       codeController.unfoldAt(foldedBlock.firstLine);
     }
-
-    // for (int i = firstLine; i <= lastLine; i++) {
-    //   codeController.unfoldAt(i);
-    // }
   }
 
   TextSelection matchToSelection(SearchMatch match) {

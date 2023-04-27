@@ -14,6 +14,7 @@ import '../code/code_edit_result.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../search/controller.dart';
+import '../search/match.dart';
 import '../search/result.dart';
 import '../search/search_navigation_controller.dart';
 import '../search/settings_controller.dart';
@@ -843,9 +844,20 @@ class CodeController extends TextEditingController {
       style: style,
     );
 
+    final cutSearchResult = SearchResult(
+      matches: searchResult.matches
+          .map<SearchMatch>(
+            (e) => SearchMatch(
+              start: _code.hiddenRanges.cutPosition(e.start),
+              end: _code.hiddenRanges.cutPosition(e.end),
+            ),
+          )
+          .toList(growable: false),
+    );
+
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
     lastTextSpan = SearchResultHighlightedBuilder(
-      searchResult: searchResult,
+      searchResult: cutSearchResult,
       rootStyle: style,
       textSpan: spanBeforeSearch,
     ).build();
