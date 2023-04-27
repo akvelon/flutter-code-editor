@@ -162,6 +162,7 @@ class CodeController extends TextEditingController {
     addListener(_scheduleAnalysis);
     addListener(_updateSearchResult);
     searchSettingsController.addListener(_updateSearchResult);
+    searchController.addListener(_updateSearchResult);
 
     // Create modifier map
     for (final el in modifiers) {
@@ -935,17 +936,11 @@ class CodeController extends TextEditingController {
   }
 
   void _dismissSearch() {
-    if (searchSettingsController.value.isEnabled) {
-      searchSettingsController.value = searchSettingsController.value.copyWith(
-        isEnabled: false,
-      );
-    }
+    searchController.disableSearch();
   }
 
   void enableSearch() {
-    searchSettingsController.value = searchSettingsController.value.copyWith(
-      isEnabled: true,
-    );
+    searchController.enableSearch();
   }
 
   @override

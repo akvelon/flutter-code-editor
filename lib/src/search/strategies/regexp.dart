@@ -12,15 +12,10 @@ class RegExpSearchStrategy extends SearchStrategy {
         multiLine: true,
       );
 
-      final matches = regex.allMatches(text);
-      final searchMatches = matches
-          .map<SearchMatch>(
-            (e) => SearchMatch(
-              start: e.start,
-              end: e.end,
-            ),
-          )
-          .toList(growable: false);
+      final matches = regex
+          .allMatches(text)
+          .map((e) => SearchMatch(start: e.start, end: e.end));
+      final searchMatches = matches.toList(growable: false);
       return SearchResult(matches: searchMatches);
     } on Exception {
       return SearchResult.empty;

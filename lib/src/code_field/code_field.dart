@@ -224,8 +224,8 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
-    widget.controller.searchSettingsController.addListener(
-      _onSearchSettingsChanged,
+    widget.controller.searchController.addListener(
+      _onSearchControllerChange,
     );
     _horizontalCodeScroll = ScrollController();
     _focusNode = widget.focusNode ?? FocusNode();
@@ -252,8 +252,8 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
-    widget.controller.searchSettingsController.removeListener(
-      _onSearchSettingsChanged,
+    widget.controller.searchController.removeListener(
+      _onSearchControllerChange,
     );
     _numberScroll?.dispose();
     _codeScroll?.dispose();
@@ -267,15 +267,15 @@ class _CodeFieldState extends State<CodeField> {
     oldWidget.controller.removeListener(_onTextChanged);
     oldWidget.controller.removeListener(_updatePopupOffset);
     oldWidget.controller.popupController.removeListener(_onPopupStateChanged);
-    oldWidget.controller.searchSettingsController.removeListener(
-      _onSearchSettingsChanged,
+    oldWidget.controller.searchController.removeListener(
+      _onSearchControllerChange,
     );
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
-    widget.controller.searchSettingsController.addListener(
-      _onSearchSettingsChanged,
+    widget.controller.searchController.addListener(
+      _onSearchControllerChange,
     );
   }
 
@@ -540,9 +540,8 @@ class _CodeFieldState extends State<CodeField> {
     _suggestionsPopup!.markNeedsBuild();
   }
 
-  void _onSearchSettingsChanged() {
-    final shouldShow =
-        widget.controller.searchSettingsController.value.isEnabled;
+  void _onSearchControllerChange() {
+    final shouldShow = widget.controller.searchController.isEnabled;
 
     if (!shouldShow) {
       _searchPopup?.remove();

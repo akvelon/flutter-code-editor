@@ -146,9 +146,7 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   void _dismiss() {
-    settingsController.value = settingsController.value.copyWith(
-      isEnabled: false,
-    );
+    searchController.disableSearch();
     parentFocus.requestFocus();
   }
 
