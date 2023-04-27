@@ -12,6 +12,8 @@ import 'strategies/regexp.dart';
 /// and generating search results when requested.
 /// Notifies the listeners only when enabled / disabled.
 class SearchController extends ChangeNotifier {
+  // TODO(yescorp): Move this to a better place.
+  //  https://github.com/akvelon/flutter-code-editor/issues/234
   bool get isEnabled => _isEnabled;
   bool _isEnabled = false;
 
