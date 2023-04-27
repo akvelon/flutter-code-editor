@@ -845,11 +845,12 @@ class CodeController extends TextEditingController {
       style: style,
     );
 
-    final cutSearchResult = _code.hiddenRanges.cutSearchResult(fullSearchResult);
+    final visibleSearchResult =
+        _code.hiddenRanges.cutSearchResult(fullSearchResult);
 
     // TODO(alexeyinkin): Return cached if the value did not change, https://github.com/akvelon/flutter-code-editor/issues/127
     lastTextSpan = SearchResultHighlightedBuilder(
-      searchResult: cutSearchResult,
+      searchResult: visibleSearchResult,
       rootStyle: style,
       textSpan: spanBeforeSearch,
       selectedMatch: searchNavigationController.state.value,
