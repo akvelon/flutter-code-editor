@@ -6,6 +6,19 @@ import 'match.dart';
 import 'result.dart';
 import 'search_navigation_state.dart';
 
+/// Controller that navigates through the [SearchResult].
+///
+/// Listens to the [CodeController] and
+/// gets the actual [SearchResult] from there.
+///
+/// When [SearchResult] changes,
+/// advances the [state] to the nearest match index.
+/// Changes selection of [CodeController] along with [state]
+/// to scroll the CodeField to the currentMatch.
+///
+/// When the text of a [CodeController] is changed with non-empty [SearchResult]
+/// enters the editing mode where it doesn't advance the [state] to currentMatch
+/// nor change the selection of the [CodeController].
 class SearchNavigationController {
   final CodeController codeController;
   final SearchNavigationState state = SearchNavigationState();

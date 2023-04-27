@@ -8,6 +8,9 @@ import 'strategies/plain_case_insensitive.dart';
 import 'strategies/plain_case_sensitive.dart';
 import 'strategies/regexp.dart';
 
+/// Controller that is responsible for enabling the search
+/// and generating search results when requested.
+/// Notifies the listeners only when enabled / disabled.
 class SearchController extends ChangeNotifier {
   bool get isEnabled => _isEnabled;
   bool _isEnabled = false;
