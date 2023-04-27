@@ -939,6 +939,9 @@ class CodeController extends TextEditingController {
   void dispose() {
     _debounce?.cancel();
     historyController.dispose();
+    searchController.dispose();
+    searchSettingsController.dispose();
+    searchNavigationController.dispose();
 
     super.dispose();
   }
