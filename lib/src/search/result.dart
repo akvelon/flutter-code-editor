@@ -13,7 +13,6 @@ class SearchResult extends Equatable {
 
   SearchResult copyWith({
     List<SearchMatch>? matches,
-    int? currentMatchIndex,
   }) {
     return SearchResult(
       matches: matches ?? this.matches,
@@ -21,5 +20,7 @@ class SearchResult extends Equatable {
   }
 
   @override
-  List<Object?> get props => [matches];
+  List<Object?> get props => [
+        matches,
+      ];
 }
