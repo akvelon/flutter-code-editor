@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../search/match.dart';
 import '../search/result.dart';
+import '../search/search_navigation_state.dart';
 
 const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
 const searchTextColor = Colors.black;
@@ -17,8 +18,8 @@ class SearchResultHighlightedBuilder {
     required this.searchResult,
     required this.rootStyle,
     required this.textSpan,
-    required int selectedMatch,
-  }) : highlightedMatchIndex = selectedMatch * 2 + 1 {
+    required SearchNavigationState searchNavigationState,
+  }) : highlightedMatchIndex = searchNavigationState.currentMatchIndex * 2 + 1 {
     if (searchResult.matches.isEmpty) {
       return;
     }

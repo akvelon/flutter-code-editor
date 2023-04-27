@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 
-class SearchNavigationState extends ValueNotifier<int> {
+class SearchNavigationState {
+  final int currentMatchIndex;
+  final int totalMatchesCount;
+
   SearchNavigationState({
-    int value = -1,
-  }) : super(value);
+    this.currentMatchIndex = -1,
+    this.totalMatchesCount = 0,
+  });
+
+  SearchNavigationState copyWith({
+    int? currentMatchIndex,
+    int? totalMatchesCount,
+  }) {
+    return SearchNavigationState(
+      currentMatchIndex: currentMatchIndex ?? this.currentMatchIndex,
+      totalMatchesCount: totalMatchesCount ?? this.totalMatchesCount,
+    );
+  }
 }

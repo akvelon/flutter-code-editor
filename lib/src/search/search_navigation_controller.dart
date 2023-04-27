@@ -12,23 +12,24 @@ import 'search_navigation_state.dart';
 /// gets the actual [SearchResult] from there.
 ///
 /// When [SearchResult] changes,
-/// advances the [state] to the nearest match index.
-/// Changes selection of [CodeController] along with [state]
+/// advances the [value] to the nearest match index.
+/// Changes selection of [CodeController] along with [value]
 /// to scroll the CodeField to the currentMatch.
 ///
 /// When the text of a [CodeController] is changed with non-empty [SearchResult]
-/// enters the editing mode where it doesn't advance the [state] to currentMatch
+/// enters the editing mode where it doesn't advance the [value] to currentMatch
 /// nor change the selection of the [CodeController].
-class SearchNavigationController {
+class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   final CodeController codeController;
-  final SearchNavigationState state = SearchNavigationState();
+
   SearchResult searchResult = SearchResult.empty;
   String lastText = '';
   bool _isEditing = false;
 
   SearchNavigationController({
     required this.codeController,
-  }) {
+    SearchNavigationState? state,
+  }) : super(state ?? SearchNavigationState()) {
     codeController.addListener(_updateState);
     lastText = codeController.code.text;
   }
@@ -39,13 +40,13 @@ class SearchNavigationController {
       return;
     }
 
-    if (state.value == searchResult.matches.length - 1) {
-      state.value = 0;
+    if (value.currentMatchIndex == searchResult.matches.length - 1) {
+      value = value.copyWith(currentMatchIndex: 0);
     } else {
-      state.value = state.value + 1;
+      value = value.copyWith(currentMatchIndex: value.currentMatchIndex + 1);
     }
 
-    moveSelectionToMatch(state.value);
+    moveSelectionToMatch(value.currentMatchIndex);
   }
 
   void movePrevious() {
@@ -54,13 +55,15 @@ class SearchNavigationController {
       return;
     }
 
-    if (state.value == 0) {
-      state.value = searchResult.matches.length - 1;
+    if (value.currentMatchIndex == 0) {
+      value = value.copyWith(
+        currentMatchIndex: searchResult.matches.length - 1,
+      );
     } else {
-      state.value = state.value - 1;
+      value = value.copyWith(currentMatchIndex: value.currentMatchIndex - 1);
     }
 
-    moveSelectionToMatch(state.value);
+    moveSelectionToMatch(value.currentMatchIndex);
   }
 
   void _updateState() {
@@ -70,12 +73,12 @@ class SearchNavigationController {
     }
 
     if (_isEditing) {
-      state.value = -1;
+      value = value.copyWith(currentMatchIndex: -1);
       return;
     }
 
     if (codeController.fullSearchResult.matches.isEmpty) {
-      state.value = -1;
+      value = value.copyWith(currentMatchIndex: -1, totalMatchesCount: 0);
       return;
     }
 
@@ -108,7 +111,10 @@ class SearchNavigationController {
     expandFoldedBlockIfNeeded(match);
 
     codeController.selection = matchToSelection(match);
-    state.value = matchIndex;
+    value = value.copyWith(
+      currentMatchIndex: matchIndex,
+      totalMatchesCount: searchResult.matches.length,
+    );
   }
 
   void expandFoldedBlockIfNeeded(SearchMatch match) {
