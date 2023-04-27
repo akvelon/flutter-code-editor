@@ -861,6 +861,7 @@ class CodeController extends TextEditingController {
       searchResult: cutSearchResult,
       rootStyle: style,
       textSpan: spanBeforeSearch,
+      currentMatch: searchNavigationController.state.value,
     ).build();
 
     return lastTextSpan!;

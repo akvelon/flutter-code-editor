@@ -10,14 +10,18 @@ class SearchNavigationController {
   final CodeController codeController;
   final SearchNavigationState state = SearchNavigationState();
   SearchResult searchResult = SearchResult.empty;
+  String lastText = '';
+  bool _isEditing = false;
 
   SearchNavigationController({
     required this.codeController,
   }) {
     codeController.addListener(_updateState);
+    lastText = codeController.code.text;
   }
 
   void moveNext() {
+    _isEditing = false;
     if (searchResult.matches.isEmpty) {
       return;
     }
@@ -32,6 +36,7 @@ class SearchNavigationController {
   }
 
   void movePrevious() {
+    _isEditing = false;
     if (searchResult.matches.isEmpty) {
       return;
     }
@@ -46,6 +51,16 @@ class SearchNavigationController {
   }
 
   void _updateState() {
+    if (codeController.code.text != lastText) {
+      _isEditing = true;
+      lastText = codeController.code.text;
+    }
+
+    if (_isEditing) {
+      state.value = -1;
+      return;
+    }
+
     if (codeController.searchResult.matches.isEmpty) {
       state.value = -1;
       return;

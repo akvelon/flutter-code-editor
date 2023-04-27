@@ -4,17 +4,20 @@ import '../search/result.dart';
 
 const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
 const searchTextColor = Colors.black;
+const currentMatchBackgroundColor = Colors.yellow;
 
 class SearchResultHighlightedBuilder {
   final SearchResult searchResult;
   final TextStyle? rootStyle;
   final TextSpan textSpan;
+  late final int currentMatch;
 
   SearchResultHighlightedBuilder({
     required this.searchResult,
     required this.rootStyle,
     required this.textSpan,
-  }) {
+    required int currentMatch,
+  }) : currentMatch = currentMatch * 2 + 1 {
     if (searchResult.matches.isEmpty) {
       return;
     }
@@ -53,14 +56,20 @@ class SearchResultHighlightedBuilder {
   /// `TextStyle` of current span that is being processed.
   TextStyle? _currentSpanStyle;
 
+  /// Returns the background color either for regular match,
+  /// or currently highlighted match.
+  Color get searchMatchBackgroundColor => currentMatch == _currentMatchIndex
+      ? currentMatchBackgroundColor
+      : searchBackgroundColor;
+
   /// Overrides `TextStyle` of span to highlight search result.
   TextStyle get searchStyle =>
       _currentSpanStyle?.copyWith(
-        backgroundColor: searchBackgroundColor,
+        backgroundColor: searchMatchBackgroundColor,
         color: searchTextColor,
       ) ??
-      const TextStyle(
-        backgroundColor: searchBackgroundColor,
+      TextStyle(
+        backgroundColor: searchMatchBackgroundColor,
         color: searchTextColor,
       );
 
