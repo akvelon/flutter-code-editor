@@ -10,6 +10,7 @@ class RegExpSearchStrategy extends SearchStrategy {
       final regex = RegExp(
         settings.pattern,
         multiLine: true,
+        caseSensitive: settings.isCaseSensitive,
       );
 
       final matches = regex
