@@ -55,14 +55,8 @@ class SearchSettingsWidget extends StatelessWidget {
                 settingsController.value.isRegExp,
               ],
               children: const [
-                Icon(
-                  Icons.abc,
-                  size: _iconSize,
-                ),
-                Icon(
-                  Icons.r_mobiledata,
-                  size: _iconSize,
-                ),
+                Text('Aa'),
+                Text('.*'),
               ],
             ),
           ],
