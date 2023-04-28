@@ -43,9 +43,11 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return;
     }
 
+    final currentIndex =
+        value.currentMatchIndex ?? _getClosestMatchIndex() ?? 0;
+
     value = value.copyWith(
-      currentMatchIndex:
-          ((value.currentMatchIndex ?? 0) + 1) % value.totalMatchesCount,
+      currentMatchIndex: (currentIndex + 1) % value.totalMatchesCount,
     );
 
     _moveSelectionToMatch(value.currentMatchIndex!);
@@ -57,9 +59,11 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return;
     }
 
+    final currentIndex =
+        value.currentMatchIndex ?? _getClosestMatchIndex() ?? 0;
+
     value = value.copyWith(
-      currentMatchIndex:
-          ((value.currentMatchIndex ?? 0) - 1) % value.totalMatchesCount,
+      currentMatchIndex: (currentIndex - 1) % value.totalMatchesCount,
     );
 
     _moveSelectionToMatch(value.currentMatchIndex!);
@@ -89,6 +93,17 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return;
     }
 
+    final closestMatchIndex = _getClosestMatchIndex();
+    if (closestMatchIndex != null) {
+      _moveSelectionToMatch(closestMatchIndex);
+    }
+  }
+
+  int? _getClosestMatchIndex() {
+    if (_searchResult.matches.isEmpty) {
+      return null;
+    }
+
     final visibleSelectionEnd = codeController.selection.end;
     final fullSelectionEnd = codeController.code.hiddenRanges.recoverPosition(
       visibleSelectionEnd,
@@ -103,7 +118,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       closestMatchIndex = _searchResult.matches.length - 1;
     }
 
-    _moveSelectionToMatch(closestMatchIndex);
+    return closestMatchIndex;
   }
 
   void _moveSelectionToMatch(int matchIndex) {
