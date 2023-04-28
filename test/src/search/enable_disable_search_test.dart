@@ -3,7 +3,6 @@ import 'package:flutter_code_editor/src/search/controller.dart';
 import 'package:flutter_code_editor/src/search/result.dart';
 import 'package:flutter_code_editor/src/search/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
 void main() {
   test('SearchController enalbe/disable', () {

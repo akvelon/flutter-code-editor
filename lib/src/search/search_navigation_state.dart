@@ -1,11 +1,13 @@
 class SearchNavigationState {
-  final int currentMatchIndex;
+  final int? currentMatchIndex;
   final int totalMatchesCount;
 
-  SearchNavigationState({
-    this.currentMatchIndex = -1,
-    this.totalMatchesCount = 0,
+  const SearchNavigationState({
+    this.currentMatchIndex,
+    required this.totalMatchesCount,
   });
+
+  static const noMatches = SearchNavigationState(totalMatchesCount: 0);
 
   SearchNavigationState copyWith({
     int? currentMatchIndex,
@@ -15,5 +17,9 @@ class SearchNavigationState {
       currentMatchIndex: currentMatchIndex ?? this.currentMatchIndex,
       totalMatchesCount: totalMatchesCount ?? this.totalMatchesCount,
     );
+  }
+
+  SearchNavigationState resetCurrentMatchIndex() {
+    return SearchNavigationState(totalMatchesCount: totalMatchesCount);
   }
 }

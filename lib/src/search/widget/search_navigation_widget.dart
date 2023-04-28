@@ -53,7 +53,7 @@ class SearchNavigationWidget extends StatelessWidget {
             ],
           ),
           Text(
-            '${searchNavigationController.value.currentMatchIndex + 1} '
+            '${(searchNavigationController.value.currentMatchIndex ?? -1) + 1} '
             '/ '
             '${searchNavigationController.value.totalMatchesCount}',
           ),

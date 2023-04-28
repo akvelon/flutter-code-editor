@@ -5,8 +5,6 @@ import 'package:flutter_code_editor/src/search/strategies/plain_case_sensitive.d
 import 'package:flutter_code_editor/src/search/strategies/regexp.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../code_field/split_highlight_lines_test.dart';
-
 void main() {
   test('Get search strategy', () {
     const examples = <_Example>[

@@ -19,7 +19,8 @@ class SearchResultHighlightedBuilder {
     required this.rootStyle,
     required this.textSpan,
     required SearchNavigationState searchNavigationState,
-  }) : highlightedMatchIndex = searchNavigationState.currentMatchIndex * 2 + 1 {
+  }) : highlightedMatchIndex =
+            (searchNavigationState.currentMatchIndex ?? -1) * 2 + 1 {
     if (searchResult.matches.isEmpty) {
       return;
     }
