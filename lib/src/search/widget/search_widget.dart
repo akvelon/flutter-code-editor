@@ -62,7 +62,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             ),
             const SizedBox(width: 10),
             Expanded(
-              flex: 2,
+              flex: 3,
               child: SearchNavigationWidget(
                 patternFocusNode: patternFocusNode,
                 codeFieldFocusNode: widget.codeFieldFocusNode,
@@ -101,6 +101,7 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   void dispose() {
+    widget.codeFieldFocusNode.removeListener(_onFocusChange);
     patternFocusNode.dispose();
     timer.cancel();
     super.dispose();
