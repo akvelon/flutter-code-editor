@@ -556,6 +556,7 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   OverlayEntry _buildSearchOverlay() {
+    final borderColor = Theme.of(context).colorScheme.onBackground;
     return OverlayEntry(
       builder: (context) {
         return Positioned(
@@ -563,8 +564,11 @@ class _CodeFieldState extends State<CodeField> {
           right: 10,
           child: Container(
             clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: borderColor,
+              ),
+              borderRadius: const BorderRadius.all(
                 Radius.circular(5),
               ),
             ),
