@@ -19,7 +19,9 @@ class SearchNavigationState {
     );
   }
 
-  SearchNavigationState resetCurrentMatchIndex() {
-    return SearchNavigationState(totalMatchesCount: totalMatchesCount);
+  SearchNavigationState resetCurrentMatchIndex(int? totalMatchesCount) {
+    return SearchNavigationState(
+      totalMatchesCount: totalMatchesCount ?? this.totalMatchesCount,
+    );
   }
 }

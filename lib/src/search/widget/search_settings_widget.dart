@@ -43,6 +43,8 @@ class SearchSettingsWidget extends StatelessWidget {
               onPressed: (index) {
                 // TODO(yescorp): Use keyed_collection_widgets when this lands:
                 //  https://github.com/alexeyinkin/flutter-keyed-collection-widgets/issues/2
+
+                patternFocusNode.requestFocus();
                 switch (index) {
                   case 0:
                     settingsController.toggleCaseSensitivity();

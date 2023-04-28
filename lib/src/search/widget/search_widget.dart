@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -28,11 +30,18 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  late final focusNode = FocusNode(onKeyEvent: _onkey);
+  late final patternFocusNode = FocusNode(onKeyEvent: _onkey);
+  late final Timer timer;
+  var _shouldDismissChangeCounter = 0;
+  var _shouldDismiss = false;
 
   @override
   void initState() {
-    focusNode.requestFocus();
+    patternFocusNode.requestFocus();
+
+    patternFocusNode.addListener(_onFocusChange);
+    widget.codeFieldFocusNode.addListener(_onFocusChange);
+    Timer.periodic(const Duration(milliseconds: 300), _timerCallback);
     super.initState();
   }
 
@@ -47,7 +56,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             Expanded(
               flex: 6,
               child: SearchSettingsWidget(
-                patternFocusNode: focusNode,
+                patternFocusNode: patternFocusNode,
                 settingsController: widget.searchSettingsController,
               ),
             ),
@@ -55,7 +64,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             Expanded(
               flex: 2,
               child: SearchNavigationWidget(
-                patternFocusNode: focusNode,
+                patternFocusNode: patternFocusNode,
                 codeFieldFocusNode: widget.codeFieldFocusNode,
                 searchNavigationController: widget.searchNavigationController,
               ),
@@ -92,7 +101,27 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   void dispose() {
-    focusNode.dispose();
+    patternFocusNode.dispose();
+    timer.cancel();
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    setState(() {
+      _shouldDismiss =
+          !widget.codeFieldFocusNode.hasFocus && !patternFocusNode.hasFocus;
+      _shouldDismissChangeCounter++;
+    });
+  }
+
+  void _timerCallback(Timer timer) {
+    if (_shouldDismissChangeCounter > 0) {
+      _shouldDismissChangeCounter = 0;
+      return;
+    }
+
+    if (_shouldDismiss) {
+      _dismiss();
+    }
   }
 }

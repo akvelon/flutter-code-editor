@@ -12,17 +12,22 @@ class SearchResultHighlightedBuilder {
   final SearchResult searchResult;
   final TextStyle? rootStyle;
   final TextSpan textSpan;
-  late final int highlightedMatchIndex;
+  late final int? highlightedMatchIndex;
 
   SearchResultHighlightedBuilder({
     required this.searchResult,
     required this.rootStyle,
     required this.textSpan,
     required SearchNavigationState searchNavigationState,
-  }) : highlightedMatchIndex =
-            (searchNavigationState.currentMatchIndex ?? -1) * 2 + 1 {
+  }) {
     if (searchResult.matches.isEmpty) {
       return;
+    }
+
+    if (searchNavigationState.currentMatchIndex == null) {
+      highlightedMatchIndex = null;
+    } else {
+      highlightedMatchIndex = searchNavigationState.currentMatchIndex! * 2 + 1;
     }
 
     searchResult.matches.sort(_searchMatchStartAscendingComparator);

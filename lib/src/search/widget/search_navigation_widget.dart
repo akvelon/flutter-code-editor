@@ -27,7 +27,6 @@ class SearchNavigationWidget extends StatelessWidget {
             InkWell(
               hoverColor: Colors.transparent,
               onTap: () {
-                patternFocusNode.unfocus();
                 codeFieldFocusNode.requestFocus();
                 searchNavigationController.movePrevious();
               },
@@ -39,7 +38,6 @@ class SearchNavigationWidget extends StatelessWidget {
             InkWell(
               hoverColor: Colors.transparent,
               onTap: () {
-                patternFocusNode.unfocus();
                 codeFieldFocusNode.requestFocus();
                 searchNavigationController.moveNext();
               },

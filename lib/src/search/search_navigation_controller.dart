@@ -50,7 +50,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       currentMatchIndex: (currentIndex + 1) % value.totalMatchesCount,
     );
 
-    _moveSelectionToMatch(value.currentMatchIndex!);
+    _moveSelectionToCurrentMatch();
   }
 
   void movePrevious() {
@@ -66,37 +66,40 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       currentMatchIndex: (currentIndex - 1) % value.totalMatchesCount,
     );
 
-    _moveSelectionToMatch(value.currentMatchIndex!);
+    _moveSelectionToCurrentMatch();
   }
 
   void _updateState() {
+    _wasEdited = codeController.code.text != _lastText;
+    _lastText = codeController.code.text;
+
     if (codeController.fullSearchResult == _searchResult) {
       return;
     }
 
     _searchResult = codeController.fullSearchResult;
 
-    value = value.copyWith(totalMatchesCount: _searchResult.matches.length);
+    value = _createValue();
+    _moveSelectionToCurrentMatch();
+  }
 
-    if (codeController.code.text != _lastText) {
-      _wasEdited = true;
-      _lastText = codeController.code.text;
-    }
-
+  SearchNavigationState _createValue() {
     if (_wasEdited) {
-      value = value.resetCurrentMatchIndex();
-      return;
+      return value.resetCurrentMatchIndex(
+        codeController.fullSearchResult.matches.length,
+      );
     }
 
     if (_searchResult.matches.isEmpty) {
-      value = SearchNavigationState.noMatches;
-      return;
+      return SearchNavigationState.noMatches;
     }
 
-    final closestMatchIndex = _getClosestMatchIndex();
-    if (closestMatchIndex != null) {
-      _moveSelectionToMatch(closestMatchIndex);
-    }
+    final closestMatch = _getClosestMatchIndex();
+
+    return value.copyWith(
+      currentMatchIndex: closestMatch,
+      totalMatchesCount: _searchResult.matches.length,
+    );
   }
 
   int? _getClosestMatchIndex() {
@@ -121,16 +124,16 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     return closestMatchIndex;
   }
 
-  void _moveSelectionToMatch(int matchIndex) {
-    final match = _searchResult.matches[matchIndex];
+  void _moveSelectionToCurrentMatch() {
+    if (value.currentMatchIndex == null) {
+      return;
+    }
+
+    final match = _searchResult.matches[value.currentMatchIndex!];
 
     _expandFoldedBlockIfNeed(match);
 
     codeController.selection = _matchToSelection(match);
-    value = value.copyWith(
-      currentMatchIndex: matchIndex,
-      totalMatchesCount: _searchResult.matches.length,
-    );
   }
 
   void _expandFoldedBlockIfNeed(SearchMatch match) {
