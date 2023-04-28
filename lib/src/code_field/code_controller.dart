@@ -933,7 +933,6 @@ class CodeController extends TextEditingController {
 
   void enableSearch() {
     searchController.enableSearch();
-    searchController.currentSearchPopupFocusNode?.requestFocus();
   }
 
   @override
