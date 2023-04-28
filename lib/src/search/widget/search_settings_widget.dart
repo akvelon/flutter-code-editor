@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../settings_controller.dart';
 
 const _hintText = 'Search...';
-const _iconSize = 24.0;
 
 class SearchSettingsWidget extends StatelessWidget {
   final FocusNode patternFocusNode;
