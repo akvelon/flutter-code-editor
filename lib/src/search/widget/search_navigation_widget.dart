@@ -20,38 +20,35 @@ class SearchNavigationWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: searchNavigationController,
-      builder: (context, child) => Column(
+      builder: (context, child) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              InkWell(
-                hoverColor: Colors.transparent,
-                onTap: () {
-                  patternFocusNode.unfocus();
-                  codeFieldFocusNode.requestFocus();
-                  searchNavigationController.movePrevious();
-                },
-                child: const Icon(
-                  Icons.arrow_upward,
-                  size: _iconSize,
-                ),
+          if (searchNavigationController.value.totalMatchesCount > 0) ...[
+            InkWell(
+              hoverColor: Colors.transparent,
+              onTap: () {
+                patternFocusNode.unfocus();
+                codeFieldFocusNode.requestFocus();
+                searchNavigationController.movePrevious();
+              },
+              child: const Icon(
+                Icons.arrow_upward,
+                size: _iconSize,
               ),
-              InkWell(
-                hoverColor: Colors.transparent,
-                onTap: () {
-                  patternFocusNode.unfocus();
-                  codeFieldFocusNode.requestFocus();
-                  searchNavigationController.moveNext();
-                },
-                child: const Icon(
-                  Icons.arrow_downward,
-                  size: _iconSize,
-                ),
+            ),
+            InkWell(
+              hoverColor: Colors.transparent,
+              onTap: () {
+                patternFocusNode.unfocus();
+                codeFieldFocusNode.requestFocus();
+                searchNavigationController.moveNext();
+              },
+              child: const Icon(
+                Icons.arrow_downward,
+                size: _iconSize,
               ),
-            ],
-          ),
+            ),
+          ],
           Text(
             '${(searchNavigationController.value.currentMatchIndex ?? -1) + 1} '
             '/ '

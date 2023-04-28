@@ -40,36 +40,38 @@ class _SearchWidgetState extends State<SearchWidget> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50,
-      width: 300,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 6,
-            child: SearchSettingsWidget(
-              patternFocusNode: focusNode,
-              settingsController: widget.searchSettingsController,
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: SearchNavigationWidget(
-              patternFocusNode: focusNode,
-              codeFieldFocusNode: widget.codeFieldFocusNode,
-              searchNavigationController: widget.searchNavigationController,
-            ),
-          ),
-          Expanded(
-            child: InkWell(
-              hoverColor: Colors.transparent,
-              onTap: _dismiss,
-              child: const Icon(
-                Icons.close,
-                size: _iconSize,
+      child: IntrinsicWidth(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 6,
+              child: SearchSettingsWidget(
+                patternFocusNode: focusNode,
+                settingsController: widget.searchSettingsController,
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              flex: 2,
+              child: SearchNavigationWidget(
+                patternFocusNode: focusNode,
+                codeFieldFocusNode: widget.codeFieldFocusNode,
+                searchNavigationController: widget.searchNavigationController,
+              ),
+            ),
+            Expanded(
+              child: InkWell(
+                hoverColor: Colors.transparent,
+                onTap: _dismiss,
+                child: const Icon(
+                  Icons.close,
+                  size: _iconSize,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

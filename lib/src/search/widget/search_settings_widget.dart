@@ -24,15 +24,18 @@ class SearchSettingsWidget extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: _hintText,
-                    isCollapsed: true,
-                    border: InputBorder.none,
+                child: SizedBox(
+                  width: 100,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: _hintText,
+                      isCollapsed: true,
+                      border: InputBorder.none,
+                    ),
+                    focusNode: patternFocusNode,
+                    enabled: true,
+                    controller: settingsController.patternController,
                   ),
-                  focusNode: patternFocusNode,
-                  enabled: true,
-                  controller: settingsController.patternController,
                 ),
               ),
             ),
