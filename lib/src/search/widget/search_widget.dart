@@ -37,6 +37,8 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   void initState() {
+    widget.searchController.currentSearchPopupFocusNode = patternFocusNode;
+
     patternFocusNode.requestFocus();
 
     patternFocusNode.addListener(_onFocusChange);
@@ -108,6 +110,7 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   void dispose() {
+    widget.searchController.currentSearchPopupFocusNode = null;
     widget.codeFieldFocusNode.removeListener(_onFocusChange);
     patternFocusNode.dispose();
     timer.cancel();

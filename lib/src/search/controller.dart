@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../code/code.dart';
 import 'result.dart';
@@ -17,7 +17,11 @@ class SearchController extends ChangeNotifier {
   bool get isEnabled => _isEnabled;
   bool _isEnabled = false;
 
+  FocusNode? currentSearchPopupFocusNode;
+
   void enableSearch() {
+    currentSearchPopupFocusNode?.requestFocus();
+
     if (isEnabled == true) {
       return;
     }
