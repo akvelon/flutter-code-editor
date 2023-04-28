@@ -3,6 +3,9 @@ import 'package:flutter_code_editor/src/search/controller.dart';
 import 'package:flutter_code_editor/src/search/match.dart';
 import 'package:flutter_code_editor/src/search/result.dart';
 import 'package:flutter_code_editor/src/search/settings.dart';
+import 'package:flutter_code_editor/src/search/strategies/plain_case_insensitive.dart';
+import 'package:flutter_code_editor/src/search/strategies/plain_case_sensitive.dart';
+import 'package:flutter_code_editor/src/search/strategies/regexp.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -24,56 +27,8 @@ void main() {
           ],
         ),
       ),
-
-      _Example(
-        'Case Insensitive Search',
-        settings: const SearchSettings(
-          isCaseSensitive: false,
-          isRegExp: false,
-          pattern: 'A',
-        ),
-        code: Code(text: 'AaAa'),
-        expected: const SearchResult(
-          matches: [
-            SearchMatch(start: 0, end: 1),
-            SearchMatch(start: 1, end: 2),
-            SearchMatch(start: 2, end: 3),
-            SearchMatch(start: 3, end: 4),
-          ],
-        ),
-      ),
-
-      _Example(
-        'RegExp Case sensitive Search',
-        settings: const SearchSettings(
-          isCaseSensitive: true,
-          isRegExp: true,
-          pattern: 'A+',
-        ),
-        code: Code(text: 'AAaAa'),
-        expected: const SearchResult(
-          matches: [
-            SearchMatch(start: 0, end: 2),
-            SearchMatch(start: 3, end: 4),
-          ],
-        ),
-      ),
-
-      _Example(
-        'RegExp Case Insensitive Search',
-        settings: const SearchSettings(
-          isCaseSensitive: false,
-          isRegExp: true,
-          pattern: 'A+',
-        ),
-        code: Code(text: 'AAaAa'),
-        expected: const SearchResult(
-          matches: [
-            SearchMatch(start: 0, end: 5),
-          ],
-        ),
-      ),
     ];
+
     for (final example in examples) {
       final searchController = SearchController();
       searchController.enableSearch();
@@ -90,6 +45,94 @@ void main() {
 
       searchController.dispose();
     }
+  });
+
+  test('PlainCaseInsensitiveSearchStrategy', () {
+    const text = 'Aa';
+    const pattern = 'a';
+    const expectedResult = SearchResult(
+      matches: [
+        SearchMatch(start: 0, end: 1),
+        SearchMatch(start: 1, end: 2),
+      ],
+    );
+
+    final result = PlainCaseInsensitiveSearchStrategy().searchPlain(
+      text,
+      settings: const SearchSettings(
+        isCaseSensitive: false,
+        isRegExp: false,
+        pattern: pattern,
+      ),
+    );
+
+    expect(result, expectedResult);
+  });
+
+  test('PlainCaseSensitiveSearchStrategy', () {
+    const text = 'Aa';
+    const pattern = 'a';
+    const expectedResult = SearchResult(
+      matches: [
+        SearchMatch(start: 1, end: 2),
+      ],
+    );
+
+    final result = PlainCaseSensitiveSearchStrategy().searchPlain(
+      text,
+      settings: const SearchSettings(
+        isCaseSensitive: true,
+        isRegExp: false,
+        pattern: pattern,
+      ),
+    );
+
+    expect(result, expectedResult);
+  });
+
+  group('RegExpSearchStrategy', () {
+    test('Case sensitive', () {
+      const text = 'AaAa';
+      const pattern = 'A+';
+      const expectedResult = SearchResult(
+        matches: [
+          SearchMatch(start: 0, end: 1),
+          SearchMatch(start: 2, end: 3),
+        ],
+      );
+
+      final result = RegExpSearchStrategy().searchPlain(
+        text,
+        settings: const SearchSettings(
+          isCaseSensitive: true,
+          isRegExp: true,
+          pattern: pattern,
+        ),
+      );
+
+      expect(result, expectedResult);
+    });
+
+    test('Case insensitive', () {
+      const text = 'AaAa';
+      const pattern = 'A+';
+      const expectedResult = SearchResult(
+        matches: [
+          SearchMatch(start: 0, end: 4),
+        ],
+      );
+
+      final result = RegExpSearchStrategy().searchPlain(
+        text,
+        settings: const SearchSettings(
+          isCaseSensitive: false,
+          isRegExp: true,
+          pattern: pattern,
+        ),
+      );
+
+      expect(result, expectedResult);
+    });
   });
 }
 

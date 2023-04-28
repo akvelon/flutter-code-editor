@@ -22,7 +22,6 @@ void main() {
 
       _Example(
         'PlainCaseInsensitiveSearchStrategy',
-        // ignore: use_named_constants
         settings: SearchSettings(
           isCaseSensitive: true,
           isRegExp: false,
@@ -33,7 +32,6 @@ void main() {
 
       _Example(
         'PlainCaseInsensitiveSearchStrategy',
-        // ignore: use_named_constants
         settings: SearchSettings(
           isCaseSensitive: false,
           isRegExp: true,
