@@ -41,7 +41,7 @@ class _SearchWidgetState extends State<SearchWidget> {
 
     patternFocusNode.addListener(_onFocusChange);
     widget.codeFieldFocusNode.addListener(_onFocusChange);
-    Timer.periodic(const Duration(milliseconds: 300), _timerCallback);
+    timer = Timer.periodic(const Duration(milliseconds: 300), _timerCallback);
     super.initState();
   }
 
@@ -56,6 +56,7 @@ class _SearchWidgetState extends State<SearchWidget> {
             Expanded(
               flex: 6,
               child: SearchSettingsWidget(
+                onSubmitted: _onSubmitted,
                 patternFocusNode: patternFocusNode,
                 settingsController: widget.searchSettingsController,
               ),
@@ -97,6 +98,12 @@ class _SearchWidgetState extends State<SearchWidget> {
     }
 
     return KeyEventResult.ignored;
+  }
+
+  void _onSubmitted(String str) {
+    widget.codeFieldFocusNode.requestFocus();
+    widget.searchNavigationController.moveNext();
+    patternFocusNode.requestFocus();
   }
 
   @override

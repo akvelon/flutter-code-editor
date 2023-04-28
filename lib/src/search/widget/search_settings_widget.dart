@@ -7,11 +7,13 @@ const _hintText = 'Search...';
 class SearchSettingsWidget extends StatelessWidget {
   final FocusNode patternFocusNode;
   final SearchSettingsController settingsController;
+  final void Function(String)? onSubmitted;
 
   const SearchSettingsWidget({
     super.key,
     required this.patternFocusNode,
     required this.settingsController,
+    this.onSubmitted,
   });
 
   @override
@@ -27,6 +29,7 @@ class SearchSettingsWidget extends StatelessWidget {
                 child: SizedBox(
                   width: 100,
                   child: TextField(
+                    onSubmitted: onSubmitted,
                     decoration: const InputDecoration(
                       hintText: _hintText,
                       isCollapsed: true,

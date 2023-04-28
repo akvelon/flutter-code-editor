@@ -556,7 +556,8 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   OverlayEntry _buildSearchOverlay() {
-    final borderColor = Theme.of(context).colorScheme.onBackground;
+    final colorScheme = Theme.of(context).colorScheme;
+    final borderColor = _getTextColorFromTheme() ?? colorScheme.onBackground;
     return OverlayEntry(
       builder: (context) {
         return Positioned(
@@ -586,6 +587,26 @@ class _CodeFieldState extends State<CodeField> {
         );
       },
     );
+  }
+
+  Color? _getTextColorFromTheme() {
+    final textTheme = Theme.of(context).textTheme;
+
+    return textTheme.bodyLarge?.color ??
+        textTheme.bodyMedium?.color ??
+        textTheme.bodySmall?.color ??
+        textTheme.displayLarge?.color ??
+        textTheme.displayMedium?.color ??
+        textTheme.displaySmall?.color ??
+        textTheme.headlineLarge?.color ??
+        textTheme.headlineMedium?.color ??
+        textTheme.headlineSmall?.color ??
+        textTheme.labelLarge?.color ??
+        textTheme.labelMedium?.color ??
+        textTheme.labelSmall?.color ??
+        textTheme.titleLarge?.color ??
+        textTheme.titleMedium?.color ??
+        textTheme.titleSmall?.color;
   }
 
   OverlayEntry _buildSuggestionOverlay() {
