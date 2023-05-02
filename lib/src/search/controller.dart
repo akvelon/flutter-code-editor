@@ -27,12 +27,13 @@ class SearchController extends ChangeNotifier {
   late final SearchSettingsController settingsController;
   late final SearchNavigationController navigationController;
 
+  FocusNode? get codeFieldFocusNode => _codeFieldFocusNode;
   FocusNode? _codeFieldFocusNode;
-  // ignore: avoid_setters_without_getters
-  set codeFieldFocusNode(FocusNode newValue) {
+  set codeFieldFocusNode(FocusNode? newValue) {
     _codeFieldFocusNode?.removeListener(_onFocusChange);
     _codeFieldFocusNode = newValue;
     _codeFieldFocusNode?.addListener(_onFocusChange);
+    navigationController.codeFieldFocusNode = newValue;
   }
 
   late FocusNode patternFocusNode = FocusNode(onKeyEvent: _onkey);
@@ -55,14 +56,14 @@ class SearchController extends ChangeNotifier {
 
   void enableSearch() {
     patternFocusNode.requestFocus();
-    _dismissTimer = Timer.periodic(
-      const Duration(milliseconds: 300),
-      _dismissTimerCallback,
-    );
-
     if (isEnabled == true) {
       return;
     }
+
+    _dismissTimer = Timer.periodic(
+      const Duration(milliseconds: 1000),
+      _dismissTimerCallback,
+    );
 
     _isEnabled = true;
     notifyListeners();
@@ -123,7 +124,7 @@ class SearchController extends ChangeNotifier {
   KeyEventResult _onkey(FocusNode node, KeyEvent event) {
     if ((event is KeyDownEvent || event is KeyRepeatEvent) &&
         event.logicalKey == LogicalKeyboardKey.enter) {
-      unawaited(onEnterKeyPressed());
+      unawaited(_onEnterKeyPressed());
       return KeyEventResult.handled;
     }
 
@@ -135,8 +136,7 @@ class SearchController extends ChangeNotifier {
     return KeyEventResult.ignored;
   }
 
-  Future<void> onEnterKeyPressed() async {
-    // The navigation is handled in CodeController
+  Future<void> _onEnterKeyPressed() async {
     _codeFieldFocusNode?.requestFocus();
     navigationController.moveNext();
     await Future.delayed(const Duration(milliseconds: 1));

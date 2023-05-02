@@ -237,7 +237,7 @@ class _CodeFieldState extends State<CodeField> {
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
 
-    widget.controller.searchController.codeFieldFocusNode = _focusNode!;
+    widget.controller.searchController.codeFieldFocusNode = _focusNode;
 
     // Workaround for disabling spellchecks in FireFox
     // https://github.com/akvelon/flutter-code-editor/issues/197
@@ -279,7 +279,7 @@ class _CodeFieldState extends State<CodeField> {
       _onSearchControllerChange,
     );
 
-    widget.controller.searchController.codeFieldFocusNode = _focusNode!;
+    widget.controller.searchController.codeFieldFocusNode = _focusNode;
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
@@ -584,12 +584,7 @@ class _CodeFieldState extends State<CodeField> {
             ),
             child: Material(
               child: SearchWidget(
-                codeFieldFocusNode: _focusNode!,
                 searchController: widget.controller.searchController,
-                searchNavigationController:
-                    widget.controller.searchController.navigationController,
-                searchSettingsController:
-                    widget.controller.searchController.settingsController,
               ),
             ),
           ),

@@ -5,14 +5,12 @@ import '../search_navigation_controller.dart';
 const _iconSize = 20.0;
 
 class SearchNavigationWidget extends StatelessWidget {
-  final FocusNode patternFocusNode;
-  final FocusNode codeFieldFocusNode;
+  final FocusNode? codeFieldFocusNode;
   final SearchNavigationController searchNavigationController;
 
   const SearchNavigationWidget({
     super.key,
-    required this.patternFocusNode,
-    required this.codeFieldFocusNode,
+    this.codeFieldFocusNode,
     required this.searchNavigationController,
   });
 
@@ -30,10 +28,7 @@ class SearchNavigationWidget extends StatelessWidget {
             if (searchNavigationController.value.totalMatchesCount > 0) ...[
               InkWell(
                 hoverColor: Colors.transparent,
-                onTap: () {
-                  codeFieldFocusNode.requestFocus();
-                  searchNavigationController.movePrevious();
-                },
+                onTap: searchNavigationController.movePrevious,
                 child: const Icon(
                   Icons.arrow_upward,
                   size: _iconSize,
@@ -41,10 +36,7 @@ class SearchNavigationWidget extends StatelessWidget {
               ),
               InkWell(
                 hoverColor: Colors.transparent,
-                onTap: () {
-                  codeFieldFocusNode.requestFocus();
-                  searchNavigationController.moveNext();
-                },
+                onTap: searchNavigationController.moveNext,
                 child: const Icon(
                   Icons.arrow_downward,
                   size: _iconSize,

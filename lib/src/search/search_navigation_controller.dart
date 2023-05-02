@@ -29,6 +29,8 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   String _lastText = '';
   bool _wasEdited = false;
 
+  FocusNode? codeFieldFocusNode;
+
   SearchNavigationController({
     required this.codeController,
     SearchNavigationState? state,
@@ -38,6 +40,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   }
 
   void moveNext() {
+    codeFieldFocusNode?.requestFocus();
     _wasEdited = false;
     if (_searchResult.matches.isEmpty) {
       return;
@@ -54,6 +57,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   }
 
   void movePrevious() {
+    codeFieldFocusNode?.requestFocus();
     _wasEdited = false;
     if (_searchResult.matches.isEmpty) {
       return;
