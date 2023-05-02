@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../code/code.dart';
+import 'match.dart';
 import 'result.dart';
 import 'settings.dart';
 import 'strategies/abstract.dart';
@@ -41,6 +42,10 @@ class SearchController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Performs the search on the full text of a code.
+  ///
+  /// The returned result does not contain collapsed matches and is sorted
+  /// by the start position of the match.
   SearchResult search(Code code, {required SearchSettings settings}) {
     if (!_isEnabled) {
       return SearchResult.empty;
@@ -52,7 +57,10 @@ class SearchController extends ChangeNotifier {
 
     final strategy = getSearchStrategy(settings);
 
-    return strategy.searchPlain(code.text, settings: settings);
+    final result = strategy.searchPlain(code.text, settings: settings);
+    result.matches.sort(_searchMatchStartAscendingComparator);
+
+    return result;
   }
 
   @visibleForTesting
@@ -67,4 +75,11 @@ class SearchController extends ChangeNotifier {
 
     return PlainCaseInsensitiveSearchStrategy();
   }
+}
+
+int _searchMatchStartAscendingComparator(
+  SearchMatch first,
+  SearchMatch second,
+) {
+  return first.start - second.start;
 }

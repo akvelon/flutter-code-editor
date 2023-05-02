@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../search/match.dart';
 import '../search/result.dart';
 import '../search/search_navigation_state.dart';
 
@@ -29,8 +28,6 @@ class SearchResultHighlightedBuilder {
     } else {
       highlightedMatchIndex = searchNavigationState.currentMatchIndex! * 2 + 1;
     }
-
-    searchResult.matches.sort(_searchMatchStartAscendingComparator);
 
     matchIndexes = searchResult.matches
         .expand<int>((e) => [e.start, e.end])
@@ -158,11 +155,4 @@ class SearchResultHighlightedBuilder {
       _currentWindowStart += text.length;
     }
   }
-}
-
-int _searchMatchStartAscendingComparator(
-  SearchMatch first,
-  SearchMatch second,
-) {
-  return first.start - second.start;
 }
