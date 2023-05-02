@@ -7,13 +7,11 @@ const _hintText = 'Search...';
 class SearchSettingsWidget extends StatelessWidget {
   final FocusNode patternFocusNode;
   final SearchSettingsController settingsController;
-  final void Function(String)? onSubmitted;
 
   const SearchSettingsWidget({
     super.key,
     required this.patternFocusNode,
     required this.settingsController,
-    this.onSubmitted,
   });
 
   @override
@@ -30,7 +28,6 @@ class SearchSettingsWidget extends StatelessWidget {
                   width: 100,
                   child: TextField(
                     maxLines: null,
-                    onSubmitted: onSubmitted,
                     decoration: const InputDecoration(
                       hintText: _hintText,
                       isCollapsed: true,
@@ -47,7 +44,6 @@ class SearchSettingsWidget extends StatelessWidget {
               onPressed: (index) {
                 // TODO(yescorp): Use keyed_collection_widgets when this lands:
                 //  https://github.com/alexeyinkin/flutter-keyed-collection-widgets/issues/2
-
                 patternFocusNode.requestFocus();
                 switch (index) {
                   case 0:
