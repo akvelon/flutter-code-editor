@@ -1,3 +1,4 @@
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_code_editor/src/code/code.dart';
 import 'package:flutter_code_editor/src/search/controller.dart';
 import 'package:flutter_code_editor/src/search/result.dart';
@@ -29,6 +30,18 @@ void main() {
       );
 
       expect(result, SearchResult.empty);
+    });
+  });
+
+  group('CodeController', () {
+    test('enable/disable', () {
+      final controller = CodeController();
+
+      controller.enableSearch();
+      expect(controller.searchController.isEnabled, true);
+
+      controller.dismiss();
+      expect(controller.searchController.isEnabled, false);
     });
   });
 }
