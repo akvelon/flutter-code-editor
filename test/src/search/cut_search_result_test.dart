@@ -3,7 +3,6 @@ import 'package:flutter_code_editor/src/hidden_ranges/hidden_ranges.dart';
 import 'package:flutter_code_editor/src/search/match.dart';
 import 'package:flutter_code_editor/src/search/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meta/meta.dart';
 
 void main() {
   test('cutSearchResult', () {
