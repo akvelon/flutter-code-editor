@@ -1,5 +1,4 @@
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_code_editor/src/search/controller.dart';
 import 'package:flutter_code_editor/src/search/match.dart';
 import 'package:flutter_code_editor/src/search/result.dart';
 import 'package:flutter_code_editor/src/search/settings.dart';
@@ -30,9 +29,9 @@ void main() {
     ];
 
     for (final example in examples) {
-      final searchController = SearchController();
-      searchController.enableSearch();
-      final result = searchController.search(
+      final codeController = CodeController();
+      codeController.searchController.enableSearch();
+      final result = codeController.searchController.search(
         example.code,
         settings: example.settings,
       );
@@ -42,8 +41,6 @@ void main() {
         example.expected,
         reason: example.name,
       );
-
-      searchController.dispose();
     }
   });
 

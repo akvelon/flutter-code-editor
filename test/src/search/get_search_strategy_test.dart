@@ -1,4 +1,4 @@
-import 'package:flutter_code_editor/src/search/controller.dart';
+import 'package:flutter_code_editor/src/code_field/code_controller.dart';
 import 'package:flutter_code_editor/src/search/settings.dart';
 import 'package:flutter_code_editor/src/search/strategies/plain_case_insensitive.dart';
 import 'package:flutter_code_editor/src/search/strategies/plain_case_sensitive.dart';
@@ -42,8 +42,11 @@ void main() {
     ];
 
     for (final example in examples) {
-      final searchController = SearchController();
-      final result = searchController.getSearchStrategy(example.settings);
+      final codeController = CodeController();
+
+      final result = codeController.searchController.getSearchStrategy(
+        example.settings,
+      );
 
       expect(
         result.runtimeType,

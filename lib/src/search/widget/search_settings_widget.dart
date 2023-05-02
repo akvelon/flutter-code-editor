@@ -29,6 +29,7 @@ class SearchSettingsWidget extends StatelessWidget {
                 child: SizedBox(
                   width: 100,
                   child: TextField(
+                    maxLines: null,
                     onSubmitted: onSubmitted,
                     decoration: const InputDecoration(
                       hintText: _hintText,

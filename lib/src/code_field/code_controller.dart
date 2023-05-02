@@ -101,15 +101,12 @@ class CodeController extends TextEditingController {
   late final historyController = CodeHistoryController(codeController: this);
 
   @internal
-  final searchSettingsController = SearchSettingsController();
+  late final searchController = SearchController(codeController: this);
 
-  @internal
-  final searchController = SearchController();
-
-  @internal
-  late final searchNavigationController = SearchNavigationController(
-    codeController: this,
-  );
+  SearchSettingsController get _searchSettingsController =>
+      searchController.settingsController;
+  SearchNavigationController get _searchNavigationController =>
+      searchController.navigationController;
 
   @internal
   SearchResult fullSearchResult = SearchResult.empty;
@@ -162,7 +159,7 @@ class CodeController extends TextEditingController {
 
     addListener(_scheduleAnalysis);
     addListener(_updateSearchResult);
-    searchSettingsController.addListener(_updateSearchResult);
+    _searchSettingsController.addListener(_updateSearchResult);
     searchController.addListener(_updateSearchResult);
 
     // Create modifier map
@@ -190,7 +187,7 @@ class CodeController extends TextEditingController {
   void _updateSearchResult() {
     final result = searchController.search(
       code,
-      settings: searchSettingsController.value,
+      settings: _searchSettingsController.value,
     );
 
     if (result == fullSearchResult) {
@@ -332,8 +329,8 @@ class CodeController extends TextEditingController {
     }
 
     if (searchController.isEnabled &&
-        searchNavigationController.value.currentMatchIndex != null) {
-      searchNavigationController.moveNext();
+        _searchNavigationController.value.currentMatchIndex != null) {
+      _searchNavigationController.moveNext();
       return;
     }
 
@@ -865,7 +862,7 @@ class CodeController extends TextEditingController {
       searchResult: visibleSearchResult,
       rootStyle: style,
       textSpan: spanBeforeSearch,
-      searchNavigationState: searchNavigationController.value,
+      searchNavigationState: _searchNavigationController.value,
     ).build();
 
     return lastTextSpan!;
@@ -941,7 +938,7 @@ class CodeController extends TextEditingController {
   }
 
   void _dismissSearch() {
-    searchController.disableSearch();
+    searchController.disableSearch(returnFocusToCodeField: true);
   }
 
   void enableSearch() {
@@ -953,8 +950,6 @@ class CodeController extends TextEditingController {
     _debounce?.cancel();
     historyController.dispose();
     searchController.dispose();
-    searchSettingsController.dispose();
-    searchNavigationController.dispose();
 
     super.dispose();
   }

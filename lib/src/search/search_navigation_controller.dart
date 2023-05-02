@@ -172,4 +172,10 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    codeController.removeListener(_updateState);
+    super.dispose();
+  }
 }

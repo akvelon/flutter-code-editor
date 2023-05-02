@@ -48,7 +48,8 @@ void main() {
         controller.enableSearch();
 
         for (final example in examples) {
-          controller.searchSettingsController.value = example.settings;
+          controller.searchController.settingsController.value =
+              example.settings;
 
           expect(
             controller.fullSearchResult,

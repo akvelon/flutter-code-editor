@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../code/code.dart';
+import '../code_field/code_controller.dart';
 import 'match.dart';
 import 'result.dart';
+import 'search_navigation_controller.dart';
 import 'settings.dart';
+import 'settings_controller.dart';
 import 'strategies/abstract.dart';
 import 'strategies/plain_case_insensitive.dart';
 import 'strategies/plain_case_sensitive.dart';
@@ -18,10 +24,41 @@ class SearchController extends ChangeNotifier {
   bool get isEnabled => _isEnabled;
   bool _isEnabled = false;
 
-  FocusNode? currentSearchPopupFocusNode;
+  late final SearchSettingsController settingsController;
+  late final SearchNavigationController navigationController;
+
+  FocusNode? _codeFieldFocusNode;
+  // ignore: avoid_setters_without_getters
+  set codeFieldFocusNode(FocusNode newValue) {
+    _codeFieldFocusNode?.removeListener(_onFocusChange);
+    _codeFieldFocusNode = newValue;
+    _codeFieldFocusNode?.addListener(_onFocusChange);
+  }
+
+  late FocusNode patternFocusNode = FocusNode(onKeyEvent: _onkey);
+
+  int focusChangesWithinTimeFrame = 0;
+  bool shouldDismiss = false;
+
+  Timer? _dismissTimer;
+
+  SearchController({
+    required CodeController codeController,
+  }) {
+    settingsController = SearchSettingsController();
+    navigationController = SearchNavigationController(
+      codeController: codeController,
+    );
+
+    patternFocusNode.addListener(_onFocusChange);
+  }
 
   void enableSearch() {
-    currentSearchPopupFocusNode?.requestFocus();
+    patternFocusNode.requestFocus();
+    _dismissTimer = Timer.periodic(
+      const Duration(milliseconds: 300),
+      _dismissTimerCallback,
+    );
 
     if (isEnabled == true) {
       return;
@@ -31,8 +68,15 @@ class SearchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void disableSearch() {
-    currentSearchPopupFocusNode = null;
+  void disableSearch({
+    required bool returnFocusToCodeField,
+  }) {
+    patternFocusNode.unfocus();
+    _dismissTimer?.cancel();
+
+    if (returnFocusToCodeField == true) {
+      _codeFieldFocusNode?.requestFocus();
+    }
 
     if (isEnabled == false) {
       return;
@@ -74,6 +118,56 @@ class SearchController extends ChangeNotifier {
     }
 
     return PlainCaseInsensitiveSearchStrategy();
+  }
+
+  KeyEventResult _onkey(FocusNode node, KeyEvent event) {
+    if ((event is KeyDownEvent || event is KeyRepeatEvent) &&
+        event.logicalKey == LogicalKeyboardKey.enter) {
+      unawaited(onEnterKeyPressed());
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      disableSearch(returnFocusToCodeField: true);
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  Future<void> onEnterKeyPressed() async {
+    // The navigation is handled in CodeController
+    _codeFieldFocusNode?.requestFocus();
+    navigationController.moveNext();
+    await Future.delayed(const Duration(milliseconds: 1));
+    patternFocusNode.requestFocus();
+  }
+
+  void _onFocusChange() {
+    focusChangesWithinTimeFrame++;
+
+    shouldDismiss = patternFocusNode.hasFocus == false &&
+        _codeFieldFocusNode?.hasFocus == false;
+  }
+
+  void _dismissTimerCallback(Timer timer) {
+    if (focusChangesWithinTimeFrame > 0) {
+      focusChangesWithinTimeFrame = 0;
+      return;
+    }
+
+    if (shouldDismiss) {
+      disableSearch(returnFocusToCodeField: false);
+    }
+  }
+
+  @override
+  void dispose() {
+    navigationController.dispose();
+    patternFocusNode.dispose();
+    settingsController.dispose();
+    _dismissTimer?.cancel();
+    super.dispose();
   }
 }
 
