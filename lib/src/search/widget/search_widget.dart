@@ -102,9 +102,10 @@ class _SearchWidgetState extends State<SearchWidget> {
     return KeyEventResult.ignored;
   }
 
-  void _onSubmitted(String str) {
+  Future<void> _onSubmitted(String str) async {
+    // The navigation is handled in CodeController
     widget.codeFieldFocusNode.requestFocus();
-    widget.searchNavigationController.moveNext();
+    await Future.delayed(const Duration(milliseconds: 1));
     patternFocusNode.requestFocus();
   }
 

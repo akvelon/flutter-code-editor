@@ -26,6 +26,7 @@ import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/redo.dart';
 import 'actions/search.dart';
+import 'actions/submit.dart';
 import 'actions/undo.dart';
 import 'search_result_highlighted_builder.dart';
 import 'span_builder.dart';
@@ -129,6 +130,7 @@ class CodeController extends TextEditingController {
     UndoTextIntent: UndoAction(controller: this),
     SearchIntent: SearchAction(controller: this),
     DismissIntent: CustomDismissAction(controller: this),
+    SubmitIntent: SubmitAction(controller: this),
   };
 
   CodeController({
@@ -318,13 +320,24 @@ class CodeController extends TextEditingController {
         popupController.scrollByArrow(ScrollDirection.down);
         return KeyEventResult.handled;
       }
-      if (event.logicalKey == LogicalKeyboardKey.enter) {
-        insertSelectedWord();
-        return KeyEventResult.handled;
-      }
     }
 
     return KeyEventResult.ignored; // The framework will handle.
+  }
+
+  void submit() {
+    if (popupController.shouldShow) {
+      insertSelectedWord();
+      return;
+    }
+
+    if (searchController.isEnabled &&
+        searchNavigationController.value.currentMatchIndex != null) {
+      searchNavigationController.moveNext();
+      return;
+    }
+
+    insertStr('\n');
   }
 
   /// Inserts the word selected from the list of completions

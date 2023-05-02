@@ -74,6 +74,13 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     _lastText = codeController.code.text;
 
     if (codeController.fullSearchResult == _searchResult) {
+      if (codeController.selection.isCollapsed &&
+          value.currentMatchIndex != null) {
+        value = value.resetCurrentMatchIndex(
+          codeController.fullSearchResult.matches.length,
+        );
+      }
+
       return;
     }
 

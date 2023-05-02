@@ -31,6 +31,8 @@ class SearchController extends ChangeNotifier {
   }
 
   void disableSearch() {
+    currentSearchPopupFocusNode = null;
+
     if (isEnabled == false) {
       return;
     }
