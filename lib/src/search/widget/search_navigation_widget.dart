@@ -5,12 +5,10 @@ import '../search_navigation_controller.dart';
 const _iconSize = 20.0;
 
 class SearchNavigationWidget extends StatelessWidget {
-  final FocusNode? codeFieldFocusNode;
   final SearchNavigationController searchNavigationController;
 
   const SearchNavigationWidget({
     super.key,
-    this.codeFieldFocusNode,
     required this.searchNavigationController,
   });
 

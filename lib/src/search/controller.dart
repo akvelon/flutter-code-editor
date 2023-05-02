@@ -36,10 +36,10 @@ class SearchController extends ChangeNotifier {
     navigationController.codeFieldFocusNode = newValue;
   }
 
-  late FocusNode patternFocusNode = FocusNode(onKeyEvent: _onkey);
+  late final FocusNode patternFocusNode = FocusNode(onKeyEvent: _onkey);
 
-  int focusChangesWithinTimeFrame = 0;
-  bool shouldDismiss = false;
+  int _focusChangesWithinTimeFrame = 0;
+  bool _shouldDismiss = false;
 
   Timer? _dismissTimer;
 
@@ -144,19 +144,19 @@ class SearchController extends ChangeNotifier {
   }
 
   void _onFocusChange() {
-    focusChangesWithinTimeFrame++;
+    _focusChangesWithinTimeFrame++;
 
-    shouldDismiss = patternFocusNode.hasFocus == false &&
+    _shouldDismiss = patternFocusNode.hasFocus == false &&
         _codeFieldFocusNode?.hasFocus == false;
   }
 
   void _dismissTimerCallback(Timer timer) {
-    if (focusChangesWithinTimeFrame > 0) {
-      focusChangesWithinTimeFrame = 0;
+    if (_focusChangesWithinTimeFrame > 0) {
+      _focusChangesWithinTimeFrame = 0;
       return;
     }
 
-    if (shouldDismiss) {
+    if (_shouldDismiss) {
       disableSearch(returnFocusToCodeField: false);
     }
   }

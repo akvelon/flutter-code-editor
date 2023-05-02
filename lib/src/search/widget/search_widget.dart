@@ -23,7 +23,7 @@ class SearchWidget extends StatelessWidget {
         hoverColor: Colors.transparent,
         splashColor: Colors.transparent,
         focusColor: Colors.transparent,
-        onTap: () => searchController.patternFocusNode.requestFocus(),
+        onTap: searchController.patternFocusNode.requestFocus,
         child: SizedBox(
           height: 50,
           child: IntrinsicWidth(
@@ -41,7 +41,6 @@ class SearchWidget extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: SearchNavigationWidget(
-                    codeFieldFocusNode: searchController.codeFieldFocusNode,
                     searchNavigationController:
                         searchController.navigationController,
                   ),
