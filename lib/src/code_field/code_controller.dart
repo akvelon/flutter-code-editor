@@ -22,11 +22,11 @@ import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/copy.dart';
 import 'actions/dismiss.dart';
+import 'actions/enter_key.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/redo.dart';
 import 'actions/search.dart';
-import 'actions/submit.dart';
 import 'actions/undo.dart';
 import 'search_result_highlighted_builder.dart';
 import 'span_builder.dart';
@@ -130,7 +130,7 @@ class CodeController extends TextEditingController {
     UndoTextIntent: UndoAction(controller: this),
     SearchIntent: SearchAction(controller: this),
     DismissIntent: CustomDismissAction(controller: this),
-    SubmitIntent: SubmitAction(controller: this),
+    EnterKeyIntent: EnterKeyAction(controller: this),
   };
 
   CodeController({
@@ -325,7 +325,7 @@ class CodeController extends TextEditingController {
     return KeyEventResult.ignored; // The framework will handle.
   }
 
-  void submit() {
+  void onEnterKeyAction() {
     if (popupController.shouldShow) {
       insertSelectedWord();
       return;
