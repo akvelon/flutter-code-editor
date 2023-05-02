@@ -44,7 +44,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     }
 
     final currentIndex =
-        value.currentMatchIndex ?? _getClosestMatchIndex() ?? 0;
+        value.currentMatchIndex ?? _getNextOrFirstMatchIndex() ?? 0;
 
     value = value.copyWith(
       currentMatchIndex: (currentIndex + 1) % value.totalMatchesCount,
@@ -60,7 +60,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     }
 
     final currentIndex =
-        value.currentMatchIndex ?? _getClosestMatchIndex() ?? 0;
+        value.currentMatchIndex ?? _getNextOrFirstMatchIndex() ?? 0;
 
     value = value.copyWith(
       currentMatchIndex: (currentIndex - 1) % value.totalMatchesCount,
@@ -101,7 +101,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return SearchNavigationState.noMatches;
     }
 
-    final closestMatch = _getClosestMatchIndex();
+    final closestMatch = _getNextOrFirstMatchIndex();
 
     return value.copyWith(
       currentMatchIndex: closestMatch,
@@ -109,7 +109,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     );
   }
 
-  int? _getClosestMatchIndex() {
+  int? _getNextOrFirstMatchIndex() {
     if (_searchResult.matches.isEmpty) {
       return null;
     }
