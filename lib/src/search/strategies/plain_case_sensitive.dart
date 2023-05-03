@@ -10,7 +10,6 @@ class PlainCaseSensitiveSearchStrategy extends SearchStrategy {
         .allMatches(
           text,
         )
-        .where((match) => match.start != match.end)
         .map((match) => SearchMatch(start: match.start, end: match.end))
         .toList(growable: false);
 

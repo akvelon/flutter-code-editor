@@ -48,5 +48,22 @@ void main() {
 
       expect(result, expectedResult);
     });
+
+    test('Invalid RegExp -> empty result', () {
+      const text = '[]';
+      const pattern = '[';
+      const expectedResult = SearchResult.empty;
+
+      final result = RegExpSearchStrategy().searchPlain(
+        text,
+        settings: const SearchSettings(
+          isCaseSensitive: false,
+          isRegExp: true,
+          pattern: pattern,
+        ),
+      );
+
+      expect(result, expectedResult);
+    });
   });
 }
