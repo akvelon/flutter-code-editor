@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../settings_controller.dart';
 
-const _hintText = 'Search...';
+const _hintText = 'Search…';
 
 class SearchSettingsWidget extends StatelessWidget {
   final FocusNode patternFocusNode;
@@ -27,6 +27,9 @@ class SearchSettingsWidget extends StatelessWidget {
                 child: SizedBox(
                   width: 100,
                   child: TextField(
+                    // We need to set this in order to catch
+                    // LogicalKeyBoardKey.enter pressed event.
+                    // Otherwise we would need to catch it in `onSubmitted`.
                     maxLines: null,
                     decoration: const InputDecoration(
                       hintText: _hintText,
@@ -34,7 +37,6 @@ class SearchSettingsWidget extends StatelessWidget {
                       border: InputBorder.none,
                     ),
                     focusNode: patternFocusNode,
-                    enabled: true,
                     controller: settingsController.patternController,
                   ),
                 ),

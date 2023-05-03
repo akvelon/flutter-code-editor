@@ -30,7 +30,7 @@ void main() {
 
     for (final example in examples) {
       final codeController = CodeController();
-      codeController.searchController.enableSearch();
+      codeController.searchController.showSearch();
       final result = codeController.searchController.search(
         example.code,
         settings: example.settings,

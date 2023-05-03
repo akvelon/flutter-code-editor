@@ -15,8 +15,8 @@ class RegExpSearchStrategy extends SearchStrategy {
 
       final matches = regex
           .allMatches(text)
-          .where((element) => element.start != element.end)
-          .map((e) => SearchMatch(start: e.start, end: e.end));
+          .where((match) => match.start != match.end)
+          .map((match) => SearchMatch(start: match.start, end: match.end));
       final searchMatches = matches.toList(growable: false);
       return SearchResult(matches: searchMatches);
     } on Exception {

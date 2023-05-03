@@ -160,6 +160,8 @@ class CodeController extends TextEditingController {
     addListener(_scheduleAnalysis);
     addListener(_updateSearchResult);
     _searchSettingsController.addListener(_updateSearchResult);
+    // This listener is called when search controller notifies about
+    // showing or hiding the search popup.
     searchController.addListener(_updateSearchResult);
 
     // Create modifier map
@@ -328,7 +330,7 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    if (searchController.isEnabled &&
+    if (searchController.shouldShow &&
         _searchNavigationController.value.currentMatchIndex != null) {
       _searchNavigationController.moveNext();
       return;
@@ -938,11 +940,11 @@ class CodeController extends TextEditingController {
   }
 
   void _dismissSearch() {
-    searchController.disableSearch(returnFocusToCodeField: true);
+    searchController.hideSearch(returnFocusToCodeField: true);
   }
 
-  void enableSearch() {
-    searchController.enableSearch();
+  void showSearch() {
+    searchController.showSearch();
   }
 
   @override

@@ -1,27 +1,27 @@
 class SearchNavigationState {
   final int? currentMatchIndex;
-  final int totalMatchesCount;
+  final int totalMatchCount;
 
   const SearchNavigationState({
+    required this.totalMatchCount,
     this.currentMatchIndex,
-    required this.totalMatchesCount,
   });
 
-  static const noMatches = SearchNavigationState(totalMatchesCount: 0);
+  static const noMatches = SearchNavigationState(totalMatchCount: 0);
 
   SearchNavigationState copyWith({
     int? currentMatchIndex,
-    int? totalMatchesCount,
+    int? totalMatchCount,
   }) {
     return SearchNavigationState(
       currentMatchIndex: currentMatchIndex ?? this.currentMatchIndex,
-      totalMatchesCount: totalMatchesCount ?? this.totalMatchesCount,
+      totalMatchCount: totalMatchCount ?? this.totalMatchCount,
     );
   }
 
-  SearchNavigationState resetCurrentMatchIndex(int? totalMatchesCount) {
+  SearchNavigationState resetCurrentMatchIndex(int? totalMatchCount) {
     return SearchNavigationState(
-      totalMatchesCount: totalMatchesCount ?? this.totalMatchesCount,
+      totalMatchCount: totalMatchCount ?? this.totalMatchCount,
     );
   }
 }

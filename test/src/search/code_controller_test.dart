@@ -8,13 +8,13 @@ void main() {
     const text = 'AaAa';
     final controller = await pumpController(wt, text);
 
-    expect(controller.searchController.isEnabled, false);
+    expect(controller.searchController.shouldShow, false);
 
     await wt.sendKeyDownEvent(LogicalKeyboardKey.control);
     await wt.sendKeyEvent(LogicalKeyboardKey.keyF);
     await wt.sendKeyUpEvent(LogicalKeyboardKey.control);
 
-    expect(controller.searchController.isEnabled, true);
+    expect(controller.searchController.shouldShow, true);
   });
 
   testWidgets('ESCAPE disables search', (wt) async {
@@ -26,6 +26,6 @@ void main() {
     await wt.sendKeyUpEvent(LogicalKeyboardKey.control);
 
     await wt.sendKeyEvent(LogicalKeyboardKey.escape);
-    expect(controller.searchController.isEnabled, false);
+    expect(controller.searchController.shouldShow, false);
   });
 }

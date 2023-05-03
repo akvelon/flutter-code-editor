@@ -2,6 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../code_field/code_controller.dart';
+import '../folding/foldable_block.dart';
+import '../folding/foldable_block_type.dart';
 import 'match.dart';
 import 'result.dart';
 import 'search_navigation_state.dart';
@@ -25,49 +27,41 @@ import 'widget/search_navigation_widget.dart';
 class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
   final CodeController codeController;
 
-  SearchResult _searchResult = SearchResult.empty;
-  String _lastText = '';
+  SearchResult _lastFullSearchResult = SearchResult.empty;
+  String _lastText;
   bool _wasEdited = false;
 
   FocusNode? codeFieldFocusNode;
 
   SearchNavigationController({
     required this.codeController,
-    SearchNavigationState? state,
-  }) : super(state ?? SearchNavigationState.noMatches) {
+  })  : _lastText = '',
+        super(SearchNavigationState.noMatches) {
     codeController.addListener(_updateState);
     _lastText = codeController.code.text;
   }
 
   void moveNext() {
-    codeFieldFocusNode?.requestFocus();
-    _wasEdited = false;
-    if (_searchResult.matches.isEmpty) {
-      return;
-    }
-
-    final currentIndex =
-        value.currentMatchIndex ?? _getNextOrFirstMatchIndex() ?? 0;
-
-    value = value.copyWith(
-      currentMatchIndex: (currentIndex + 1) % value.totalMatchesCount,
-    );
-
-    _moveSelectionToCurrentMatch();
+    _moveToResult(1);
   }
 
   void movePrevious() {
+    _moveToResult(-1);
+  }
+
+  void _moveToResult(int delta) {
     codeFieldFocusNode?.requestFocus();
     _wasEdited = false;
-    if (_searchResult.matches.isEmpty) {
+    if (_lastFullSearchResult.matches.isEmpty) {
       return;
     }
 
-    final currentIndex =
-        value.currentMatchIndex ?? _getNextOrFirstMatchIndex() ?? 0;
+    final currentIndex = value.currentMatchIndex ??
+        _getNextOrFirstMatchIndex() ??
+        (throw Exception('Empty result must have been checked above.'));
 
     value = value.copyWith(
-      currentMatchIndex: (currentIndex - 1) % value.totalMatchesCount,
+      currentMatchIndex: (currentIndex + delta) % value.totalMatchCount,
     );
 
     _moveSelectionToCurrentMatch();
@@ -77,7 +71,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     _wasEdited = codeController.code.text != _lastText;
     _lastText = codeController.code.text;
 
-    if (codeController.fullSearchResult == _searchResult) {
+    if (codeController.fullSearchResult == _lastFullSearchResult) {
       if (codeController.selection.isCollapsed &&
           value.currentMatchIndex != null) {
         value = value.resetCurrentMatchIndex(
@@ -88,7 +82,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return;
     }
 
-    _searchResult = codeController.fullSearchResult;
+    _lastFullSearchResult = codeController.fullSearchResult;
 
     value = _createValue();
     _moveSelectionToCurrentMatch();
@@ -101,7 +95,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       );
     }
 
-    if (_searchResult.matches.isEmpty) {
+    if (_lastFullSearchResult.matches.isEmpty) {
       return SearchNavigationState.noMatches;
     }
 
@@ -109,12 +103,12 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
 
     return value.copyWith(
       currentMatchIndex: closestMatch,
-      totalMatchesCount: _searchResult.matches.length,
+      totalMatchCount: _lastFullSearchResult.matches.length,
     );
   }
 
   int? _getNextOrFirstMatchIndex() {
-    if (_searchResult.matches.isEmpty) {
+    if (_lastFullSearchResult.matches.isEmpty) {
       return null;
     }
 
@@ -124,12 +118,12 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       placeHiddenRanges: TextAffinity.downstream,
     );
 
-    var closestMatchIndex = _searchResult.matches.indexWhere(
+    var closestMatchIndex = _lastFullSearchResult.matches.indexWhere(
       (element) => element.start >= fullSelectionEnd,
     );
 
     if (closestMatchIndex == -1) {
-      closestMatchIndex = _searchResult.matches.length - 1;
+      closestMatchIndex = _lastFullSearchResult.matches.length - 1;
     }
 
     return closestMatchIndex;
@@ -140,7 +134,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return;
     }
 
-    final match = _searchResult.matches[value.currentMatchIndex!];
+    final match = _lastFullSearchResult.matches[value.currentMatchIndex!];
 
     _expandFoldedBlockIfNeed(match);
 
@@ -155,12 +149,14 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       match.end,
     );
 
+    final matchRange = FoldableBlock(
+      firstLine: firstLine,
+      lastLine: lastLine,
+      type: FoldableBlockType.union,
+    );
+
     final foldedBlock = codeController.code.foldedBlocks.firstWhereOrNull(
-      (element) =>
-          (firstLine <= element.firstLine && element.firstLine <= lastLine) ||
-          (firstLine <= element.lastLine && element.lastLine <= lastLine) ||
-          (element.firstLine <= firstLine && firstLine <= element.lastLine) ||
-          (element.firstLine <= lastLine && lastLine <= element.lastLine),
+      (block) => block.overlaps(matchRange),
     );
 
     if (foldedBlock != null) {

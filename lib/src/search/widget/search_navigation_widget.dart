@@ -17,13 +17,10 @@ class SearchNavigationWidget extends StatelessWidget {
     return AnimatedBuilder(
       animation: searchNavigationController,
       builder: (context, child) {
-        final currentMatchIndex =
-            (searchNavigationController.value.currentMatchIndex ?? -1) + 1;
-
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (searchNavigationController.value.totalMatchesCount > 0) ...[
+            if (searchNavigationController.value.totalMatchCount > 0) ...[
               InkWell(
                 hoverColor: Colors.transparent,
                 onTap: searchNavigationController.movePrevious,
@@ -43,15 +40,19 @@ class SearchNavigationWidget extends StatelessWidget {
             ],
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                '$currentMatchIndex '
-                '/ '
-                '${searchNavigationController.value.totalMatchesCount}',
-              ),
+              child: Text(_getText()),
             ),
           ],
         );
       },
     );
+  }
+
+  String _getText() {
+    final currentMatchIndex =
+        (searchNavigationController.value.currentMatchIndex ?? -1) + 1;
+    final totalMatchCount = searchNavigationController.value.totalMatchCount;
+
+    return '$currentMatchIndex / $totalMatchCount';
   }
 }

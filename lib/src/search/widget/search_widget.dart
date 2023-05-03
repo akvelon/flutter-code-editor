@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controller.dart';
+import 'focus_rediretor.dart';
 import 'search_navigation_widget.dart';
 import 'search_settings_widget.dart';
 
@@ -18,12 +19,8 @@ class SearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: searchController,
-      builder: (context, child) => InkWell(
-        mouseCursor: MouseCursor.defer,
-        hoverColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        focusColor: Colors.transparent,
-        onTap: searchController.patternFocusNode.requestFocus,
+      builder: (context, child) => FocusRedirector(
+        redirectTo: searchController.patternFocusNode,
         child: SizedBox(
           height: 50,
           child: IntrinsicWidth(
@@ -48,7 +45,7 @@ class SearchWidget extends StatelessWidget {
                 Expanded(
                   child: InkWell(
                     hoverColor: Colors.transparent,
-                    onTap: () => searchController.disableSearch(
+                    onTap: () => searchController.hideSearch(
                       returnFocusToCodeField: true,
                     ),
                     child: const Icon(

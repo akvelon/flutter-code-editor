@@ -45,7 +45,7 @@ void main() {
         ];
 
         final controller = await pumpController(wt, text);
-        controller.enableSearch();
+        controller.showSearch();
 
         for (final example in examples) {
           controller.searchController.settingsController.value =

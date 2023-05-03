@@ -15,7 +15,7 @@ class SearchAction extends Action<SearchIntent> {
 
   @override
   Object? invoke(SearchIntent intent) {
-    controller.enableSearch();
+    controller.showSearch();
 
     return null;
   }

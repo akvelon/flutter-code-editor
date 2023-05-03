@@ -21,11 +21,11 @@ void main() {
         codeController: codeController,
       );
 
-      expect(controller.isEnabled, false);
-      controller.enableSearch();
-      expect(controller.isEnabled, true);
-      controller.disableSearch(returnFocusToCodeField: false);
-      expect(controller.isEnabled, false);
+      expect(controller.shouldShow, false);
+      controller.showSearch();
+      expect(controller.shouldShow, true);
+      controller.hideSearch(returnFocusToCodeField: false);
+      expect(controller.shouldShow, false);
     });
 
     test('Disabled controller returns empty result on search()', () {
@@ -50,11 +50,11 @@ void main() {
     test('enable/disable', () {
       final controller = CodeController();
 
-      controller.enableSearch();
-      expect(controller.searchController.isEnabled, true);
+      controller.showSearch();
+      expect(controller.searchController.shouldShow, true);
 
       controller.dismiss();
-      expect(controller.searchController.isEnabled, false);
+      expect(controller.searchController.shouldShow, false);
     });
   });
 }

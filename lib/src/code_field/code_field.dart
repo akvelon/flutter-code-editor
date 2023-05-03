@@ -106,7 +106,7 @@ final _shortcuts = <ShortcutActivator, Intent>{
     LogicalKeyboardKey.escape,
   ): const DismissIntent(),
 
-  // Submit
+  // EnterKey
   LogicalKeySet(
     LogicalKeyboardKey.enter,
   ): const EnterKeyIntent(),
@@ -550,7 +550,7 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   void _onSearchControllerChange() {
-    final shouldShow = widget.controller.searchController.isEnabled;
+    final shouldShow = widget.controller.searchController.shouldShow;
 
     if (!shouldShow) {
       _searchPopup?.remove();

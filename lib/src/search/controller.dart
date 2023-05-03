@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meta/meta.dart';
 
 import '../code/code.dart';
 import '../code_field/code_controller.dart';
@@ -19,13 +20,12 @@ import 'strategies/regexp.dart';
 /// and generating search results when requested.
 /// Notifies the listeners only when enabled / disabled.
 class SearchController extends ChangeNotifier {
-  // TODO(yescorp): Move this to a better place.
-  //  https://github.com/akvelon/flutter-code-editor/issues/234
-  bool get isEnabled => _isEnabled;
-  bool _isEnabled = false;
+  bool get shouldShow => _shouldShow;
+  bool _shouldShow = false;
 
-  late final SearchSettingsController settingsController;
-  late final SearchNavigationController navigationController;
+  final SearchSettingsController settingsController =
+      SearchSettingsController();
+  final SearchNavigationController navigationController;
 
   FocusNode? get codeFieldFocusNode => _codeFieldFocusNode;
   FocusNode? _codeFieldFocusNode;
@@ -41,58 +41,55 @@ class SearchController extends ChangeNotifier {
   int _focusChangesWithinTimeFrame = 0;
   bool _shouldDismiss = false;
 
-  Timer? _dismissTimer;
+  Timer? _hidingTimer;
 
   SearchController({
     required CodeController codeController,
-  }) {
-    settingsController = SearchSettingsController();
-    navigationController = SearchNavigationController(
-      codeController: codeController,
-    );
-
+  }) : navigationController =
+            SearchNavigationController(codeController: codeController) {
     patternFocusNode.addListener(_onFocusChange);
   }
 
-  void enableSearch() {
+  void showSearch() {
     patternFocusNode.requestFocus();
-    if (isEnabled == true) {
+    if (shouldShow == true) {
       return;
     }
 
-    _dismissTimer = Timer.periodic(
+    _hidingTimer = Timer.periodic(
       const Duration(milliseconds: 1000),
-      _dismissTimerCallback,
+      _hidingTimerCallback,
     );
 
-    _isEnabled = true;
+    _shouldShow = true;
     notifyListeners();
   }
 
-  void disableSearch({
+  @internal
+  void hideSearch({
     required bool returnFocusToCodeField,
   }) {
     patternFocusNode.unfocus();
-    _dismissTimer?.cancel();
+    _hidingTimer?.cancel();
 
     if (returnFocusToCodeField == true) {
       _codeFieldFocusNode?.requestFocus();
     }
 
-    if (isEnabled == false) {
+    if (shouldShow == false) {
       return;
     }
 
-    _isEnabled = false;
+    _shouldShow = false;
     notifyListeners();
   }
 
-  /// Performs the search on the full text of a code.
+  /// Performs the search on the full text of the [code].
   ///
   /// The returned result does not contain collapsed matches and is sorted
   /// by the start position of the match.
   SearchResult search(Code code, {required SearchSettings settings}) {
-    if (!_isEnabled) {
+    if (!_shouldShow) {
       return SearchResult.empty;
     }
 
@@ -129,7 +126,7 @@ class SearchController extends ChangeNotifier {
     }
 
     if (event.logicalKey == LogicalKeyboardKey.escape) {
-      disableSearch(returnFocusToCodeField: true);
+      hideSearch(returnFocusToCodeField: true);
       return KeyEventResult.handled;
     }
 
@@ -143,6 +140,7 @@ class SearchController extends ChangeNotifier {
     patternFocusNode.requestFocus();
   }
 
+  /// Called when pattern or code field is focused or de-focused.
   void _onFocusChange() {
     _focusChangesWithinTimeFrame++;
 
@@ -150,14 +148,20 @@ class SearchController extends ChangeNotifier {
         _codeFieldFocusNode?.hasFocus == false;
   }
 
-  void _dismissTimerCallback(Timer timer) {
+  /// We should hide the search if focus is neither in the pattern field
+  /// nor in the code field. But the focus could have left these fields
+  /// for a short while on search navigation.
+  ///
+  /// So only hide the search if both nodes were de-focused for
+  /// the whole last tick and did not fire events during it.
+  void _hidingTimerCallback(Timer timer) {
     if (_focusChangesWithinTimeFrame > 0) {
       _focusChangesWithinTimeFrame = 0;
       return;
     }
 
     if (_shouldDismiss) {
-      disableSearch(returnFocusToCodeField: false);
+      hideSearch(returnFocusToCodeField: false);
     }
   }
 
@@ -166,7 +170,7 @@ class SearchController extends ChangeNotifier {
     navigationController.dispose();
     patternFocusNode.dispose();
     settingsController.dispose();
-    _dismissTimer?.cancel();
+    _hidingTimer?.cancel();
     super.dispose();
   }
 }

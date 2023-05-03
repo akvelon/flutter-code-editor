@@ -12,8 +12,8 @@ class PlainCaseInsensitiveSearchStrategy extends SearchStrategy {
         .allMatches(
           lowerCaseText,
         )
-        .where((element) => element.start != element.end)
-        .map((e) => SearchMatch(start: e.start, end: e.end))
+        .where((match) => match.start != match.end)
+        .map((match) => SearchMatch(start: match.start, end: match.end))
         .toList(growable: false);
 
     return SearchResult(matches: matches);
