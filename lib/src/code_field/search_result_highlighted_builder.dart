@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import '../search/result.dart';
 import '../search/search_navigation_state.dart';
 
+@visibleForTesting
 const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
+
+@visibleForTesting
 const searchTextColor = Colors.black;
+
+@visibleForTesting
 const currentMatchBackgroundColor = Colors.yellow;
 
 class SearchResultHighlightedBuilder {
@@ -129,12 +134,14 @@ class SearchResultHighlightedBuilder {
     final sliceIndex = matchIndexes[_currentMatchIndex] - _currentWindowStart;
 
     if (sliceIndex >= 0 && sliceIndex <= text.length) {
-      _spans.add(
-        TextSpan(
-          text: text.substring(0, sliceIndex),
-          style: _actualStyle,
-        ),
-      );
+      if (sliceIndex != 0) {
+        _spans.add(
+          TextSpan(
+            text: text.substring(0, sliceIndex),
+            style: _actualStyle,
+          ),
+        );
+      }
       _currentWindowStart = matchIndexes[_currentMatchIndex];
       _currentMatchIndex++;
       if (sliceIndex == text.length) {
