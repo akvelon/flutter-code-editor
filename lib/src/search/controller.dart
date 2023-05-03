@@ -19,7 +19,7 @@ import 'strategies/regexp.dart';
 /// Controller that is responsible for enabling the search
 /// and generating search results when requested.
 /// Notifies the listeners only when enabled / disabled.
-class SearchController extends ChangeNotifier {
+class CodeSearchController extends ChangeNotifier {
   bool get shouldShow => _shouldShow;
   bool _shouldShow = false;
 
@@ -43,7 +43,7 @@ class SearchController extends ChangeNotifier {
 
   Timer? _hidingTimer;
 
-  SearchController({
+  CodeSearchController({
     required CodeController codeController,
   }) : navigationController =
             SearchNavigationController(codeController: codeController) {

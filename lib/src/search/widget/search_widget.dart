@@ -8,7 +8,7 @@ import 'search_settings_widget.dart';
 const _iconSize = 24.0;
 
 class SearchWidget extends StatelessWidget {
-  final SearchController searchController;
+  final CodeSearchController searchController;
 
   const SearchWidget({
     super.key,

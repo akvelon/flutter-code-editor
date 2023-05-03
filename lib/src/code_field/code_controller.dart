@@ -101,7 +101,7 @@ class CodeController extends TextEditingController {
   late final historyController = CodeHistoryController(codeController: this);
 
   @internal
-  late final searchController = SearchController(codeController: this);
+  late final searchController = CodeSearchController(codeController: this);
 
   SearchSettingsController get _searchSettingsController =>
       searchController.settingsController;

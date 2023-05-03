@@ -17,7 +17,7 @@ void main() {
 
   group('SearchController', () {
     test('enalbe/disable', () {
-      final controller = SearchController(
+      final controller = CodeSearchController(
         codeController: codeController,
       );
 
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('Disabled controller returns empty result on search()', () {
-      final controller = SearchController(
+      final controller = CodeSearchController(
         codeController: codeController,
       );
 
