@@ -11,14 +11,6 @@ class SearchResult extends Equatable {
     matches: [],
   );
 
-  SearchResult copyWith({
-    List<SearchMatch>? matches,
-  }) {
-    return SearchResult(
-      matches: matches ?? this.matches,
-    );
-  }
-
   @override
   List<Object?> get props => [
         matches,
