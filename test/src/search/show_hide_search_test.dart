@@ -15,8 +15,8 @@ void main() {
     when(() => codeController.code).thenReturn(Code.empty);
   });
 
-  group('SearchController', () {
-    test('enalbe/disable', () {
+  group('CodeSearchController', () {
+    test('showSearch(), hideSearch()', () {
       final controller = CodeSearchController(
         codeController: codeController,
       );
@@ -47,7 +47,7 @@ void main() {
   });
 
   group('CodeController', () {
-    test('enable/disable', () {
+    test('showSearch(), dismiss()', () {
       final controller = CodeController();
 
       controller.showSearch();
