@@ -330,10 +330,18 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    if (searchController.shouldShow &&
-        _searchNavigationController.value.currentMatchIndex != null) {
-      _searchNavigationController.moveNext();
-      return;
+    final currentMatchIndex =
+        _searchNavigationController.value.currentMatchIndex;
+
+    if (searchController.shouldShow && currentMatchIndex != null) {
+      final fullSelection = code.hiddenRanges.recoverSelection(selection);
+      final currentMatch = fullSearchResult.matches[currentMatchIndex];
+
+      if (fullSelection.start == currentMatch.start &&
+          fullSelection.end == currentMatch.end) {
+        _searchNavigationController.moveNext();
+        return;
+      }
     }
 
     insertStr('\n');
