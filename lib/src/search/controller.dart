@@ -56,6 +56,7 @@ class CodeSearchController extends ChangeNotifier {
       return;
     }
 
+    _hidingTimer?.cancel();
     _hidingTimer = Timer.periodic(
       const Duration(milliseconds: 1000),
       _hidingTimerCallback,
@@ -167,6 +168,7 @@ class CodeSearchController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _codeFieldFocusNode?.removeListener(_onFocusChange);
     navigationController.dispose();
     patternFocusNode.dispose();
     settingsController.dispose();
