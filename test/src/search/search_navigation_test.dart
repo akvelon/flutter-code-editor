@@ -8,7 +8,8 @@ void main() {
   group('SearchNavigationController', () {
     group(
         'Search advances the current match index '
-        'to the first one that is after the selection ', () {
+        'to the first one that is after the selection '
+        'and changes selection of a codeController.', () {
       const examples = [
         //
         _Example(
@@ -55,16 +56,16 @@ void main() {
       ];
       for (final example in examples) {
         testWidgets(example.name, (wt) async {
-          final controller = await pumpController(wt, example.text);
-          controller.selection = example.selection;
+          final codeController = await pumpController(wt, example.text);
+          codeController.selection = example.selection;
 
-          controller.showSearch();
+          codeController.showSearch();
 
-          controller.searchController.settingsController.value =
+          codeController.searchController.settingsController.value =
               example.settings;
 
           expect(
-            controller
+            codeController
                 .searchController.navigationController.value.currentMatchIndex,
             example.expectedCurrentMatchIndex,
             reason: example.name,
@@ -88,25 +89,147 @@ c
 }
 }
 }''';
-      final controller = await pumpController(wt, text);
-      controller.foldAt(0);
-      controller.foldAt(1);
-      controller.foldAt(2);
-      controller.foldAt(3);
+      final codeController = await pumpController(wt, text);
+      codeController.foldAt(0);
+      codeController.foldAt(1);
+      codeController.foldAt(2);
+      codeController.foldAt(3);
 
-      expect(controller.text, '{');
+      expect(codeController.text, '{');
 
-      controller.showSearch();
+      codeController.showSearch();
 
-      controller.searchController.settingsController.value =
+      codeController.searchController.settingsController.value =
           const SearchSettings(
         isCaseSensitive: false,
         isRegExp: false,
         pattern: 'c',
       );
 
-      expect(controller.text, text);
+      expect(codeController.text, text);
     });
+  });
+
+  testWidgets('moveNext()', (wt) async {
+    const text = 'Aaaa';
+    final codeController = await pumpController(wt, text);
+    codeController.selection = const TextSelection.collapsed(offset: 0);
+
+    codeController.showSearch();
+
+    final navigationController =
+        codeController.searchController.navigationController;
+
+    codeController.searchController.settingsController.value =
+        const SearchSettings(
+      isCaseSensitive: false,
+      isRegExp: false,
+      pattern: 'a',
+    );
+
+    expect(navigationController.value.currentMatchIndex, 0);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 1),
+    );
+
+    navigationController.moveNext();
+
+    expect(navigationController.value.currentMatchIndex, 1);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 1, extentOffset: 2),
+    );
+
+    navigationController.moveNext();
+
+    expect(navigationController.value.currentMatchIndex, 2);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 2, extentOffset: 3),
+    );
+
+    navigationController.moveNext();
+
+    expect(navigationController.value.currentMatchIndex, 3);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 3, extentOffset: 4),
+    );
+
+    navigationController.moveNext();
+
+    expect(navigationController.value.currentMatchIndex, 0);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 1),
+    );
+  });
+
+  testWidgets('movePrevious()', (wt) async {
+    const text = 'Aaaa';
+    final codeController = await pumpController(wt, text);
+    codeController.selection = const TextSelection.collapsed(offset: 0);
+
+    codeController.showSearch();
+
+    final navigationController =
+        codeController.searchController.navigationController;
+
+    codeController.searchController.settingsController.value =
+        const SearchSettings(
+      isCaseSensitive: false,
+      isRegExp: false,
+      pattern: 'a',
+    );
+
+    expect(navigationController.value.currentMatchIndex, 0);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 1),
+    );
+
+    navigationController.movePrevious();
+
+    expect(navigationController.value.currentMatchIndex, 3);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 3, extentOffset: 4),
+    );
+
+    navigationController.movePrevious();
+
+    expect(navigationController.value.currentMatchIndex, 2);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 2, extentOffset: 3),
+    );
+
+    navigationController.movePrevious();
+
+    expect(navigationController.value.currentMatchIndex, 1);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 1, extentOffset: 2),
+    );
+
+    navigationController.movePrevious();
+
+    expect(navigationController.value.currentMatchIndex, 0);
+    expect(navigationController.value.totalMatchCount, 4);
+    expect(
+      codeController.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 1),
+    );
   });
 }
 
