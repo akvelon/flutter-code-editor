@@ -148,11 +148,11 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       type: FoldableBlockType.union,
     );
 
-    final foldedBlock = codeController.code.foldedBlocks.firstWhereOrNull(
+    final foldedBlocks = codeController.code.foldedBlocks.where(
       (block) => block.overlaps(matchRange),
     );
 
-    if (foldedBlock != null) {
+    for (final foldedBlock in foldedBlocks) {
       codeController.unfoldAt(foldedBlock.firstLine);
     }
   }
