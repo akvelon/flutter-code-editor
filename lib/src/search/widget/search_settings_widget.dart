@@ -30,6 +30,10 @@ class SearchSettingsWidget extends StatelessWidget {
                     // We need to set this in order to catch
                     // LogicalKeyBoardKey.enter pressed event.
                     // Otherwise we would need to catch it in `onSubmitted`.
+                    // The problem with onSubmitted is that
+                    // when we receive the event and immediately focus on the
+                    // codefield, the flutter also fires the KeyEvent
+                    // with EnterKey on the codefield.
                     maxLines: null,
                     decoration: const InputDecoration(
                       hintText: _hintText,

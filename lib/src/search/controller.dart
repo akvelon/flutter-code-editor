@@ -18,7 +18,7 @@ import 'strategies/regexp.dart';
 
 /// Controller that is responsible for enabling the search
 /// and generating search results when requested.
-/// Notifies the listeners only when enabled / disabled.
+/// Notifies the listeners only when shown or hidden.
 class CodeSearchController extends ChangeNotifier {
   bool get shouldShow => _shouldShow;
   bool _shouldShow = false;
