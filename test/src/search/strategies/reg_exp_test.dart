@@ -49,6 +49,27 @@ void main() {
       expect(result, expectedResult);
     });
 
+    test('Line start and end expressions work ', () {
+      const text = 'AaAa';
+      const pattern = 'A+';
+      const expectedResult = SearchResult(
+        matches: [
+          SearchMatch(start: 0, end: 4),
+        ],
+      );
+
+      final result = RegExpSearchStrategy().searchPlain(
+        text,
+        settings: const SearchSettings(
+          isCaseSensitive: false,
+          isRegExp: true,
+          pattern: pattern,
+        ),
+      );
+
+      expect(result, expectedResult);
+    });
+
     test('Invalid RegExp -> empty result', () {
       const text = '[]';
       const pattern = '[';

@@ -3,22 +3,16 @@ import 'package:flutter_code_editor/src/code_field/code_controller.dart';
 import 'package:flutter_code_editor/src/search/controller.dart';
 import 'package:flutter_code_editor/src/search/result.dart';
 import 'package:flutter_code_editor/src/search/settings.dart';
+import 'package:flutter_code_editor/src/search/widget/search_widget.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
-class _MockCodeController extends Mock implements CodeController {}
+import '../common/create_app.dart';
 
 void main() {
-  final codeController = _MockCodeController();
-
-  setUp(() {
-    when(() => codeController.code).thenReturn(Code.empty);
-  });
-
   group('CodeSearchController', () {
     test('showSearch(), hideSearch()', () {
       final controller = CodeSearchController(
-        codeController: codeController,
+        codeController: CodeController(),
       );
 
       expect(controller.shouldShow, false);
@@ -30,7 +24,7 @@ void main() {
 
     test('Disabled controller returns empty result on search()', () {
       final controller = CodeSearchController(
-        codeController: codeController,
+        codeController: CodeController(),
       );
 
       final result = controller.search(
@@ -47,14 +41,34 @@ void main() {
   });
 
   group('CodeController', () {
-    test('showSearch(), dismiss()', () {
-      final controller = CodeController();
+    testWidgets('showSearch(), dismiss()', (wt) async {
+      const text = '';
+      final controller = await pumpController(wt, text);
+      await wt.pumpAndSettle();
+
+      expect(controller.searchController.shouldShow, false);
+      expect(
+        find.byWidgetPredicate((widget) => widget.runtimeType == SearchWidget),
+        findsNothing,
+      );
 
       controller.showSearch();
+      await wt.pumpAndSettle();
+
       expect(controller.searchController.shouldShow, true);
+      expect(
+        find.byWidgetPredicate((widget) => widget.runtimeType == SearchWidget),
+        findsOneWidget,
+      );
 
       controller.dismiss();
+      await wt.pumpAndSettle();
+
       expect(controller.searchController.shouldShow, false);
+      expect(
+        find.byWidgetPredicate((widget) => widget.runtimeType == SearchWidget),
+        findsNothing,
+      );
     });
   });
 }

@@ -7,12 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('PlainCaseInsensitiveSearchStrategy', () {
     test('PlainCaseInsensitiveSearchStrategy', () {
-      const text = 'Aa';
-      const pattern = 'a';
+      const text = 'Aaaa';
+      const pattern = 'aa';
       const expectedResult = SearchResult(
         matches: [
-          SearchMatch(start: 0, end: 1),
-          SearchMatch(start: 1, end: 2),
+          SearchMatch(start: 0, end: 2),
+          SearchMatch(start: 2, end: 4),
         ],
       );
 
