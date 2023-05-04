@@ -16,6 +16,8 @@ import 'strategies/plain_case_insensitive.dart';
 import 'strategies/plain_case_sensitive.dart';
 import 'strategies/regexp.dart';
 
+const _hidingCheckInterval = Duration(milliseconds: 1000);
+
 /// Controller that is responsible for enabling the search
 /// and generating search results when requested.
 /// Notifies the listeners only when shown or hidden.
@@ -56,7 +58,7 @@ class CodeSearchController extends ChangeNotifier {
 
     _hidingTimer?.cancel();
     _hidingTimer = Timer.periodic(
-      const Duration(milliseconds: 1000),
+      _hidingCheckInterval,
       _hidingTimerCallback,
     );
 
@@ -135,7 +137,7 @@ class CodeSearchController extends ChangeNotifier {
   Future<void> _onEnterKeyPressed() async {
     _codeFieldFocusNode?.requestFocus();
     navigationController.moveNext();
-    await Future.delayed(const Duration(milliseconds: 1));
+    await Future.delayed(Duration.zero);
     patternFocusNode.requestFocus();
   }
 
