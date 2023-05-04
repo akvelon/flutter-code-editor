@@ -258,14 +258,14 @@ class _CodeFieldState extends State<CodeField> {
   @override
   void dispose() {
     widget.controller.searchController.codeFieldFocusNode = null;
-    widget.controller.searchController
-        .hideSearch(returnFocusToCodeField: false);
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
     widget.controller.searchController.removeListener(
       _onSearchControllerChange,
     );
+    _searchPopup?.remove();
+    _searchPopup = null;
     _numberScroll?.dispose();
     _codeScroll?.dispose();
     _horizontalCodeScroll?.dispose();

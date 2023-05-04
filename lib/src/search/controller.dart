@@ -166,8 +166,9 @@ class CodeSearchController extends ChangeNotifier {
 
   @override
   void dispose() {
-    hideSearch(returnFocusToCodeField: false);
+    _shouldShow = false;
     _codeFieldFocusNode?.removeListener(_onFocusChange);
+    _codeFieldFocusNode = null;
     navigationController.dispose();
     settingsController.dispose();
     _hidingTimer?.cancel();
