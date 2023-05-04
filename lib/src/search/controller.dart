@@ -6,7 +6,6 @@ import 'package:meta/meta.dart';
 
 import '../code/code.dart';
 import '../code_field/code_controller.dart';
-import 'match.dart';
 import 'result.dart';
 import 'search_navigation_controller.dart';
 import 'settings.dart';
@@ -99,9 +98,7 @@ class CodeSearchController extends ChangeNotifier {
     }
 
     final strategy = getSearchStrategy(settings);
-
     final result = strategy.searchPlain(code.text, settings: settings);
-    result.matches.sort(_searchMatchStartAscendingComparator);
 
     return result;
   }
@@ -177,11 +174,4 @@ class CodeSearchController extends ChangeNotifier {
     patternFocusNode.dispose();
     super.dispose();
   }
-}
-
-int _searchMatchStartAscendingComparator(
-  SearchMatch first,
-  SearchMatch second,
-) {
-  return first.start - second.start;
 }
