@@ -107,6 +107,8 @@ c
       );
 
       expect(codeController.text, text);
+
+      await wt.pumpAndSettle();
     });
   });
 
@@ -169,6 +171,8 @@ c
       codeController.selection,
       const TextSelection(baseOffset: 0, extentOffset: 1),
     );
+
+    await wt.pumpAndSettle();
   });
 
   testWidgets('movePrevious()', (wt) async {
@@ -230,6 +234,8 @@ c
       codeController.selection,
       const TextSelection(baseOffset: 0, extentOffset: 1),
     );
+
+    await wt.pumpAndSettle();
   });
 }
 

@@ -55,6 +55,8 @@ void main() {
           reason: example.name,
         );
       }
+
+      await wt.pumpAndSettle();
     });
 
     test('patternController change causes value to change', () {

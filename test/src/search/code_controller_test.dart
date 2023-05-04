@@ -58,6 +58,8 @@ void main() {
       controller.value = const TextEditingValue(text: changedText);
 
       expect(controller.fullSearchResult, resultAfterChange);
+
+      await wt.pumpAndSettle();
     });
   });
 }
