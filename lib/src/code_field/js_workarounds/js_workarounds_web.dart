@@ -28,6 +28,8 @@ void disableSpellCheck() {
 
 //=========================== Disable Builtin Search ===========================
 
+// 114 -> F3
+// 70  -> F
 const _jsDisableBuiltinSearch = '''
   window.addEventListener("keydown",function (e) {
     if (e.keyCode === 114 || ((e.ctrlKey || e.metaKey) && e.keyCode === 70)) {
