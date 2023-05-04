@@ -50,14 +50,14 @@ void main() {
     });
 
     test('Line start and end expressions work', () {
-      const text = '__a__a__\n__abc_\n';
+      const text = '__a^__\$a__\n__abc_\n';
       const pattern = r'^_+|_+$';
       const expectedResult = SearchResult(
         matches: [
           SearchMatch(start: 0, end: 2),
-          SearchMatch(start: 6, end: 8),
-          SearchMatch(start: 9, end: 11),
-          SearchMatch(start: 14, end: 15),
+          SearchMatch(start: 8, end: 10),
+          SearchMatch(start: 11, end: 13),
+          SearchMatch(start: 16, end: 17),
         ],
       );
 
