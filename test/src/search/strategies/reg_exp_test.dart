@@ -49,12 +49,15 @@ void main() {
       expect(result, expectedResult);
     });
 
-    test('Line start and end expressions work ', () {
-      const text = 'AaAa';
-      const pattern = 'A+';
+    test('Line start and end expressions work', () {
+      const text = '__a__a__\n__abc_\n';
+      const pattern = r'^_+|_+$';
       const expectedResult = SearchResult(
         matches: [
-          SearchMatch(start: 0, end: 4),
+          SearchMatch(start: 0, end: 2),
+          SearchMatch(start: 6, end: 8),
+          SearchMatch(start: 9, end: 11),
+          SearchMatch(start: 14, end: 15),
         ],
       );
 

@@ -39,8 +39,6 @@ class CodeSearchController extends ChangeNotifier {
   late final FocusNode patternFocusNode = FocusNode(onKeyEvent: _onkey);
 
   int _focusChangesWithinTimeFrame = 0;
-  bool _shouldDismiss = false;
-
   Timer? _hidingTimer;
 
   CodeSearchController({
@@ -144,9 +142,6 @@ class CodeSearchController extends ChangeNotifier {
   /// Called when pattern or code field is focused or de-focused.
   void _onFocusChange() {
     _focusChangesWithinTimeFrame++;
-
-    _shouldDismiss = patternFocusNode.hasFocus == false &&
-        _codeFieldFocusNode?.hasFocus == false;
   }
 
   /// We should hide the search if focus is neither in the pattern field
@@ -161,7 +156,10 @@ class CodeSearchController extends ChangeNotifier {
       return;
     }
 
-    if (_shouldDismiss) {
+    final shouldDismiss = patternFocusNode.hasFocus == false &&
+        _codeFieldFocusNode?.hasFocus == false;
+
+    if (shouldDismiss) {
       hideSearch(returnFocusToCodeField: false);
     }
   }

@@ -77,41 +77,55 @@ void main() {
     test('toggleCaseSensitivity()', () {
       final settingsController = SearchSettingsController();
 
-      expect(settingsController.value.isCaseSensitive, false);
-      expect(settingsController.value.pattern, '');
-      expect(settingsController.value.isRegExp, false);
+      expect(
+        settingsController.value,
+        SearchSettings.empty,
+      );
 
       settingsController.toggleCaseSensitivity();
 
-      expect(settingsController.value.isCaseSensitive, true);
-      expect(settingsController.value.pattern, '');
-      expect(settingsController.value.isRegExp, false);
+      expect(
+        settingsController.value,
+        const SearchSettings(
+          isCaseSensitive: true,
+          isRegExp: false,
+          pattern: '',
+        ),
+      );
 
       settingsController.toggleCaseSensitivity();
 
-      expect(settingsController.value.isCaseSensitive, false);
-      expect(settingsController.value.pattern, '');
-      expect(settingsController.value.isRegExp, false);
+      expect(
+        settingsController.value,
+        SearchSettings.empty,
+      );
     });
 
     test('toggleIsRegExp()', () {
       final settingsController = SearchSettingsController();
 
-      expect(settingsController.value.isRegExp, false);
-      expect(settingsController.value.pattern, '');
-      expect(settingsController.value.isCaseSensitive, false);
+      expect(
+        settingsController.value,
+        SearchSettings.empty,
+      );
 
       settingsController.toggleIsRegExp();
 
-      expect(settingsController.value.isRegExp, true);
-      expect(settingsController.value.pattern, '');
-      expect(settingsController.value.isCaseSensitive, false);
+      expect(
+        settingsController.value,
+        const SearchSettings(
+          isCaseSensitive: false,
+          isRegExp: true,
+          pattern: '',
+        ),
+      );
 
       settingsController.toggleIsRegExp();
 
-      expect(settingsController.value.isRegExp, false);
-      expect(settingsController.value.pattern, '');
-      expect(settingsController.value.isCaseSensitive, false);
+      expect(
+        settingsController.value,
+        SearchSettings.empty,
+      );
     });
   });
 }

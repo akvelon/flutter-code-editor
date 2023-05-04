@@ -128,12 +128,12 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
 
     final match = _lastFullSearchResult.matches[value.currentMatchIndex!];
 
-    _expandFoldedBlockIfNeed(match);
+    _expandFoldedBlocksIfNeed(match);
 
     codeController.selection = _matchToSelection(match);
   }
 
-  void _expandFoldedBlockIfNeed(SearchMatch match) {
+  void _expandFoldedBlocksIfNeed(SearchMatch match) {
     final firstLine = codeController.code.lines.characterIndexToLineIndex(
       match.start,
     );

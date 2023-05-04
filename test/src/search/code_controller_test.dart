@@ -25,8 +25,7 @@ void main() {
       expect(controller.searchController.shouldShow, false);
     });
 
-    testWidgets('CodeController change generates new search result',
-        (wt) async {
+    testWidgets('Change generates new search result', (wt) async {
       const settings = SearchSettings(
         isCaseSensitive: true,
         isRegExp: false,
@@ -50,7 +49,6 @@ void main() {
       final controller = await pumpController(wt, initialText);
 
       controller.showSearch();
-
       controller.searchController.settingsController.value = settings;
 
       expect(controller.fullSearchResult, initialResult);

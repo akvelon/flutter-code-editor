@@ -47,17 +47,14 @@ void main() {
       await wt.pumpAndSettle();
 
       expect(controller.searchController.shouldShow, false);
-      expect(
-        find.byWidgetPredicate((widget) => widget.runtimeType == SearchWidget),
-        findsNothing,
-      );
+      expect(find.byType(SearchWidget), findsNothing);
 
       controller.showSearch();
       await wt.pumpAndSettle();
 
       expect(controller.searchController.shouldShow, true);
       expect(
-        find.byWidgetPredicate((widget) => widget.runtimeType == SearchWidget),
+        find.byType(SearchWidget),
         findsOneWidget,
       );
 
@@ -66,7 +63,7 @@ void main() {
 
       expect(controller.searchController.shouldShow, false);
       expect(
-        find.byWidgetPredicate((widget) => widget.runtimeType == SearchWidget),
+        find.byType(SearchWidget),
         findsNothing,
       );
     });
