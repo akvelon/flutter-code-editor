@@ -17,7 +17,7 @@ import 'actions/outdent.dart';
 import 'actions/search.dart';
 import 'code_controller.dart';
 import 'default_styles.dart';
-import 'disable_spell_check/disable_spell_check.dart';
+import 'js_workarounds/js_workarounds.dart';
 
 final _shortcuts = <ShortcutActivator, Intent>{
   // Copy
