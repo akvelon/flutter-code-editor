@@ -51,7 +51,7 @@ class CodeSearchController extends ChangeNotifier {
 
   void showSearch() {
     patternFocusNode.requestFocus();
-    if (shouldShow == true) {
+    if (_shouldShow) {
       return;
     }
 
@@ -76,7 +76,7 @@ class CodeSearchController extends ChangeNotifier {
       _codeFieldFocusNode?.requestFocus();
     }
 
-    if (shouldShow == false) {
+    if (!_shouldShow) {
       return;
     }
 
