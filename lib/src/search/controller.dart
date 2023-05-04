@@ -30,10 +30,10 @@ class CodeSearchController extends ChangeNotifier {
   FocusNode? get codeFieldFocusNode => _codeFieldFocusNode;
   FocusNode? _codeFieldFocusNode;
   set codeFieldFocusNode(FocusNode? newValue) {
+    navigationController.codeFieldFocusNode = newValue;
     _codeFieldFocusNode?.removeListener(_onFocusChange);
     _codeFieldFocusNode = newValue;
     _codeFieldFocusNode?.addListener(_onFocusChange);
-    navigationController.codeFieldFocusNode = newValue;
   }
 
   late final FocusNode patternFocusNode = FocusNode(onKeyEvent: _onkey);
@@ -170,9 +170,9 @@ class CodeSearchController extends ChangeNotifier {
   void dispose() {
     _codeFieldFocusNode?.removeListener(_onFocusChange);
     navigationController.dispose();
-    patternFocusNode.dispose();
     settingsController.dispose();
     _hidingTimer?.cancel();
+    patternFocusNode.dispose();
     super.dispose();
   }
 }
