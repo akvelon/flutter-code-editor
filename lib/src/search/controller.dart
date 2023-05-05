@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 
 import '../code/code.dart';
+import '../code/key_event.dart';
 import '../code_field/code_controller.dart';
 import 'result.dart';
 import 'search_navigation_controller.dart';
@@ -117,18 +118,8 @@ class CodeSearchController extends ChangeNotifier {
   }
 
   KeyEventResult _onkey(FocusNode node, KeyEvent event) {
-    if (event.physicalKey == PhysicalKeyboardKey.keyF ||
-        event.logicalKey == LogicalKeyboardKey.keyF) {
-      final logicalKeys = HardwareKeyboard.instance.logicalKeysPressed;
-      final metaOrControlIsPressed =
-          logicalKeys.contains(LogicalKeyboardKey.metaLeft) ||
-              logicalKeys.contains(LogicalKeyboardKey.metaRight) ||
-              logicalKeys.contains(LogicalKeyboardKey.controlLeft) ||
-              logicalKeys.contains(LogicalKeyboardKey.controlRight);
-
-      if (metaOrControlIsPressed) {
-        return KeyEventResult.handled;
-      }
+    if (event.isCtrlF(HardwareKeyboard.instance.logicalKeysPressed)) {
+      return KeyEventResult.handled;
     }
 
     if ((event is KeyDownEvent || event is KeyRepeatEvent) &&

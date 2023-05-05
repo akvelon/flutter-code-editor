@@ -11,6 +11,7 @@ import 'package:meta/meta.dart';
 import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
+import '../code/key_event.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../search/controller.dart';
@@ -316,6 +317,11 @@ class CodeController extends TextEditingController {
   }
 
   KeyEventResult _onKeyDownRepeat(KeyEvent event) {
+    if (event.isCtrlF(HardwareKeyboard.instance.logicalKeysPressed)) {
+      showSearch();
+      return KeyEventResult.handled;
+    }
+
     if (popupController.shouldShow) {
       if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         popupController.scrollByArrow(ScrollDirection.up);
