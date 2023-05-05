@@ -1,3 +1,11 @@
+## 0.2.21
+
+* 'Enter' key in the search pattern input scrolls to the next match.
+
+## 0.2.20
+
+* Alpha version of search.
+
 ## 0.2.19
 
 * Fixed inability to change the value with `WidgetTester.enterText()` (Issue [232](https://github.com/akvelon/flutter-code-editor/issues/232)).
