@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../../code_field/actions/ignore.dart';
 import '../controller.dart';
 import 'focus_rediretor.dart';
 import 'search_navigation_widget.dart';
@@ -17,44 +19,59 @@ class SearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: searchController,
-      builder: (context, child) => FocusRedirector(
-        redirectTo: searchController.patternFocusNode,
-        child: SizedBox(
-          height: 50,
-          child: IntrinsicWidth(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 6,
-                  child: SearchSettingsWidget(
-                    patternFocusNode: searchController.patternFocusNode,
-                    settingsController: searchController.settingsController,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 3,
-                  child: SearchNavigationWidget(
-                    searchNavigationController:
-                        searchController.navigationController,
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    hoverColor: Colors.transparent,
-                    onTap: () => searchController.hideSearch(
-                      returnFocusToCodeField: true,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      size: _iconSize,
+    return FocusableActionDetector(
+      actions: {
+        IgnoreIntent: IgnoreAction(),
+      },
+      shortcuts: {
+        LogicalKeySet(
+          LogicalKeyboardKey.keyF,
+          LogicalKeyboardKey.control,
+        ): const IgnoreIntent(),
+        LogicalKeySet(
+          LogicalKeyboardKey.keyF,
+          LogicalKeyboardKey.meta,
+        ): const IgnoreIntent(),
+      },
+      child: AnimatedBuilder(
+        animation: searchController,
+        builder: (context, child) => FocusRedirector(
+          redirectTo: searchController.patternFocusNode,
+          child: SizedBox(
+            height: 50,
+            child: IntrinsicWidth(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: SearchSettingsWidget(
+                      patternFocusNode: searchController.patternFocusNode,
+                      settingsController: searchController.settingsController,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 3,
+                    child: SearchNavigationWidget(
+                      searchNavigationController:
+                          searchController.navigationController,
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      hoverColor: Colors.transparent,
+                      onTap: () => searchController.hideSearch(
+                        returnFocusToCodeField: true,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: _iconSize,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
