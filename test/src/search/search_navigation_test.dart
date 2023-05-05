@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/src/search/settings.dart';
+import 'package:flutter_code_editor/src/search/settings_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
@@ -225,6 +226,42 @@ d
       );
 
       await wt.pumpAndSettle();
+    });
+
+    testWidgets(
+        'Changing CodeController with '
+        'non-null current match', (wt) async {
+      const text = 'Aa';
+      final controller = await pumpController(wt, text);
+      controller.selection = const TextSelection.collapsed(offset: 0);
+
+      controller.showSearch();
+
+      controller.searchController.settingsController.value =
+          const SearchSettings(
+        isCaseSensitive: false,
+        isRegExp: false,
+        pattern: 'a',
+      );
+      expect(
+        controller
+            .searchController.navigationController.value.currentMatchIndex,
+        0,
+      );
+
+      controller.selection = const TextSelection.collapsed(offset: 1);
+      expect(
+        controller
+            .searchController.navigationController.value.currentMatchIndex,
+        0,
+      );
+
+      controller.insertStr('a');
+      expect(
+        controller
+            .searchController.navigationController.value.currentMatchIndex,
+        null,
+      );
     });
   });
 }
