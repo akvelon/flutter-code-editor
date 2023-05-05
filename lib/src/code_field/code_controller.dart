@@ -89,6 +89,11 @@ class CodeController extends TextEditingController {
   ///If it is not empty, all another code except specified will be hidden.
   Set<String> _visibleSectionNames = {};
 
+  /// Makes the text un-editable, but allows to set the full text.
+  /// Focusing and moving the selection inside of a [CodeField] will
+  /// still be possible.
+  final bool readonly;
+
   String get languageId => _languageId;
 
   Code _code;
@@ -141,6 +146,7 @@ class CodeController extends TextEditingController {
         Map<String, TextStyle>? theme,
     this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
+    this.readonly = false,
     this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const [
@@ -642,6 +648,10 @@ class CodeController extends TextEditingController {
   void modifySelectedLines(
     String Function(String line) modifierCallback,
   ) {
+    if (readonly) {
+      return;
+    }
+
     if (selection.start == -1 || selection.end == -1) {
       return;
     }
@@ -717,6 +727,10 @@ class CodeController extends TextEditingController {
   Code get code => _code;
 
   CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
+    if (readonly) {
+      return null;
+    }
+
     final editResult = _code.getEditResult(value.selection, newValue);
     if (!_code.isReadOnlyInLineRange(editResult.linesChanged)) {
       return editResult;
