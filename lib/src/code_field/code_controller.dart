@@ -93,7 +93,7 @@ class CodeController extends TextEditingController {
   /// Makes the text un-editable, but allows to set the full text.
   /// Focusing and moving the selection inside of a [CodeField] will
   /// still be possible.
-  final bool readonly;
+  final bool readOnly;
 
   String get languageId => _languageId;
 
@@ -147,7 +147,7 @@ class CodeController extends TextEditingController {
         Map<String, TextStyle>? theme,
     this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
-    this.readonly = false,
+    this.readOnly = false,
     this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const [
@@ -654,7 +654,7 @@ class CodeController extends TextEditingController {
   void modifySelectedLines(
     String Function(String line) modifierCallback,
   ) {
-    if (readonly) {
+    if (readOnly) {
       return;
     }
 
@@ -733,7 +733,7 @@ class CodeController extends TextEditingController {
   Code get code => _code;
 
   CodeEditResult? _getEditResultNotBreakingReadOnly(TextEditingValue newValue) {
-    if (readonly) {
+    if (readOnly) {
       return null;
     }
 

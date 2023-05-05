@@ -3,12 +3,12 @@ import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('CodeController.readonly', () {
+  group('CodeController.readOnly', () {
     test('Setting readonly restricts modification of text', () {
       const initialText = 'Aaa\nAaaa';
       final controller = CodeController(
         text: initialText,
-        readonly: true,
+        readOnly: true,
       );
 
       controller.value = const TextEditingValue(

@@ -151,7 +151,7 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.readOnly}
   ///
   /// This is just passed as a parameter to a [TextField].
-  /// See also [CodeController.readonly].
+  /// See also [CodeController.readOnly].
   final bool readOnly;
 
   final Color? background;

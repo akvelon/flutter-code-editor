@@ -1,7 +1,10 @@
+## 0.2.23
+
+* Added `CodeController.readOnly`.
+
 ## 0.2.22
 
 * Fixed most of the search bugs (Issue [228](https://github.com/akvelon/flutter-code-editor/issues/228)).
-* Added `CodeController.readOnly`.
 
 ## 0.2.21
 
