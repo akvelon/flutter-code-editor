@@ -4,7 +4,7 @@ import '../search/result.dart';
 import '../search/search_navigation_state.dart';
 
 @visibleForTesting
-const searchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
+const matchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
 
 @visibleForTesting
 const searchTextColor = Colors.black;
@@ -57,10 +57,10 @@ class SearchResultHighlightedBuilder {
   bool get _isCurrentMatchIndexSearch => _currentMatchIndex.isOdd;
 
   /// Whether we finished to process all of the search matches.
-  bool get _isLastMatchProcessed => _currentMatchIndex >= matchIndexes.length;
+  bool get _areAllMatchesProcessed => _currentMatchIndex >= matchIndexes.length;
 
-  /// Number of characters that are already processed.
-  /// Or the current position in the text that we are about to process.
+  /// Number of characters of the whole text that are already processed.
+  /// Also the current position in the text that we are about to process.
   int _currentWindowStart = 0;
 
   /// `TextStyle` of current span that is being processed.
@@ -71,7 +71,7 @@ class SearchResultHighlightedBuilder {
   Color get searchMatchBackgroundColor =>
       highlightedMatchIndex == _currentMatchIndex
           ? currentMatchBackgroundColor
-          : searchBackgroundColor;
+          : matchBackgroundColor;
 
   /// Overrides `TextStyle` of span to highlight search result.
   TextStyle get searchStyle =>
@@ -84,8 +84,8 @@ class SearchResultHighlightedBuilder {
         color: searchTextColor,
       );
 
-  /// Get actual style based on
-  /// whether the current processing index is inside search or not.
+  /// The current style we are painting with:
+  /// either the span's original style, or the highlighted.
   TextStyle? get _actualStyle =>
       _isCurrentMatchIndexSearch ? searchStyle : _currentSpanStyle;
 
@@ -121,7 +121,7 @@ class SearchResultHighlightedBuilder {
   /// If all of the matches are prcoessed,
   /// adds the whole text to the [_spans] with regular styling.
   void _processText(String text) {
-    if (_isLastMatchProcessed) {
+    if (_areAllMatchesProcessed) {
       _spans.add(
         TextSpan(
           text: text,
@@ -133,26 +133,7 @@ class SearchResultHighlightedBuilder {
 
     final sliceIndex = matchIndexes[_currentMatchIndex] - _currentWindowStart;
 
-    if (sliceIndex >= 0 && sliceIndex <= text.length) {
-      if (sliceIndex != 0) {
-        _spans.add(
-          TextSpan(
-            text: text.substring(0, sliceIndex),
-            style: _actualStyle,
-          ),
-        );
-      }
-      _currentWindowStart = matchIndexes[_currentMatchIndex];
-      _currentMatchIndex++;
-      if (sliceIndex == text.length) {
-        return;
-      }
-
-      final textAfter = text.substring(sliceIndex, text.length);
-      if (textAfter.isNotEmpty) {
-        _processText(textAfter);
-      }
-    } else {
+    if (sliceIndex < 0 || sliceIndex > text.length) {
       _spans.add(
         TextSpan(
           text: text,
@@ -160,6 +141,28 @@ class SearchResultHighlightedBuilder {
         ),
       );
       _currentWindowStart += text.length;
+      return;
+    }
+
+    if (sliceIndex != 0) {
+      _spans.add(
+        TextSpan(
+          text: text.substring(0, sliceIndex),
+          style: _actualStyle,
+        ),
+      );
+    }
+
+    _currentWindowStart = matchIndexes[_currentMatchIndex];
+    _currentMatchIndex++;
+
+    if (sliceIndex == text.length) {
+      return;
+    }
+
+    final textAfter = text.substring(sliceIndex, text.length);
+    if (textAfter.isNotEmpty) {
+      _processText(textAfter);
     }
   }
 }
