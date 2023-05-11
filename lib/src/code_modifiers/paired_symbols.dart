@@ -5,11 +5,11 @@ import 'code_modifier.dart';
 
 class PairedSymbolsCodeModifier extends CodeModifier {
   final String openChar;
-  final String closeChar;
+  final String closeString;
 
   const PairedSymbolsCodeModifier({
     required this.openChar,
-    required this.closeChar,
+    required this.closeString,
   }) : super(openChar);
 
   @override
@@ -18,12 +18,12 @@ class PairedSymbolsCodeModifier extends CodeModifier {
     TextSelection sel,
     EditorParams params,
   ) {
-    final replaced = replace(text, sel.start, sel.end, '$openChar$closeChar');
+    final replaced = replace(text, sel.start, sel.end, '$openChar$closeString');
 
     return replaced.copyWith(
       selection: TextSelection(
-        baseOffset: replaced.selection.baseOffset - closeChar.length,
-        extentOffset: replaced.selection.extentOffset - closeChar.length,
+        baseOffset: replaced.selection.baseOffset - closeString.length,
+        extentOffset: replaced.selection.extentOffset - closeString.length,
       ),
     );
   }
