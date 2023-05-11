@@ -381,10 +381,11 @@ class Code {
     // If there is any folded block that is going to be removed
     // because of `backspace` or `delete`, return unchanged text.
     if (oldSelection.isCollapsed &&
+        visibleAfter.text.length == visibleText.length - 1 &&
         foldedBlocks.any(
-          (element) =>
-              element.lastLine >= firstChangedLine &&
-              element.lastLine <= lastChangedLine,
+          (block) =>
+              block.lastLine >= firstChangedLine &&
+              block.lastLine <= lastChangedLine,
         )) {
       return CodeEditResult(
         fullTextAfter: text,

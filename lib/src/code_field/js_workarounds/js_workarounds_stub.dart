@@ -1,0 +1,3 @@
+void disableSpellCheck() {}
+
+void disableBuiltInSearch() {}

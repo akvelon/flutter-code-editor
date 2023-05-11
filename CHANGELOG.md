@@ -1,3 +1,23 @@
+## 0.2.23
+
+* Added `CodeController.readOnly`.
+
+## 0.2.22
+
+* Fixed most of the search bugs (Issue [228](https://github.com/akvelon/flutter-code-editor/issues/228)).
+
+## 0.2.21
+
+* 'Enter' key in the search pattern input scrolls to the next match.
+
+## 0.2.20
+
+* Alpha version of search.
+
+## 0.2.19
+
+* Fixed inability to change the value with `WidgetTester.enterText()` (Issue [232](https://github.com/akvelon/flutter-code-editor/issues/232)).
+
 ## 0.2.18
 
 * Fixed the suggestion box horizontal offset (Issue [224](https://github.com/akvelon/flutter-code-editor/issues/224)).
