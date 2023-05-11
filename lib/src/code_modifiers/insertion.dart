@@ -3,14 +3,31 @@ import 'package:flutter/services.dart';
 import '../code_field/editor_params.dart';
 import 'code_modifier.dart';
 
-class PairedSymbolsCodeModifier extends CodeModifier {
+class InsertionCodeModifier extends CodeModifier {
   final String openChar;
   final String closeString;
 
-  const PairedSymbolsCodeModifier({
+  const InsertionCodeModifier({
     required this.openChar,
     required this.closeString,
   }) : super(openChar);
+
+  const InsertionCodeModifier.backticks()
+      : this(openChar: '`', closeString: '`');
+
+  const InsertionCodeModifier.braces() : this(openChar: '{', closeString: '}');
+
+  const InsertionCodeModifier.brackets()
+      : this(openChar: '[', closeString: ']');
+
+  const InsertionCodeModifier.doubleQuotes()
+      : this(openChar: '"', closeString: '"');
+
+  const InsertionCodeModifier.parentheses()
+      : this(openChar: '(', closeString: ')');
+
+  const InsertionCodeModifier.singleQuotes()
+      : this(openChar: '\'', closeString: '\'');
 
   @override
   TextEditingValue? updateString(

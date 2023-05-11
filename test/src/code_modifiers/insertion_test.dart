@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_code_editor/src/code_modifiers/paired_symbols.dart';
+import 'package:flutter_code_editor/src/code_modifiers/insertion.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Paired symbols modifier test', () {
+  test('Insertion modifier test', () {
     const examples = [
       //
       _Example(
-        'Add paired symbols at the start of the string',
+        'Add close char at the start of the string',
         initialValue: TextEditingValue(
           text: 'dict',
           //     \ cursor
@@ -24,7 +24,7 @@ void main() {
       ),
 
       _Example(
-        'Add paired symbols in the middle of the string',
+        'Add close char in the middle of the string',
         initialValue: TextEditingValue(
           text: 'print',
           //        \ cursor
@@ -40,7 +40,7 @@ void main() {
       ),
 
       _Example(
-        'Add paired symbols at the end of the string',
+        'Add close char at the end of the string',
         initialValue: TextEditingValue(
           text: 'print',
           //          \ cursor
@@ -56,7 +56,7 @@ void main() {
       ),
 
       _Example(
-        'Add paired symbols with several close chars',
+        'Add close with several close chars',
         initialValue: TextEditingValue(
           text: 'string',
           //           \ cursor
@@ -72,7 +72,7 @@ void main() {
       ),
 
       _Example(
-        'Add paired symbols before same close char',
+        'Add close char before same close char',
         initialValue: TextEditingValue(
           text: 'string)',
           //           \ cursor
@@ -106,7 +106,7 @@ void main() {
     ];
 
     for (final example in examples) {
-      final modifier = PairedSymbolsCodeModifier(
+      final modifier = InsertionCodeModifier(
         openChar: example.openChar,
         closeString: example.closeString,
       );
