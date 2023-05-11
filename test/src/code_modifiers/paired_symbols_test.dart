@@ -106,27 +106,48 @@ void main() {
     ];
 
     for (final example in examples) {
-      final controller = CodeController();
       final modifier = PairedSymbolsCodeModifier(
         openChar: example.openChar,
         closeString: example.closeString,
       );
 
+      final controller = CodeController(
+        modifiers: [modifier],
+      );
+
       controller.value = example.initialValue;
 
-      final updatedValue = modifier.updateString(
-        controller.text,
-        controller.selection,
-        const EditorParams(),
+      controller.value = _addCharToSelectedPosition(
+        controller.value,
+        example.openChar,
       );
 
       expect(
-        updatedValue,
+        controller.value,
         example.expected,
         reason: example.name,
       );
     }
   });
+}
+
+TextEditingValue _addCharToSelectedPosition(
+  TextEditingValue value,
+  String char,
+) {
+  final selection = value.selection;
+  final text = value.text;
+
+  final newText = text.substring(0, selection.start) +
+      char +
+      text.substring(selection.start);
+
+  return TextEditingValue(
+    text: newText,
+    selection: TextSelection.collapsed(
+      offset: selection.start + char.length,
+    ),
+  );
 }
 
 class _Example {
