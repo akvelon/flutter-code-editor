@@ -137,6 +137,18 @@ class CodeController extends TextEditingController {
     EnterKeyIntent: EnterKeyAction(controller: this),
   };
 
+  static const defaultCodeModifiers = [
+      IndentModifier(),
+      CloseBlockModifier(),
+      TabModifier(),
+      InsertionCodeModifier.backticks(),
+      InsertionCodeModifier.braces(),
+      InsertionCodeModifier.brackets(),
+      InsertionCodeModifier.doubleQuotes(),
+      InsertionCodeModifier.parentheses(),
+      InsertionCodeModifier.singleQuotes(),
+    ];
+
   CodeController({
     String? text,
     Mode? language,
@@ -151,17 +163,7 @@ class CodeController extends TextEditingController {
     this.readOnly = false,
     this.stringMap,
     this.params = const EditorParams(),
-    this.modifiers = const [
-      IndentModifier(),
-      CloseBlockModifier(),
-      TabModifier(),
-      InsertionCodeModifier.backticks(),
-      InsertionCodeModifier.braces(),
-      InsertionCodeModifier.brackets(),
-      InsertionCodeModifier.doubleQuotes(),
-      InsertionCodeModifier.parentheses(),
-      InsertionCodeModifier.singleQuotes(),
-    ],
+    this.modifiers = defaultCodeModifiers,
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,

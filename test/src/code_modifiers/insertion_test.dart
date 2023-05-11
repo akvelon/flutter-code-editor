@@ -19,8 +19,7 @@ void main() {
           //      \ cursor
           selection: TextSelection.collapsed(offset: 1),
         ),
-        openChar: '{',
-        closeString: '}',
+        inputChar: '{',
       ),
 
       _Example(
@@ -35,8 +34,7 @@ void main() {
           //         \ cursor
           selection: TextSelection.collapsed(offset: 4),
         ),
-        openChar: '(',
-        closeString: ')',
+        inputChar: '(',
       ),
 
       _Example(
@@ -51,8 +49,7 @@ void main() {
           //           \ cursor
           selection: TextSelection.collapsed(offset: 6),
         ),
-        openChar: '[',
-        closeString: ']',
+        inputChar: '[',
       ),
 
       _Example(
@@ -67,8 +64,8 @@ void main() {
           //            \ cursor
           selection: TextSelection.collapsed(offset: 7),
         ),
-        openChar: '1',
-        closeString: '23',
+        inputChar: '1',
+        insertedString: '23',
       ),
 
       _Example(
@@ -83,8 +80,7 @@ void main() {
           //            \ cursor
           selection: TextSelection.collapsed(offset: 7),
         ),
-        openChar: '(',
-        closeString: ')',
+        inputChar: '(',
       ),
 
       _Example(
@@ -100,26 +96,41 @@ void main() {
           //      \ cursor
           selection: TextSelection.collapsed(offset: 1),
         ),
-        openChar: '(',
-        closeString: ')',
+        inputChar: '(',
       ),
     ];
 
     for (final example in examples) {
-      final modifier = InsertionCodeModifier(
-        openChar: example.openChar,
-        closeString: example.closeString,
-      );
+      final additionalModifier = example.insertedString != null
+          ? InsertionCodeModifier(
+              openChar: example.inputChar,
+              closeString: example.insertedString!,
+            )
+          : null;
 
-      final controller = CodeController(
-        modifiers: [modifier],
-      );
+      if (additionalModifier != null &&
+          CodeController.defaultCodeModifiers.any(
+            (e) =>
+                e is InsertionCodeModifier && e.openChar == example.inputChar,
+          )) {
+        fail('Modifier for ${example.inputChar} already exists');
+      }
+
+      late CodeController controller;
+
+      if (additionalModifier == null) {
+        controller = CodeController();
+      } else {
+        controller = CodeController(
+          modifiers: CodeController.defaultCodeModifiers + [additionalModifier],
+        );
+      }
 
       controller.value = example.initialValue;
 
       controller.value = _addCharToSelectedPosition(
         controller.value,
-        example.openChar,
+        example.inputChar,
       );
 
       expect(
@@ -154,14 +165,14 @@ class _Example {
   final String name;
   final TextEditingValue initialValue;
   final TextEditingValue expected;
-  final String openChar;
-  final String closeString;
+  final String inputChar;
+  final String? insertedString;
 
   const _Example(
     this.name, {
     required this.initialValue,
     required this.expected,
-    required this.openChar,
-    required this.closeString,
+    required this.inputChar,
+    this.insertedString,
   });
 }
