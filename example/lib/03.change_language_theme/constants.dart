@@ -20,7 +20,7 @@ const languageList = <String>[
   'java',
   'python',
   'scala',
-  'yaml'
+  'yaml',
 ];
 
 const themeList = <String>[

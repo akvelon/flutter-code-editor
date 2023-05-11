@@ -21,7 +21,7 @@ class FoldableBlockParserFactory {
     if (mode == yaml) {
       return IndentFoldableBlockParser();
     }
-    
+
     return HighlightFoldableBlockParser();
   }
 }
