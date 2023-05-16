@@ -141,12 +141,12 @@ class CodeController extends TextEditingController {
       IndentModifier(),
       CloseBlockModifier(),
       TabModifier(),
-      InsertionCodeModifier.backticks(),
-      InsertionCodeModifier.braces(),
-      InsertionCodeModifier.brackets(),
-      InsertionCodeModifier.doubleQuotes(),
-      InsertionCodeModifier.parentheses(),
-      InsertionCodeModifier.singleQuotes(),
+      InsertionCodeModifier.backticks,
+      InsertionCodeModifier.braces,
+      InsertionCodeModifier.brackets,
+      InsertionCodeModifier.doubleQuotes,
+      InsertionCodeModifier.parentheses,
+      InsertionCodeModifier.singleQuotes,
     ];
 
   CodeController({
