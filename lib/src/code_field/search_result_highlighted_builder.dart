@@ -4,7 +4,7 @@ import '../search/result.dart';
 import '../search/search_navigation_state.dart';
 
 @visibleForTesting
-const matchBackgroundColor = Color.fromARGB(141, 255, 235, 59);
+const matchBackgroundColor = Colors.green;
 
 @visibleForTesting
 const searchTextColor = Colors.black;

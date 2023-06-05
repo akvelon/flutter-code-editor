@@ -262,6 +262,41 @@ d
         null,
       );
     });
+
+    testWidgets('Changing search pattern with match at current '
+    'selection will not jump to next', (wt) async {
+      const text = 'abcabc';
+      final controller = await pumpController(wt, text);
+      controller.selection = const TextSelection.collapsed(offset: 0);
+
+      controller.showSearch();
+
+      controller.searchController.settingsController.value =
+          const SearchSettings(
+        isCaseSensitive: false,
+        isRegExp: false,
+        pattern: 'a',
+      );
+
+      expect(
+        controller
+            .searchController.navigationController.value.currentMatchIndex,
+        0,
+      );
+
+      controller.searchController.settingsController.value =
+          const SearchSettings(
+        isCaseSensitive: false,
+        isRegExp: false,
+        pattern: 'ab',
+      );
+
+      expect(
+        controller
+            .searchController.navigationController.value.currentMatchIndex,
+        0,
+      );
+    });
   });
 }
 
