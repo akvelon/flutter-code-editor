@@ -9,6 +9,7 @@ import '../gutter/gutter.dart';
 import '../line_numbers/gutter_style.dart';
 import '../search/widget/search_widget.dart';
 import '../sizes.dart';
+import '../util/public_notifier.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/enter_key.dart';
@@ -186,7 +187,7 @@ class CodeField extends StatefulWidget {
     this.onChanged,
     @Deprecated('Use gutterStyle instead') this.lineNumbers,
     @Deprecated('Use gutterStyle instead')
-        this.lineNumberStyle = const GutterStyle(),
+    this.lineNumberStyle = const GutterStyle(),
   })  : assert(
             gutterStyle == null || lineNumbers == null,
             'Can not provide gutterStyle and lineNumbers at the same time. '
@@ -207,6 +208,7 @@ class _CodeFieldState extends State<CodeField> {
   final _codeFieldKey = GlobalKey();
 
   OverlayEntry? _suggestionsPopup;
+  final _suggestionsCloseNotifier = PublicNotifier();
   OverlayEntry? _searchPopup;
   Offset _normalPopupOffset = Offset.zero;
   Offset _flippedPopupOffset = Offset.zero;
@@ -264,6 +266,7 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
+    _suggestionsCloseNotifier.notifyPublic();
     widget.controller.searchController.removeListener(
       _onSearchControllerChange,
     );
@@ -549,6 +552,7 @@ class _CodeFieldState extends State<CodeField> {
 
     if (_suggestionsPopup == null) {
       _suggestionsPopup = _buildSuggestionOverlay();
+      _suggestionsCloseNotifier.addListener(_suggestionsPopup!.remove);
       Overlay.of(context).insert(_suggestionsPopup!);
     }
 
