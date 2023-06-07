@@ -69,8 +69,7 @@ class CodeController extends TextEditingController {
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
 
-  /// A map of specific keywords to style
-  final Map<String, TextStyle>? stringMap;
+
 
   /// Common editor params such as the size of a tab in spaces
   ///
@@ -145,7 +144,6 @@ class CodeController extends TextEditingController {
     this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
     this.readOnly = false,
-    this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const [
       IndentModifier(),
@@ -175,10 +173,6 @@ class CodeController extends TextEditingController {
 
     // Build styleRegExp
     final patternList = <String>[];
-    if (stringMap != null) {
-      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
-      _styleList.addAll(stringMap!.values);
-    }
     if (patternMap != null) {
       patternList.addAll(patternMap!.keys.map((e) => '($e)'));
       _styleList.addAll(patternMap!.values);
