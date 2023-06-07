@@ -263,8 +263,9 @@ d
       );
     });
 
-    testWidgets('Changing search pattern with match at current '
-    'selection will not jump to next', (wt) async {
+    testWidgets(
+        'Search selection should stay at current match when search pattern '
+        'changes with match at current', (wt) async {
       const text = 'abcabc';
       final controller = await pumpController(wt, text);
       controller.selection = const TextSelection.collapsed(offset: 0);

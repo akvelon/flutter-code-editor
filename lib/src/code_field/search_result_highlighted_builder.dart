@@ -4,13 +4,13 @@ import '../search/result.dart';
 import '../search/search_navigation_state.dart';
 
 @visibleForTesting
-const matchBackgroundColor = Colors.green;
+const matchBackgroundColor = Color.fromARGB(255, 255, 235, 0);
 
 @visibleForTesting
 const searchTextColor = Colors.black;
 
 @visibleForTesting
-const currentMatchBackgroundColor = Colors.yellow;
+const currentMatchBackgroundColor = Color.fromARGB(255, 255, 150, 50);
 
 class SearchResultHighlightedBuilder {
   final SearchResult searchResult;
