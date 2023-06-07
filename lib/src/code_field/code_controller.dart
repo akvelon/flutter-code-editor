@@ -899,48 +899,8 @@ class CodeController extends TextEditingController {
       ).build();
     }
 
-    // This check is disabled, because _processPatterns
-    // breaks emoji display and is was not useful.
-    // if (_styleRegExp != null) {
-    //   return _processPatterns(text, style);
-    // }
-
     return TextSpan(text: text, style: style);
   }
-
-  // TextSpan _processPatterns(String text, TextStyle? style) {
-  //   final children = <TextSpan>[];
-
-  //   text.splitMapJoin(
-  //     _styleRegExp!,
-  //     onMatch: (Match m) {
-  //       if (_styleList.isEmpty) {
-  //         return '';
-  //       }
-
-  //       int idx;
-  //       for (idx = 1;
-  //           idx < m.groupCount &&
-  //               idx <= _styleList.length &&
-  //               m.group(idx) == null;
-  //           idx++) {}
-
-  //       children.add(
-  //         TextSpan(
-  //           text: m[0],
-  //           style: _styleList[idx - 1],
-  //         ),
-  //       );
-  //       return '';
-  //     },
-  //     onNonMatch: (String span) {
-  //       children.add(TextSpan(text: span, style: style));
-  //       return '';
-  //     },
-  //   );
-
-  //   return TextSpan(style: style, children: children);
-  // }
 
   CodeThemeData _getTheme(BuildContext context) {
     return CodeTheme.of(context) ?? CodeThemeData();

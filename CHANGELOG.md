@@ -1,4 +1,5 @@
 ## 0.3.0
+
 * **BREAKING:** Deleted `CodeController.stringMap`.
 * **BREAKING:** Deleted `theme` from `CodeController`, (Issue [172](https://github.com/akvelon/flutter-code-editor/issues/172)).
 
