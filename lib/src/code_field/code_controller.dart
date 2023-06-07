@@ -101,7 +101,6 @@ class CodeController extends TextEditingController {
 
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
-  RegExp? _styleRegExp;
   late PopupController popupController;
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
@@ -143,8 +142,6 @@ class CodeController extends TextEditingController {
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
-    @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-    Map<String, TextStyle>? theme,
     this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
     this.readOnly = false,
@@ -186,7 +183,6 @@ class CodeController extends TextEditingController {
       patternList.addAll(patternMap!.keys.map((e) => '($e)'));
       _styleList.addAll(patternMap!.values);
     }
-    _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     popupController = PopupController(onCompletionSelected: insertSelectedWord);
 
@@ -911,46 +907,48 @@ class CodeController extends TextEditingController {
       ).build();
     }
 
-    if (_styleRegExp != null) {
-      return _processPatterns(text, style);
-    }
+    // This check is disabled, because _processPatterns
+    // breaks emoji display and is was not useful.
+    // if (_styleRegExp != null) {
+    //   return _processPatterns(text, style);
+    // }
 
     return TextSpan(text: text, style: style);
   }
 
-  TextSpan _processPatterns(String text, TextStyle? style) {
-    final children = <TextSpan>[];
+  // TextSpan _processPatterns(String text, TextStyle? style) {
+  //   final children = <TextSpan>[];
 
-    text.splitMapJoin(
-      _styleRegExp!,
-      onMatch: (Match m) {
-        if (_styleList.isEmpty) {
-          return '';
-        }
+  //   text.splitMapJoin(
+  //     _styleRegExp!,
+  //     onMatch: (Match m) {
+  //       if (_styleList.isEmpty) {
+  //         return '';
+  //       }
 
-        int idx;
-        for (idx = 1;
-            idx < m.groupCount &&
-                idx <= _styleList.length &&
-                m.group(idx) == null;
-            idx++) {}
+  //       int idx;
+  //       for (idx = 1;
+  //           idx < m.groupCount &&
+  //               idx <= _styleList.length &&
+  //               m.group(idx) == null;
+  //           idx++) {}
 
-        children.add(
-          TextSpan(
-            text: m[0],
-            style: _styleList[idx - 1],
-          ),
-        );
-        return '';
-      },
-      onNonMatch: (String span) {
-        children.add(TextSpan(text: span, style: style));
-        return '';
-      },
-    );
+  //       children.add(
+  //         TextSpan(
+  //           text: m[0],
+  //           style: _styleList[idx - 1],
+  //         ),
+  //       );
+  //       return '';
+  //     },
+  //     onNonMatch: (String span) {
+  //       children.add(TextSpan(text: span, style: style));
+  //       return '';
+  //     },
+  //   );
 
-    return TextSpan(style: style, children: children);
-  }
+  //   return TextSpan(style: style, children: children);
+  // }
 
   CodeThemeData _getTheme(BuildContext context) {
     return CodeTheme.of(context) ?? CodeThemeData();
