@@ -144,7 +144,7 @@ class CodeController extends TextEditingController {
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
     @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-        Map<String, TextStyle>? theme,
+    Map<String, TextStyle>? theme,
     this.analysisResult = const AnalysisResult(issues: []),
     this.patternMap,
     this.readOnly = false,
