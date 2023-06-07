@@ -69,8 +69,6 @@ class CodeController extends TextEditingController {
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
 
-
-
   /// Common editor params such as the size of a tab in spaces
   ///
   /// Will be exposed to all [modifiers]
