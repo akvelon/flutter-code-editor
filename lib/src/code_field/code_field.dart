@@ -186,7 +186,7 @@ class CodeField extends StatefulWidget {
     this.onChanged,
     @Deprecated('Use gutterStyle instead') this.lineNumbers,
     @Deprecated('Use gutterStyle instead')
-        this.lineNumberStyle = const GutterStyle(),
+    this.lineNumberStyle = const GutterStyle(),
   })  : assert(
             gutterStyle == null || lineNumbers == null,
             'Can not provide gutterStyle and lineNumbers at the same time. '
@@ -264,6 +264,7 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
+    _suggestionsPopup?.remove();
     widget.controller.searchController.removeListener(
       _onSearchControllerChange,
     );
