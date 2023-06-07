@@ -111,9 +111,7 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
     );
 
     var closestMatchIndex = _lastFullSearchResult.matches.indexWhere(
-      (element) {
-        return element.start >= fullSelectionStart;
-      },
+      (element) => element.start >= fullSelectionStart,
     );
 
     if (closestMatchIndex == -1) {
