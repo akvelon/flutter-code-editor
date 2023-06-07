@@ -9,7 +9,6 @@ import '../gutter/gutter.dart';
 import '../line_numbers/gutter_style.dart';
 import '../search/widget/search_widget.dart';
 import '../sizes.dart';
-import '../util/public_notifier.dart';
 import '../wip/autocomplete/popup.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/enter_key.dart';
@@ -208,7 +207,6 @@ class _CodeFieldState extends State<CodeField> {
   final _codeFieldKey = GlobalKey();
 
   OverlayEntry? _suggestionsPopup;
-  final _suggestionsCloseNotifier = PublicNotifier();
   OverlayEntry? _searchPopup;
   Offset _normalPopupOffset = Offset.zero;
   Offset _flippedPopupOffset = Offset.zero;
@@ -266,7 +264,7 @@ class _CodeFieldState extends State<CodeField> {
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
-    _suggestionsCloseNotifier.notifyPublic();
+    _suggestionsPopup?.remove();
     widget.controller.searchController.removeListener(
       _onSearchControllerChange,
     );
@@ -552,7 +550,6 @@ class _CodeFieldState extends State<CodeField> {
 
     if (_suggestionsPopup == null) {
       _suggestionsPopup = _buildSuggestionOverlay();
-      _suggestionsCloseNotifier.addListener(_suggestionsPopup!.remove);
       Overlay.of(context).insert(_suggestionsPopup!);
     }
 
