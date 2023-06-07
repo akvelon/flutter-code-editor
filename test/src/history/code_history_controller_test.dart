@@ -258,7 +258,6 @@ void main() {
           controller.selection,
           const TextSelection.collapsed(
             offset: MethodSnippet.visible.length,
-            affinity: TextAffinity.upstream,
           ),
         );
 
@@ -269,7 +268,6 @@ void main() {
           controller.selection,
           const TextSelection.collapsed(
             offset: MethodSnippet.visible.length,
-            affinity: TextAffinity.upstream,
           ),
         );
       });

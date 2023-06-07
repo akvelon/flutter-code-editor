@@ -121,7 +121,6 @@ void main() {
             //               cursor /
             selection: TextSelection.collapsed(
               offset: 14,
-              affinity: TextAffinity.upstream,
             ),
           ),
           reason: 'Delete - no effect',
@@ -460,7 +459,6 @@ void main() {
             //          cursor /
             selection: TextSelection.collapsed(
               offset: 10,
-              affinity: TextAffinity.upstream,
             ),
           ),
           reason: 'Backspace Delete Type at last empty line - No effect',
