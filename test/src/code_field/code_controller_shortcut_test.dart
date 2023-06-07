@@ -18,12 +18,16 @@ class MyClass {
 void main() {
   final calls = <MethodCall>[];
 
-  void mockClipboardHandler() {
+  void mockClipboardHandler(WidgetTester wt) {
     calls.clear();
 
-    SystemChannels.platform.setMockMethodCallHandler((MethodCall call) async {
-      calls.add(call);
-    });
+    wt.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall call) async {
+        calls.add(call);
+        return null;
+      },
+    );
   }
 
   group('CodeController. Shortcuts.', () {
@@ -97,7 +101,7 @@ void main() {
         controller.value = const TextEditingValue(text: MethodSnippet.full);
         controller.foldAt(1);
         await wt.selectFromHome(18, offset: 16);
-        mockClipboardHandler();
+        mockClipboardHandler(wt);
 
         await example.act();
 
