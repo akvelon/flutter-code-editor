@@ -104,14 +104,14 @@ class SearchNavigationController extends ValueNotifier<SearchNavigationState> {
       return null;
     }
 
-    final visibleSelectionEnd = codeController.selection.end;
-    final fullSelectionEnd = codeController.code.hiddenRanges.recoverPosition(
-      visibleSelectionEnd,
+    final visibleSelectionStart = codeController.selection.start;
+    final fullSelectionStart = codeController.code.hiddenRanges.recoverPosition(
+      visibleSelectionStart,
       placeHiddenRanges: TextAffinity.downstream,
     );
 
     var closestMatchIndex = _lastFullSearchResult.matches.indexWhere(
-      (element) => element.start >= fullSelectionEnd,
+      (element) => element.start >= fullSelectionStart,
     );
 
     if (closestMatchIndex == -1) {
