@@ -54,25 +54,69 @@ void main() {
       ),
 
       _Example(
-        'Delete',
+        'Delete non-ambigious',
         oldValue: TextEditingValue(
           text: 'abc',
           //      \ cursor
           selection: TextSelection.collapsed(offset: 1),
         ),
         newString: 'ac',
-        expected: null,
+        expected: TextRange(start: 1, end: 2),
       ),
 
       _Example(
-        'Backspace',
+        'Delete disambiguated first b',
+        oldValue: TextEditingValue(
+          text: 'abbc',
+          //      \ cursor
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+        newString: 'abc',
+        expected: TextRange(start: 1, end: 2),
+      ),
+
+      _Example(
+        'Delete disambiguated second b',
+        oldValue: TextEditingValue(
+          text: 'abbc',
+          //       \ cursor
+          selection: TextSelection.collapsed(offset: 2),
+        ),
+        newString: 'abc',
+        expected: TextRange(start: 2, end: 3),
+      ),
+
+      _Example(
+        'Backspace non-ambigious',
         oldValue: TextEditingValue(
           text: 'abc',
           //       \ cursor
           selection: TextSelection.collapsed(offset: 2),
         ),
         newString: 'ac',
-        expected: null,
+        expected: TextRange(start: 1, end: 2),
+      ),
+
+      _Example(
+        'Backspace disambiguated first b',
+        oldValue: TextEditingValue(
+          text: 'abbc',
+          //       \ cursor
+          selection: TextSelection.collapsed(offset: 2),
+        ),
+        newString: 'abc',
+        expected: TextRange(start: 1, end: 2),
+      ),
+
+      _Example(
+        'Backspace disambiguated second b',
+        oldValue: TextEditingValue(
+          text: 'abbc',
+          //        \ cursor
+          selection: TextSelection.collapsed(offset: 3),
+        ),
+        newString: 'abc',
+        expected: TextRange(start: 2, end: 3),
       ),
 
       _Example(
