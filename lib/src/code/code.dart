@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
 import '../../src/highlight/result.dart';
+import '../code_field/text_editing_value.dart';
 import '../folding/foldable_block.dart';
 import '../folding/foldable_block_matcher.dart';
 import '../folding/invalid_foldable_block.dart';
@@ -325,7 +326,7 @@ class Code {
     TextSelection oldSelection,
     TextEditingValue visibleAfter,
   ) {
-    final visibleRangeAfter = visibleAfter.text.getChangedRangeAroundSelection(
+    final visibleRangeAfter = visibleAfter.getChangedRange(
           TextEditingValue(text: visibleText, selection: oldSelection),
         ) ??
         visibleAfter.text.getChangedRange(
@@ -385,7 +386,7 @@ class Code {
         foldedBlocks.any(
           (block) =>
               block.lastLine >= firstChangedLine &&
-              block.lastLine <= lastChangedLine,
+              block.lastLine < lastChangedLine,
         )) {
       return CodeEditResult(
         fullTextAfter: text,
