@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import '../code/reg_exp.dart';
 import '../code/string.dart';
 import '../code/text_range.dart';
+import '../code_field/code_controller.dart';
+import '../util/edit_type.dart';
 import 'text_selection.dart';
 
 extension TextEditingValueExtension on TextEditingValue {
@@ -184,5 +186,74 @@ extension TextEditingValueExtension on TextEditingValue {
       ),
       text: text,
     );
+  }
+
+  /// Returns the widest [TextRange] of this that is different from [oldValue]
+  /// if it can be produced by any of common edits allowed for user input.
+  /// These are all edits that go through [CodeController.value] setter
+  /// and do not include undo/redo.
+  ///
+  /// Returns null if the change cannot be produced by such user edits.
+  TextRange? getChangedRange(TextEditingValue oldValue) {
+    switch (getEditType(oldValue)) {
+      case EditType.backspaceBeforeCollapsedSelection:
+        return TextRange.collapsed(
+          text.length - oldValue.afterSelection.length,
+        );
+
+      case EditType.deleteSelection:
+      case EditType.deleteAfterCollapsedSelection:
+        return TextRange.collapsed(oldValue.beforeSelection.length);
+
+      case EditType.replaceSelection:
+      case EditType.insertAtCollapsedSelection:
+        return TextRange(
+          start: oldValue.beforeSelection.length,
+          end: text.length - oldValue.afterSelection.length,
+        );
+
+      case EditType.unchanged:
+      case EditType.other:
+        return null;
+    }
+  }
+
+  EditType getEditType(TextEditingValue oldValue) {
+    if (oldValue.text == text) {
+      return EditType.unchanged;
+    }
+
+    final oldBefore = oldValue.beforeSelection;
+    final oldAfter = oldValue.afterSelection;
+    final oldUnselectedLength = oldBefore.length + oldAfter.length;
+
+    if (text.length < oldUnselectedLength) {
+      if (text.startsWith(oldBefore) && selection == oldValue.selection) {
+        return EditType.deleteAfterCollapsedSelection;
+      }
+
+      if (text.endsWith(oldAfter) &&
+          selection.isCollapsed &&
+          selection.start ==
+              text.length - oldValue.text.length + oldValue.selection.start) {
+        return EditType.backspaceBeforeCollapsedSelection;
+      }
+
+      return EditType.other;
+    }
+
+    if (text.startsWith(oldBefore) && text.endsWith(oldAfter)) {
+      if (oldValue.selection.isCollapsed) {
+        return EditType.insertAtCollapsedSelection;
+      }
+
+      if (text.length == oldUnselectedLength) {
+        return EditType.deleteSelection;
+      }
+
+      return EditType.replaceSelection;
+    }
+
+    return EditType.other;
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_code_editor/src/code/string.dart';
+import 'package:flutter_code_editor/src/code_field/text_editing_value.dart';
 import 'package:flutter_code_editor/src/code_field/text_selection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('String.getChangedRangeAroundSelection', () {
+  test('TextEditingValue.getChangedRange', () {
     const examples = [
       //
       _Example(
@@ -14,7 +14,11 @@ void main() {
           //        <->
           selection: TextSelection(baseOffset: 3, extentOffset: 6),
         ),
-        newString: 'abcghi',
+        newValue: TextEditingValue(
+          text: 'abcghi',
+          //        \ cursor
+          selection: TextSelection.collapsed(offset: 3),
+        ),
         expected: TextRange(start: 3, end: 3),
       ),
 
@@ -25,7 +29,11 @@ void main() {
           //        <->
           selection: TextSelection(baseOffset: 3, extentOffset: 6),
         ),
-        newString: 'abcdeghi',
+        newValue: TextEditingValue(
+          text: 'abcdeghi',
+          //         \ cursor
+          selection: TextSelection.collapsed(offset: 4),
+        ),
         expected: TextRange(start: 3, end: 5),
       ),
 
@@ -36,8 +44,11 @@ void main() {
           //        \ cursor
           selection: TextSelection.collapsed(offset: 3),
         ),
-        newString: 'abcDDghi',
-        //             +
+        newValue: TextEditingValue(
+          text: 'abcDDghi',
+          //        +\ cursor
+          selection: TextSelection.collapsed(offset: 4),
+        ),
         expected: TextRange(start: 3, end: 4),
       ),
 
@@ -48,31 +59,71 @@ void main() {
           //         \ cursor
           selection: TextSelection.collapsed(offset: 4),
         ),
-        newString: 'abcDDghi',
-        //              +
+        newValue: TextEditingValue(
+          text: 'abcDDghi',
+          //         +\ cursor
+          selection: TextSelection.collapsed(offset: 5),
+        ),
         expected: TextRange(start: 4, end: 5),
       ),
 
       _Example(
-        'Delete',
+        'Delete disambiguated first b',
         oldValue: TextEditingValue(
+          text: 'abbc',
+          //      \ cursor
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+        newValue: TextEditingValue(
           text: 'abc',
           //      \ cursor
           selection: TextSelection.collapsed(offset: 1),
         ),
-        newString: 'ac',
-        expected: null,
+        expected: TextRange(start: 1, end: 1),
       ),
 
       _Example(
-        'Backspace',
+        'Delete disambiguated second b',
         oldValue: TextEditingValue(
+          text: 'abbc',
+          //       \ cursor
+          selection: TextSelection.collapsed(offset: 2),
+        ),
+        newValue: TextEditingValue(
           text: 'abc',
           //       \ cursor
           selection: TextSelection.collapsed(offset: 2),
         ),
-        newString: 'ac',
-        expected: null,
+        expected: TextRange(start: 2, end: 2),
+      ),
+
+      _Example(
+        'Backspace disambiguated first b',
+        oldValue: TextEditingValue(
+          text: 'abbc',
+          //       \ cursor
+          selection: TextSelection.collapsed(offset: 2),
+        ),
+        newValue: TextEditingValue(
+          text: 'abc',
+          //      \ cursor
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+        expected: TextRange(start: 1, end: 1),
+      ),
+
+      _Example(
+        'Backspace disambiguated second b',
+        oldValue: TextEditingValue(
+          text: 'abbc',
+          //        \ cursor
+          selection: TextSelection.collapsed(offset: 3),
+        ),
+        newValue: TextEditingValue(
+          text: 'abc',
+          selection: TextSelection.collapsed(offset: 2),
+        ),
+        expected: TextRange(start: 2, end: 2),
       ),
 
       _Example(
@@ -82,7 +133,11 @@ void main() {
           //      \ cursor
           selection: TextSelection.collapsed(offset: 1),
         ),
-        newString: 'Abc',
+        newValue: TextEditingValue(
+          text: 'Abc',
+          //      \ cursor
+          selection: TextSelection.collapsed(offset: 1), // any
+        ),
         expected: null,
       ),
 
@@ -93,23 +148,26 @@ void main() {
           //      \ cursor
           selection: TextSelection.collapsed(offset: 1),
         ),
-        newString: 'abC',
+        newValue: TextEditingValue(
+          text: 'abC',
+          //      \ cursor
+          selection: TextSelection.collapsed(offset: 1), // any
+        ),
         expected: null,
       ),
     ];
 
     for (final example in examples) {
       expect(
-        () =>
-            example.newString.getChangedRangeAroundSelection(example.oldValue),
+        () => example.newValue.getChangedRange(example.oldValue),
         returnsNormally,
         reason: example.name,
       );
 
-      final range = example.newString.getChangedRangeAroundSelection(
+      final range = example.newValue.getChangedRange(
         example.oldValue,
       );
-      final reversedRange = example.newString.getChangedRangeAroundSelection(
+      final reversedRange = example.newValue.getChangedRange(
         example.oldValue.copyWith(
           selection: example.oldValue.selection.reversed,
         ),
@@ -132,13 +190,13 @@ void main() {
 class _Example {
   final String name;
   final TextEditingValue oldValue;
-  final String newString;
+  final TextEditingValue newValue;
   final TextRange? expected;
 
   const _Example(
     this.name, {
     required this.oldValue,
-    required this.newString,
+    required this.newValue,
     required this.expected,
   });
 }
