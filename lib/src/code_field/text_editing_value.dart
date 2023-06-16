@@ -195,24 +195,21 @@ extension TextEditingValueExtension on TextEditingValue {
   ///
   /// Returns null if the change cannot be produced by such user edits.
   TextRange? getChangedRange(TextEditingValue oldValue) {
-    final oldBefore = oldValue.beforeSelection;
-    final oldAfter = oldValue.afterSelection;
-
-    final editType = getEditType(oldValue);
-
-    switch (editType) {
+    switch (getEditType(oldValue)) {
       case EditType.backspaceBeforeCollapsedSelection:
-        return TextRange.collapsed(text.length - oldAfter.length);
+        return TextRange.collapsed(
+          text.length - oldValue.afterSelection.length,
+        );
 
       case EditType.deleteSelection:
       case EditType.deleteAfterCollapsedSelection:
-        return TextRange.collapsed(oldBefore.length);
+        return TextRange.collapsed(oldValue.beforeSelection.length);
 
       case EditType.replaceSelection:
       case EditType.insertAtCollapsedSelection:
         return TextRange(
-          start: oldBefore.length,
-          end: text.length - oldAfter.length,
+          start: oldValue.beforeSelection.length,
+          end: text.length - oldValue.afterSelection.length,
         );
 
       case EditType.unchanged:
