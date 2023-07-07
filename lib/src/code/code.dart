@@ -145,7 +145,7 @@ class Code {
       namedSections: sectionsMap,
       visibleHighlighted:
           hiddenRanges.cutHighlighted(highlighted)?.splitLines(),
-      visibleText: hiddenRanges.cutString(text),
+      visibleText: text,
       visibleSectionNames: visibleSectionNames,
     );
   }

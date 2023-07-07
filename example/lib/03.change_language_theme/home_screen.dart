@@ -6,7 +6,7 @@ import '../common/themes.dart';
 import 'constants.dart';
 import 'widgets/dropdown_selector.dart';
 
-const _defaultLanguage = 'dart';
+const _defaultLanguage = 'python';
 const _defaultTheme = 'monokai-sublime';
 
 const _defaultAnalyzer = DefaultLocalAnalyzer();

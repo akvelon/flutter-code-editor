@@ -10,9 +10,12 @@ environment:
 dependencies:
   flutter: { sdk: flutter }
   flutter_code_editor: { path: ../ }
-  flutter_highlight: ^0.7.0
-  highlight: ^0.7.0
   http: ^0.13.5
+  highlight:
+    git:
+      url: https://github.com/yescorp/highlight.dart.git
+      ref: 4e75ac3cca4539add6dc53b93bdcb61b9af06fa1
+      path: highlight/
 
 dev_dependencies:
   flutter_test: { sdk: flutter }
