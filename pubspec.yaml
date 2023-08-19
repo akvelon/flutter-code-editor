@@ -16,7 +16,7 @@ dependencies:
   flutter: { sdk: flutter }
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
-  http: ^0.13.5
+  http: ^1.1.0
   linked_scroll_controller: ^0.2.0
   meta: ^1.7.0
   mocktail: ^0.3.0
