@@ -29,6 +29,8 @@ jobs:
 
       - run: flutter --version
 
+      - run: flutter clean
+
       - name: Install Dependencies
         run: flutter pub get
 
