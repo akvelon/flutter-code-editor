@@ -73,7 +73,7 @@ class CodeSearchController extends ChangeNotifier {
     patternFocusNode.unfocus();
     _hidingTimer?.cancel();
 
-    if (returnFocusToCodeField == true) {
+    if (returnFocusToCodeField) {
       _codeFieldFocusNode?.requestFocus();
     }
 
@@ -160,8 +160,8 @@ class CodeSearchController extends ChangeNotifier {
       return;
     }
 
-    final shouldDismiss = patternFocusNode.hasFocus == false &&
-        _codeFieldFocusNode?.hasFocus == false;
+    final shouldDismiss =
+        !patternFocusNode.hasFocus && _codeFieldFocusNode?.hasFocus == false;
 
     if (shouldDismiss) {
       hideSearch(returnFocusToCodeField: false);

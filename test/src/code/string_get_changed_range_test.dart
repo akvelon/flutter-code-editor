@@ -82,7 +82,7 @@ void main() {
         str1: 'abccde',
         str2: 'abcde',
         expected: [TextRange(start: 2, end: 2), TextRange(start: 3, end: 3)],
-      )
+      ),
     ];
     const affinities = [TextAffinity.upstream, TextAffinity.downstream];
 

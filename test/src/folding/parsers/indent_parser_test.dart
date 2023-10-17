@@ -169,7 +169,7 @@ numbers = [1,
     5
 ]''',
           expected: [_FB(firstLine: 0, lastLine: 4, type: _T.indent)],
-        )
+        ),
       ];
 
       for (final example in examples) {
