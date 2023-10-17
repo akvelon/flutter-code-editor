@@ -76,8 +76,14 @@ void main() {
           final controller = await pumpController(wt, MethodSnippet.full);
           await wt.cursorEnd();
 
+          controller.value = controller.value.replacedText(
+            controller.value.text,
+          );
           controller.value = controller.value.typed('a');
           controller.value = controller.value.typed('b');
+          controller.value = controller.value.replacedText(
+            controller.value.text,
+          );
           controller.foldAt(0);
           controller.unfoldAt(0);
 
