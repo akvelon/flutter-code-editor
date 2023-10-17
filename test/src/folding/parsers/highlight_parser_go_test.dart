@@ -58,7 +58,7 @@ func (
         InvalidFoldableBlock(endLine: 6, type: FBT.braces),
         InvalidFoldableBlock(endLine: 6, type: FBT.braces),
         InvalidFoldableBlock(startLine: 6, type: FBT.parentheses),
-        InvalidFoldableBlock(endLine: 8, type: FBT.braces)
+        InvalidFoldableBlock(endLine: 8, type: FBT.braces),
       ];
       _Tester.parseAndCheck(
         mode: go,
