@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Support for Flutter v3.13.6.
+
 ## 0.3.0
 
 * **BREAKING:** Deleted `CodeController.stringMap`.
