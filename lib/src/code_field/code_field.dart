@@ -514,7 +514,7 @@ class _CodeFieldState extends State<CodeField> {
       widget.controller.selection.base,
       Rect.zero,
     );
-    return (widget.controller.selection.base.offset > 0) ? caretFullHeight! : 0;
+    return caretFullHeight ?? 0;
   }
 
   double _getPopupLeftOffset(TextPainter textPainter) {
