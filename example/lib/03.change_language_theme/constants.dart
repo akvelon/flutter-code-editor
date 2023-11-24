@@ -4,6 +4,7 @@ import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/php.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
+import 'package:highlight/languages/yaml.dart';
 
 final builtinLanguages = {
   'dart': dart,
@@ -12,6 +13,7 @@ final builtinLanguages = {
   'php': php,
   'python': python,
   'scala': scala,
+  'yaml': yaml,
 };
 
 const languageList = <String>[
@@ -21,6 +23,7 @@ const languageList = <String>[
   'php',
   'python',
   'scala',
+  'yaml',
 ];
 
 const themeList = <String>[
