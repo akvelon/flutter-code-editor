@@ -371,7 +371,10 @@ class CodeController extends TextEditingController {
       );
     }
 
-    popupController.hide();
+    // Hide the popup after a short delay to allow the selection to be updated.
+    Future.delayed(const Duration(microseconds: 100), () {
+      popupController.hide();
+    });
   }
 
   String get fullText => _code.text;
