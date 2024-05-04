@@ -29,10 +29,12 @@ class CodeEditor extends StatelessWidget {
       home: Scaffold(
         body: CodeTheme(
           data: CodeThemeData(styles: monokaiSublimeTheme),
-          child: SingleChildScrollView(
-            child: CodeField(
-              controller: controller,
-            ),
+          child: ListView(
+            children: [
+              CodeField(
+                controller: controller,
+              ),
+            ],
           ),
         ),
       ),
