@@ -24,7 +24,7 @@ void disableSpellCheck() {
   if (!_isTimerSet) {
     js.globalContext.callMethod(
       'eval'.toJS,
-      [_jsSetDisableSpellCheckTimer].toJSBox,
+      _jsSetDisableSpellCheckTimer.toJS,
     );
     _isTimerSet = true;
   }
@@ -43,5 +43,5 @@ const _jsDisableBuiltinSearch = '''
 ''';
 
 void disableBuiltInSearch() {
-  js.globalContext.callMethod('eval'.toJS, [_jsDisableBuiltinSearch].toJSBox);
+  js.globalContext.callMethod('eval'.toJS, _jsDisableBuiltinSearch.toJS);
 }
