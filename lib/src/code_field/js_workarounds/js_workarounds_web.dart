@@ -1,5 +1,6 @@
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js;
+import 'dart:js_interop' as js;
+import 'dart:js_interop_unsafe' as js_util;
 
 //=========================== Disable Spellcheck ===========================
 
@@ -21,7 +22,10 @@ bool _isTimerSet = false;
 
 void disableSpellCheck() {
   if (!_isTimerSet) {
-    js.context.callMethod('eval', [_jsSetDisableSpellCheckTimer]);
+    js.globalContext.callMethod(
+      'eval'.toJS,
+      _jsSetDisableSpellCheckTimer.toJS,
+    );
     _isTimerSet = true;
   }
 }
@@ -39,5 +43,5 @@ const _jsDisableBuiltinSearch = '''
 ''';
 
 void disableBuiltInSearch() {
-  js.context.callMethod('eval', [_jsDisableBuiltinSearch]);
+  js.globalContext.callMethod('eval'.toJS, _jsDisableBuiltinSearch.toJS);
 }

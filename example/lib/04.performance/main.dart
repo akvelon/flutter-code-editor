@@ -5,7 +5,9 @@
 
 // ignore_for_file: avoid_print
 
-import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+import 'dart:js_interop' as js;
+import 'dart:js_interop_unsafe' as js_util;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/vs2015.dart';
@@ -56,7 +58,8 @@ final fieldFactories = <String, FieldFactory>{
       ),
 };
 
-final renderer = js.context['flutterCanvasKit'] == null ? 'HTML' : 'CanvasKit';
+final renderer =
+    js.globalContext['flutterCanvasKit'] == null ? 'HTML' : 'CanvasKit';
 
 void main() {
   runApp(CodeEditor());
