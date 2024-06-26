@@ -7,7 +7,7 @@ on:
     branches: [ '**' ]
 
 env:
-  flutter_version: 3.13.6
+  flutter_version: 3.19.6
 
 jobs:
   build:
