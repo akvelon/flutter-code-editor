@@ -47,6 +47,7 @@ class PopupState extends State<Popup> {
   final pageStorageBucket = PageStorageBucket();
   @override
   void initState() {
+    widget.controller.reset();
     widget.controller.addListener(rebuild);
     super.initState();
   }

@@ -12,6 +12,7 @@ import '../../flutter_code_editor.dart';
 import '../autocomplete/autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../code/key_event.dart';
+import '../code_modifiers/insertion.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../search/controller.dart';
@@ -132,6 +133,18 @@ class CodeController extends TextEditingController {
     EnterKeyIntent: EnterKeyAction(controller: this),
   };
 
+  static const defaultCodeModifiers = [
+      IndentModifier(),
+      CloseBlockModifier(),
+      TabModifier(),
+      InsertionCodeModifier.backticks,
+      InsertionCodeModifier.braces,
+      InsertionCodeModifier.brackets,
+      InsertionCodeModifier.doubleQuotes,
+      InsertionCodeModifier.parentheses,
+      InsertionCodeModifier.singleQuotes,
+    ];
+
   CodeController({
     String? text,
     Mode? language,
@@ -143,11 +156,7 @@ class CodeController extends TextEditingController {
     this.patternMap,
     this.readOnly = false,
     this.params = const EditorParams(),
-    this.modifiers = const [
-      IndentModifier(),
-      CloseBlockModifier(),
-      TabModifier(),
-    ],
+    this.modifiers = defaultCodeModifiers,
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
