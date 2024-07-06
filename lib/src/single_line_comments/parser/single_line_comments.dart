@@ -6,6 +6,7 @@ import 'package:highlight/languages/php.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
 import 'package:highlight/languages/vhdl.dart';
+import 'package:highlight/languages/yaml.dart';
 
 class SingleLineComments {
   const SingleLineComments._();
@@ -18,6 +19,7 @@ class SingleLineComments {
     python: [_hash],
     scala: [_slashes],
     vhdl: [_hyphenMinuses],
+    yaml: [_hash],
   };
 
   static const _slashes = '//';
