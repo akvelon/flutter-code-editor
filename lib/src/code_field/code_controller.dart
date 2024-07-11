@@ -9,7 +9,7 @@ import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
 import '../../flutter_code_editor.dart';
-import '../autocomplete/autocompleter.dart';
+import '../autocomplete/default_autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../code/key_event.dart';
 import '../history/code_history_controller.dart';
@@ -99,7 +99,7 @@ class CodeController extends TextEditingController {
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
   late PopupController popupController;
-  final autocompleter = Autocompleter();
+  late final Autocompleter autocompleter;
   late final historyController = CodeHistoryController(codeController: this);
 
   @internal
@@ -148,10 +148,13 @@ class CodeController extends TextEditingController {
       CloseBlockModifier(),
       TabModifier(),
     ],
+    Autocompleter? autocompleter,
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
+    this.autocompleter = autocompleter ?? DefaultAutocompleter();
+    
     setLanguage(language, analyzer: analyzer);
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
@@ -349,28 +352,11 @@ class CodeController extends TextEditingController {
 
   /// Inserts the word selected from the list of completions
   void insertSelectedWord() {
-    final previousSelection = selection;
-    final selectedWord = popupController.getSelectedWord();
-    final startPosition = value.wordAtCursorStart;
-
-    if (startPosition != null) {
-      final replacedText = text.replaceRange(
-        startPosition,
-        selection.baseOffset,
-        selectedWord,
-      );
-
-      final adjustedSelection = previousSelection.copyWith(
-        baseOffset: startPosition + selectedWord.length,
-        extentOffset: startPosition + selectedWord.length,
-      );
-
-      value = TextEditingValue(
-        text: replacedText,
-        selection: adjustedSelection,
-      );
+    final suggestionItem = popupController.getSelectedItem();
+    final result = autocompleter.replaceText(selection, value, suggestionItem);
+    if (result != null) {
+      value = result;
     }
-
     popupController.hide();
   }
 
@@ -763,14 +749,8 @@ class CodeController extends TextEditingController {
   }
 
   Future<void> generateSuggestions() async {
-    final prefix = value.wordToCursor;
-    if (prefix == null) {
-      popupController.hide();
-      return;
-    }
-
     final suggestions =
-        (await autocompleter.getSuggestions(prefix)).toList(growable: false);
+        (await autocompleter.getSuggestionItems(value)).toList(growable: false);
 
     if (suggestions.isNotEmpty) {
       popupController.show(suggestions);

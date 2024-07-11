@@ -4,6 +4,7 @@ export 'src/analyzer/default_analyzer.dart';
 export 'src/analyzer/models/analysis_result.dart';
 export 'src/analyzer/models/issue.dart';
 export 'src/analyzer/models/issue_type.dart';
+export 'src/autocomplete/autocompleter.dart';
 
 export 'src/code/code.dart';
 export 'src/code/code_line.dart';

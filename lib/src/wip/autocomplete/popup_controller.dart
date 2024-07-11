@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../autocomplete/autocompleter.dart';
+
 class PopupController extends ChangeNotifier {
-  late List<String> suggestions;
+  late List<SuggestionItem> suggestions;
   int _selectedIndex = 0;
   bool shouldShow = false;
   bool enabled = true;
@@ -23,8 +25,8 @@ class PopupController extends ChangeNotifier {
 
   int get selectedIndex => _selectedIndex;
 
-  void show(List<String> suggestions) {
-    if (enabled == false) {
+  void show(List<SuggestionItem> suggestions) {
+    if (!enabled) {
       return;
     }
 
@@ -76,7 +78,7 @@ class PopupController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String getSelectedWord() => suggestions[selectedIndex];
+  SuggestionItem getSelectedItem() => suggestions[selectedIndex];
 }
 
 /// Possible directions of completions list navigation
