@@ -15,6 +15,7 @@ class PopupController extends ChangeNotifier {
 
   /// Should be called when an active list item is selected to be inserted into the text
   late final void Function() onCompletionSelected;
+  FocusNode? codeFieldFocusNode;
 
   PopupController({required this.onCompletionSelected}) : super();
 
