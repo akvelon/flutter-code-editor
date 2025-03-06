@@ -45,9 +45,9 @@ class Popup extends StatefulWidget {
 
 class PopupState extends State<Popup> {
   final pageStorageBucket = PageStorageBucket();
+
   @override
   void initState() {
-    widget.controller.reset();
     widget.controller.addListener(rebuild);
     super.initState();
   }
@@ -68,6 +68,13 @@ class PopupState extends State<Popup> {
             Sizes.autocompletePopupMaxWidth +
             (widget.editorOffset?.dx ?? 0) -
             100;
+
+    // Fixes assertion error when ISC isn't attached but _attach method
+    // of ISC instance are being called
+    ItemScrollController? isc;
+    if (widget.controller.itemScrollController.isAttached) {
+      isc = widget.controller.itemScrollController;
+    }
 
     return PageStorage(
       bucket: pageStorageBucket,
@@ -98,7 +105,7 @@ class PopupState extends State<Popup> {
             child: ScrollablePositionedList.builder(
               shrinkWrap: true,
               physics: const ClampingScrollPhysics(),
-              itemScrollController: widget.controller.itemScrollController,
+              itemScrollController: isc,
               itemPositionsListener: widget.controller.itemPositionsListener,
               itemCount: widget.controller.suggestions.length,
               itemBuilder: (context, index) {

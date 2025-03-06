@@ -7,7 +7,7 @@ class PopupController extends ChangeNotifier {
   bool shouldShow = false;
   bool enabled = true;
 
-  ItemScrollController itemScrollController = ItemScrollController();
+  final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
 
@@ -23,12 +23,8 @@ class PopupController extends ChangeNotifier {
 
   int get selectedIndex => _selectedIndex;
 
-  void reset() {
-    itemScrollController = ItemScrollController();
-  }
-
   void show(List<String> suggestions) {
-    if (enabled == false) {
+    if (!enabled) {
       return;
     }
 

@@ -15,6 +15,7 @@ import 'actions/enter_key.dart';
 import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/search.dart';
+import 'actions/tab.dart';
 import 'code_controller.dart';
 import 'default_styles.dart';
 import 'js_workarounds/js_workarounds.dart';
@@ -110,6 +111,11 @@ final _shortcuts = <ShortcutActivator, Intent>{
   LogicalKeySet(
     LogicalKeyboardKey.enter,
   ): const EnterKeyIntent(),
+
+  // TabKey
+  LogicalKeySet(
+    LogicalKeyboardKey.tab,
+  ): const TabKeyIntent(),
 };
 
 class CodeField extends StatefulWidget {
