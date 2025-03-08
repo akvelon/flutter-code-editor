@@ -3,6 +3,8 @@ import 'package:flutter_code_editor/src/named_sections/parsers/brackets_start_en
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/angelscript.dart';
 import 'package:highlight/languages/java.dart';
+import 'package:highlight/languages/javascript.dart';
+import 'package:highlight/languages/typescript.dart';
 
 final _language = java;
 
@@ -99,6 +101,56 @@ public class MyClass {
 
       expect(
         code.lines.lines.map((line) => line.isReadOnly),
+        expected,
+      );
+    });
+
+    test('Lines in read-only sections are read-only for JS/TS Language', () {
+      const text = '''
+export class MyTypeScriptClass {
+  run() { // [START section1]
+  }
+  // [END section1]
+  // [START section2]
+  method() {
+  }
+  // [END section2]
+}
+''';
+      const expected = [
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+      ];
+
+      final codeTypescript = Code(
+        text: text,
+        namedSectionParser: const BracketsStartEndNamedSectionParser(),
+        readOnlySectionNames: {'section1', 'nonexistent'},
+        language: typescript,
+      );
+
+      final codeJavascript = Code(
+        text: text,
+        namedSectionParser: const BracketsStartEndNamedSectionParser(),
+        readOnlySectionNames: {'section1', 'nonexistent'},
+        language: javascript,
+      );
+
+      expect(
+        codeTypescript.lines.lines.map((line) => line.isReadOnly),
+        expected,
+      );
+
+      expect(
+        codeJavascript.lines.lines.map((line) => line.isReadOnly),
         expected,
       );
     });
