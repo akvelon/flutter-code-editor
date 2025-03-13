@@ -24,7 +24,7 @@ class PopupController extends ChangeNotifier {
   int get selectedIndex => _selectedIndex;
 
   void show(List<String> suggestions) {
-    if (enabled == false) {
+    if (!enabled) {
       return;
     }
 
