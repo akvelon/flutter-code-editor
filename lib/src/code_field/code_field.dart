@@ -259,9 +259,6 @@ class _CodeFieldState extends State<CodeField> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onTextChanged();
-      final double width = _codeFieldKey.currentContext!.size!.width;
-      final double height = _codeFieldKey.currentContext!.size!.height;
-      windowSize = Size(width, height);
     });
   }
 
