@@ -258,11 +258,11 @@ class _CodeFieldState extends State<CodeField> {
     disableSpellCheckIfWeb();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onTextChanged();
       final double width = _codeFieldKey.currentContext!.size!.width;
       final double height = _codeFieldKey.currentContext!.size!.height;
       windowSize = Size(width, height);
     });
-    _onTextChanged();
   }
 
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
@@ -342,7 +342,9 @@ class _CodeFieldState extends State<CodeField> {
       _editorOffset = box?.localToGlobal(Offset.zero);
       if (_editorOffset != null) {
         Offset fixedOffset = _editorOffset!;
-        fixedOffset += Offset(0, _codeScroll.offset);
+        if (_codeScroll.hasClients) {
+          fixedOffset += Offset(0, _codeScroll.offset);
+        }
         _editorOffset = fixedOffset;
       }
     }
