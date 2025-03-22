@@ -307,18 +307,20 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   void rebuild() {
-    setState(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // For some reason _codeFieldKey.currentContext is null in tests
-        // so check first.
-        final context = _codeFieldKey.currentContext;
-        if (context != null) {
-          final double width = context.size!.width;
-          final double height = context.size!.height;
-          windowSize = Size(width, height);
-        }
+    if (mounted) {
+      setState(() {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // For some reason _codeFieldKey.currentContext is null in tests
+          // so check first.
+          final context = _codeFieldKey.currentContext;
+          if (context != null) {
+            final double width = context.size!.width;
+            final double height = context.size!.height;
+            windowSize = Size(width, height);
+          }
+        });
       });
-    });
+    }
   }
 
   void _onTextChanged() {
@@ -503,11 +505,11 @@ class _CodeFieldState extends State<CodeField> {
     final flippedTopOffset = normalTopOffset -
         (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
+    _normalPopupOffset = Offset(leftOffset, normalTopOffset);
+    _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
+
     if (mounted) {
-      setState(() {
-        _normalPopupOffset = Offset(leftOffset, normalTopOffset);
-        _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
-      });
+      setState(() {});
     }
   }
 
@@ -547,12 +549,14 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   double _getPopupTopOffset(TextPainter textPainter, double caretHeight) {
+    final codeScrollOffset = _codeScroll.hasClients ? _codeScroll.offset : 0;
+
     return max(
       _getCaretOffset(textPainter).dy +
           caretHeight +
           16 +
           widget.padding.top -
-          _codeScroll.offset +
+          codeScrollOffset +
           (_editorOffset?.dy ?? 0),
       0,
     );
