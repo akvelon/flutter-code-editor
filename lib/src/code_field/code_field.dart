@@ -503,10 +503,12 @@ class _CodeFieldState extends State<CodeField> {
     final flippedTopOffset = normalTopOffset -
         (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
-    setState(() {
-      _normalPopupOffset = Offset(leftOffset, normalTopOffset);
-      _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
-    });
+    if (mounted) {
+      setState(() {
+        _normalPopupOffset = Offset(leftOffset, normalTopOffset);
+        _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
+      });
+    }
   }
 
   TextPainter _getTextPainter(String text) {
@@ -532,10 +534,13 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   double _getPopupLeftOffset(TextPainter textPainter) {
+    final double scrollOffset =
+        _horizontalCodeScroll.hasClients ? _horizontalCodeScroll.offset : 0;
+
     return max(
       _getCaretOffset(textPainter).dx +
           widget.padding.left -
-          _horizontalCodeScroll.offset +
+          scrollOffset +
           (_editorOffset?.dx ?? 0),
       0,
     );
