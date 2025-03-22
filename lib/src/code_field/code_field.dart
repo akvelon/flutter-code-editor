@@ -331,7 +331,7 @@ class _CodeFieldState extends State<CodeField> {
       if (line.length > longestLine.length) longestLine = line;
     });
 
-    if (_codeScroll != null && _editorKey.currentContext != null) {
+    if (_codeScroll != null && _codeScroll!.hasClients && _editorKey.currentContext != null) {
       final box = _editorKey.currentContext!.findRenderObject() as RenderBox?;
       _editorOffset = box?.localToGlobal(Offset.zero);
       if (_editorOffset != null) {
