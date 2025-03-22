@@ -312,12 +312,12 @@ class _CodeFieldState extends State<CodeField> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           // For some reason _codeFieldKey.currentContext is null in tests
           // so check first.
-          final context = _codeFieldKey.currentContext;
-          if (context != null) {
-            final double width = context.size!.width;
-            final double height = context.size!.height;
-            windowSize = Size(width, height);
-          }
+          final BuildContext? context = _codeFieldKey.currentContext;
+          if (context == null || context.size == null) return;
+
+          final double width = context.size!.width;
+          final double height = context.size!.height;
+          windowSize = Size(width, height);
         });
       });
     }
