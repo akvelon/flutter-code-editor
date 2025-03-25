@@ -145,6 +145,12 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.textStyle}
   final TextStyle? textStyle;
 
+  /// {@macro flutter.widgets.textField.smartDashesType}
+  final SmartDashesType smartDashesType;
+
+  /// {@macro flutter.widgets.textField.smartQuotesType}
+  final SmartQuotesType smartQuotesType;
+
   /// A way to replace specific line numbers by a custom TextSpan
   final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
 
@@ -181,6 +187,8 @@ class CodeField extends StatefulWidget {
     this.background,
     this.decoration,
     this.textStyle,
+    this.smartDashesType = SmartDashesType.disabled,
+    this.smartQuotesType = SmartQuotesType.disabled,
     this.padding = EdgeInsets.zero,
     GutterStyle? gutterStyle,
     this.enabled,
@@ -406,6 +414,8 @@ class _CodeFieldState extends State<CodeField> {
       focusNode: _focusNode,
       scrollPadding: widget.padding,
       style: textStyle,
+      smartDashesType: widget.smartDashesType,
+      smartQuotesType: widget.smartQuotesType,
       controller: widget.controller,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
