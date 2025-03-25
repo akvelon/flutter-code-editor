@@ -1,3 +1,8 @@
+## 0.3.3
+
+- Added `smartDashesType` and `smartQuotesType` to `CodeField` (https://github.com/akvelon/flutter-code-editor/pull/278).
+- Added named sections support for JavaScript and TypeScript (https://github.com/akvelon/flutter-code-editor/pull/291).
+
 ## 0.3.2
 
 - Flutter 3.22 WASM fixes
