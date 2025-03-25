@@ -556,20 +556,20 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   void _onPopupStateChanged() {
-    final shouldShow =
-        widget.controller.popupController.shouldShow && windowSize != null;
-    if (!shouldShow) {
-      _suggestionsPopup?.remove();
-      _suggestionsPopup = null;
-      return;
-    }
+    // final shouldShow =
+    //     widget.controller.popupController.shouldShow && windowSize != null;
+    // if (!shouldShow) {
+    //   _suggestionsPopup?.remove();
+    //   _suggestionsPopup = null;
+    //   return;
+    // }
 
-    if (_suggestionsPopup == null) {
-      _suggestionsPopup = _buildSuggestionOverlay();
-      Overlay.of(context).insert(_suggestionsPopup!);
-    }
+    // if (_suggestionsPopup == null) {
+    //   _suggestionsPopup = _buildSuggestionOverlay();
+    //   Overlay.of(context).insert(_suggestionsPopup!);
+    // }
 
-    _suggestionsPopup!.markNeedsBuild();
+    // _suggestionsPopup!.markNeedsBuild();
   }
 
   void _onSearchControllerChange() {
