@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../code/code.dart';
@@ -10,6 +11,7 @@ import 'models/issue_type.dart';
 
 // Example for implementation of Analyzer for Dart.
 class DartPadAnalyzer extends AbstractAnalyzer {
+  @visibleForTesting
   static const String url =
       'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
 
