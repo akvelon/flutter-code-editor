@@ -18,6 +18,6 @@ class Issue {
   });
 }
 
-Comparator<Issue> issueLineComparator = (issue1, issue2) {
+Comparator<Issue> issueLineComparator = (Issue issue1, Issue issue2) {
   return issue1.line - issue2.line;
 };

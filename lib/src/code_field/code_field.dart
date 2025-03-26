@@ -512,11 +512,11 @@ class _CodeFieldState extends State<CodeField> {
     final flippedTopOffset = normalTopOffset -
         (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
-    _normalPopupOffset = Offset(leftOffset, normalTopOffset);
-    _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
-
     if (mounted) {
-      setState(() {});
+      setState(() {
+        _normalPopupOffset = Offset(leftOffset, normalTopOffset);
+        _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
+      });
     }
   }
 
@@ -603,7 +603,7 @@ class _CodeFieldState extends State<CodeField> {
 
   OverlayEntry _buildSearchOverlay() {
     final colorScheme = Theme.of(context).colorScheme;
-    final borderColor = _getTextColorFromTheme() ?? colorScheme.onBackground;
+    final borderColor = _getTextColorFromTheme() ?? colorScheme.onSurface;
     return OverlayEntry(
       builder: (context) {
         return Positioned(

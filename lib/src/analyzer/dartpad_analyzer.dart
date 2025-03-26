@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_dynamic_calls
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -11,41 +10,44 @@ import 'models/issue_type.dart';
 
 // Example for implementation of Analyzer for Dart.
 class DartPadAnalyzer extends AbstractAnalyzer {
-  static const _url =
+  static const String url =
       'https://stable.api.dartpad.dev/api/dartservices/v2/analyze';
+
+  final http.Client client;
+
+  DartPadAnalyzer({http.Client? client}) : client = client ?? http.Client();
 
   @override
   Future<AnalysisResult> analyze(Code code) async {
-    final client = http.Client();
-
-    final response = await client.post(
-      Uri.parse(_url),
-      body: json.encode({
-        'source': code.text,
-      }),
+    final http.Response response = await client.post(
+      Uri.parse(url),
+      body: json.encode(<String, String>{'source': code.text}),
       encoding: utf8,
     );
 
-    final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
-    final issueMaps = decodedResponse['issues'];
+    final Map<String, dynamic> decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    final dynamic issueMaps = decodedResponse['issues'];
 
-    if (issueMaps is! Iterable || (issueMaps.isEmpty)) {
-      return const AnalysisResult(issues: []);
+    if (issueMaps is! Iterable<dynamic> || (issueMaps.isEmpty)) {
+      return const AnalysisResult(issues: <Issue>[]);
     }
 
-    final issues = issueMaps
+    final List<Issue> issues = issueMaps
         .cast<Map<String, dynamic>>()
-        .map(issueFromJson)
+        .map<Issue>(issueFromJson)
         .toList(growable: false);
+
     return AnalysisResult(issues: issues);
   }
 }
 
 // Converts json to Issue object for the DartAnalyzer.
 Issue issueFromJson(Map<String, dynamic> json) {
-  final type = mapIssueType(json['kind']);
+  final IssueType type = mapIssueType(json['kind']);
+  final int line = json['line'];
   return Issue(
-    line: json['line'] - 1,
+    line: line - 1,
     message: json['message'],
     suggestion: json['correction'],
     type: type,
