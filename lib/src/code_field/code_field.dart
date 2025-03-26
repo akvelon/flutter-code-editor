@@ -535,11 +535,11 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   double _getCaretHeight(TextPainter textPainter) {
-    final double caretFullHeight = textPainter.getFullHeightForCaret(
+    final double? caretFullHeight = textPainter.getFullHeightForCaret(
       widget.controller.selection.base,
       Rect.zero,
     );
-    return caretFullHeight;
+    return caretFullHeight ?? 0;
   }
 
   double _getPopupLeftOffset(TextPainter textPainter) {
