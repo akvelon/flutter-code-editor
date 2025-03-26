@@ -214,11 +214,15 @@ class CodeField extends StatefulWidget {
 
 class _CodeFieldState extends State<CodeField> {
   // Add a controller
-  LinkedScrollControllerGroup? _controllers;
-  ScrollController? _numberScroll;
-  ScrollController? _codeScroll;
-  ScrollController? _horizontalCodeScroll;
-  final _codeFieldKey = GlobalKey();
+  final LinkedScrollControllerGroup _controllers =
+      LinkedScrollControllerGroup();
+
+  late final ScrollController _numberScroll;
+  late final ScrollController _codeScroll;
+  late final ScrollController _horizontalCodeScroll;
+
+  final GlobalKey<State<StatefulWidget>> _codeFieldKey =
+      GlobalKey<State<StatefulWidget>>();
 
   OverlayEntry? _suggestionsPopup;
   OverlayEntry? _searchPopup;
@@ -234,15 +238,16 @@ class _CodeFieldState extends State<CodeField> {
   late TextStyle textStyle;
   Color? _backgroundCol;
 
-  final _editorKey = GlobalKey();
+  final GlobalKey<State<StatefulWidget>> _editorKey =
+      GlobalKey<State<StatefulWidget>>();
   Offset? _editorOffset;
 
   @override
   void initState() {
     super.initState();
-    _controllers = LinkedScrollControllerGroup();
-    _numberScroll = _controllers?.addAndGet();
-    _codeScroll = _controllers?.addAndGet();
+
+    _numberScroll = _controllers.addAndGet();
+    _codeScroll = _controllers.addAndGet();
 
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
@@ -261,11 +266,8 @@ class _CodeFieldState extends State<CodeField> {
     disableSpellCheckIfWeb();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final double width = _codeFieldKey.currentContext!.size!.width;
-      final double height = _codeFieldKey.currentContext!.size!.height;
-      windowSize = Size(width, height);
+      _onTextChanged();
     });
-    _onTextChanged();
   }
 
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
@@ -284,9 +286,9 @@ class _CodeFieldState extends State<CodeField> {
     );
     _searchPopup?.remove();
     _searchPopup = null;
-    _numberScroll?.dispose();
-    _codeScroll?.dispose();
-    _horizontalCodeScroll?.dispose();
+    _numberScroll.dispose();
+    _codeScroll.dispose();
+    _horizontalCodeScroll.dispose();
     super.dispose();
   }
 
@@ -310,18 +312,20 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   void rebuild() {
-    setState(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // For some reason _codeFieldKey.currentContext is null in tests
-        // so check first.
-        final context = _codeFieldKey.currentContext;
-        if (context != null) {
+    if (mounted) {
+      setState(() {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // For some reason _codeFieldKey.currentContext is null in tests
+          // so check first.
+          final BuildContext? context = _codeFieldKey.currentContext;
+          if (context == null || context.size == null) return;
+
           final double width = context.size!.width;
           final double height = context.size!.height;
           windowSize = Size(width, height);
-        }
+        });
       });
-    });
+    }
   }
 
   void _onTextChanged() {
@@ -339,12 +343,15 @@ class _CodeFieldState extends State<CodeField> {
       if (line.length > longestLine.length) longestLine = line;
     });
 
-    if (_codeScroll != null && _editorKey.currentContext != null) {
-      final box = _editorKey.currentContext!.findRenderObject() as RenderBox?;
+    if (_editorKey.currentContext != null) {
+      final RenderBox? box =
+          _editorKey.currentContext!.findRenderObject() as RenderBox?;
       _editorOffset = box?.localToGlobal(Offset.zero);
       if (_editorOffset != null) {
-        var fixedOffset = _editorOffset!;
-        fixedOffset += Offset(0, _codeScroll!.offset);
+        Offset fixedOffset = _editorOffset!;
+        if (_codeScroll.hasClients) {
+          fixedOffset += Offset(0, _codeScroll.offset);
+        }
         _editorOffset = fixedOffset;
       }
     }
@@ -362,7 +369,7 @@ class _CodeFieldState extends State<CodeField> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+        children: <Widget>[
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: 0,
@@ -391,10 +398,10 @@ class _CodeFieldState extends State<CodeField> {
   @override
   Widget build(BuildContext context) {
     // Default color scheme
-    const rootKey = 'root';
+    const String rootKey = 'root';
 
-    final themeData = Theme.of(context);
-    final styles = CodeTheme.of(context)?.styles;
+    final ThemeData themeData = Theme.of(context);
+    final Map<String, TextStyle>? styles = CodeTheme.of(context)?.styles;
     _backgroundCol = widget.background ??
         styles?[rootKey]?.backgroundColor ??
         DefaultStyles.backgroundColor;
@@ -410,7 +417,7 @@ class _CodeFieldState extends State<CodeField> {
 
     textStyle = defaultTextStyle.merge(widget.textStyle);
 
-    final codeField = TextField(
+    final TextField codeField = TextField(
       focusNode: _focusNode,
       scrollPadding: widget.padding,
       style: textStyle,
@@ -505,10 +512,12 @@ class _CodeFieldState extends State<CodeField> {
     final flippedTopOffset = normalTopOffset -
         (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
 
-    setState(() {
-      _normalPopupOffset = Offset(leftOffset, normalTopOffset);
-      _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
-    });
+    if (mounted) {
+      setState(() {
+        _normalPopupOffset = Offset(leftOffset, normalTopOffset);
+        _flippedPopupOffset = Offset(leftOffset, flippedTopOffset);
+      });
+    }
   }
 
   TextPainter _getTextPainter(String text) {
@@ -534,22 +543,27 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   double _getPopupLeftOffset(TextPainter textPainter) {
+    final double scrollOffset =
+        _horizontalCodeScroll.hasClients ? _horizontalCodeScroll.offset : 0;
+
     return max(
       _getCaretOffset(textPainter).dx +
           widget.padding.left -
-          _horizontalCodeScroll!.offset +
+          scrollOffset +
           (_editorOffset?.dx ?? 0),
       0,
     );
   }
 
   double _getPopupTopOffset(TextPainter textPainter, double caretHeight) {
+    final codeScrollOffset = _codeScroll.hasClients ? _codeScroll.offset : 0;
+
     return max(
       _getCaretOffset(textPainter).dy +
           caretHeight +
           16 +
           widget.padding.top -
-          _codeScroll!.offset +
+          codeScrollOffset +
           (_editorOffset?.dy ?? 0),
       0,
     );
@@ -589,7 +603,7 @@ class _CodeFieldState extends State<CodeField> {
 
   OverlayEntry _buildSearchOverlay() {
     final colorScheme = Theme.of(context).colorScheme;
-    final borderColor = _getTextColorFromTheme() ?? colorScheme.onBackground;
+    final borderColor = _getTextColorFromTheme() ?? colorScheme.onSurface;
     return OverlayEntry(
       builder: (context) {
         return Positioned(

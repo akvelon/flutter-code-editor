@@ -33,15 +33,17 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (event) {
-        setState(() {
-          _mouseEnteredPopup = false;
-          if (_entry != null) {
-            return;
-          }
-          _entry = _getErrorPopup();
-          final overlay = Overlay.of(context);
-          overlay.insert(_entry!);
-        });
+        if (mounted) {
+          setState(() {
+            _mouseEnteredPopup = false;
+            if (_entry != null) {
+              return;
+            }
+            _entry = _getErrorPopup();
+            final overlay = Overlay.of(context);
+            overlay.insert(_entry!);
+          });
+        }
       },
       onExit: (event) {
         // Delay event here to keep overlay
@@ -49,12 +51,14 @@ class _GutterErrorWidgetState extends State<GutterErrorWidget> {
         Future.delayed(
           const Duration(milliseconds: 50),
           () {
-            setState(() {
-              if (!_mouseEnteredPopup) {
-                _entry?.remove();
-                _entry = null;
-              }
-            });
+            if (mounted) {
+              setState(() {
+                if (!_mouseEnteredPopup) {
+                  _entry?.remove();
+                  _entry = null;
+                }
+              });
+            }
           },
         );
       },
