@@ -4,6 +4,7 @@ import 'package:highlight/highlight_core.dart';
 
 import '../code/reg_exp.dart';
 import '../code_field/text_editing_value.dart';
+import '../util/string_util.dart';
 import 'autocompleter.dart';
 
 /// Accumulates textual data and suggests autocompletion based on it.
@@ -165,25 +166,45 @@ class DefaultAutocompleter extends Autocompleter {
     SuggestionItem item,
   ) {
     final previousSelection = selection;
+    final selectedWord = item.text;
     final startPosition = value.wordAtCursorStart;
+    final currentWord = value.wordAtCursor;
 
-    if (startPosition != null) {
-      final replacedText = text.replaceRange(
-        startPosition,
-        selection.baseOffset,
-        item.text,
-      );
-
-      final adjustedSelection = previousSelection.copyWith(
-        baseOffset: startPosition + item.text.length,
-        extentOffset: startPosition + item.text.length,
-      );
-
-      return TextEditingValue(
-        text: replacedText,
-        selection: adjustedSelection,
-      );
+    if (startPosition == null || currentWord == null) {
+      return null;
     }
-    return null;
+
+    final endReplacingPosition = startPosition + currentWord.length;
+    final endSelectionPosition = startPosition + selectedWord.length;
+
+    var additionalSpaceIfEnd = '';
+    var offsetIfEndsWithSpace = 1;
+    if (text.length < endReplacingPosition + 1) {
+      additionalSpaceIfEnd = ' ';
+    } else {
+      final charAfterText = text[endReplacingPosition];
+      if (charAfterText != ' ' &&
+          !StringUtil.isDigit(charAfterText) &&
+          !StringUtil.isLetterEng(charAfterText)) {
+        // ex. case ';' or other finalizer, or symbol
+        offsetIfEndsWithSpace = 0;
+      }
+    }
+
+    final replacedText = text.replaceRange(
+      startPosition,
+      endReplacingPosition,
+      '$selectedWord$additionalSpaceIfEnd',
+    );
+
+    final adjustedSelection = previousSelection.copyWith(
+      baseOffset: endSelectionPosition + offsetIfEndsWithSpace,
+      extentOffset: endSelectionPosition + offsetIfEndsWithSpace,
+    );
+
+    return TextEditingValue(
+      text: replacedText,
+      selection: adjustedSelection,
+    );
   }
 }

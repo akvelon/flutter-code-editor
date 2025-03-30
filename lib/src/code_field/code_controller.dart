@@ -12,6 +12,7 @@ import '../../flutter_code_editor.dart';
 import '../autocomplete/default_autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../code/key_event.dart';
+import '../code_modifiers/insertion.dart';
 import '../history/code_history_controller.dart';
 import '../history/code_history_record.dart';
 import '../search/controller.dart';
@@ -28,6 +29,7 @@ import 'actions/indent.dart';
 import 'actions/outdent.dart';
 import 'actions/redo.dart';
 import 'actions/search.dart';
+import 'actions/tab.dart';
 import 'actions/undo.dart';
 import 'search_result_highlighted_builder.dart';
 import 'span_builder.dart';
@@ -50,6 +52,7 @@ class CodeController extends TextEditingController {
   /// Calls [AbstractAnalyzer.analyze] after change with 500ms debounce.
   AbstractAnalyzer get analyzer => _analyzer;
   AbstractAnalyzer _analyzer;
+
   set analyzer(AbstractAnalyzer analyzer) {
     if (_analyzer == analyzer) {
       return;
@@ -107,6 +110,7 @@ class CodeController extends TextEditingController {
 
   SearchSettingsController get _searchSettingsController =>
       searchController.settingsController;
+
   SearchNavigationController get _searchNavigationController =>
       searchController.navigationController;
 
@@ -130,7 +134,20 @@ class CodeController extends TextEditingController {
     SearchIntent: SearchAction(controller: this),
     DismissIntent: CustomDismissAction(controller: this),
     EnterKeyIntent: EnterKeyAction(controller: this),
+    TabKeyIntent: TabKeyAction(controller: this),
   };
+
+  static const defaultCodeModifiers = [
+    IndentModifier(),
+    CloseBlockModifier(),
+    TabModifier(),
+    InsertionCodeModifier.backticks,
+    InsertionCodeModifier.braces,
+    InsertionCodeModifier.brackets,
+    InsertionCodeModifier.doubleQuotes,
+    InsertionCodeModifier.parentheses,
+    InsertionCodeModifier.singleQuotes,
+  ];
 
   CodeController({
     String? text,
@@ -143,12 +160,8 @@ class CodeController extends TextEditingController {
     this.patternMap,
     this.readOnly = false,
     this.params = const EditorParams(),
-    this.modifiers = const [
-      IndentModifier(),
-      CloseBlockModifier(),
-      TabModifier(),
-    ],
     Autocompleter? autocompleter,
+    this.modifiers = defaultCodeModifiers,
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
@@ -348,6 +361,15 @@ class CodeController extends TextEditingController {
     }
 
     insertStr('\n');
+  }
+
+  void onTabKeyAction() {
+    if (popupController.shouldShow) {
+      insertSelectedWord();
+      return;
+    }
+
+    insertStr(' ' * params.tabSpaces);
   }
 
   /// Inserts the word selected from the list of completions
