@@ -125,6 +125,8 @@ class CodeController extends TextEditingController {
   @visibleForTesting
   TextSpan? lastTextSpan;
 
+  bool _disposed = false;
+
   late final actions = <Type, Action<Intent>>{
     CommentUncommentIntent: CommentUncommentAction(controller: this),
     CopySelectionTextIntent: CopyAction(controller: this),
@@ -230,6 +232,10 @@ class CodeController extends TextEditingController {
     if (_code.text != codeSentToAnalysis.text) {
       // If the code has been changed before we got analysis result, discard it.
       // This happens on request race condition.
+      return;
+    }
+
+    if (_disposed) {
       return;
     }
 
@@ -971,6 +977,7 @@ class CodeController extends TextEditingController {
 
   @override
   void dispose() {
+    _disposed = true;
     _debounce?.cancel();
     historyController.dispose();
     searchController.dispose();
