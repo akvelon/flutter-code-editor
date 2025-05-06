@@ -104,17 +104,19 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           CodeTheme(
             data: CodeThemeData(styles: themes[_theme]),
-            child: CodeField(
-              focusNode: _codeFieldFocusNode,
-              controller: _codeController,
-              textStyle: const TextStyle(fontFamily: 'SourceCode'),
-              gutterStyle: GutterStyle(
-                textStyle: const TextStyle(
-                  color: Colors.purple,
+            child: CodeFieldOverlay(
+              child: CodeField(
+                focusNode: _codeFieldFocusNode,
+                controller: _codeController,
+                textStyle: const TextStyle(fontFamily: 'SourceCode'),
+                gutterStyle: GutterStyle(
+                  textStyle: const TextStyle(
+                    color: Colors.purple,
+                  ),
+                  showLineNumbers: _showNumbers,
+                  showErrors: _showErrors,
+                  showFoldingHandles: _showFoldingHandles,
                 ),
-                showLineNumbers: _showNumbers,
-                showErrors: _showErrors,
-                showFoldingHandles: _showFoldingHandles,
               ),
             ),
           ),
