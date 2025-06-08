@@ -38,22 +38,33 @@ class FoldableBlock extends InclusiveRange with EquatableMixin {
   bool get isComment {
     // ignore: missing_enum_constant_in_switch
     switch (type) {
+      case FoldableBlockType.braces:
+      case FoldableBlockType.brackets:
+      case FoldableBlockType.parentheses:
+      case FoldableBlockType.indent:
+      case FoldableBlockType.imports:
+      case FoldableBlockType.union:
+        return false;
       case FoldableBlockType.singleLineComment:
       case FoldableBlockType.multilineComment:
         return true;
     }
-
-    return false;
   }
 
   bool get isImports {
     // ignore: missing_enum_constant_in_switch
     switch (type) {
+      case FoldableBlockType.singleLineComment:
+      case FoldableBlockType.braces:
+      case FoldableBlockType.brackets:
+      case FoldableBlockType.parentheses:
+      case FoldableBlockType.indent:
+      case FoldableBlockType.union:
+      case FoldableBlockType.multilineComment:
+        return false;
       case FoldableBlockType.imports:
         return true;
     }
-
-    return false;
   }
 
   bool isSameLines(FoldableBlock other) {

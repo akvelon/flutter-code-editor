@@ -490,9 +490,12 @@ class _CodeFieldState extends State<CodeField> {
           ),
     );
 
-    return GutterWidget(
-      codeController: widget.controller,
-      style: gutterStyle,
+    return Container(
+      padding: const EdgeInsets.only(top: 4),
+      child: GutterWidget(
+        codeController: widget.controller,
+        style: gutterStyle,
+      ),
     );
   }
 
