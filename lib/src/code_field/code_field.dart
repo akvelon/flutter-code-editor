@@ -136,6 +136,10 @@ class CodeField extends StatefulWidget {
   /// language highlight, themeing and modifiers.
   final CodeController controller;
 
+  /// An UndoHistoryController instance
+  /// to control TextField history.
+  final UndoHistoryController? undoController;
+
   @Deprecated('Use gutterStyle instead')
   final GutterStyle lineNumberStyle;
 
@@ -180,6 +184,7 @@ class CodeField extends StatefulWidget {
   const CodeField({
     super.key,
     required this.controller,
+    this.undoController,
     this.minLines,
     this.maxLines,
     this.expands = false,
@@ -417,6 +422,7 @@ class _CodeFieldState extends State<CodeField> {
       smartDashesType: widget.smartDashesType,
       smartQuotesType: widget.smartQuotesType,
       controller: widget.controller,
+      undoController: widget.undoController,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       expands: widget.expands,
