@@ -181,6 +181,11 @@ class CodeField extends StatefulWidget {
 
   final GutterStyle gutterStyle;
 
+  final int caretPadding;
+  final double autocompletePopupMaxHeight;
+  final double autocompletePopupMaxWidth;
+  final Widget Function(BuildContext context)? autocompleteListBuilder;
+
   const CodeField({
     super.key,
     required this.controller,
@@ -206,6 +211,10 @@ class CodeField extends StatefulWidget {
     @Deprecated('Use gutterStyle instead') this.lineNumbers,
     @Deprecated('Use gutterStyle instead')
     this.lineNumberStyle = const GutterStyle(),
+    this.caretPadding = Sizes.caretPadding,
+    this.autocompletePopupMaxHeight = Sizes.autocompletePopupMaxHeight,
+    this.autocompletePopupMaxWidth = Sizes.autocompletePopupMaxWidth,
+    this.autocompleteListBuilder,
   })  : assert(
             gutterStyle == null || lineNumbers == null,
             'Can not provide gutterStyle and lineNumbers at the same time. '
@@ -260,6 +269,7 @@ class _CodeFieldState extends State<CodeField> {
     _focusNode!.attach(context, onKeyEvent: _onKeyEvent);
 
     widget.controller.searchController.codeFieldFocusNode = _focusNode;
+    widget.controller.popupController.codeFieldFocusNode = _focusNode;
 
     // Workaround for disabling spellchecks in FireFox
     // https://github.com/akvelon/flutter-code-editor/issues/197
@@ -283,6 +293,7 @@ class _CodeFieldState extends State<CodeField> {
   @override
   void dispose() {
     widget.controller.searchController.codeFieldFocusNode = null;
+    widget.controller.popupController.codeFieldFocusNode = null;
     widget.controller.removeListener(_onTextChanged);
     widget.controller.removeListener(_updatePopupOffset);
     widget.controller.popupController.removeListener(_onPopupStateChanged);
@@ -309,6 +320,7 @@ class _CodeFieldState extends State<CodeField> {
     );
 
     widget.controller.searchController.codeFieldFocusNode = _focusNode;
+    widget.controller.popupController.codeFieldFocusNode = _focusNode;
     widget.controller.addListener(_onTextChanged);
     widget.controller.addListener(_updatePopupOffset);
     widget.controller.popupController.addListener(_onPopupStateChanged);
@@ -516,7 +528,7 @@ class _CodeFieldState extends State<CodeField> {
     final leftOffset = _getPopupLeftOffset(textPainter);
     final normalTopOffset = _getPopupTopOffset(textPainter, caretHeight);
     final flippedTopOffset = normalTopOffset -
-        (Sizes.autocompletePopupMaxHeight + caretHeight + Sizes.caretPadding);
+        (widget.autocompletePopupMaxHeight + caretHeight + widget.caretPadding);
 
     setState(() {
       _normalPopupOffset = Offset(leftOffset, normalTopOffset);
@@ -661,6 +673,9 @@ class _CodeFieldState extends State<CodeField> {
           backgroundColor: _backgroundCol,
           parentFocusNode: _focusNode!,
           editorOffset: _editorOffset,
+          listBuilder: widget.autocompleteListBuilder,
+          maxHeight: widget.autocompletePopupMaxHeight,
+          maxWidth: widget.autocompletePopupMaxWidth,
         );
       },
     );

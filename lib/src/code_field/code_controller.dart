@@ -9,7 +9,7 @@ import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
 import '../../flutter_code_editor.dart';
-import '../autocomplete/autocompleter.dart';
+import '../autocomplete/default_autocompleter.dart';
 import '../code/code_edit_result.dart';
 import '../code/key_event.dart';
 import '../code_modifiers/insertion.dart';
@@ -20,7 +20,6 @@ import '../search/result.dart';
 import '../search/search_navigation_controller.dart';
 import '../search/settings_controller.dart';
 import '../single_line_comments/parser/single_line_comments.dart';
-import '../util/string_util.dart';
 import '../wip/autocomplete/popup_controller.dart';
 import 'actions/comment_uncomment.dart';
 import 'actions/copy.dart';
@@ -103,7 +102,7 @@ class CodeController extends TextEditingController {
   final _styleList = <TextStyle>[];
   final _modifierMap = <String, CodeModifier>{};
   late PopupController popupController;
-  final autocompleter = Autocompleter();
+  late final Autocompleter autocompleter;
   late final historyController = CodeHistoryController(codeController: this);
 
   @internal
@@ -163,11 +162,14 @@ class CodeController extends TextEditingController {
     this.patternMap,
     this.readOnly = false,
     this.params = const EditorParams(),
+    Autocompleter? autocompleter,
     this.modifiers = defaultCodeModifiers,
   })  : _analyzer = analyzer,
         _readOnlySectionNames = readOnlySectionNames,
         _code = Code.empty,
         _isTabReplacementEnabled = modifiers.any((e) => e is TabModifier) {
+    this.autocompleter = autocompleter ?? DefaultAutocompleter();
+    
     setLanguage(language, analyzer: analyzer);
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
@@ -378,49 +380,11 @@ class CodeController extends TextEditingController {
 
   /// Inserts the word selected from the list of completions
   void insertSelectedWord() {
-    final previousSelection = selection;
-    final selectedWord = popupController.getSelectedWord();
-    final startPosition = value.wordAtCursorStart;
-    final currentWord = value.wordAtCursor;
-
-    if (startPosition == null || currentWord == null) {
-      popupController.hide();
-      return;
+    final suggestionItem = popupController.getSelectedItem();
+    final result = autocompleter.replaceText(selection, value, suggestionItem);
+    if (result != null) {
+      value = result;
     }
-
-    final endReplacingPosition = startPosition + currentWord.length;
-    final endSelectionPosition = startPosition + selectedWord.length;
-
-    var additionalSpaceIfEnd = '';
-    var offsetIfEndsWithSpace = 1;
-    if (text.length < endReplacingPosition + 1) {
-      additionalSpaceIfEnd = ' ';
-    } else {
-      final charAfterText = text[endReplacingPosition];
-      if (charAfterText != ' ' &&
-          !StringUtil.isDigit(charAfterText) &&
-          !StringUtil.isLetterEng(charAfterText)) {
-        // ex. case ';' or other finalizer, or symbol
-        offsetIfEndsWithSpace = 0;
-      }
-    }
-
-    final replacedText = text.replaceRange(
-      startPosition,
-      endReplacingPosition,
-      '$selectedWord$additionalSpaceIfEnd',
-    );
-
-    final adjustedSelection = previousSelection.copyWith(
-      baseOffset: endSelectionPosition + offsetIfEndsWithSpace,
-      extentOffset: endSelectionPosition + offsetIfEndsWithSpace,
-    );
-
-    value = TextEditingValue(
-      text: replacedText,
-      selection: adjustedSelection,
-    );
-
     popupController.hide();
   }
 
@@ -813,14 +777,8 @@ class CodeController extends TextEditingController {
   }
 
   Future<void> generateSuggestions() async {
-    final prefix = value.wordToCursor;
-    if (prefix == null) {
-      popupController.hide();
-      return;
-    }
-
     final suggestions =
-        (await autocompleter.getSuggestions(prefix)).toList(growable: false);
+        (await autocompleter.getSuggestionItems(value)).toList(growable: false);
 
     if (suggestions.isNotEmpty) {
       popupController.show(suggestions);
