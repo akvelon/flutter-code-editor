@@ -266,7 +266,7 @@ class _CodeFieldState extends State<CodeField> {
     disableSpellCheckIfWeb();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(!mounted){
+      if (!mounted) {
         return;
       }
       final double width = _codeFieldKey.currentContext!.size!.width;
@@ -320,7 +320,7 @@ class _CodeFieldState extends State<CodeField> {
   void rebuild() {
     setState(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if(!mounted){
+        if (!mounted) {
           return;
         }
         // For some reason _codeFieldKey.currentContext is null in tests
