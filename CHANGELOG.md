@@ -3,6 +3,7 @@
 - Added default height to `defaultTextStyle` (https://github.com/akvelon/flutter-code-editor/pull/297).
 - Added `disposed` and `mounted` checks to `CodeField` and `CodeController` (https://github.com/akvelon/flutter-code-editor/pull/298).
 - Added `UndoHistoryController` to `CodeField` (https://github.com/akvelon/flutter-code-editor/pull/302).
+- Added support for `yaml` comments (https://github.com/akvelon/flutter-code-editor/pull/305).
 
 ## 0.3.3
 
