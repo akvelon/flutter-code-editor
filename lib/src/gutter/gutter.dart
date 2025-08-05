@@ -66,7 +66,7 @@ class GutterWidget extends StatelessWidget {
     }
 
     return Container(
-      padding: EdgeInsets.only(top: 12, bottom: 12, right: style.margin),
+      padding: EdgeInsets.only(top: 16, bottom: 16, right: style.margin),
       width: style.showLineNumbers ? gutterWidth : null,
       child: Table(
         columnWidths: {
