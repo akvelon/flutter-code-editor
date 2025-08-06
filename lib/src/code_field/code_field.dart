@@ -506,6 +506,7 @@ class _CodeFieldState extends State<CodeField> {
     return GutterWidget(
       codeController: widget.controller,
       style: gutterStyle,
+      scrollController: _numberScroll,
     );
   }
 
