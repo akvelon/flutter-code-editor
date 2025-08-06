@@ -75,12 +75,11 @@ class GutterWidget extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(right: style.margin),
-      width: style.showLineNumbers ? gutterWidth : null,
       child: Table(
-        columnWidths: {
-          _lineNumberColumn: const FlexColumnWidth(),
-          _issueColumn: FixedColumnWidth(issueColumnWidth),
-          _foldingColumn: FixedColumnWidth(foldingColumnWidth),
+        columnWidths: const {
+          _lineNumberColumn: IntrinsicColumnWidth(),
+          _issueColumn: IntrinsicColumnWidth(),
+          _foldingColumn: IntrinsicColumnWidth(),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: tableRows,
