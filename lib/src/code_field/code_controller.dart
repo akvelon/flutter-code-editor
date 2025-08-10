@@ -87,6 +87,7 @@ class CodeController extends TextEditingController {
   int get lineOffset => _currentChunk?.startLine ?? 0;
   ValueNotifier<bool> fileLoading = ValueNotifier(false);
   ValueNotifier<bool> fileSaving = ValueNotifier(false);
+  bool reversed = false;
 
   Mode? _language;
 
@@ -209,6 +210,7 @@ class CodeController extends TextEditingController {
     Mode? language,
     AbstractAnalyzer analyzer = const DefaultLocalAnalyzer(),
     this.namedSectionParser,
+    this.reversed = false,
     Set<String> readOnlySectionNames = const {},
     Set<String> visibleSectionNames = const {},
     this.analysisResult = const AnalysisResult(issues: []),
@@ -1070,7 +1072,7 @@ class CodeController extends TextEditingController {
 
   void _updateCodeIfChanged(String text) {
     if (text != _code.text) {
-      _updateCode(text);
+      _updateCode(reversed ? text.split('\n').reversed.join('\n') : text);
     }
   }
 
