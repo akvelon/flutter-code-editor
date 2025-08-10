@@ -383,8 +383,6 @@ class CodeController extends TextEditingController {
     final nextLoadTriggerLine = chunkEndLine - overlapSize;
     final prevLoadTriggerLine = chunkStartLine == 0 ? -1 : chunkStartLine + overlapSize;
 
-    print(prevLoadTriggerLine);
-
     EditableTextState? editableTextState;
 
     void visitor(Element element) {
