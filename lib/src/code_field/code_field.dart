@@ -428,7 +428,7 @@ class _CodeFieldState extends State<CodeField> {
       scrollController: widget.controller.codeScroll,
       decoration: const InputDecoration(
         isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16),
+        contentPadding: EdgeInsets.symmetric(vertical: 8),
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
