@@ -324,18 +324,60 @@ class CodeController extends TextEditingController {
     if (_isLoadingChunk || _fileHandle == null || _lineOffsets == null) return;
 
     final totalLines = _lineOffsets!.length - 1;
-    final actualStartLine = math.max(0, startLine);
 
-    if (_lastRequestedChunkStart == actualStartLine) {
+    if (reversed) {
+      final chunkSize = _chunkConfig.chunkSize;
+      final actualEndLine = totalLines - startLine;
+      final actualStartLine = math.max(0, actualEndLine - chunkSize);
+
+      if (actualEndLine <= 0) return;
+
+      final startOffset = _lineOffsets![actualStartLine];
+      final endOffset = _lineOffsets![actualEndLine];
+
+      await _fileHandle!.setPosition(startOffset);
+      final chunkLength = endOffset - startOffset;
+      final buffer = List<int>.filled(chunkLength, 0);
+      await _fileHandle!.readInto(buffer);
+
+      final chunkText = String.fromCharCodes(buffer);
+      final lines = chunkText.split('\n');
+      if (lines.isNotEmpty && lines.last.isEmpty) lines.removeLast();
+
+      final reversedLines = lines.reversed.toList();
+
+      _currentChunk = FileChunk(
+        startLine: actualStartLine,
+        endLine: actualEndLine,
+        lines: reversedLines,
+        fileStartOffset: startOffset,
+        fileEndOffset: endOffset,
+      );
+
+      final chunkContent = reversedLines.join('\n');
+      _updateCodeIfChanged(chunkContent);
+      super.value = TextEditingValue(text: _code.visibleText);
+
+      if (maintainScrollPositionData != null && codeScroll != null && codeScroll!.hasClients) {
+        final targetScrollOffset = maintainScrollPositionData.$1 * maintainScrollPositionData.$2;
+        final maxScroll = codeScroll!.position.maxScrollExtent;
+        final scrollOffset = math.min(targetScrollOffset, maxScroll);
+        codeScroll!.jumpTo(scrollOffset);
+      }
+
+      _lastRequestedChunkStart = startLine;
+      _isLoadingChunk = false;
       return;
     }
+
+    final actualStartLine = math.max(0, startLine);
+    if (_lastRequestedChunkStart == actualStartLine) return;
 
     _isLoadingChunk = true;
     _lastRequestedChunkStart = actualStartLine;
 
     try {
       final endLine = math.min(totalLines, actualStartLine + _chunkConfig.chunkSize);
-
       if (actualStartLine >= totalLines) return;
 
       final startOffset = _lineOffsets![actualStartLine];
@@ -348,10 +390,7 @@ class CodeController extends TextEditingController {
 
       final chunkText = String.fromCharCodes(buffer);
       final lines = chunkText.split('\n');
-
-      if (lines.isNotEmpty && lines.last.isEmpty) {
-        lines.removeLast();
-      }
+      if (lines.isNotEmpty && lines.last.isEmpty) lines.removeLast();
 
       _currentChunk = FileChunk(
         startLine: actualStartLine,
@@ -361,13 +400,11 @@ class CodeController extends TextEditingController {
         fileEndOffset: endOffset,
       );
 
-      if (maintainScrollPositionData != null && codeScroll != null) {
-        if (codeScroll!.hasClients) {
-          final targetScrollOffset = maintainScrollPositionData.$1 * maintainScrollPositionData.$2;
-          final maxScroll = codeScroll!.position.maxScrollExtent;
-          final scrollOffset = math.min(targetScrollOffset, maxScroll);
-          codeScroll!.jumpTo(scrollOffset);
-        }
+      if (maintainScrollPositionData != null && codeScroll != null && codeScroll!.hasClients) {
+        final targetScrollOffset = maintainScrollPositionData.$1 * maintainScrollPositionData.$2;
+        final maxScroll = codeScroll!.position.maxScrollExtent;
+        final scrollOffset = math.min(targetScrollOffset, maxScroll);
+        codeScroll!.jumpTo(scrollOffset);
       }
 
       final chunkContent = lines.join('\n');
@@ -389,9 +426,7 @@ class CodeController extends TextEditingController {
     final chunkStartLine = _currentChunk!.startLine;
     final chunkEndLine = _currentChunk!.endLine;
     final overlapSize = _chunkConfig.chunkLineOverlap;
-
-    final nextLoadTriggerLine = chunkEndLine - overlapSize;
-    final prevLoadTriggerLine = chunkStartLine == 0 ? -1 : chunkStartLine + overlapSize;
+    final totalLines = _lineOffsets!.length - 1;
 
     EditableTextState? editableTextState;
 
@@ -408,9 +443,8 @@ class CodeController extends TextEditingController {
       context.visitChildElements(visitor);
     }
 
-    if (_cachedLineMetrics.isEmpty) {
+    if (_cachedLineMetrics.isEmpty && editableTextState != null) {
       final textStyle = editableTextState!.widget.style;
-
       final textPainter = TextPainter(
         text: TextSpan(text: text, style: textStyle),
         textDirection: TextDirection.ltr,
@@ -427,29 +461,59 @@ class CodeController extends TextEditingController {
       _cachedLineMetrics.addAll(lineMetrics);
     }
 
-    if (editableTextState != null && _cachedLineMetrics.isNotEmpty) {
-      final box = editableTextState!.context.findRenderObject()! as RenderBox;
-      final lineHeight = _cachedLineMetrics[0].height;
+    if (editableTextState == null || _cachedLineMetrics.isEmpty) {
+      return;
+    }
 
-      final scrollOffset = codeScroll!.offset;
-      final firstVisibleLine = (scrollOffset / lineHeight).floor();
+    final box = editableTextState!.context.findRenderObject()! as RenderBox;
+    final lineHeight = _cachedLineMetrics[0].height;
+    final scrollOffset = codeScroll!.offset;
+    final firstVisibleLineOffset = (scrollOffset / lineHeight).floor();
+    final viewportHeight = box.size.height;
+    final visibleBottom = scrollOffset + viewportHeight;
+    final lastVisibleLineOffset = (visibleBottom / lineHeight).floor().clamp(0, _cachedLineMetrics.length - 1);
 
-      final double viewportHeight = box.size.height;
-      final double visibleBottom = scrollOffset + viewportHeight;
-      final lastVisibleLine = (visibleBottom / lineHeight).floor().clamp(0, _cachedLineMetrics.length - 1);
+    if (!reversed) {
+      final nextLoadTriggerLine = chunkEndLine - overlapSize;
+      final prevLoadTriggerLine = chunkStartLine == 0 ? -1 : chunkStartLine + overlapSize;
 
-      if ((chunkStartLine + firstVisibleLine) >= nextLoadTriggerLine) {
+      if ((chunkStartLine + firstVisibleLineOffset) >= nextLoadTriggerLine) {
         final nextChunkStart = _currentChunk!.endLine - (overlapSize * 2);
-        final totalLines = _lineOffsets!.length - 1;
 
         if (nextChunkStart < totalLines && _lastRequestedChunkStart != nextChunkStart) {
-          unawaited(_loadChunk(nextChunkStart, maintainScrollPositionData: (firstVisibleLine + chunkStartLine - nextChunkStart, lineHeight)));
+          unawaited(_loadChunk(nextChunkStart, maintainScrollPositionData: (firstVisibleLineOffset + chunkStartLine - nextChunkStart, lineHeight)));
         }
-      } else if (lastVisibleLine + chunkStartLine <= prevLoadTriggerLine) {
-        final prevChunkStart = math.max(0, _currentChunk!.startLine - (_chunkConfig.chunkSize - (_chunkConfig.chunkLineOverlap * 2)));
+      } else if (lastVisibleLineOffset + chunkStartLine <= prevLoadTriggerLine) {
+        final prevChunkStart = math.max(0, _currentChunk!.startLine - (_chunkConfig.chunkSize - (overlapSize * 2)));
 
         if (prevChunkStart >= 0 && _lastRequestedChunkStart != prevChunkStart) {
-          unawaited(_loadChunk(prevChunkStart, maintainScrollPositionData: (firstVisibleLine + (_chunkConfig.chunkSize / 2).floor(), lineHeight)));
+          unawaited(
+            _loadChunk(prevChunkStart, maintainScrollPositionData: (firstVisibleLineOffset + (_chunkConfig.chunkSize / 2).floor(), lineHeight)),
+          );
+        }
+      }
+    } else {
+      final nextLoadTriggerLine = chunkStartLine + overlapSize;
+      final prevLoadTriggerLine = chunkEndLine == totalLines ? totalLines + 1 : chunkEndLine - overlapSize;
+
+      if ((chunkEndLine - lastVisibleLineOffset + (lastVisibleLineOffset - firstVisibleLineOffset)) <= nextLoadTriggerLine) {
+        final nextChunkStart = _lastRequestedChunkStart != null ? _lastRequestedChunkStart! + (_chunkConfig.chunkSize - (overlapSize * 2)) : 0;
+        if (nextChunkStart < totalLines && _lastRequestedChunkStart != nextChunkStart) {
+          unawaited(_loadChunk(nextChunkStart, maintainScrollPositionData: (overlapSize, lineHeight)));
+        }
+      } else if (chunkEndLine - lastVisibleLineOffset >= prevLoadTriggerLine) {
+        final prevChunkStart =
+            math.max(0, _lastRequestedChunkStart != null ? _lastRequestedChunkStart! - (_chunkConfig.chunkSize - (overlapSize * 2)) : 0);
+        if (prevChunkStart >= 0 && _lastRequestedChunkStart != prevChunkStart) {
+          unawaited(
+            _loadChunk(
+              prevChunkStart,
+              maintainScrollPositionData: (
+                overlapSize + (_chunkConfig.chunkSize - (overlapSize * 2) - (lastVisibleLineOffset - firstVisibleLineOffset)),
+                lineHeight
+              ),
+            ),
+          );
         }
       }
     }
@@ -1072,7 +1136,7 @@ class CodeController extends TextEditingController {
 
   void _updateCodeIfChanged(String text) {
     if (text != _code.text) {
-      _updateCode(reversed ? text.split('\n').reversed.join('\n') : text);
+      _updateCode(text);
     }
   }
 

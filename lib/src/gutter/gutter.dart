@@ -43,14 +43,6 @@ class GutterWidget extends StatelessWidget {
   Widget _buildOnChange(BuildContext context, Widget? child) {
     final code = codeController.code;
 
-    final gutterWidth = style.width -
-        (style.showErrors ? 0 : _issueColumnWidth) -
-        (style.showFoldingHandles ? 0 : _foldingColumnWidth);
-
-    final issueColumnWidth = style.showErrors ? _issueColumnWidth : 0.0;
-    final foldingColumnWidth =
-        style.showFoldingHandles ? _foldingColumnWidth : 0.0;
-
     final tableRows = List.generate(
       code.hiddenLineRanges.visibleLineNumbers.length,
       // ignore: prefer_const_constructors
@@ -89,16 +81,18 @@ class GutterWidget extends StatelessWidget {
 
   void _fillLineNumbers(List<TableRow> tableRows) {
     final code = codeController.code;
+    final total = code.hiddenLineRanges.visibleLineNumbers.length;
 
-    for (final i in code.hiddenLineRanges.visibleLineNumbers) {
+    for (var idx = 0; idx < total; idx++) {
+      final i = code.hiddenLineRanges.visibleLineNumbers.toList()[idx];
       final lineIndex = _lineIndexToTableRowIndex(i);
 
-      if (lineIndex == null) {
-        continue;
-      }
+      if (lineIndex == null) continue;
+
+      final number = codeController.reversed ? (total - idx + codeController.lineOffset) : (i + 1 + codeController.lineOffset);
 
       tableRows[lineIndex].children![_lineNumberColumn] = Text(
-        style.showLineNumbers ? '${i + 1 + codeController.lineOffset}' : ' ',
+        style.showLineNumbers ? '$number' : ' ',
         style: style.textStyle,
         textAlign: style.textAlign,
       );
@@ -117,8 +111,7 @@ class GutterWidget extends StatelessWidget {
       }
       tableRows[lineIndex].children![_issueColumn] = GutterErrorWidget(
         issue,
-        style.errorPopupTextStyle ??
-            (throw Exception('Error popup style should never be null')),
+        style.errorPopupTextStyle ?? (throw Exception('Error popup style should never be null')),
       );
     }
   }
@@ -137,9 +130,7 @@ class GutterWidget extends StatelessWidget {
       tableRows[lineIndex].children![_foldingColumn] = FoldToggle(
         color: style.textStyle?.color,
         isFolded: isFolded,
-        onTap: isFolded
-            ? () => codeController.unfoldAt(block.firstLine)
-            : () => codeController.foldAt(block.firstLine),
+        onTap: isFolded ? () => codeController.unfoldAt(block.firstLine) : () => codeController.foldAt(block.firstLine),
       );
     }
 
