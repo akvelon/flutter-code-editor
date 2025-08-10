@@ -381,7 +381,9 @@ class CodeController extends TextEditingController {
     final overlapSize = _chunkConfig.chunkLineOverlap;
 
     final nextLoadTriggerLine = chunkEndLine - overlapSize;
-    final prevLoadTriggerLine = chunkStartLine + overlapSize;
+    final prevLoadTriggerLine = chunkStartLine == 0 ? -1 : chunkStartLine + overlapSize;
+
+    print(prevLoadTriggerLine);
 
     EditableTextState? editableTextState;
 
@@ -436,10 +438,10 @@ class CodeController extends TextEditingController {
           unawaited(_loadChunk(nextChunkStart, maintainScrollPositionData: (firstVisibleLine + chunkStartLine - nextChunkStart, lineHeight)));
         }
       } else if (lastVisibleLine + chunkStartLine <= prevLoadTriggerLine) {
-        final prevChunkStart = math.max(0, _currentChunk!.startLine - _chunkConfig.chunkSize + _chunkConfig.chunkLineOverlap);
+        final prevChunkStart = math.max(0, _currentChunk!.startLine - (_chunkConfig.chunkSize - (_chunkConfig.chunkLineOverlap * 2)));
 
         if (prevChunkStart >= 0 && _lastRequestedChunkStart != prevChunkStart) {
-          unawaited(_loadChunk(prevChunkStart, maintainScrollPositionData: (chunkStartLine + firstVisibleLine, lineHeight)));
+          unawaited(_loadChunk(prevChunkStart, maintainScrollPositionData: (firstVisibleLine + (_chunkConfig.chunkSize / 2).floor(), lineHeight)));
         }
       }
     }
