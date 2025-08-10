@@ -86,6 +86,7 @@ class CodeController extends TextEditingController {
   int? _lastRequestedChunkStart;
   int get lineOffset => _currentChunk?.startLine ?? 0;
   ValueNotifier<bool> fileLoading = ValueNotifier(false);
+  ValueNotifier<bool> fileSaving = ValueNotifier(false);
 
   Mode? _language;
 
@@ -302,12 +303,19 @@ class CodeController extends TextEditingController {
   Future<void> saveChunk() async {
     if (_fileHandle == null || _currentChunk == null) return;
 
+    fileSaving.value = true;
+
     final newText = _code.text;
     final encoded = utf8.encode(newText);
     final start = _currentChunk!.fileStartOffset;
 
     await _fileHandle!.setPosition(start);
     await _fileHandle!.writeFrom(encoded);
+
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+      () => fileSaving.value = false,
+    );
   }
 
   Future<void> _loadChunk(int startLine, {(int, double)? maintainScrollPositionData}) async {
