@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../sizes.dart';
 import 'popup_controller.dart';
 
 /// Popup window displaying the list of possible completions
@@ -27,6 +26,10 @@ class Popup extends StatefulWidget {
   final TextStyle style;
   final Color? backgroundColor;
 
+  final double maxHeight;
+  final double maxWidth;
+  final Widget Function(BuildContext context)? listBuilder;
+
   const Popup({
     super.key,
     required this.controller,
@@ -37,6 +40,9 @@ class Popup extends StatefulWidget {
     required this.parentFocusNode,
     required this.style,
     this.backgroundColor,
+    required this.maxHeight,
+    required this.maxWidth,
+    this.listBuilder,
   });
 
   @override
@@ -64,8 +70,7 @@ class PopupState extends State<Popup> {
     final bool isHorizontalOverflowed = _isHorizontallyOverflowed();
     final double leftOffsetLimit =
         // TODO(nausharipov): find where 100 comes from
-        widget.editingWindowSize.width -
-            Sizes.autocompletePopupMaxWidth +
+        widget.editingWindowSize.width - widget.maxWidth +
             (widget.editorOffset?.dx ?? 0) -
             100;
 
@@ -87,14 +92,14 @@ class PopupState extends State<Popup> {
           alignment: verticalFlipRequired
               ? Alignment.bottomCenter
               : Alignment.topCenter,
-          constraints: const BoxConstraints(
-            maxHeight: Sizes.autocompletePopupMaxHeight,
-            maxWidth: Sizes.autocompletePopupMaxWidth,
+          constraints: BoxConstraints(
+            maxHeight: widget.maxHeight,
+            maxWidth: widget.maxWidth,
           ),
           // Container is used because the vertical borders
           // in DecoratedBox are hidden under scroll.
           // ignore: use_decorated_box
-          child: Container(
+          child: widget.listBuilder?.call(context) ?? Container(
             decoration: BoxDecoration(
               color: widget.backgroundColor,
               border: Border.all(
@@ -120,9 +125,9 @@ class PopupState extends State<Popup> {
 
   bool _isVerticalFlipRequired() {
     final isPopupShorterThanWindow =
-        Sizes.autocompletePopupMaxHeight < widget.editingWindowSize.height;
+        widget.maxHeight < widget.editingWindowSize.height;
     final isPopupOverflowingHeight = widget.normalOffset.dy +
-            Sizes.autocompletePopupMaxHeight -
+            widget.maxHeight -
             (widget.editorOffset?.dy ?? 0) >
         widget.editingWindowSize.height;
 
@@ -132,7 +137,7 @@ class PopupState extends State<Popup> {
   bool _isHorizontallyOverflowed() {
     return widget.normalOffset.dx -
             (widget.editorOffset?.dx ?? 0) +
-            Sizes.autocompletePopupMaxWidth >
+            widget.maxWidth >
         widget.editingWindowSize.width;
   }
 
@@ -159,7 +164,7 @@ class PopupState extends State<Popup> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              widget.controller.suggestions[index],
+              widget.controller.suggestions[index].displayText,
               overflow: TextOverflow.ellipsis,
               style: widget.style,
             ),

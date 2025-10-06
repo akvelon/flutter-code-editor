@@ -1,4 +1,4 @@
-import 'package:flutter_code_editor/src/autocomplete/autocompleter.dart';
+import 'package:flutter_code_editor/src/autocomplete/default_autocompleter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/java.dart';
@@ -30,7 +30,7 @@ $dollar1 dollar2$ $dollar3$
 void main() {
   group('Autocompleter', () {
     test('Mutable mode, keywords from mode, sorted ascending', () async {
-      final ac = Autocompleter();
+      final ac = DefaultAutocompleter();
 
       final initialResults = await ac.getSuggestions('f');
       ac.mode = java;
@@ -66,7 +66,7 @@ void main() {
     });
 
     test('Shows words from text', () async {
-      final ac = Autocompleter();
+      final ac = DefaultAutocompleter();
 
       ac.setText(Object, loremIpsum);
       final singleResults = await ac.getSuggestions('s');
@@ -104,7 +104,7 @@ void main() {
     });
 
     test('Shows custom words', () async {
-      final ac = Autocompleter();
+      final ac = DefaultAutocompleter();
       ac.setCustomWords(['Lorem', 'ipsum', 'word3', 'word4']);
 
       final results = await ac.getSuggestions('word');
@@ -113,7 +113,7 @@ void main() {
     });
 
     test('Applies the blacklist', () async {
-      final obj = Autocompleter();
+      final obj = DefaultAutocompleter();
       obj.mode = java;
 
       obj.blacklist = ['Finally'];
