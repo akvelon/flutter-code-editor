@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../common/create_app.dart';
@@ -110,6 +111,28 @@ void main() {
         expect(calls[0].arguments, {'text': _copiedText}, reason: example.name);
         expect(controller.text, example.visibleTextAfter, reason: example.name);
       }
+    });
+
+    test('IME composition bypasses popup arrow key handling', () {
+      final controller = createController('');
+      controller.popupController.show(['one', 'two']);
+      controller.value = const TextEditingValue(
+        text: 'ni',
+        selection: TextSelection.collapsed(offset: 2),
+        composing: TextRange(start: 0, end: 2),
+      );
+
+      final result = controller.onKey(
+        const KeyDownEvent(
+          timeStamp: Duration.zero,
+          physicalKey: PhysicalKeyboardKey.arrowDown,
+          logicalKey: LogicalKeyboardKey.arrowDown,
+        ),
+      );
+
+      expect(result, KeyEventResult.ignored);
+      expect(controller.popupController.selectedIndex, 0);
+      controller.dispose();
     });
   });
 }

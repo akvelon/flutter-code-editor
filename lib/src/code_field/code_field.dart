@@ -102,20 +102,6 @@ final _shortcuts = <ShortcutActivator, Intent>{
     meta: true,
   ): const SearchIntent(),
 
-  // Dismiss
-  LogicalKeySet(
-    LogicalKeyboardKey.escape,
-  ): const DismissIntent(),
-
-  // EnterKey
-  LogicalKeySet(
-    LogicalKeyboardKey.enter,
-  ): const EnterKeyIntent(),
-
-  // TabKey
-  LogicalKeySet(
-    LogicalKeyboardKey.tab,
-  ): const TabKeyIntent(),
 };
 
 class CodeField extends StatefulWidget {
@@ -422,6 +408,22 @@ class _CodeFieldState extends State<CodeField> {
 
     textStyle = defaultTextStyle.merge(widget.textStyle);
 
+    final isComposingText = widget.controller.hasActiveComposition;
+    final shortcuts = {
+      ..._shortcuts,
+      if (!isComposingText) ...{
+        LogicalKeySet(
+          LogicalKeyboardKey.escape,
+        ): const DismissIntent(),
+        LogicalKeySet(
+          LogicalKeyboardKey.enter,
+        ): const EnterKeyIntent(),
+        LogicalKeySet(
+          LogicalKeyboardKey.tab,
+        ): const TabKeyIntent(),
+      },
+    };
+
     final codeField = TextField(
       focusNode: _focusNode,
       scrollPadding: widget.padding,
@@ -463,7 +465,7 @@ class _CodeFieldState extends State<CodeField> {
 
     return FocusableActionDetector(
       actions: widget.controller.actions,
-      shortcuts: _shortcuts,
+      shortcuts: shortcuts,
       child: Container(
         decoration: widget.decoration,
         color: _backgroundCol,
