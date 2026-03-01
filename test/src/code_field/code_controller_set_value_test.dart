@@ -27,19 +27,19 @@ void main() {
     controller.selection = const TextSelection.collapsed(offset: 1);
 
     controller.value = const TextEditingValue(
-      text: '} ni hao',
-      selection: TextSelection.collapsed(offset: 8),
-      composing: TextRange(start: 2, end: 8),
+      text: '} ni',
+      selection: TextSelection.collapsed(offset: 4),
+      composing: TextRange(start: 2, end: 4),
     );
 
     controller.value = const TextEditingValue(
-      text: '} 你好',
-      selection: TextSelection.collapsed(offset: 4),
+      text: '} 你',
+      selection: TextSelection.collapsed(offset: 3),
       composing: TextRange.empty,
     );
 
-    expect(controller.text, '} 你好');
-    expect(controller.fullText, '} 你好');
+    expect(controller.text, '} 你');
+    expect(controller.fullText, '} 你');
     controller.dispose();
   });
 

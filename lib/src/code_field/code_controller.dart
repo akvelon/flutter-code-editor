@@ -462,6 +462,7 @@ class CodeController extends TextEditingController {
 
   @override
   set value(TextEditingValue newValue) {
+    final hadActiveCompositionInOldValue = hasActiveComposition;
     final hasTextChanged = newValue.text != super.value.text;
     final hasSelectionChanged = newValue.selection != super.value.selection;
     final hasComposingChanged = newValue.composing != super.value.composing;
@@ -472,13 +473,17 @@ class CodeController extends TextEditingController {
       return;
     }
 
-    if (hasActiveComposingInNewValue) {
+    if (hasActiveComposingInNewValue || hadActiveCompositionInOldValue) {
       if (readOnly && hasTextChanged) {
         return;
       }
 
       // During IME composition, preserve platform-provided editing state
       // and avoid applying editor transforms that may break composition commit.
+      // Keep internal code state in sync so highlighted rendering doesn't drift.
+      if (hasTextChanged) {
+        _updateCodeIfChanged(newValue.text);
+      }
       super.value = newValue;
       return;
     }
