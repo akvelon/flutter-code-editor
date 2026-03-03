@@ -4,6 +4,45 @@ import 'package:flutter_test/flutter_test.dart';
 import '../common/create_app.dart';
 
 void main() {
+  test('Composing-only updates are applied', () {
+    final controller = createController('');
+    controller.value = const TextEditingValue(
+      text: 'ni',
+      selection: TextSelection.collapsed(offset: 2),
+      composing: TextRange(start: 0, end: 1),
+    );
+
+    controller.value = const TextEditingValue(
+      text: 'ni',
+      selection: TextSelection.collapsed(offset: 2),
+      composing: TextRange(start: 0, end: 2),
+    );
+
+    expect(controller.value.composing, const TextRange(start: 0, end: 2));
+    controller.dispose();
+  });
+
+  test('Composing text is committed correctly after IME selection', () {
+    final controller = createController('}');
+    controller.selection = const TextSelection.collapsed(offset: 1);
+
+    controller.value = const TextEditingValue(
+      text: '} ni',
+      selection: TextSelection.collapsed(offset: 4),
+      composing: TextRange(start: 2, end: 4),
+    );
+
+    controller.value = const TextEditingValue(
+      text: '} 你',
+      selection: TextSelection.collapsed(offset: 3),
+      composing: TextRange.empty,
+    );
+
+    expect(controller.text, '} 你');
+    expect(controller.fullText, '} 你');
+    controller.dispose();
+  });
+
   testWidgets(
       'Backspace or delete at a folded block collapse point '
       '=> Do nothing.', (wt) async {

@@ -64,7 +64,7 @@ class CodeController extends TextEditingController {
   }
 
   AnalysisResult analysisResult;
-  String _lastAnalyzedText = '';
+  var _lastAnalyzedText = '';
   Timer? _debounce;
 
   final AbstractNamedSectionParser? namedSectionParser;
@@ -85,7 +85,7 @@ class CodeController extends TextEditingController {
   final bool _isTabReplacementEnabled;
 
   /* Computed members */
-  String _languageId = '';
+  var _languageId = '';
 
   ///Contains names of named sections, those will be visible for user.
   ///If it is not empty, all another code except specified will be hidden.
@@ -125,7 +125,7 @@ class CodeController extends TextEditingController {
   @visibleForTesting
   TextSpan? lastTextSpan;
 
-  bool _disposed = false;
+  var _disposed = false;
 
   late final actions = <Type, Action<Intent>>{
     CommentUncommentIntent: CommentUncommentAction(controller: this),
@@ -172,6 +172,8 @@ class CodeController extends TextEditingController {
     this.visibleSectionNames = visibleSectionNames;
     _code = _createCode(text ?? '');
     fullText = text ?? '';
+
+    debugPrint('CodeController initialized with text:\n$text');
 
     addListener(_scheduleAnalysis);
     addListener(_updateSearchResult);
@@ -317,11 +319,20 @@ class CodeController extends TextEditingController {
   }
 
   KeyEventResult onKey(KeyEvent event) {
+    if (hasActiveComposition) {
+      return KeyEventResult.ignored;
+    }
+
     if (event is KeyDownEvent || event is KeyRepeatEvent) {
       return _onKeyDownRepeat(event);
     }
 
     return KeyEventResult.ignored; // The framework will handle.
+  }
+
+  bool get hasActiveComposition {
+    final composing = value.composing;
+    return composing.isValid && !composing.isCollapsed;
   }
 
   KeyEventResult _onKeyDownRepeat(KeyEvent event) {
@@ -345,6 +356,10 @@ class CodeController extends TextEditingController {
   }
 
   void onEnterKeyAction() {
+    if (hasActiveComposition) {
+      return;
+    }
+
     if (popupController.shouldShow) {
       insertSelectedWord();
       return;
@@ -368,6 +383,10 @@ class CodeController extends TextEditingController {
   }
 
   void onTabKeyAction() {
+    if (hasActiveComposition) {
+      return;
+    }
+
     if (popupController.shouldShow) {
       insertSelectedWord();
       return;
@@ -443,10 +462,29 @@ class CodeController extends TextEditingController {
 
   @override
   set value(TextEditingValue newValue) {
+    final hadActiveCompositionInOldValue = hasActiveComposition;
     final hasTextChanged = newValue.text != super.value.text;
     final hasSelectionChanged = newValue.selection != super.value.selection;
+    final hasComposingChanged = newValue.composing != super.value.composing;
+    final hasActiveComposingInNewValue =
+        newValue.composing.isValid && !newValue.composing.isCollapsed;
 
-    if (!hasTextChanged && !hasSelectionChanged) {
+    if (!hasTextChanged && !hasSelectionChanged && !hasComposingChanged) {
+      return;
+    }
+
+    if (hasActiveComposingInNewValue || hadActiveCompositionInOldValue) {
+      if (readOnly && hasTextChanged) {
+        return;
+      }
+
+      // During IME composition, preserve platform-provided editing state
+      // and avoid applying editor transforms that may break composition commit.
+      // Keep internal code state in sync so highlighted rendering doesn't drift.
+      if (hasTextChanged) {
+        _updateCodeIfChanged(newValue.text);
+      }
+      super.value = newValue;
       return;
     }
 
@@ -917,6 +955,17 @@ class CodeController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
+    // IME composition (e.g. pinyin) depends on composing-aware rendering.
+    // When composing is active, delegate to Flutter's default implementation
+    // so the composing range is preserved and rendered correctly.
+    if (hasActiveComposition) {
+      return super.buildTextSpan(
+        context: context,
+        style: style,
+        withComposing: withComposing ?? true,
+      );
+    }
+
     final spanBeforeSearch = _createTextSpan(
       context: context,
       style: style,
