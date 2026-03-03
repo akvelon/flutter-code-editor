@@ -28,14 +28,11 @@ class GutterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: SingleChildScrollView(
-        controller: scrollController,
-        child: AnimatedBuilder(
-          animation: codeController,
-          builder: _buildOnChange,
-        ),
+    return SingleChildScrollView(
+      controller: scrollController,
+      child: AnimatedBuilder(
+        animation: codeController,
+        builder: _buildOnChange,
       ),
     );
   }
@@ -90,6 +87,13 @@ class GutterWidget extends StatelessWidget {
 
   void _fillLineNumbers(List<TableRow> tableRows) {
     final code = codeController.code;
+    final numberStyle = style.textStyle;
+    final numberStrutStyle = numberStyle == null
+        ? null
+        : StrutStyle.fromTextStyle(
+            numberStyle,
+            forceStrutHeight: true,
+          );
 
     for (final i in code.hiddenLineRanges.visibleLineNumbers) {
       final lineIndex = _lineIndexToTableRowIndex(i);
@@ -100,7 +104,8 @@ class GutterWidget extends StatelessWidget {
 
       tableRows[lineIndex].children![_lineNumberColumn] = Text(
         style.showLineNumbers ? '${i + 1}' : ' ',
-        style: style.textStyle,
+        style: numberStyle,
+        strutStyle: numberStrutStyle,
         textAlign: style.textAlign,
       );
     }

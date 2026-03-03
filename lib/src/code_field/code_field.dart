@@ -234,7 +234,7 @@ class _CodeFieldState extends State<CodeField> {
 
   FocusNode? _focusNode;
   String? lines;
-  String longestLine = '';
+  var longestLine = '';
   Size? windowSize;
   late TextStyle textStyle;
   Color? _backgroundCol;
@@ -390,9 +390,7 @@ class _CodeFieldState extends State<CodeField> {
     );
 
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-        right: widget.padding.right,
-      ),
+      padding: EdgeInsets.zero,
       scrollDirection: Axis.horizontal,
       controller: _horizontalCodeScroll,
       child: intrinsic,
@@ -421,14 +419,21 @@ class _CodeFieldState extends State<CodeField> {
     );
 
     textStyle = defaultTextStyle.merge(widget.textStyle);
+    final lineStrutStyle = StrutStyle.fromTextStyle(
+      textStyle,
+      forceStrutHeight: true,
+    );
+    final contentPadding = const EdgeInsets.only(left: 8).add(widget.padding);
 
     final codeField = TextField(
       focusNode: _focusNode,
-      scrollPadding: widget.padding,
+      scrollPadding: EdgeInsets.zero,
       style: textStyle,
       smartDashesType: widget.smartDashesType,
       smartQuotesType: widget.smartQuotesType,
       controller: widget.controller,
+      strutStyle: lineStrutStyle,
+      textAlignVertical: TextAlignVertical.top,
       undoController: widget.undoController,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
@@ -436,7 +441,7 @@ class _CodeFieldState extends State<CodeField> {
       scrollController: _codeScroll,
       decoration: const InputDecoration(
         isCollapsed: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 16),
+        contentPadding: EdgeInsets.zero,
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
@@ -468,7 +473,7 @@ class _CodeFieldState extends State<CodeField> {
         decoration: widget.decoration,
         color: _backgroundCol,
         key: _codeFieldKey,
-        padding: const EdgeInsets.only(left: 8),
+        padding: contentPadding,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -490,6 +495,7 @@ class _CodeFieldState extends State<CodeField> {
       color: lineNumberColor,
       fontFamily: textStyle.fontFamily,
       fontSize: lineNumberSize,
+      height: textStyle.height,
     );
 
     final gutterStyle = widget.gutterStyle.copyWith(
@@ -540,7 +546,7 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   double _getCaretHeight(TextPainter textPainter) {
-    final double? caretFullHeight = textPainter.getFullHeightForCaret(
+    final double caretFullHeight = textPainter.getFullHeightForCaret(
       widget.controller.selection.base,
       Rect.zero,
     );
@@ -550,7 +556,6 @@ class _CodeFieldState extends State<CodeField> {
   double _getPopupLeftOffset(TextPainter textPainter) {
     return max(
       _getCaretOffset(textPainter).dx +
-          widget.padding.left -
           _horizontalCodeScroll!.offset +
           (_editorOffset?.dx ?? 0),
       0,
@@ -561,8 +566,6 @@ class _CodeFieldState extends State<CodeField> {
     return max(
       _getCaretOffset(textPainter).dy +
           caretHeight +
-          16 +
-          widget.padding.top -
           _codeScroll!.offset +
           (_editorOffset?.dy ?? 0),
       0,
@@ -603,7 +606,7 @@ class _CodeFieldState extends State<CodeField> {
 
   OverlayEntry _buildSearchOverlay() {
     final colorScheme = Theme.of(context).colorScheme;
-    final borderColor = _getTextColorFromTheme() ?? colorScheme.onBackground;
+    final borderColor = _getTextColorFromTheme() ?? colorScheme.onSurface;
     return OverlayEntry(
       builder: (context) {
         return Positioned(
