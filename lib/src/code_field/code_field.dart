@@ -173,6 +173,7 @@ class CodeField extends StatefulWidget {
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
+  final TextDirection? textDirection;
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
 
@@ -196,6 +197,7 @@ class CodeField extends StatefulWidget {
     this.smartQuotesType = SmartQuotesType.disabled,
     this.padding = EdgeInsets.zero,
     GutterStyle? gutterStyle,
+    this.textDirection,
     this.enabled,
     this.readOnly = false,
     this.cursorColor,
@@ -234,7 +236,7 @@ class _CodeFieldState extends State<CodeField> {
 
   FocusNode? _focusNode;
   String? lines;
-  String longestLine = '';
+  var longestLine = '';
   Size? windowSize;
   late TextStyle textStyle;
   Color? _backgroundCol;
@@ -434,6 +436,7 @@ class _CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _codeScroll,
+      textDirection: widget.textDirection ?? Directionality.of(context),
       decoration: const InputDecoration(
         isCollapsed: true,
         contentPadding: EdgeInsets.symmetric(vertical: 16),
@@ -464,17 +467,20 @@ class _CodeFieldState extends State<CodeField> {
     return FocusableActionDetector(
       actions: widget.controller.actions,
       shortcuts: _shortcuts,
-      child: Container(
-        decoration: widget.decoration,
-        color: _backgroundCol,
-        key: _codeFieldKey,
-        padding: const EdgeInsets.only(left: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.gutterStyle.showGutter) _buildGutter(),
-            Expanded(key: _editorKey, child: editingField),
-          ],
+      child: Directionality(
+        textDirection: widget.textDirection ?? Directionality.of(context),
+        child: Container(
+          padding: const EdgeInsetsDirectional.only(start: 8),
+          decoration: widget.decoration,
+          color: _backgroundCol,
+          key: _codeFieldKey,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.gutterStyle.showGutter) _buildGutter(),
+              Expanded(key: _editorKey, child: editingField),
+            ],
+          ),
         ),
       ),
     );
@@ -540,11 +546,11 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   double _getCaretHeight(TextPainter textPainter) {
-    final double? caretFullHeight = textPainter.getFullHeightForCaret(
+    final double caretFullHeight = textPainter.getFullHeightForCaret(
       widget.controller.selection.base,
       Rect.zero,
     );
-    return caretFullHeight ?? 0;
+    return caretFullHeight;
   }
 
   double _getPopupLeftOffset(TextPainter textPainter) {
@@ -603,7 +609,7 @@ class _CodeFieldState extends State<CodeField> {
 
   OverlayEntry _buildSearchOverlay() {
     final colorScheme = Theme.of(context).colorScheme;
-    final borderColor = _getTextColorFromTheme() ?? colorScheme.onBackground;
+    final borderColor = _getTextColorFromTheme() ?? colorScheme.onSurface;
     return OverlayEntry(
       builder: (context) {
         return Positioned(
